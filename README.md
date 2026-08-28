@@ -36,6 +36,7 @@ src/
   styles/
     01..13-*.css      the original stylesheet, split at its own banners
     14-refactor.css   the one rule the DOM-shuffle used to do imperatively
+    15-demo.css       the rebuilt app screens
   lib/
     schedule.ts       THE STAGE SCHEDULE — band weights, scrubT, yForT, feel dials
     math.ts           the easing vocabulary
@@ -54,7 +55,9 @@ src/
                       useKeplerProbe · useSqueezeItalics
   components/
     stage/            Stage · Hero · Lockup · StepDots · GradientField
-    stage/phone/      the demo app: four screens + chrome + token picker
+    stage/phone/      the demo app: four autoplaying screens + chrome
+    stage/phone/ui/   Sheet · Keypad · ProgressList · FieldRow · Chart
+    stage/phone/flows/ the scripts, and the player that walks them
     light/            marquee · security · faq · final CTA · footer
     marks/            vector marks lifted verbatim
 ```
@@ -113,6 +116,78 @@ they belong:
 
 A media-query listener that moves nodes has to re-run on every resize and
 invalidates the engine's cached child lists. A breakpoint does not.
+
+---
+
+## The demo screens
+
+The four screens inside the phone shell are rebuilt against the real near.com
+app — recordings of Perps, Swap, Earn and Universal Send — and they **autoplay**.
+Each card runs its own scripted flow, and only while that card is the landed one
+on stage.
+
+| Card | Flow |
+|---|---|
+| Perps | Size a long, set a stop loss the form refuses, fix it, open the position. Live candle chart with an entry line. |
+| Account | Universal Send, funded from the **Earn vault** — the sentence the copy makes, happening. |
+| Swap | Token sheet with search, then `Finding best price → Executing trade → Trade complete`. |
+| Earn | Vault list, the vault's fees, Use max, and a deposit that settles. |
+
+### A flow is a script, not an animation
+
+`flows/player.ts` walks an ordered list of beats, each with a duration and a
+patch. The state at any moment is `initial` plus every patch up to the current
+beat — so a flow is a pure function of elapsed time, scrubbable and impossible to
+desync. Same shape as the stage engine one level up, for the same reason.
+
+**The beat index is the only thing that re-renders.** Anything that has to move
+continuously — the candle chart, the live price, a progress ring — runs on its
+own rAF inside the component that draws it. A script with a beat per keystroke
+needs no sub-beat progress at all, which is why the keypad can light one key per
+digit without React seeing a frame.
+
+`prefers-reduced-motion` gets one frame per card — the beat named `restFrame` —
+and no loop.
+
+### Why the stop loss is wrong on purpose
+
+The Perps flow types a stop loss above the entry price, watches `Open long` turn
+grey and read `Review stop loss`, and then corrects it. A form that only ever
+succeeds shows nothing about the product; the refusal is the moment the screen
+stops looking like a picture of an app.
+
+### The chart is canvas, not a charting library
+
+At 320px inside a phone shell there is no crosshair to hit, no axis to zoom and
+no dataset to stream. Everything a library buys costs ~45KB here and buys
+nothing. The series is a seeded walk, so every reader sees the same chart and a
+screenshot taken in CI matches one taken by hand. Only the last candle is live.
+
+### Two structural notes
+
+**Sheets are portalled.** `.sheet` is `inset:0` on its positioned ancestor, and
+a sheet that stops at the content area — leaving the header and the tab bar
+showing — reads as a panel rather than a layer. The faces are inset inside
+`.cswap`, so a sheet written where it belongs would do exactly that.
+`ui/SheetSlot.tsx` keeps the JSX next to the flow that drives it and the DOM node
+where the CSS needs it.
+
+**Compaction is a container query, not a media query.** The shell is ~696px in a
+desktop column and ~430px once the lockup stacks — about 309px of content under
+the header and the tab bar. The phone is a column inside a grid, so its height
+and the window's have never been the same number. `container-type: size` is safe
+on `.morph` precisely because its height is an explicit value the stage engine
+writes and its width comes from the grid: nothing about that box is derived from
+its contents. Below 560px the keypad goes entirely — it is 150 of those 309px,
+and the blinking caret already says "this is being typed" for free.
+
+### Nothing here takes a pointer
+
+The screens are a readout. There are no `:hover` or `:active` rules in
+`15-demo.css` on purpose — a control that lights up under a cursor it will never
+receive is a promise the tour does not keep. `.tokenmenu` in the ported sheet is
+now unreferenced for the same reason; it is left in place because those files are
+verbatim and their value is that they stay that way.
 
 ---
 

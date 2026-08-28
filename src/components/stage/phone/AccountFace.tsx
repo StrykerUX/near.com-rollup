@@ -1,104 +1,118 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { IconEye, IconReceive, IconSend } from './icons';
+import { findToken } from '@/lib/tokens';
+import { useFlow } from './flows/player';
+import { accountScript, type AccountState } from './flows/account';
+import { FieldRow } from './ui/FieldRow';
+import { Keypad } from './ui/Keypad';
+import { TokenDot } from './TokenDot';
+import { IconReceive, IconSend } from './icons';
+
+const ZEC = findToken('ZEC');
+const NEAR = findToken('NEAR');
 
 const BALANCES = [
-  { name: 'Crypto & stocks', value: '$3,190.00' },
-  { name: 'Perps', value: '$740.00' },
-  { name: 'Earn', value: '$1,070.00' },
+  { name: 'Crypto', value: '$6,806.76', note: 'NEAR, USDC', tone: 'plain' as const },
+  { name: 'Perps', value: '$1,075.98', note: '+$5.1 unrealized P&L', tone: 'up' as const },
+  { name: 'Earn', value: '$2,347.81', note: '5.1% blended APY', tone: 'info' as const },
 ];
-const TOTAL = '$5,000.00';
-const MASK = '••••••';
 
 /**
- * 1 · ACCOUNT — the app home screen.
- *
- * The eye masks every figure on the card at once. Real values live in this
- * module, never re-derived from the DOM, so unmasking cannot reformat them
- * differently from how they first rendered.
+ * 1 · ACCOUNT — the home screen, and the send it opens.
  */
 export function AccountFace() {
-  const [hidden, setHidden] = useState(false);
-  /* Micro-crossfade: 140ms out, swap, ease back. The figures keep their box —
-     tabular digits and bullets are near-identical width — so nothing shifts and
-     there is nothing to animate but opacity.
-     `armed` exists so the transition is only applied once the reader has asked
-     for one. Mounting with it in place is harmless; removing it in the same
-     commit that restores opacity is NOT, because the fade back in then has no
-     transition to run on and the figures snap. */
-  const [armed, setArmed] = useState(false);
-  const [fading, setFading] = useState(false);
-  const [action, setAction] = useState<'Receive' | 'Send'>('Send');
-  const timer = useRef(0);
-  useEffect(() => () => clearTimeout(timer.current), []);
+  const { state: s } = useFlow<AccountState>(1, accountScript);
 
-  const toggle = () => {
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      setHidden((h) => !h);
-      return;
-    }
-    setArmed(true);
-    setFading(true);
-    clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => {
-      setHidden((h) => !h);
-      setFading(false);
-    }, 150);
-  };
+  if (s.screen === 'home') {
+    return (
+      <div className="face aface" data-face="0">
+        <div className="totrow">
+          <span className="klabel">Total balance</span>
+        </div>
+        <div className="kbig">$10,230.56</div>
 
-  const fig = (v: string) => (hidden ? MASK : v);
-  const figStyle = armed
-    ? { opacity: fading ? 0 : 1, transition: 'opacity 140ms var(--ease-out)' }
-    : undefined;
+        <div className="seg" role="group" aria-label="Account actions">
+          <span className="segb"><IconReceive />Receive</span>
+          <span className="segb"><IconSend />Send</span>
+        </div>
 
-  return (
-    <div className="face" data-face="0">
-      <div className="totrow">
-        <span className="klabel">Total balance</span>
-        <button
-          className="eye"
-          type="button"
-          aria-pressed={hidden}
-          aria-label={hidden ? 'Show balances' : 'Hide balances'}
-          onClick={toggle}
-        >
-          <IconEye />
-        </button>
-      </div>
-      <div className="kbig" data-fig style={figStyle}>{fig(TOTAL)}</div>
-
-      <div className="seg" role="group" aria-label="Account actions">
-        <button
-          data-act="Receive"
-          aria-pressed={action === 'Receive'}
-          onClick={() => setAction('Receive')}
-        >
-          <IconReceive />Receive
-        </button>
-        <button
-          data-act="Send"
-          aria-pressed={action === 'Send'}
-          onClick={() => setAction('Send')}
-        >
-          <IconSend />Send
-        </button>
-      </div>
-
-      <div className="balgrp">
-        <span className="klabel">Balances</span>
-        <div className="ballist">
-          {BALANCES.map((b) => (
-            <button className="balrow" type="button" key={b.name}>
-              <span className="brt">
-                <span className="bn">{b.name}</span>
-                <span className="bar" aria-hidden="true">&rarr;</span>
-              </span>
-              <span className="bv" data-fig style={figStyle}>{fig(b.value)}</span>
-            </button>
-          ))}
+        <div className="balgrp">
+          <span className="klabel">Balances</span>
+          <div className="ballist">
+            {BALANCES.map((b) => (
+              <div className="balrow" key={b.name}>
+                <span className="brt">
+                  <span className="bn">{b.name}</span>
+                  <span className="bar" aria-hidden="true">&rarr;</span>
+                </span>
+                <span className="bv">{b.value}</span>
+                <span className={'bnote ' + b.tone}>{b.note}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+    );
+  }
+
+  /* The real app SCROLLS this form under the keypad: with the pad up, the
+     heading and the token/network rows are off the top and only the recipient,
+     the amount and the ask are in frame. Composing the two views beats an
+     overflow container — there is no scrollbar to inherit and no scroll
+     position to restore between loops. */
+  const packed = s.focus;
+
+  return (
+    <div className="face aface send" data-face="0">
+      {packed ? null : (
+        <>
+          <h3 className="usend">Universal Send</h3>
+          <p className="usub">Send any token to any network, pay with any asset you own.</p>
+        </>
+      )}
+
+      <div className="urows">
+        {packed ? null : (
+          <>
+            <FieldRow mark={<TokenDot token={ZEC} size={22} />} label="Token" value="ZEC" />
+            <FieldRow mark={<span className="unet" aria-hidden="true">Z</span>} label="Network" value="Zcash" />
+          </>
+        )}
+        <FieldRow mark={<span className="urec" aria-hidden="true">□</span>} label="Recipient" value="Select recipient" muted />
+      </div>
+
+      <div className={'uamt' + (s.focus ? ' focus' : '')}>
+        <b className={s.amount ? '' : 'ghost'}>
+          {s.amount || '0'} <i>ZEC</i>
+          {s.focus ? <span className="pcaret" /> : null}
+        </b>
+        <em>${s.amount ? (Number(s.amount) * ZEC.price).toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0.00'}</em>
+
+        <span className="upay">
+          <i className="upaylbl">Pay with</i>
+          <span className={'upayrow' + (s.swapping ? ' swapping' : '')}>
+            {s.payWith === 'NEAR' ? (
+              <>
+                <TokenDot token={NEAR} size={20} />
+                <b>NEAR</b>
+                <span className="upaybal"><i>Balance</i>3535.3148</span>
+              </>
+            ) : (
+              <>
+                <span className="vico" aria-hidden="true">$</span>
+                <b>Gauntlet USDC</b>
+                <span className="upaybal"><i>Yield vault</i>1,343.03</span>
+              </>
+            )}
+            <span className="vmax">Use max</span>
+          </span>
+        </span>
+      </div>
+
+      <button className={'ucta' + (s.amount ? '' : ' off')} type="button" tabIndex={-1}>
+        {s.amount ? 'Review send' : 'Enter amount'}
+      </button>
+
+      {s.focus ? <Keypad pressed={s.pressed} /> : null}
     </div>
   );
 }

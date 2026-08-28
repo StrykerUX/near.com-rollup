@@ -5,9 +5,8 @@ import { EarnFace } from './EarnFace';
 import { IconLock, IconScan } from './icons';
 import { PerpsFace } from './PerpsFace';
 import { SwapFace } from './SwapFace';
-import { SwapProvider } from './swapState';
 import { TabBar } from './TabBar';
-import { TokenMenu } from './TokenMenu';
+import { SheetSlotProvider } from './ui/SheetSlot';
 
 /**
  * The phone shell: one chrome, four screens.
@@ -18,18 +17,21 @@ import { TokenMenu } from './TokenMenu';
  *
  * The faces are authored in DISPLAY order (Perps, Account, Swap, Earn). Their
  * `data-face` attributes keep the ORIGINAL indices, because the stylesheet and
- * the demo-app wiring both select on them.
+ * the stage engine both select on them.
+ *
+ * Each face autoplays its own flow, and only while it is the card on stage —
+ * see flows/player.ts. Nothing in here takes a pointer.
  */
 export function PhoneShell() {
   return (
-    <SwapProvider>
-      <div className="morph" id="morph">
+    <div className="morph" id="morph">
+      <SheetSlotProvider>
         <div className="hhead">
           <span className="avatar" aria-hidden="true"><NearGlyph /></span>
           <span className="atitle">{CH_TITLES[0]}</span>
           <span className="hicons">
-            <button className="icb" type="button" aria-label="Scan"><IconScan /></button>
-            <button className="icb" type="button" aria-label="Locked"><IconLock /></button>
+            <span className="icb" aria-hidden="true"><IconScan /></span>
+            <span className="icb" aria-hidden="true"><IconLock /></span>
           </span>
         </div>
 
@@ -41,8 +43,7 @@ export function PhoneShell() {
         </div>
 
         <TabBar />
-        <TokenMenu />
-      </div>
-    </SwapProvider>
+      </SheetSlotProvider>
+    </div>
   );
 }

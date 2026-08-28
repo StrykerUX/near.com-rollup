@@ -6,7 +6,7 @@ import {
 import { clamp, easeShrink, lin, qblur, sm, sstep } from '@/lib/math';
 import { makeGradientField, fireRipple, stepRipple, RIP } from '@/gl/gradientField';
 import { makeVarWriter, sty } from './domCache';
-import { callCtaRearm, closeStageMenu } from './bus';
+import { callCtaRearm, setActiveFace } from './bus';
 
 /**
  * THE STAGE ENGINE
@@ -335,6 +335,11 @@ export function startStageEngine(): () => void {
     }
 
     syncInert();
+
+    /* Publish the landed card to the demo flows. Only a LANDED card counts:
+       mid-move both faces are in motion and neither owns the frame, and an
+       autoplay that restarts on every scroll wobble reads as a glitch. */
+    setActiveFace(!moving && onStage && curIdx >= 0 ? curIdx : -1);
   }
 
   /* ==================================================================
@@ -488,8 +493,6 @@ export function startStageEngine(): () => void {
     setVar('--card-o', live.toFixed(3));
     setVar('--card-s', (0.94 + live * 0.06).toFixed(4));
     lockEl!.classList.toggle('live', live > 0.6);
-    /* the picker cannot outlive the frame it belongs to */
-    if (live < 0.5) closeStageMenu();
   }
 
   /* ==================================================================
