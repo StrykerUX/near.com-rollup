@@ -1,12 +1,11 @@
 import type { Beat, Script } from './player';
 
 /**
- * PERPS — the longest flow, and the one the card's headline is about.
+ * PERPS — size a long, get the stop loss wrong, fix it, open the position.
  *
- * Fund the account, size a long, set a stop loss badly, watch the CTA refuse
- * it, fix it, open the position. The bad stop loss is deliberate: a form that
- * only ever succeeds shows nothing about the product, and "Stop loss must be
- * below entry price" is the moment this screen stops looking like a picture.
+ * The bad stop loss is deliberate: a form that only ever succeeds shows nothing
+ * about the product, and "Stop loss must be below entry price" is the moment
+ * this screen stops looking like a picture of an app.
  */
 export type PerpsState = {
   screen: 'flat' | 'ticket' | 'submitting' | 'position';
@@ -16,8 +15,9 @@ export type PerpsState = {
   protect: boolean;
   tp: string;
   sl: string;
-  /** which field the keypad is currently attached to */
+  /** which field the keypad is attached to */
   focus: 'amount' | 'tp' | 'sl' | null;
+  /** lights one key, so a filled field reads as typed rather than pasted */
   pressed: string | null;
   /** index into the submit checklist */
   step: number;
@@ -40,62 +40,32 @@ const initial: PerpsState = {
 export const ENTRY = 79654;
 export const SUBMIT_STEPS = ['Set leverage', 'Submit order'];
 
-/**
- * One beat per keystroke: a key lights, then the digit lands. Typing a whole
- * number in a single beat reads as a paste, and the keypad might as well not
- * be on screen.
- */
-function type(
-  field: 'amount' | 'tp' | 'sl',
-  digits: string,
-  from = '',
-  ms = 130,
-): Beat<PerpsState>[] {
-  const out: Beat<PerpsState>[] = [];
-  let acc = from;
-  for (const d of digits) {
-    acc += d;
-    out.push({ ms, set: { [field]: acc, pressed: d } as Partial<PerpsState> });
-    out.push({ ms: 60, set: { pressed: null } });
-  }
-  return out;
-}
-
 const beats: Beat<PerpsState>[] = [
-  /* the screen as you find it */
-  { ms: 1100, set: { screen: 'flat' } },
-  /* size the trade */
-  { ms: 520, set: { screen: 'ticket', focus: 'amount' } },
-  ...type('amount', '700'),
-  { ms: 700 },
-  /* leverage */
-  { ms: 620, set: { leverage: '20x' } },
-  /* opt into protection */
-  { ms: 560, set: { protect: true, focus: 'tp' } },
-  ...type('tp', '82000'),
-  { ms: 520, set: { focus: 'sl' } },
+  /* the market, as you find it */
+  { w: 4, set: { screen: 'flat' } },
+  /* sizing */
+  /* w:2, not 1 — a beat narrower than a wheel notch is a beat nobody sees,
+     and this one is the only thing that says the amount was typed */
+  { w: 2, set: { screen: 'ticket', focus: 'amount', amount: '7', pressed: '7' } },
+  { w: 3, set: { amount: '700', pressed: null } },
+  /* protection */
+  { w: 3, set: { protect: true, focus: 'tp', tp: '82000' } },
   /* the stop loss that will not do */
-  ...type('sl', '799'),
-  { ms: 1500 },
-  /* fix it */
-  { ms: 420, set: { sl: '' } },
-  ...type('sl', '79980'),
-  { ms: 900, set: { focus: null } },
+  { w: 3, set: { focus: 'sl', sl: '799' } },
+  { w: 3, set: { sl: '79980' } },
   /* submit */
-  { ms: 900, set: { screen: 'submitting', step: 0 } },
-  { ms: 1100, set: { step: 1 } },
-  { ms: 800, set: { step: 2 } },
-  /* live */
-  { ms: 3600, set: { screen: 'position' } },
-  { ms: 900, set: { screen: 'flat', amount: '', tp: '', sl: '', protect: false, step: 0 } },
+  { w: 2, set: { screen: 'submitting', focus: null, step: 0 } },
+  { w: 2, set: { step: 1 } },
+  { w: 1, set: { step: 2 } },
+  /* and it holds here while the card leaves */
+  { w: 5, set: { screen: 'position' } },
 ];
 
 export const perpsScript: Script<PerpsState> = {
   initial,
   beats,
-  /* Reduced motion gets the open position: it is the only frame that shows
-     both the chart and the outcome, and it holds still. */
-  restFrame: beats.length - 2,
+  /* the open position: the only frame with both the chart and the outcome */
+  restFrame: beats.length - 1,
 };
 
 /** A stop loss above the entry is the error the real app raises. */

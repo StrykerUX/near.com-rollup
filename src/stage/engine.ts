@@ -6,7 +6,7 @@ import {
 import { clamp, easeShrink, lin, qblur, sm, sstep } from '@/lib/math';
 import { makeGradientField, fireRipple, stepRipple, RIP } from '@/gl/gradientField';
 import { makeVarWriter, sty } from './domCache';
-import { callCtaRearm, setActiveFace } from './bus';
+import { callCtaRearm, setActiveFace, setStageProgress } from './bus';
 
 /**
  * THE STAGE ENGINE
@@ -563,6 +563,8 @@ export function startStageEngine(): () => void {
     /* The recede is one continuous ramp from the top of the page to the moment
        card 0 lands, off the same smoothed scroll as everything else. */
     heroOut = clamp(stagePS / Math.max(entryEnd(), 1e-6), 0, 1);
+    /* the demo screens scrub off the same smoothed position the cards do */
+    setStageProgress(stagePS);
     paintCards();
   }
 

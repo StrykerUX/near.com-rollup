@@ -55,9 +55,9 @@ src/
                       useKeplerProbe · useSqueezeItalics
   components/
     stage/            Stage · Hero · Lockup · StepDots · GradientField
-    stage/phone/      the demo app: four autoplaying screens + chrome
+    stage/phone/      the demo app: four scroll-scrubbed screens + chrome
     stage/phone/ui/   Sheet · Keypad · ProgressList · FieldRow · Chart
-    stage/phone/flows/ the scripts, and the player that walks them
+    stage/phone/flows/ the scripts, and the player that scrubs them
     light/            marquee · security · faq · final CTA · footer
     marks/            vector marks lifted verbatim
 ```
@@ -122,9 +122,8 @@ invalidates the engine's cached child lists. A breakpoint does not.
 ## The demo screens
 
 The four screens inside the phone shell are rebuilt against the real near.com
-app — recordings of Perps, Swap, Earn and Universal Send — and they **autoplay**.
-Each card runs its own scripted flow, and only while that card is the landed one
-on stage.
+app — recordings of Perps, Swap, Earn and Universal Send — and each one is
+**scrubbed by scroll**, per section.
 
 | Card | Flow |
 |---|---|
@@ -133,26 +132,37 @@ on stage.
 | Swap | Token sheet with search, then `Finding best price → Executing trade → Trade complete`. |
 | Earn | Vault list, the vault's fees, Use max, and a deposit that settles. |
 
-### A flow is a script, not an animation
+### A flow is a script, and scroll is its clock
 
-`flows/player.ts` walks an ordered list of beats, each with a duration and a
-patch. The state at any moment is `initial` plus every patch up to the current
-beat — so a flow is a pure function of elapsed time, scrubbable and impossible to
-desync. Same shape as the stage engine one level up, for the same reason.
+Each card owns a band of the stage — the dwell the reader is given to look at
+it — and its flow runs across exactly that band. Scroll into Perps and the order
+ticket fills in as you go. Keep scrolling and it holds finished while the card
+leaves. Scroll back up and it unwinds, because it is the same composition run
+backwards rather than a second animation with its own direction.
 
-**The beat index is the only thing that re-renders.** Anything that has to move
-continuously — the candle chart, the live price, a progress ring — runs on its
-own rAF inside the component that draws it. A script with a beat per keystroke
-needs no sub-beat progress at all, which is why the keypad can light one key per
-digit without React seeing a frame.
+That is the rule the stage engine one level up is built on, and the phone had no
+business keeping its own clock against it. `dwellT(p, k)` in `lib/schedule.ts`
+is the mapping; `flows/player.ts` walks the beats. Flows and cards read the same
+schedule, so retuning `W_REST` moves both.
 
-`prefers-reduced-motion` gets one frame per card — the beat named `restFrame` —
-and no loop.
+**A beat carries a weight, not a duration** — its share of the card's dwell. That
+share is the constraint the scripts are written against: a dwell is ~9% of the
+stage and one wheel notch is a fifth of it, so a script with a beat per keystroke
+would jump eighteen of them per notch and the typing would never be seen. Few,
+large, legible states; each one gets real scroll. Nothing below w:2, which is
+about one notch.
+
+**The beat index is the only thing that re-renders.** The one genuinely
+continuous element — the live candle — runs on its own rAF inside the component
+that draws it, and stops dead when its card is not the one on stage.
+
+`prefers-reduced-motion` gets one frame per card, the beat named `restFrame`,
+and no scrub at all.
 
 ### Why the stop loss is wrong on purpose
 
-The Perps flow types a stop loss above the entry price, watches `Open long` turn
-grey and read `Review stop loss`, and then corrects it. A form that only ever
+The Perps flow types a stop loss above the entry price, `Open long` turns grey
+and reads `Review stop loss`, and then it is corrected. A form that only ever
 succeeds shows nothing about the product; the refusal is the moment the screen
 stops looking like a picture of an app.
 

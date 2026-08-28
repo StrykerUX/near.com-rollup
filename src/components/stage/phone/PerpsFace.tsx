@@ -16,7 +16,7 @@ const MARKETS = ['BTC-USD', 'ETH-USD', 'SOL-USD', 'NEAR-USD'];
  * demo autoplays rather than waiting to be poked.
  */
 export function PerpsFace() {
-  const { state: s } = useFlow<PerpsState>(0, perpsScript);
+  const { state: s, live } = useFlow<PerpsState>(0, perpsScript);
   const badSl = slInvalid(s.sl);
   const keypadUp = s.focus !== null;
 
@@ -41,7 +41,7 @@ export function PerpsFace() {
             $79,670.5 <span className="pdelta up">+$56.50 +0.07%</span>
           </div>
           <div className="pchartwrap">
-            <Chart entry={s.screen === 'position' ? ENTRY : null} side="long" />
+            <Chart entry={s.screen === 'position' ? ENTRY : null} side="long" live={live} />
           </div>
           <div className="ptf"><span>1H</span><i>▾</i></div>
         </>

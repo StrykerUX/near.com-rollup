@@ -15,7 +15,7 @@ export type AccountState = {
   focus: boolean;
   /** which balance the send is funded from */
   payWith: 'NEAR' | 'vault';
-  /** lights the row while the source is being changed */
+  /** lights the row while the source is changing */
   swapping: boolean;
 };
 
@@ -28,32 +28,19 @@ const initial: AccountState = {
   swapping: false,
 };
 
-function type(digits: string, ms = 140): Beat<AccountState>[] {
-  const out: Beat<AccountState>[] = [];
-  let acc = '';
-  for (const d of digits) {
-    acc += d;
-    out.push({ ms, set: { amount: acc, pressed: d } });
-    out.push({ ms: 60, set: { pressed: null } });
-  }
-  return out;
-}
-
 const beats: Beat<AccountState>[] = [
-  { ms: 1800, set: { screen: 'home' } },
-  { ms: 900, set: { screen: 'send', focus: true } },
-  ...type('100'),
-  { ms: 1200 },
-  /* the switch */
-  { ms: 700, set: { swapping: true } },
-  { ms: 1900, set: { payWith: 'vault', swapping: false, focus: false } },
-  { ms: 2200 },
-  { ms: 800, set: { screen: 'home', amount: '', payWith: 'NEAR' } },
+  { w: 5, set: { screen: 'home' } },
+  /* w:2 — see the note in perps.ts: below that this beat is narrower than one
+     wheel notch and the typing is never seen */
+  { w: 2, set: { screen: 'send', focus: true, amount: '1', pressed: '1' } },
+  { w: 4, set: { amount: '100', pressed: null } },
+  { w: 1, set: { swapping: true } },
+  { w: 7, set: { payWith: 'vault', swapping: false, focus: false } },
 ];
 
 export const accountScript: Script<AccountState> = {
   initial,
   beats,
   /* the send funded from the vault — the one frame that carries the claim */
-  restFrame: beats.length - 2,
+  restFrame: beats.length - 1,
 };

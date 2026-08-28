@@ -64,9 +64,16 @@ export type ChartProps = {
   entry?: number | null;
   /** 'long' tints the entry chip; null hides the position marker */
   side?: 'long' | 'short' | null;
+  /**
+   * The market only ticks while its card is on stage. Everything else on this
+   * page is a function of scroll; the live candle is the one thing that is
+   * genuinely continuous, so it is also the one thing that has to be switched
+   * off when nobody is looking at it.
+   */
+  live?: boolean;
 };
 
-export function Chart({ entry = null, side = null }: ChartProps) {
+export function Chart({ entry = null, side = null, live = true }: ChartProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   /* The draw loop reads these every frame but must not re-subscribe when they
      change — mirroring them into a ref from an effect keeps the rAF stable and
@@ -193,7 +200,7 @@ export function Chart({ entry = null, side = null }: ChartProps) {
         chip(ctx, w - 50, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F');
       }
 
-      raf = requestAnimationFrame(draw);
+      if (live) raf = requestAnimationFrame(draw);
     };
 
     raf = requestAnimationFrame(draw);
@@ -203,7 +210,9 @@ export function Chart({ entry = null, side = null }: ChartProps) {
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, []);
+    /* re-subscribing on `live` is the point: the loop stops dead when the card
+       leaves and starts again from a fresh clock when it comes back */
+  }, [live]);
 
   return <canvas className="pchart" ref={ref} aria-hidden="true" />;
 }
