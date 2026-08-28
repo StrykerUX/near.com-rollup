@@ -1,0 +1,212 @@
+/* ==========================================================================
+   v04 CONVERSION PASS
+   ========================================================================== */
+
+/* --- hero call to action ------------------------------------------------ */
+/* Rides --cue-out, the same 0->1 the scroll cue uses, so the button recedes on
+   the identical curve as the type above it. One variable, two elements, no
+   second clock to keep in sync. */
+.herocta{
+  /* opened up once the card peek dropped to 240px. The button needs air above
+     it more than the stats need air below, so the headline gap grows most. */
+  margin-top:clamp(34px,4.8vh,62px);
+  display:flex;flex-direction:column;align-items:center;gap:19px;
+  opacity:calc(1 - var(--cue-out,0));
+  transform:translate3d(0,calc(var(--cue-out,0) * 18px),0);
+  will-change:opacity,transform;
+}
+.herocta .friction{
+  margin:0;font-family:var(--font-body);font-size:.95rem;font-weight:400;
+  color:rgba(255,255,255,.72);letter-spacing:.005em;
+  text-shadow:0 1px 20px rgba(0,0,0,.4);
+}
+.hstats{
+  margin:clamp(38px,6.4vh,82px) 0 0;padding:0;
+  /* inline-grid with equal auto columns: each stat gets the width of the
+     widest one, so the three read as a measured row rather than as three
+     items sized by how long their labels happen to be. Shrinks to content
+     and centres, which a 3-column fr grid on the full width would not. */
+  display:inline-grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+  gap:clamp(18px,3vw,40px);
+  /* OPTICAL CENTRE. Equal columns centre the BOX, but the three stats do not
+     carry equal ink: "$25B+ / via Intents" is the widest pair and it sits
+     last, so the row's visual mass lands right of the card's axis below it.
+     Measured at 1440: box centre 720, ink centre 729 before the nudge. 0.48em
+     lands it on the axis; in em so it tracks the type, not the viewport. */
+  transform:translateX(-0.48em);
+}
+.hstats div{display:flex;flex-direction:column;align-items:center;gap:2px}
+.hstats dt{
+  font-family:var(--font-display,var(--font-body));
+  font-size:clamp(1.15rem,1.8vw,1.6rem);font-weight:500;color:#fff;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  text-shadow:0 1px 22px rgba(0,0,0,.42);
+}
+.hstats dd{
+  margin:0;font-family:var(--font-mono,var(--font-body));
+  font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;
+  /* .60 measured 3.91:1 worst case against the gradient under the glyphs,
+     short of the 4.5:1 that 10.5px text needs. .78 measures 5.6:1.
+     (.friction stays at .72 — measured 5.01:1, it already clears.) */
+  color:rgba(255,255,255,.78);
+}
+/* Below the fold on short screens the stat bar is the first thing to go: the
+   button and the friction line are what convert, the numbers only support. */
+@media(max-height:720px){ .hstats{display:none} }
+@media(max-width:600px){
+  /* all three fit at 390 now that the first label is "via Intents" */
+  .hstats{gap:16px}
+  .herocta .friction{font-size:.88rem}
+}
+
+/* --- testimonial grid --------------------------------------------------- */
+/* Was a moving marquee. The cards are unchanged; only the container is new,
+   so .qcard's fixed 27rem width has to be released back to the grid. */
+
+/* --- tablet: keep the three-column lockup ------------------------------- */
+/* Below 1081 the lockup collapsed to one column and stacked the copy under a
+   short phone. On a tablet there is width for the desktop composition, so it
+   is restored from 768 up and only the proportions change: a narrower shell,
+   smaller side type, tighter gutters. Everything here has to out-specify the
+   max-width:1080 block above, including its !important alignment reset. */
+@media(min-width:800px) and (max-width:1080px){
+  .lockup{
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+    justify-items:stretch;
+    gap:clamp(12px,2vw,26px);
+    padding:64px var(--gut) 34px;
+  }
+  /* .side .face is absolutely positioned, so the column needs its own height
+     back. The stacked rule pinned it to 150/142px and clipped the overflow. */
+  .side{min-height:220px;height:auto;width:auto;max-width:none;overflow:visible}
+  .side.l,.side.r{height:auto}
+  .side.l .face{align-items:flex-end !important;text-align:right !important}
+  .side.r .face{align-items:flex-start !important;text-align:left !important}
+  .side h2,.permcopy h2{font-size:clamp(1.45rem,3.5vw,2.35rem)}
+  .side h2{max-width:13ch}
+  .side h2.stack{max-width:none;font-size:clamp(1.45rem,3.5vw,2.35rem)}
+  .side p{max-width:28ch;font-size:.9375rem;line-height:1.45}
+  .side .btn{font-size:.875rem;padding:8px 16px}
+  /* 300px is the floor. The card interior is laid out for ~348 and tolerates
+     300; below that the swap amounts wrap mid-number ("400" breaking to "40 / 0")
+     and the balance rows crush. So the shell gives up 48px and no more, and the
+     three-column range starts at 800 rather than 768 because that is the width
+     at which the two side columns are still worth reading. Under 800 the
+     stacked layout is the better composition anyway. */
+  .morph{width:300px}
+  /* the shell lost 48px of width, so the one piece of card type that is sized
+     to fill it has to come down with it, or a long quote wraps mid-number. */
+  .swamt{font-size:1.5rem}
+  /* the icon field goes back to the desktop full-height behaviour: with copy
+     beside the phone rather than beneath it, nothing needs the middle band */
+  /* cap 150 means the shell is full height wherever the viewport allows it
+     (696px needs 846px of height) and shrinks only when it genuinely cannot
+     fit, which is tablet landscape. */
+  :root{--m-h0-cap:150px}
+}
+
+/* --- one phone aspect on desktop and tablet ----------------------------- */
+/* The shell used to be a fixed WIDTH with a height that moved: 348x696 when
+   the viewport allowed it, but 300x618 in tablet landscape and shorter again
+   on a short desktop. Three different rectangles calling themselves the same
+   phone. It is now a single 1:2 rectangle from 800px up, matching what the
+   base path had always been (696 tall against 348 wide). The old 9/19.5 was
+   a real iPhone aspect but it made desktop 8% taller than every other
+   breakpoint's version of the same shell.
+   Height stays the driver because it is what the viewport actually constrains
+   (--m-h0 is capped by --m-h0-cap and animated by paintCards); width follows
+   from the ratio, so the shell can shrink to fit a short viewport without ever
+   changing shape. */
+@media(min-width:800px){
+  .morph{
+    aspect-ratio:1 / 2;
+    height:var(--m-h0);
+    width:auto;
+  }
+}
+
+/* --- scroll-step rail --------------------------------------------------- */
+/* Sits in the sticky stage, so it lives and dies with the card sequence. */
+/* Two elements on purpose. .stepdots is a full-bleed layer sharing .grad's
+   exact box, and carries the IDENTICAL clip-path, so when the gradient's
+   bounding box contracts into the CTA plate it wipes the rail away with it —
+   the dots are cut off by the same shrinking edge, not faded out on a separate
+   clock. Insets in a clip-path are relative to the element's own border box,
+   which is the whole reason the rail could not carry this itself. */
+.stepdots{
+  position:absolute;inset:0;z-index:6;pointer-events:none;
+  clip-path:inset(var(--ci-t) var(--ci-r) var(--ci-b) var(--ci-l) round var(--ci-rad));
+}
+.sdrail{
+  position:absolute;left:clamp(18px,2.6vw,42px);top:50%;
+  transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:17px;
+  opacity:0;pointer-events:none;
+  transition:opacity var(--dur-slow) var(--ease-out);
+}
+/* The rail is an orientation aid, not a control surface. It sits back at .62
+   and comes up only when pointed at, so it never competes with the card. */
+.stepdots.on .sdrail{
+  /* --shr is the eased shrink, 0 while the gradient is full-bleed and 1 once
+     it has closed into the plate. The rail dissolves on that same curve, so
+     the box closing is what takes the dots, not a timer of their own. */
+  opacity:calc(.62 * (1 - var(--shr, 0)));
+  pointer-events:auto;
+}
+.stepdots.on .sdrail:hover{opacity:calc(1 - var(--shr, 0))}
+/* the spine runs behind the dots and is what makes four marks read as one
+   sequence rather than four unrelated points */
+.sdrail .spine{
+  position:absolute;left:3px;top:3px;bottom:3px;width:1px;
+  background:rgba(255,255,255,.13);
+}
+.sdrail button{
+  position:relative;display:flex;align-items:center;gap:12px;
+  padding:0;background:none;border:0;cursor:pointer;color:#fff;
+}
+.sdrail .dot{
+  width:7px;height:7px;border-radius:50%;flex:none;
+  background:transparent;
+  border:1px solid rgba(255,255,255,.34);
+  transition:background-color var(--dur) var(--ease-out),border-color var(--dur) var(--ease-out),transform var(--dur) var(--ease-out);
+}
+.sdrail .lbl{
+  font-family:var(--font-mono,var(--font-body));
+  font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:rgba(255,255,255,.82);
+  opacity:0;transform:translateX(-6px);
+  transition:opacity var(--dur) var(--ease-out),transform var(--dur) var(--ease-out);
+  text-shadow:0 1px 14px rgba(0,0,0,.5);
+  white-space:nowrap;
+}
+/* passed steps read as filled, the current one as the brand mark, and only the
+   current one is labelled — four labels at once would compete with the card */
+.sdrail button.done .dot{background:rgba(255,255,255,.5);border-color:transparent}
+/* No halo, no brand green at full strength, and a much smaller size step. The
+   active mark only has to be findable, not announced. */
+.sdrail button.now .dot{
+  background:rgba(0,236,151,.9);border-color:transparent;transform:scale(1.25);
+}
+/* Labels are hover/focus only. Showing the active one permanently put it
+   straight into the left edge of the card headline at 1440 — the rail lives in
+   the gutter, and the gutter is not wide enough for a word. The active dot is
+   already unambiguous by colour and size. */
+.stepdots button:hover .lbl,
+.stepdots button:focus-visible .lbl{opacity:1;transform:none}
+.sdrail button:hover .dot{border-color:#fff}
+/* the rail needs the left gutter the stacked layout does not have */
+@media(max-width:799px){ .stepdots{display:none} }
+@media(prefers-reduced-motion:reduce){
+  .stepdots,.stepdots .dot,.sdrail .lbl{transition:none}
+}
+
+/* --- short desktop: the shell narrows, so its widest type follows --------- */
+/* With the aspect locked, a short viewport shrinks the shell by HEIGHT and the
+   width comes down with it. Below ~310px of shell the perps tab row and the
+   swap amounts no longer fit at full size. */
+@media(min-width:1081px) and (max-height:880px){
+  .swamt{font-size:1.5rem}
+  .ptabs{gap:13px}
+  .pt{font-size:.8125rem}
+}
+

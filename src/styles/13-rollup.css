@@ -1,0 +1,585 @@
+/* =========================================================================
+   v06 ROLLUP LAYOUT — copy left, phone hard right, Perps landed at scroll 0
+   ========================================================================= */
+/* The stage opens as the hero, so the centred headline block that used to
+   introduce it has no job left. */
+.herotype{display:none !important}
+
+.lockup{
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"brow phone" "head phone" "body phone" "cta phone";
+  align-content:center;
+  gap:0 clamp(28px,4.2vw,76px);
+  padding:96px var(--gut) 56px;
+}
+.rollbrow{grid-area:brow}
+.side.l  {grid-area:head}
+.side.r  {grid-area:body}
+.rollcta {grid-area:cta}
+.morph   {grid-area:phone;align-self:center}
+
+/* both columns now read left-to-right against the phone on the right */
+.side.l .face{align-items:flex-start;text-align:left}
+.side.r .face{align-items:flex-start;text-align:left}
+.side.l{min-height:190px}
+.side.r{min-height:156px}
+/* The locked line is three clauses, not a three-word headline. At the homepage
+   h1 size it ran to four lines and overflowed the absolutely-positioned face
+   into the body copy. Smaller and wider is the fix: the line has to read as
+   one thought, and it cannot do that if it wraps mid-clause. */
+.side.l h2{
+  font-size:clamp(1.85rem,2.85vw,2.55rem);
+  line-height:1.1;letter-spacing:-.022em;max-width:24ch;
+}
+.side.r p{max-width:42ch}
+
+/* --- co-brand eyebrow ---------------------------------------------------
+   Both marks are ALPHA MASKS tinted in CSS, not baked images. That is what
+   lets The Rollup's wordmark take the same copper the shader is throwing:
+   one light source, falling on both brands. */
+.rollbrow{display:flex;align-items:center;gap:14px;margin-bottom:26px;opacity:.92}
+.rollbrow .nearw{font-family:var(--font-display,inherit);font-weight:600;
+  font-size:22px;letter-spacing:-.03em;color:#fff;line-height:1}
+.rollbrow .x{width:11px;height:11px;opacity:.5;flex:none}
+.rollbrow .x svg{display:block;width:100%;height:100%}
+.rollbrow .rollw{
+  width:132px;height:23.6px;flex:none;
+  background:linear-gradient(96deg,#FFFFFF 0%,#FFE9D6 46%,#E8A470 100%);
+  -webkit-mask:var(--rollw-src) center/contain no-repeat;
+          mask:var(--rollw-src) center/contain no-repeat;
+}
+
+/* --- persistent CTA block ----------------------------------------------
+   The tour never carried a CTA. On a page whose only job is signups that was
+   the single worst thing about inheriting this layout, so the button lives in
+   the left column and never leaves. */
+.rollcta{margin-top:18px;pointer-events:auto;display:flex;flex-direction:column;
+  align-items:flex-start;gap:0}
+.rollcta .offer{
+  font-family:var(--font-mono,var(--font-body));font-size:12.5px;letter-spacing:.02em;
+  color:#E8A470;margin:0 0 16px;line-height:1.45;
+}
+.rollcta .offer b{color:#FFD9B8;font-weight:500}
+.rollcta .friction{margin:12px 0 0;font-size:var(--fs-body-sm);color:rgba(255,255,255,.72)}
+.rollcta .rdisc{margin:14px 0 0;font-size:11.5px;line-height:1.5;
+  color:rgba(255,255,255,.46);max-width:44ch}
+.rollstats{display:flex;gap:clamp(20px,2.4vw,38px);margin:24px 0 0;padding:0;list-style:none}
+.rollstats div{display:flex;flex-direction:column;gap:3px}
+.rollstats dt{font-family:var(--font-mono,var(--font-body));font-size:1.35rem;
+  font-weight:500;color:#fff;line-height:1;letter-spacing:-.01em}
+.rollstats dd{margin:0;font-family:var(--font-mono,var(--font-body));font-size:10px;
+  letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.78)}
+
+/* --- THE COPPER LIGHT --------------------------------------------------
+   The palette alone could not carry this. The shader's top stops are only
+   reached at the very brightest points of the noise, so a copper highlight
+   sitting at stop 5 barely appeared, and pushing copper further down the ramp
+   put the midtones back in the olive band the palette test was built to avoid.
+   So the connection is made with an actual second light instead: one warm
+   source, screened over the green field, placed where the shader is already
+   brightest so it reads as the same light warmed rather than a sticker. */
+.grad::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:
+    radial-gradient(56% 44% at 79% 6%,  rgba(240,178,124,.62), rgba(232,164,112,.20) 44%, transparent 72%),
+    radial-gradient(40% 34% at 96% 40%, rgba(228,150,96,.34),  transparent 66%);
+  mix-blend-mode:screen;
+}
+
+/* --- the mark as an object in the field --------------------------------
+   Not a logo pasted in a corner. It is cut out of the same light the field is
+   made of, sitting behind the phone, cropped by the frame like a real object. */
+.rollmark{
+  position:absolute;z-index:1;pointer-events:none;
+  right:-9%;top:-19%;width:min(48vw,620px);aspect-ratio:1;
+  background:linear-gradient(150deg,#FFE2C6 0%,#E8A470 34%,#B4713F 58%,#2C6B55 88%);
+  -webkit-mask:var(--rollmark-src) center/contain no-repeat;
+          mask:var(--rollmark-src) center/contain no-repeat;
+  opacity:.22;
+  filter:blur(.4px);
+}
+
+@media(max-width:1080px){
+  .lockup{
+    grid-template-columns:1fr;
+    grid-template-areas:"brow" "phone" "head" "body" "cta";
+    justify-items:start;gap:0;
+    padding:78px var(--gut) 40px;
+  }
+  .morph{justify-self:center;margin-bottom:22px}
+  .rollmark{right:-24%;top:-6%;width:min(72vw,480px);opacity:.16}
+  .side.l h2{max-width:22ch;font-size:clamp(1.6rem,4.6vw,2.1rem)}
+  .side.r p{max-width:none}
+}
+/* On a 390px screen there is no "right side", and brow + phone + headline +
+   body + CTA does not fit in 844px at any honest type size. So the shell gets
+   shorter here and the button moves into the fixed bar this build already
+   carries, which is on screen for the whole scroll anyway. */
+@media(max-width:1080px){
+  /* the lockup is inset:0 inside a sticky stage, so content taller than the
+     viewport centres and spills off BOTH edges — which is how the eyebrow
+     ended up above the top of the screen. Start-aligned, it spills only
+     downward, where the shorter shell leaves room. */
+  .lockup{align-content:start}
+  .lockup .side.l .face,.lockup .side.r .face{align-items:flex-start !important;text-align:left !important}
+  .lockup .side h2,.lockup .side p{text-align:left !important;margin-left:0;margin-right:auto}
+}
+@media(max-width:640px){
+  :root{--m-h:430px}
+  .lockup{padding:70px var(--gut) 28px}
+  .side.l{min-height:132px}
+  .side.r{min-height:126px}
+  .side.l h2{font-size:clamp(1.45rem,5.4vw,1.9rem)}
+  .side.r p{font-size:.94rem;line-height:1.5}
+  .rollbrow{margin-bottom:16px}
+  .rollbrow .nearw{font-size:18px}
+  .rollbrow .rollw{width:108px;height:19.3px}
+  .rollcta{margin-top:12px}
+  .rollcta .btn,.rollcta .friction{display:none}   /* the fixed bar carries it */
+  .rollcta .offer{margin-bottom:10px;font-size:11.5px}
+  .rollstats{margin-top:14px;gap:18px}
+  .rollstats dt{font-size:1.1rem}
+  .rdisc{font-size:10.5px !important;max-width:none !important}
+}
+
+/* =========================================================================
+   v06.1 — STILL FIELD, BALANCED FRAME, REAL LOCKUP
+   ========================================================================= */
+
+/* --- 1. the field stops moving -----------------------------------------
+   The shader still draws (the closing shrink needs redraws), but its clock
+   and its pointer are frozen, so the composition is a still image that can
+   still be clipped. Darker overall: this page is a frame around a lockup and
+   a phone, not a light show. */
+.grad{background:#02100C}
+.gcss{opacity:.92 !important}
+#gl{filter:saturate(.86) brightness(.72) contrast(1.04)}
+.grad::before{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(163deg,rgba(2,14,10,.30) 0%,rgba(2,12,9,.58) 52%,rgba(1,9,7,.80) 100%);
+}
+.grad::after{
+  background:
+    radial-gradient(52% 40% at 80% 5%, rgba(226,160,110,.40), rgba(220,150,102,.13) 46%, transparent 74%),
+    radial-gradient(38% 30% at 97% 38%, rgba(214,138,88,.22), transparent 68%);
+}
+
+/* --- 2. the frame ------------------------------------------------------
+   Reference set (OKX, Kraken, Revolut Business on Mobbin) all hold their
+   content inside the middle ~72% with real air on both flanks. This build
+   ran copy to the left gutter and the phone to the right one, so the frame
+   read as two things pushed apart rather than one composition. */
+.lockup{
+  max-width:1220px;margin-inline:auto;
+  grid-template-columns:minmax(0,1.02fr) auto;
+  gap:0 clamp(40px,5vw,96px);
+  padding:96px clamp(28px,4vw,64px) 56px;
+}
+
+/* --- 3. the lockup -----------------------------------------------------
+   The ask was a real co-brand, not two logos in a row. The contrast IS the
+   idea: NEAR flat and typographic, The Rollup rendered and dimensional, one
+   hairline holding them together. The 3D mark is generated from The Rollup's
+   own silhouette, lit to match this page's copper key. */
+.rollbrow{
+  display:flex;align-items:center;gap:clamp(14px,1.5vw,22px);
+  margin-bottom:clamp(26px,3vh,40px);opacity:1;
+}
+.rollbrow .nearw{
+  font-family:var(--font-display,inherit);font-weight:600;
+  font-size:clamp(26px,2.2vw,32px);letter-spacing:-.035em;color:#fff;line-height:1;
+}
+.rollbrow .rule{width:1px;height:34px;background:linear-gradient(180deg,
+  transparent,rgba(255,255,255,.34) 22%,rgba(232,164,112,.55) 78%,transparent);flex:none}
+.rollbrow .mark3d{
+  width:clamp(46px,4vw,58px);aspect-ratio:1;flex:none;
+  background:var(--roll3d-src) center/contain no-repeat;
+  filter:drop-shadow(0 3px 14px rgba(232,164,112,.30));
+}
+.rollbrow .rollw{
+  width:clamp(112px,10vw,140px);height:auto;aspect-ratio:620/111;flex:none;
+  background:linear-gradient(96deg,#FFFFFF 0%,#FFE9D6 44%,#E8A470 100%);
+  -webkit-mask:var(--rollw-src) center/contain no-repeat;
+          mask:var(--rollw-src) center/contain no-repeat;
+}
+
+/* --- 4. the quote ------------------------------------------------------
+   The single most consistent element across every partner page studied, and
+   the one thing a logo cannot do. Sits under the stats, hairline-ruled, so
+   it reads as attribution rather than decoration. */
+.rollquote{
+  margin:clamp(20px,2.6vh,30px) 0 0;padding:0 0 0 16px;
+  border-left:1px solid rgba(232,164,112,.42);max-width:46ch;
+}
+.rollquote p{
+  margin:0;font-family:"Kepler Std",var(--font-display,Georgia),serif;
+  font-style:italic;font-size:clamp(1.02rem,1.25vw,1.22rem);line-height:1.38;
+  color:rgba(255,255,255,.94);
+}
+.rollquote cite{
+  display:block;margin-top:9px;font-style:normal;
+  font-family:var(--font-mono,var(--font-body));font-size:10.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.62);
+}
+
+/* the big background mark steps back now that a real one sits in the lockup */
+.rollmark{opacity:.13;right:-12%;top:-22%;width:min(44vw,560px)}
+
+@media(max-width:1080px){
+  .lockup{max-width:none;padding:78px clamp(20px,5vw,40px) 40px}
+  .rollquote{max-width:none}
+}
+@media(max-width:640px){
+  .rollbrow{gap:11px;margin-bottom:16px}
+  .rollbrow .rule{height:26px}
+  .rollquote{margin-top:16px}
+  .rollquote p{font-size:.98rem}
+}
+footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
+  color:rgba(255,255,255,.46);border-top:1px solid rgba(255,255,255,.08);padding-top:20px}
+
+/* =========================================================================
+   v06.3 — DARKER FIELD, A NAV THAT ASKS
+   ========================================================================= */
+
+/* --- the field goes back a stop. The brief was subtle and darker; 06.1 was
+   darker than 06.0 but the top-left still read as the brightest thing on a
+   page whose subject is a lockup and a phone. Pull the shader down and put a
+   real vignette in the corner the copy sits in, so the copper mark and the
+   white headline are the only bright objects. */
+#gl{filter:saturate(.80) brightness(.58) contrast(1.06)}
+.gcss{opacity:.80 !important}
+.grad::before{
+  background:
+    radial-gradient(74% 62% at 6% 4%, rgba(0,10,7,.62), transparent 66%),
+    radial-gradient(66% 70% at 4% 96%, rgba(0,9,6,.52), transparent 62%),
+    linear-gradient(163deg,rgba(2,14,10,.34) 0%,rgba(2,12,9,.60) 52%,rgba(1,9,7,.84) 100%);
+}
+.grad::after{
+  background:
+    radial-gradient(52% 40% at 80% 5%, rgba(226,160,110,.34), rgba(220,150,102,.11) 46%, transparent 74%),
+    radial-gradient(38% 30% at 97% 38%, rgba(214,138,88,.18), transparent 68%);
+}
+.rollmark{opacity:.09}
+
+/* --- the nav was left bare when the brand moved into the lockup. Fill it
+   with the ask, not with the logo again: primary is Create account, sign-in
+   demotes to a text link. This is the open item from the conversion audit. */
+.nav .btn-ghost{
+  background:none;border:0;color:rgba(255,255,255,.80);
+  font-size:var(--fs-body-sm);padding:10px 4px;margin-right:18px;
+  transition:color var(--tr-ui);
+}
+.nav .btn-ghost:hover{color:#fff}
+/* the nav flips to a light plate over the light zone, and a white text link
+   disappears into it. Follow the plate. */
+.nav.on-light .btn-ghost{color:rgba(11,15,13,.72)}
+.nav.on-light .btn-ghost:hover{color:#0B0F0D}
+
+/* --- the cue was parked mid-frame between the two columns, pointing at
+   nothing. Bottom edge, dimmer, out of the composition. */
+.scrollcue{bottom:16px;color:rgba(255,255,255,.34)}
+@media(max-width:1080px){ .scrollcue{display:none} }
+
+/* --- the stack, restored. Must live after the v06.1/.2 desktop grid rule. */
+@media(max-width:1080px){
+  /* two faults, not one. The columns above; and `justify-items:center` on the
+     stacked lockup, which sizes each item to max-content — and .side.l/.side.r
+     have no in-flow children at all (every face is position:absolute), so
+     max-content is literally 0. The headline was wrapping one character per
+     line at 834. */
+  .lockup{grid-template-columns:minmax(0,1fr);justify-items:stretch}
+  .lockup>*{justify-self:stretch;width:100%}
+}
+/* --- measured, not guessed */
+/* =========================================================================
+   v06.6 — THE OFFER SPEAKS, THE QUOTE GETS A SURFACE
+   ========================================================================= */
+
+/* --- the offer, at the size its job deserves --------------------------- */
+.rollcta .offer{
+  font-family:var(--font-display,inherit);font-weight:400;
+  font-size:clamp(1.16rem,1.55vw,1.58rem);line-height:1.24;letter-spacing:-.016em;
+  color:rgba(255,255,255,.95);text-transform:none;
+  margin:0 0 clamp(16px,1.8vh,22px);max-width:26ch;
+}
+.rollcta .offer b{color:#F7BF92;font-weight:500}
+
+/* --- the quote, on its own plate --------------------------------------- */
+.side.r .rollquote{
+  margin:0;max-width:44ch;padding:clamp(16px,1.6vw,20px) clamp(18px,1.8vw,22px);
+  border:1px solid rgba(232,164,112,.30);border-radius:16px;
+  background:linear-gradient(180deg,rgba(236,172,120,.15),rgba(232,164,112,.055));
+  box-shadow:0 18px 44px rgba(0,0,0,.28);
+  -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+}
+.side.r .rollquote p{
+  margin:0;font-family:"Kepler Std",var(--font-display,Georgia),serif;font-style:italic;
+  font-size:clamp(1rem,1.15vw,1.17rem);line-height:1.4;color:rgba(255,255,255,.96);
+}
+.side.r .rollquote .qfoot{display:flex;align-items:center;gap:11px;margin-top:14px}
+.side.r .rollquote .rqmark{
+  width:22px;aspect-ratio:1;flex:none;
+  background:var(--roll3d-src) center/contain no-repeat;
+}
+.side.r .rollquote .qwho{display:flex;flex-direction:column;gap:3px;line-height:1.15}
+.side.r .rollquote .qwho b{font-size:12.5px;font-weight:600;color:#fff;letter-spacing:.005em}
+.side.r .rollquote .qwho>span{
+  font-family:var(--font-mono,var(--font-body));font-size:10px;letter-spacing:.11em;
+  text-transform:uppercase;color:rgba(255,255,255,.56);
+}
+
+/* --- the stacked layout gets an offer row above the phone -------------- */
+.offerslot{display:none}
+/* the band: dark, its own moment between the tour and the light zone */
+/* it lands between the stage's closing plate and the light zone, both of which
+   are cream by then, so a dark band read as a hole punched through the page.
+   It takes the light zone's own paper and keeps the copper. */
+.qband{display:none;background:var(--l-bg);padding:clamp(38px,7vw,60px) var(--gut)}
+.qband .rollquote{
+  display:block;margin:0 auto;max-width:44ch;padding:clamp(18px,4vw,24px);
+  border:1px solid rgba(176,104,52,.28);border-radius:16px;
+  background:linear-gradient(180deg,rgba(198,120,62,.11),rgba(198,120,62,.035));
+}
+.qband .rollquote p{
+  margin:0;font-family:"Kepler Std",var(--font-display,Georgia),serif;font-style:italic;
+  font-size:clamp(1.06rem,3.7vw,1.28rem);line-height:1.4;color:#16211C;
+}
+.qband .qfoot{display:flex;align-items:center;gap:11px;margin-top:16px}
+.qband .rqmark{width:24px;aspect-ratio:1;flex:none;background:var(--roll3d-src) center/contain no-repeat}
+.qband .qwho{display:flex;flex-direction:column;gap:3px;line-height:1.15}
+.qband .qwho b{font-size:13px;font-weight:600;color:#0B0F0D}
+.qband .qwho>span{font-family:var(--font-mono,var(--font-body));font-size:10px;
+  letter-spacing:.11em;text-transform:uppercase;color:rgba(11,15,13,.55)}
+
+@media(max-width:1080px){
+  /* Reordered as well as relocated. The stacked build ran brow -> phone -> head,
+     which buries the cheapest, highest-value element on the page under a 430px
+     image. Claim, then incentive, then proof. */
+  .lockup{grid-template-areas:"brow" "head" "offer" "phone" "body" "cta"}
+  .offerslot{display:block;grid-area:offer;margin:2px 0 6px}
+  .offerslot .offer{margin:0;max-width:none;font-size:clamp(1.05rem,3.4vw,1.3rem)}
+  /* The quote does NOT ride the stack. Shrinking the shell far enough to fit a
+     plate under it clipped the app card itself mid-content (the empty state cut
+     off by the tab bar), and a broken product shot costs more than a
+     repositioned testimonial. It gets its own band under the stage instead:
+     still absent from every screen of the tour, which is what "first screen
+     only" means. */
+  .side.r .rollquote{display:none}
+  .qband{display:block}
+}
+
+@media(max-width:640px){
+  .side.l{min-height:88px}
+  .side.r{min-height:120px}
+  /* the nav pill was 154px of a 390px viewport. The fixed bottom bar is the
+     real CTA on mobile; up here it just needs to be reachable. */
+  .nav .btn-primary{font-size:13px;padding:9px 16px}
+  .nav .btn-ghost{font-size:13px;margin-right:10px}
+}
+
+
+/* =========================================================================
+   v06.2 — ONE WORDMARK, ONE ROLLUP MARK, A FRAME WITH AIR
+   ========================================================================= */
+
+/* --- 1. the lockup is now the only brand on the page --------------------
+   Nav brand removed in script. The near mark here is the real SVG, lifted
+   out of the nav, so this is the actual wordmark and not a font that looks
+   like it. */
+.rollbrow{gap:clamp(16px,1.6vw,24px);margin-bottom:clamp(22px,2.6vh,34px)}
+.rollbrow .nearw{display:block;line-height:0}
+.rollbrow .nearw svg{display:block;height:clamp(24px,2vw,30px);width:auto;color:#fff}
+.rollbrow .rule{height:clamp(30px,3vw,42px)}
+
+/* the object. Copper against a green field is the whole co-brand idea, so it
+   gets the size to carry it. */
+.rollbrow .mark3d{
+  width:clamp(58px,5.4vw,80px);
+  background-image:var(--roll3d-src);
+  filter:drop-shadow(0 5px 20px rgba(226,150,96,.34));
+}
+/* type only. The pinwheel that used to sit inside this wordmark is now the
+   3D object two slots to its left. */
+.rollbrow .rollw{
+  width:clamp(104px,9vw,132px);aspect-ratio:470/111;
+  background:linear-gradient(96deg,#FFFFFF 0%,#FFE9D6 40%,#F0B183 100%);
+  -webkit-mask-image:var(--rollw-src);
+          mask-image:var(--rollw-src);
+}
+
+/* --- 2. air ------------------------------------------------------------
+   min-heights were 190/156 against real maxima of 139/114. That slack read
+   as two unexplained holes in the column. Measured, then set. align-content
+   centres what is left, so the frame breathes top and bottom instead of
+   running to both edges. */
+.lockup{align-content:center;padding-block:clamp(56px,7vh,84px) clamp(44px,6vh,68px)}
+.side.l{min-height:146px}
+/* the body row is sized by the QUOTE now, not the copy: the plate measures 154
+   and the faces are position:absolute, so a short row would let it spill into
+   the offer. Fixed height is also the right call here — the CTA block must not
+   move while cards crossfade. */
+.side.r{min-height:158px}
+.rollcta{margin-top:clamp(20px,2.4vh,30px)}
+.rollcta .friction{margin-top:10px}
+
+/* --- 3. the quote, tightened ------------------------------------------
+   Four lines competed with the CTA above it. Three reads as attribution. */
+.rollquote{margin-top:clamp(16px,2vh,24px);max-width:44ch}
+.rollquote p{font-size:clamp(1rem,1.15vw,1.14rem);line-height:1.34}
+
+/* --- 4. the rail joins the composition ---------------------------------
+   It was pinned at x=40 while the content started at x=168, so it read as
+   debris on the frame edge. Now it sits just outside the copy column. */
+.sdrail{left:clamp(20px,calc((100vw - 1220px) / 2 + 14px),96px)}
+
+@media(max-width:1080px){
+  .lockup{align-content:start;padding-block:70px 36px}
+  .rollbrow .mark3d{width:clamp(48px,8vw,62px)}
+}
+@media(max-width:640px){
+  .side.l{min-height:118px}
+  .side.r{min-height:110px}
+  .rollbrow .nearw svg{height:20px}
+  .rollbrow .rollw{width:96px}
+}
+
+/* =========================================================================
+   v07.1 - near.com READS AS A URL
+   ========================================================================= */
+.h1 .wordmark,
+.display .wordmark{
+  font-family:var(--font-display);font-style:normal;
+  font-weight:400;   /* literal, not --w-roman: see the note above */
+  font-size:inherit;line-height:inherit;letter-spacing:-.02em;
+  display:inline-block;transform:none;color:#fff;
+}
+
+/* =========================================================================
+   v07.2 - THE JURISDICTION NOTE
+   Bottom edge of the frame, aligned to the copy column, sized so it is
+   findable and never in the way. Opacity and travel come from paintCards.
+   ========================================================================= */
+.perpsdisc{
+  position:absolute;left:0;right:0;bottom:clamp(18px,2.4vh,30px);
+  margin:0 auto;max-width:1220px;
+  /* the right pad is not decoration: full-bleed, this line runs straight
+     through the scroll cue at the centre of the frame and out under the
+     phone. Held to the copy column it wraps to two lines and both of those
+     stay clear. */
+  padding-left:clamp(28px,4vw,64px);
+  padding-right:calc(48% + 24px);
+  font-family:var(--font-mono,var(--font-body));
+  font-size:11px;line-height:1.5;letter-spacing:.02em;
+  color:rgba(255,255,255,.42);
+  max-inline-size:none;pointer-events:none;
+  will-change:opacity,transform;
+}
+.perpsdisc b{font-weight:500;color:rgba(255,255,255,.55)}
+@media(max-width:1080px){
+  /* the cue is hidden below 1080, so the line takes the full measure again */
+  .perpsdisc{padding-left:var(--gut);padding-right:var(--gut);bottom:12px;
+             font-size:10px;max-width:none;line-height:1.45}
+}
+
+/* =========================================================================
+   v06.7 — ONE NAV FOR THE STAGE, ANOTHER FOR THE PAGE
+   ========================================================================= */
+.nav .brand{
+  opacity:0;visibility:hidden;pointer-events:none;transform:translateX(-10px);
+  transition:opacity var(--dur-slow) var(--ease-out),
+             transform var(--dur-slow) var(--ease-out),
+             visibility 0s linear var(--dur-slow);
+}
+.nav.on-light .brand{
+  opacity:1;visibility:visible;pointer-events:auto;transform:none;
+  transition:opacity var(--dur-slow) var(--ease-out),
+             transform var(--dur-slow) var(--ease-out),visibility 0s;
+}
+
+/* The ask COLLAPSES rather than hiding. visibility:hidden still reserves the
+   box, which held Sign in 230px off the right edge with nothing beside it —
+   it read as a centred link, not a corner one. Animating max-width and the
+   horizontal padding lets the button grow out of the corner when the page
+   turns light, and lets Sign in sit where it belongs until then. */
+/* the flex gap left 50px between Sign in and the collapsed button, so the link
+   still floated short of the corner. Spacing is margins from here, so it can
+   collapse with the thing it belongs to. */
+.nav{gap:0}
+.nav .btn-ghost{margin-right:0}
+.nav .btn-primary{
+  max-width:0;padding-inline:0;margin-left:0;border-inline-width:0;
+  overflow:hidden;white-space:nowrap;
+  opacity:0;pointer-events:none;
+  transition:max-width var(--dur-slow) var(--ease-out),
+             padding var(--dur-slow) var(--ease-out),
+             margin var(--dur-slow) var(--ease-out),
+             opacity var(--dur-slow) var(--ease-out);
+}
+.nav.on-light .btn-primary{
+  max-width:220px;padding-inline:22px;margin-left:22px;border-inline-width:1px;
+  opacity:1;pointer-events:auto;
+  transition-delay:90ms;   /* the brand leads, the ask follows a beat later */
+}
+
+/* =========================================================================
+   BREATHING ROOM
+   With the nav ask and the three proof points gone the column had ~100px
+   back. Spend it BETWEEN blocks rather than at the ends: every unit in this
+   stack is a different voice (co-brand, claim, endorsement, offer, action)
+   and they were reading as one dense paragraph.
+   ========================================================================= */
+.rollbrow{margin-bottom:clamp(34px,4.4vh,54px)}
+.side.l{min-height:172px}
+.side.r{min-height:168px}
+.rollcta{margin-top:clamp(30px,4vh,46px)}
+.rollcta .offer{margin-bottom:clamp(22px,2.6vh,30px)}
+.rollcta .friction{margin-top:14px}
+.lockup{padding-block:clamp(56px,7.5vh,92px) clamp(44px,6vh,68px)}
+
+@media(max-width:1080px){
+  /* the desktop breathing room is bought with column height the stack does not
+     have. Restate the stacked heights as MIN-heights rather than zeroing them:
+     `height:150px/142px` in the responsive block is not winning at 834 (the
+     same resolve-to-zero that collapsed the headline to one character per line
+     earlier this build), so the floor has to be explicit. */
+  .side.l{min-height:150px}
+  .side.r{min-height:142px}
+  .rollbrow{margin-bottom:clamp(18px,2.6vh,28px)}
+  .rollcta{margin-top:16px}
+  .rollcta .offer{margin-bottom:0}
+}
+@media(max-width:640px){
+  .side.l{min-height:112px}
+  .side.r{min-height:128px}
+}
+
+/* =========================================================================
+   v06.8 - THE CARD CENTRES, AND LEAVES WITH THE TYPE
+   ========================================================================= */
+
+/* --- 1. why it looked pinned -------------------------------------------
+   It was never a missing transform. Sampled mid-transition, the plate and the
+   headline carry IDENTICAL values (-13.3px / .847, then -172px / 0) - the
+   paint loop walks .face children and the blockquote is one.
+   backdrop-filter was the problem: a backdrop root samples what is BEHIND the
+   element at its UNTRANSFORMED position, so the blurred panel stayed put while
+   its own content slid out from under it. That reads as a card that will not
+   move. The gradient carries the plate on its own. */
+.side.r .rollquote{-webkit-backdrop-filter:none;backdrop-filter:none}
+
+/* And it does not take the exit blur. The build already exempts body copy on
+   the grounds that blurring a paragraph reads as a rendering fault rather than
+   as depth; a bordered card with a background reads worse still. The paint
+   loop writes filter inline, so this needs !important - author-important beats
+   author-inline in the cascade, which is the one place that rule earns its
+   keep. */
+.side.r .rollquote{filter:none !important}
+
+/* --- 2. centred between what is above and below it ---------------------
+   The row has to clear the tallest body copy of the four cards, so it is
+   taller than the plate. At flex-start the plate hung off the headline and
+   left all the slack underneath it. Centred, the air splits evenly and the
+   card sits BETWEEN the two text blocks instead of under one of them. */
+.side.r .face{justify-content:center}
+

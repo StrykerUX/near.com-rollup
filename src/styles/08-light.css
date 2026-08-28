@@ -1,0 +1,250 @@
+/* ============================================================
+   LIGHT ZONE
+   ============================================================ */
+.light{
+  /* black underneath, so the light panel's rounded bottom corners reveal the
+     footer colour rather than the page behind it */
+  background:#000;color:var(--l-fg);position:relative;z-index:6;
+  --fg:var(--l-fg); --fg-2:var(--l-fg-2); --fg-3:var(--l-fg-3);
+  --border:var(--l-border); --border-strong:var(--l-border-strong);
+}
+/* flow-root stops the final CTA's bottom margin collapsing out of the panel —
+   without it the light background ends flush with the CTA instead of carrying
+   its old trailing space down to the footer */
+.lightbody{
+  background:var(--l-bg);display:flow-root;
+  border-radius:0 0 var(--lb-rad) var(--lb-rad);
+}
+.light .btn-outline{border-color:var(--l-border-strong);color:var(--l-fg);backdrop-filter:none}
+.light .btn-outline:hover{background:rgba(0,0,0,.05);border-color:var(--l-fg)}
+.band{padding-block:clamp(72px,9vw,132px)}
+.band+.band{border-top:1px solid var(--l-border)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(32px,5vw,80px);align-items:center}
+.split.top{align-items:flex-start}
+/* Visual flip only — the heading stays FIRST in the DOM so the section still
+   reads and announces heading-then-evidence. Reversing the markup would put
+   four unlabelled boxes ahead of the thing that names them. The column widths
+   swap with the order, so the grid keeps the wider track. */
+.split.flip{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.split.flip>:first-child{order:2}
+.split.flip>:last-child{order:1}
+.copy>*+*{margin-top:var(--space-5)}
+
+.card{padding:26px;border:1px solid var(--l-border);border-radius:var(--radius-lg);background:var(--l-gray);transition:var(--tr-ui)}
+.card:hover{border-color:var(--l-border-strong);transform:translateY(-2px)}
+.card h4{margin-top:0}
+.card p{margin-top:10px;color:var(--l-fg-2);font-size:var(--fs-body-sm)}
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.rail{display:flex;gap:16px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x mandatory}
+.rail::-webkit-scrollbar{height:6px}
+.rail::-webkit-scrollbar-thumb{background:var(--l-gray-2);border-radius:99px}
+.rail .card{min-width:290px;scroll-snap-align:start}
+
+.marquee{overflow:hidden;margin-top:var(--space-7)}
+/* RISE & RESOLVE entrance: before reveal each card waits 42px low and soft;
+   on reveal they rise and sharpen left -> right (delays are set inline from
+   each card's on-screen x). JS-applied classes only, so no-JS never hides
+   the cards. Reduced motion skips the whole thing. */
+.marquee.mq-wait .qcard{opacity:0;transform:translateY(42px);filter:blur(6px)}
+.marquee.mq-in .qcard{opacity:1;transform:none;filter:none;
+  transition:opacity 700ms var(--ease-out),transform 700ms var(--ease-out),filter 620ms var(--ease-out)}
+/* --mset is the measured width of ONE set of quotes, written by JS. The loop
+   travels exactly that far, so the duplicate lands where the original was and
+   the seam is invisible. Never hard-code it — card width, gap, font and copy
+   length all feed into it. --mdur is derived from --mset to hold speed steady. */
+.mtrack{display:flex;gap:var(--mgap);width:max-content;will-change:transform}
+/* No CSS animation and no hover pause here: the track is rAF-driven (see
+   stepMarquee) precisely so hover can EASE the speed to zero instead of
+   freezing mid-frame — animation-play-state is a hard stop. */
+/* margin:0 is load-bearing — <figure> carries a 1em 40px UA margin, which was
+   adding 80px of dead air between every card and inflating the loop distance. */
+/* flex column + margin-top:auto pins every attribution to the card FLOOR —
+   the quotes run 1-3 lines, and without this the names sat at ragged heights
+   across the row. .mtrack's default align-items:stretch equalises the card
+   heights, so the floor is the same line on every card. */
+/* QUOTE CARDS — matched exactly to the provided reference build (27rem,
+   24px radius, 32px pad, 20px column gap, big " top-right, body-size quote
+   capped at 34ch, name 500 / role gray at the foot). Cards alternate onto
+   #101010 with a 3%/6% vertical pinstripe overlay (i%3===1). Our COLORED
+   source marks ride where the reference put its wordmark; on dark cards
+   they invert to white for legibility (Cardano navy / Bankless black would
+   vanish on #101010). */
+.qcard{position:relative;width:27rem;flex:none;margin:0;display:flex;flex-direction:column;gap:20px;
+  overflow:hidden;border-radius:1.5rem;padding:32px;background:#fff;color:#000;border:0}
+.qcard.qdark{background:#101010;color:#fff}
+.qstripes{pointer-events:none;position:absolute;inset:0;
+  background-image:repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 3%, rgba(0,0,0,0) 3% 6%)}
+.qmark{pointer-events:none;position:absolute;right:28px;top:20px;user-select:none;
+  font-family:var(--font-body);font-weight:500;line-height:1.05;
+  font-size:clamp(2.75rem,2.0825rem + 2.8479vw,5.5rem)}
+.qhead{position:relative;display:flex;align-items:center;gap:10px;align-self:flex-start}
+.qlogo{height:24px;width:auto;flex:none;border-radius:6px}
+/* dark cards: the mark stays FULL COLOUR on a small white chip. The
+   reference inverted its logos to white — but ours are marks, not
+   wordmarks, and Bankless's baked white plate turned into a blank square
+   under brightness(0) invert(1). A white chip keeps every mark visible
+   AND coloured on #101010. */
+.qcard.qdark .qlogo{background:#fff;padding:3px;height:26px;border-radius:7px}
+.qorg{font-family:var(--font-body);font-weight:500;font-size:1.05rem;letter-spacing:-.01em}
+.qcard .q{position:relative;margin:0;max-width:34ch;font-family:var(--font-body);font-weight:400;
+  font-size:clamp(.875rem,.8447rem + .1295vw,1rem);line-height:1.5;letter-spacing:.005em;text-wrap:pretty}
+.qcard .a{position:relative;margin-top:auto;font-family:var(--font-body);
+  font-size:clamp(.875rem,.8447rem + .1295vw,1rem);line-height:1.5;letter-spacing:.005em;color:#323232}
+.qcard.qdark .a{color:rgba(255,255,255,.5)}
+.qcard .a b{display:block;font-weight:500;color:#000;text-transform:none;margin-bottom:0}
+.qcard.qdark .a b{color:#fff}
+
+/* ---- Secure by design · 2×2 -------------------------------------------
+   Light mode, same key as the rest of the section. The accordion belongs to the
+   FAQ, where hiding an answer until it is asked for is the right behaviour;
+   here the four claims ARE the argument and shouldn't need a click. */
+.secgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,1.2vw,18px)}
+.sbox{
+  padding:clamp(18px,1.8vw,26px);border:1px solid var(--l-border);
+  border-radius:var(--radius-lg);background:var(--l-gray);
+}
+
+/* the schematic illustrations: fine-line vector plates in the reference's
+   blueprint voice — hairline strokes, dashed construction geometry, corner
+   registration marks, ONE green moment each, a NEAR sparkle. Drawn inline;
+   keep any new artwork on the same 400x300 grid and stroke weights (1.6 ink,
+   1.2 faint, 1 ghost) or the set stops reading as a family. */
+.sart{margin:0 0 14px;border-radius:14px;background:#F6F5F1;overflow:hidden}
+.sart svg{display:block;width:100%;height:auto}
+
+/* the volume card's title must hold ONE line at every width */
+.secgrid .sbox:nth-child(3) h3{white-space:nowrap;font-size:clamp(1.02rem,1.26vw,1.4rem)}
+.sbox h3{display:flex;align-items:center;gap:11px;font-family:var(--font-body);font-weight:500;
+  font-size:clamp(1.2rem,1.5vw,1.4rem);letter-spacing:-.018em;line-height:1.2;color:var(--l-fg)}
+.sbox p{margin-top:10px;font-size:var(--fs-body-sm);line-height:1.5;color:var(--l-fg-2)}
+.sfig{color:var(--green-600)}
+@media(max-width:560px){ .secgrid{grid-template-columns:1fr} }
+.acc{border-top:1px solid var(--l-border)}
+.acc-item{border-bottom:1px solid var(--l-border)}
+.acc-btn{width:100%;display:flex;align-items:center;gap:18px;padding:22px 0;text-align:left}
+/* the glyph must sit at the CENTRE of the box that rotates. It used to be
+   left-aligned in a 20px-wide box with no height, so rotate(45deg) — which
+   spins around the box centre, not the glyph — swung the "+" up and sideways.
+   A square box with the glyph dead-centre rotates in place. */
+.acc-btn .plus{width:20px;height:20px;flex:none;display:grid;place-items:center;
+  color:var(--green-600);font-size:1.1rem;line-height:1;
+  transition:transform var(--dur) var(--ease-out)}
+.acc-btn[aria-expanded="true"] .plus{transform:rotate(45deg)}
+.acc-btn .t{flex:1;font-family:var(--font-body);font-weight:400;
+  font-size:clamp(1.35rem,1.8vw,1.7rem);letter-spacing:-.018em;line-height:1.2}
+.acc-panel{max-height:0;overflow:hidden;transition:max-height var(--dur) var(--ease-out)}
+.acc-panel p{padding:0 0 22px 38px;color:var(--l-fg-2);max-width:64ch;
+  /* the answer FADES AND RISES inside the clip instead of being unmasked by
+     it — the clip alone reads as a shutter. Delayed slightly on open so the
+     height leads and the text settles into the space it made. */
+  opacity:0;transform:translateY(6px);
+  transition:opacity 260ms var(--ease-out),transform 260ms var(--ease-out)}
+.acc-item.open .acc-panel p{opacity:1;transform:none;transition-delay:70ms}
+/* The CTA arrives full-bleed and contracts to this inset. The TOP EDGE MUST NOT
+   MOVE, which is why the bottom is done with a padding/margin trade rather than
+   a height: extra padding-bottom grows the box downward while the matching
+   margin-bottom shrinks, so the box reaches the panel's bottom edge at t=0 and
+   nothing above or below it shifts by a pixel. Scaling or animating height
+   would drag the headline and re-wrap the copy. */
+.finalcta{
+  margin:0 calc(var(--gut) * var(--cta-t)) calc(var(--space-9) * var(--cta-t));
+  padding:var(--cta-pad) var(--gut) calc(var(--cta-pad) + var(--space-9) * (1 - var(--cta-t)));
+  /* top corners open from square; bottom corners start on the light panel's own
+     radius so the full-bleed state nests inside it instead of poking out */
+  border-radius:calc(32px * var(--cta-t)) calc(32px * var(--cta-t))
+                calc(var(--lb-rad) + (32px - var(--lb-rad)) * var(--cta-t))
+                calc(var(--lb-rad) + (32px - var(--lb-rad)) * var(--cta-t));
+  overflow:hidden;background:#000;color:#fff;text-align:center;position:relative
+}
+.finalcta .ctagrad{
+  position:absolute;inset:0;width:100%;height:100%;opacity:0;
+  transition:opacity 700ms var(--ease-out);
+  filter:blur(clamp(11px,1.45vw,24px));transform:scale(1.22);transform-origin:center;
+}
+.finalcta .ctagrad.on{opacity:1}
+.finalcta .ctaveil{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.26) 0%,rgba(0,0,0,.06) 70%)}
+
+.finalcta .ctagrad{
+  /* v07.4: four soft blobs and a base, drawn by the compositor. No context,
+     no program, no buffer, no reallocation on resize - and therefore no
+     flicker when the container contracts. Also no blur() and no scale(1.22):
+     both existed to hide shader resolution and the soft edge a blurred layer
+     leaves at its own bounds, and a gradient has neither problem. */
+  position:absolute;inset:0;width:100%;height:100%;opacity:1;
+  filter:none;transform:none;
+  background:
+    radial-gradient(124% 168% at 78% -16%,
+      rgba(140,255,196,.72) 0%, rgba(74,192,138,.46) 30%,
+      rgba(30,104,78,.25) 58%, rgba(8,32,24,0) 82%),
+    radial-gradient(100% 160% at 106% 26%,
+      rgba(104,228,166,.44), rgba(34,112,84,.20) 46%, rgba(14,50,38,.06) 68%, transparent 84%),
+    radial-gradient(70% 130% at 108% 78%,
+      rgba(60,170,124,.26), transparent 66%),
+    radial-gradient(96% 96% at 4% 106%,
+      rgba(0,8,6,.42), transparent 60%),
+    linear-gradient(168deg, #12442F 0%, #0B2A1E 48%, #04120D 100%);
+}
+
+/* the dark half of the v06.10 overlay pair goes: it was there to pull a bright
+   shader render down, and this gradient starts where it should. One layer
+   fewer to composite, and one fewer place the plate's colour is decided.
+   The copper (::after) and the text veil stay - both do a job the base cannot. */
+.finalcta::before{background:none}
+/* the copper reads a little hot against a base that is now green by
+   construction rather than green by grade. One notch down. */
+.finalcta::after{
+  background:
+    radial-gradient(52% 40% at 80% 5%, rgba(226,160,110,.17), rgba(220,150,102,.05) 46%, transparent 74%),
+    radial-gradient(38% 30% at 97% 38%, rgba(214,138,88,.08), transparent 68%);
+}
+.finalcta .ctagrad.on{opacity:1}
+
+/* =========================================================================
+   v06.10 - ONE GRADIENT
+   The closing plate now takes the master field's grade and its two overlays,
+   in the same order and at the same strengths as .grad. Lift stays 1: this box
+   is the SHRUNK state of the field, which is the plate it should match, not
+   the full-bleed hero.
+   ========================================================================= */
+.finalcta .ctagrad{
+  /* brightness is .66 here against the field's .58: this canvas is also blurred
+     and scaled 1.22, which loses luminance the field keeps. Tuned by sampling
+     both plates, not by eye - see the numbers in the change log. */
+  filter:blur(clamp(11px,1.45vw,24px)) saturate(.80) brightness(.66) contrast(1.06);
+}
+.finalcta::before,
+.finalcta::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none}
+.finalcta::before{
+  background:
+    radial-gradient(74% 62% at 6% 4%, rgba(0,10,7,.62), transparent 66%),
+    radial-gradient(66% 70% at 4% 96%, rgba(0,9,6,.52), transparent 62%),
+    linear-gradient(163deg,rgba(2,14,10,.34) 0%,rgba(2,12,9,.60) 52%,rgba(1,9,7,.84) 100%);
+}
+.finalcta::after{
+  /* the copper is dialled back from the field's .34/.18: this box is short and
+     wide, so the shader's own key light and the overlay sit on top of each
+     other instead of falling across a full viewport. */
+  background:
+    radial-gradient(52% 40% at 80% 5%, rgba(226,160,110,.24), rgba(220,150,102,.08) 46%, transparent 74%),
+    radial-gradient(38% 30% at 97% 38%, rgba(214,138,88,.12), transparent 68%);
+}
+.finalcta .inner{position:relative;z-index:2}
+.finalcta p{margin-top:22px;color:rgba(255,255,255,.82)}
+
+footer{background:#000;color:#fff;padding-block:var(--space-8) var(--space-6)}
+.fgrid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:32px}
+.fcol h5{font-family:var(--font-mono);font-size:var(--fs-micro);text-transform:uppercase;letter-spacing:.16em;color:rgba(255,255,255,.45);font-weight:400;margin:0 0 16px}
+.fcol a{display:block;font-size:var(--fs-body-sm);color:rgba(255,255,255,.78);padding:5px 0}
+.fcol a.brand{display:flex;padding:0}
+.fcol .brand svg{height:22px}
+.fcol a:hover{color:var(--near-green)}
+.fbot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:var(--space-8);padding-top:var(--space-5);border-top:1px solid rgba(255,255,255,.14);font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.04em;color:rgba(255,255,255,.5)}
+.socials{display:flex;gap:10px;margin-top:20px}
+.socials a{width:34px;height:34px;border:1px solid rgba(255,255,255,.22);border-radius:50%;display:grid;place-items:center}
+.socials a:hover{border-color:var(--near-green);color:var(--near-green)}
+
+.rv{opacity:0;transform:translateY(16px)}
+.rv.in{opacity:1;transform:none;transition:opacity var(--dur-slow) var(--ease-out),transform var(--dur-slow) var(--ease-out)}
+

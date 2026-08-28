@@ -1,0 +1,16 @@
+/* ============================================================
+   REFACTOR DELTA
+   ------------------------------------------------------------
+   The original build moved three nodes around the DOM at boot, because editing
+   the markup by hand was riskier than a runtime shuffle. Those nodes are now
+   authored where they belong, so the only thing left to do is the part that was
+   always a media query in disguise: the offer exists in both slots and the
+   breakpoint picks one.
+
+   `.offerslot` / `.qband` already carry `display:none` by default and
+   `display:block` under 1080 (see 13-rollup.css). This is the other half of the
+   pair — the desktop copy stepping aside.
+   ============================================================ */
+@media (max-width: 1080px) {
+  .rollcta .offer { display: none }
+}

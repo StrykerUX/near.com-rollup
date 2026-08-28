@@ -1,0 +1,210 @@
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:1080px){
+  .lockup{grid-template-columns:1fr;justify-items:center;gap:16px;padding:78px var(--gut) 28px}
+  /* STACKED: the text boxes CLIP — animating type above/below the phone must
+     never be readable through the translucent shell, so it is masked at its
+     own box instead of travelling behind the card */
+  .side{min-height:0;width:100%;max-width:540px;overflow:hidden}
+  .side.l{height:150px}
+  .side.r{height:142px}
+  .side .face{align-items:center !important;text-align:center !important}
+  .side h2{max-width:16ch}
+  .side h2.stack{max-width:none}
+  .side p{max-width:44ch}
+  :root{--c0-gap:8px;--c0-big:1.45rem;--c0-seg:11px;--c0-bal:10px;--c0-row:8px;--c0-tab:6px;
+        --c0-av:32px;--c0-title:1rem;--c0-bgap:5px;--c0-bv:.9375rem;
+        --m-h:696px;--m-h0-x:0px;--m-h0-cap:430px}
+  .g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .split{grid-template-columns:1fr;gap:36px}
+  /* .split.flip is TWO classes, so it outranks the single-class rule above even
+     inside this media query — the section stayed two columns all the way down to
+     390px until this line existed. Reset the order too, or the boxes stack above
+     the heading that names them. */
+  .split.flip{grid-template-columns:1fr}
+  .split.flip>:first-child,.split.flip>:last-child{order:0}
+}
+@media(max-width:860px){
+  #stage{height:554vh}
+  .fgrid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .morph{width:min(348px,92vw)}
+  :root{--c0-gap:8px;--c0-big:1.5rem;--c0-seg:11px;--c0-bal:10px;--c0-row:9px;--c0-tab:7px;
+        --c0-av:31px;--c0-title:1rem;--c0-bgap:6px;--c0-bv:.9375rem;
+        --m-h:696px;--m-h0-x:0px;--m-h0-cap:422px}
+  .g3,.g4{grid-template-columns:1fr}
+  .spark{height:42px}.duo{gap:8px}
+  .mrow{padding:9px 0}
+  .cswap>.face{padding:8px 18px 16px}.morph > .hhead{padding:14px 18px 10px}.morph > .tabbar{padding-inline:18px}
+  .chips{margin-top:11px}
+  .side.l{height:126px}.side.r{height:158px}
+  .qcard{width:20rem}
+  .fgrid{grid-template-columns:1fr}
+  
+}
+/* SHORT STACKED VIEWPORTS (landscape tablet, small laptop under 1081px wide).
+   Same overflow as small phones, different trigger: the stacked column is
+   ~938px tall against a 768px viewport at 1024x768. Same fix — tighter rhythm
+   and the --m-h0-cap budget. Cap = 70 + 116 + 12 + 12 + 120 + 16 = 346. */
+@media(max-width:1080px) and (max-height:820px){
+  .lockup{padding:70px var(--gut) 16px;gap:12px}
+  .side.l{height:116px}
+  .side.r{height:120px}
+  .side h2,.permcopy h2{font-size:1.9rem}
+  .side p{font-size:.9rem}
+  :root{--c0-gap:6px;--c0-big:1.3rem;--c0-seg:9px;--c0-bal:8px;--c0-row:6px;--c0-tab:4px;
+        --c0-av:27px;--c0-title:.9rem;--c0-bgap:4px;--c0-bv:.875rem;
+        --m-h0-cap:346px}
+  .cswap>.face{padding:7px 15px 13px}.morph > .hhead{padding:12px 15px 9px}.morph > .tabbar{padding-inline:15px}
+  .mrow{padding:7px 0}
+  .spark{height:34px}
+  /* perps + earn faces, compact: markets row and earn description go
+     first; rhythm tightens */
+  .pmk{display:none}
+  .edesc{display:none}
+  .etabs{margin-top:8px}
+  .et{padding-bottom:7px;font-size:.92rem}
+  .etbl{margin-top:8px;padding:6px}
+  .etr{padding:7px 10px;gap:9px}
+  .tico{width:27px;height:27px}
+  .ethead{padding:3px 38px 5px}
+  .tab svg{width:22px;height:22px}
+  .psub{font-size:.78rem}
+  .pblab{margin-top:8px}
+  .pacts{margin-top:9px}
+  .pacts button{padding:9px 8px}
+  .ptabs{margin-top:10px;gap:14px}
+  .pempty{margin-top:8px;gap:3px}
+}
+/* SMALL PHONES. The stacked lockup (side text above, card, side text below)
+   only overflows below ~430px — at 390x844 card 0 ran 26px under the nav and
+   14px past the bottom, and at 360x780 it lost 104px. Two mechanisms fix it:
+   tighter rhythm (below), and --m-h0-cap, which lets measureShell() cap card
+   0's height to the viewport minus everything else in the column. The cap is
+   the sum of: 68 top padding + both side boxes + two 12px gaps + 20 bottom.
+   Change any of those and re-derive it, or card 0 either clips the frame or
+   its own content. */
+@media(max-width:430px){
+  .lockup{padding:74px var(--gut) 16px;gap:12px}
+  .side.l{height:112px}
+  .side.r{height:128px}
+  .side h2,.permcopy h2{font-size:1.9rem}
+  .side p{font-size:.9375rem;max-width:40ch}
+  :root{--c0-gap:6px;--c0-big:1.3rem;--c0-seg:9px;--c0-bal:8px;--c0-row:6px;--c0-tab:4px;
+        --c0-av:27px;--c0-title:.9rem;--c0-bgap:4px;--c0-bv:.875rem;
+        --m-h:696px;--m-h0-x:0px;--m-h0-cap:354px}
+  .cswap>.face{padding:7px 15px 13px}.morph > .hhead{padding:12px 15px 9px}.morph > .tabbar{padding-inline:15px}
+  .mrow{padding:7px 0}
+  .spark{height:34px}
+  /* perps + earn faces, compact: markets row and earn description go
+     first; rhythm tightens */
+  .pmk{display:none}
+  .edesc{display:none}
+  .etabs{margin-top:8px}
+  .et{padding-bottom:7px;font-size:.92rem}
+  .etbl{margin-top:8px;padding:6px}
+  .etr{padding:7px 10px;gap:9px}
+  .tico{width:27px;height:27px}
+  .ethead{padding:3px 38px 5px}
+  .tab svg{width:22px;height:22px}
+  .psub{font-size:.78rem}
+  .pblab{margin-top:8px}
+  .pacts{margin-top:9px}
+  .pacts button{padding:9px 8px}
+  .ptabs{margin-top:10px;gap:14px}
+  .pempty{margin-top:8px;gap:3px}
+  /* the swap face is the tallest stack; at 426px shells its tab bar ran 11px
+     past the shell bottom. These four lines are that 11px. */
+  .swfield{padding:10px 12px 8px}
+  .swamt{font-size:1.5rem}
+  .swsub{margin-top:5px}
+  .swmid{margin:-8px 0}
+  .swmid .rot{width:30px;height:30px;border-radius:9px}
+  .swreview{margin-top:9px;padding:10px 14px}
+  .swrows{margin-top:9px;gap:7px}
+  .balgrp{padding:9px}
+  .ballist{margin-top:7px}
+
+}
+/* SHORT WIDE TABLETS (landscape iPad, 1024x768 class). Stacking was the
+   mistake here: at >=900px there is plenty of WIDTH, so this restores the
+   desktop three-column lockup (side | card | side) instead of fighting for
+   height. The !importants are needed to beat the 1080 block's centring
+   !importants. The h2.stack size cap mirrors the min-width:1081 rule — the
+   three-column side gives the stacked headline less width than 4.4vw needs. */
+@media(min-width:900px) and (max-width:1080px) and (max-height:820px){
+  .lockup{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);justify-items:stretch;
+    gap:clamp(22px,2.8vw,48px);padding:96px var(--gut) 48px}
+  .side,.side.l,.side.r{height:auto;min-height:200px;max-width:none;width:auto}
+  .side.l .face{align-items:flex-end !important;text-align:right !important}
+  .side.r .face{align-items:flex-start !important;text-align:left !important}
+  .side h2{max-width:14ch}
+  .side h2.stack{max-width:none;font-size:min(var(--fs-h1), calc(5.95vw - 35px))}
+  :root{--c0-gap:8px;--c0-big:1.5rem;--c0-seg:12px;--c0-bal:10px;--c0-row:9px;--c0-tab:7px;
+        --c0-av:32px;--c0-title:1rem;--c0-bgap:6px;--c0-bv:.9375rem;
+        --m-h:696px;--m-h0-x:0px;--m-h0-cap:150px}
+}
+/* SHORT NARROW SCREENS (431-899px wide, under 820px tall — small tablets and
+   foldables in landscape). Here there is neither width NOR height, so the
+   stacked column keeps the tightest rhythm it has, card 0 is capped to what
+   the viewport leaves (--m-h0-cap = 68+14 padding + 104+112 sides + two 8px
+   gaps = 314), and the app TAB BAR IS DROPPED — it is decorative chrome in
+   this mock, and its ~48px is the difference between the balances fitting
+   and clipping. */
+@media(min-width:431px) and (max-width:899px) and (max-height:820px){
+  .lockup{padding:68px var(--gut) 14px;gap:8px}
+  .side.l{height:104px}
+  .side.r{height:112px}
+  .side h2,.permcopy h2{font-size:1.8rem}
+  .side p{font-size:.875rem}
+  :root{--c0-gap:5px;--c0-big:1.2rem;--c0-seg:7px;--c0-bal:5px;--c0-row:5px;--c0-tab:4px;
+        --c0-av:25px;--c0-title:.9rem;--c0-bgap:3px;--c0-bv:.82rem;
+        --m-h:696px;--m-h0-x:0px;--m-h0-cap:314px}
+  .cswap>.face{padding:6px 14px 12px}.morph > .hhead{padding:12px 14px 8px}.morph > .tabbar{padding-inline:14px}
+  .mrow{padding:7px 0}
+  .spark{height:34px}
+  /* perps + earn faces, compact: markets row and earn description go
+     first; rhythm tightens */
+  .pmk{display:none}
+  .edesc{display:none}
+  .etabs{margin-top:8px}
+  .et{padding-bottom:7px;font-size:.92rem}
+  .etbl{margin-top:8px;padding:6px}
+  .etr{padding:7px 10px;gap:9px}
+  .tico{width:27px;height:27px}
+  .ethead{padding:3px 38px 5px}
+  .tab svg{width:22px;height:22px}
+  .psub{font-size:.78rem}
+  .pblab{margin-top:8px}
+  .pacts{margin-top:9px}
+  .pacts button{padding:9px 8px}
+  .ptabs{margin-top:10px;gap:14px}
+  .pempty{margin-top:8px;gap:3px}
+  .morph > .tabbar{display:none}
+  /* the balances container and the rebuilt swap screen are taller than what
+     they replaced — at a 386px shell they ran 26px and 55px over. This is
+     that height, given back. */
+  .balgrp{padding:7px}
+  .ballist{margin-top:5px}
+  .balrow{padding:4px 12px}
+  .swfield{padding:10px 12px 8px}
+  .swamt{font-size:1.4rem}
+  .swsub{margin-top:4px}
+  .swmid{margin:-8px 0}
+  .swmid .rot{width:29px;height:29px;border-radius:9px}
+  .swreview{margin-top:8px;padding:9px 14px}
+  .swrows{margin-top:8px;gap:6px}
+}
+@media(max-height:720px) and (min-width:1081px){ .side{min-height:200px}
+  :root{--c0-gap:8px;--c0-big:1.5rem;--c0-seg:12px;--c0-bal:10px;--c0-row:9px;--c0-tab:7px;
+        --c0-av:32px;--c0-title:1rem;--c0-bgap:6px;--c0-bv:.9375rem;
+        --m-h:696px;--m-h0-x:0px;--m-h0-cap:150px} }
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important}
+  /* transitions are handled in the MOTION PASS block below: property-restricted
+     rather than duration-zeroed, so fades survive and movement does not */
+  .rv{opacity:1;transform:none}
+}
+

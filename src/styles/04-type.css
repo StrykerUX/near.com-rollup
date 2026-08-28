@@ -1,0 +1,37 @@
+/* ============================================================
+   TYPE — serif headlines with a roman / italic split
+   ============================================================ */
+.display,.h1,.h4{
+  font-family:var(--font-display);font-weight:var(--w-roman);
+  font-variation-settings:"opsz" 60;font-optical-sizing:auto;
+}
+/* -.02em everywhere = the global -2 tracking. Do not fork per element. */
+.display{font-size:var(--fs-display);line-height:.98;letter-spacing:-.02em}
+.h1{font-size:var(--fs-h1);line-height:1.02;letter-spacing:-.02em}
+.h4{font-size:var(--fs-h4);line-height:1.16;letter-spacing:-.02em}
+em{
+  font-family:var(--font-display-it);font-style:italic;font-weight:var(--w-italic);
+  letter-spacing:-.02em;display:inline-block;transform-origin:50% 60%;
+  /* KEPLER ITALIC COMPENSATION (v03 type law): Kepler's x-height runs small
+     next to Montreal Medium, so italics in a mixed block are set LARGER —
+     the user's calibration is 89/73 against the roman (≈1.22×). Global for
+     every Kepler italic beside Montreal roman; do not fork per element. */
+  font-size:calc(89em / 73);
+  line-height:.9;   /* keeps the larger run from inflating the line box */
+}
+/* the squeeze. Origin must match .hw/.pw (50% 60%) — those override it on the
+   animated words, and a mismatch would compensate the wrong side. JS pairs each
+   italic with half the reclaimed width as a negative margin on BOTH sides, so
+   the line box collapses to the visual width and centred lines stay centred. */
+.display em,.h1 em{transform:scaleX(var(--it-x))}
+.nb{white-space:nowrap}
+/* Local-Kepler machines follow the same global law: Medium roman / regular
+   italic, tracking already -.02em from the base rules — no per-class forks. */
+.kepler{--w-roman:500; --w-italic:400}
+/* roman display is Montreal now (v03 type law) — the local-Kepler
+   condensed nudge only applies to the ITALIC runs that are still Kepler */
+.kepler em{font-stretch:condensed}
+.lead{font-size:var(--fs-body-lg);line-height:1.5;color:var(--fg-2);max-width:56ch}
+.caption{font-family:var(--font-mono);font-size:var(--fs-caption);color:var(--fg-3);line-height:1.45}
+.shell{max-width:var(--shell);margin-inline:auto;padding-inline:var(--gut)}
+

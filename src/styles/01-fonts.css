@@ -1,0 +1,86 @@
+/* ============================================================
+   TYPEFACES
+   Target: Kepler Std (display) · PP Neue Montreal (body)
+           PP Neue Montreal Mono (labels + figures)
+   Shipped with open substitutes until the licensed files land.
+   Drop the real files in — the stacks already name them first.
+   ============================================================ */
+/* Kepler Std, pulled straight off the machine. Adobe registers its optical
+   sizes and widths as separate families, and the exact name differs between
+   Creative Cloud vintages, so every plausible one is listed. If none resolve,
+   the family is simply undefined and the stack falls through to the substitute. */
+@font-face{
+  font-family:"Kepler Local";font-style:normal;font-weight:100 900;
+  src:local("KeplerStd-MediumCnDisp"), local("Kepler Std Medium Cn Disp"),
+      local("Kepler Std Medium Condensed Display"), local("KeplerStd-MediumCondensedDisp"),
+      local("Kepler Std Semicondensed Display"), local("KeplerStd-SemicondensedDisp"),
+      local("Kepler Std Medium Semicondensed Display"), local("KeplerStd-MediumSemicondensedDisp"),
+      local("Kepler Std SemiCd Disp"), local("Kepler Std Display"), local("KeplerStd-Display"),
+      local("Kepler Std Subhead"), local("KeplerStd-Subhead"),
+      local("Kepler Std"), local("KeplerStd"), local("Kepler");
+}
+/* Kepler Std is a static family: asking for weight 500 vs 300 can land on the
+   same physical font. So roman and italic are pointed at separate cuts by name —
+   heavier display for roman, light condensed for italic — and the weight vars
+   only fine-tune from there. */
+@font-face{
+  font-family:"Kepler Rm";font-style:normal;font-weight:100 900;
+  /* GLOBAL TYPE LAW: roman Kepler is the MEDIUM Condensed Display cut, so the
+     Medium names lead the chain — every local machine that has it renders it. */
+  src:local("KeplerStd-MediumCnDisp"), local("Kepler Std Medium Cn Disp"),
+      local("Kepler Std Medium Condensed Display"), local("KeplerStd-MediumCondensedDisp"),
+      local("KeplerStd-CnDisp"), local("Kepler Std Cn Disp"),
+      local("KeplerStd-LightCnDisp"), local("KeplerStd-CnSubh"),
+      local("Kepler Std Condensed Display"), local("KeplerStd-CondensedDisp"),
+      local("Kepler Std Light Condensed Display"), local("KeplerStd-LightCondensedDisp"),
+      local("Kepler Std Condensed"), local("KeplerStd-Cond"),
+      local("Kepler Std Semicondensed Display"), local("KeplerStd-SemicondensedDisp"),
+      local("Kepler Std Light Semicondensed Display"), local("KeplerStd-LightSemicondensedDisp"),
+      local("Kepler Std Semicondensed"), local("KeplerStd-Semicondensed"),
+      local("Kepler Std Display"), local("KeplerStd-Display"),
+      local("Kepler Std"), local("KeplerStd");
+}
+@font-face{
+  font-family:"Kepler It";font-style:italic;font-weight:100 900;
+  /* GLOBAL TYPE LAW: italic Kepler is the (regular) Condensed Display Italic —
+     it must lead the chain so the Light cuts never win on a local machine. */
+  /* Adobe's PostScript names abbreviate the widths: Cn = condensed,
+     SCn = semicondensed. Spelling them out ("Condensed") misses. */
+  src:local("KeplerStd-CnDispIt"), local("Kepler Std Cn Disp It"),
+      local("Kepler Std Condensed Display Italic"), local("KeplerStd-CondensedDispIt"),
+      local("KeplerStd-LightCnDispIt"), local("Kepler Std Light Cn Disp It"),
+      local("KeplerStd-LightCnSubhIt"), local("KeplerStd-CnSubhIt"),
+      local("KeplerStd-LightCnIt"), local("KeplerStd-CnIt"),
+      local("Kepler Std Light Condensed Display Italic"), local("KeplerStd-LightCondensedDispIt"),
+      local("KeplerStd-LightSCnDispIt"), local("KeplerStd-SCnDispIt"),
+      local("Kepler Std Light Semicondensed Display Italic"), local("KeplerStd-LightSemicondensedDispIt"),
+      local("Kepler Std Light Display Italic"), local("KeplerStd-LightDispIt"),
+      local("Kepler Std Light Italic"), local("KeplerStd-LightIt"),
+      local("Kepler Std Display Italic"), local("KeplerStd-DisplayIt"),
+      local("Kepler Std Italic"), local("KeplerStd-It");
+}
+
+/* the italic wants the CONDENSED cut, so those names come first */
+@font-face{
+  font-family:"Kepler Local";font-style:italic;font-weight:100 900;
+  src:local("Kepler Std Condensed Display Italic"), local("KeplerStd-CondensedDispIt"),
+      local("Kepler Std Light Condensed Display Italic"), local("KeplerStd-LightCondensedDispIt"),
+      local("Kepler Std Cond Disp It"), local("Kepler Std Condensed Italic"), local("KeplerStd-CondIt"),
+      local("Kepler Std Semicondensed Display Italic"), local("KeplerStd-SemicondensedDispIt"),
+      local("Kepler Std SemiCd Disp It"), local("Kepler Std Display Italic"), local("KeplerStd-DisplayIt"),
+      local("Kepler Std Subhead Italic"), local("KeplerStd-SubheadIt"),
+      local("Kepler Std Italic"), local("KeplerStd-It"), local("Kepler Italic");
+}
+@font-face{font-family:"Kepler Sub";src:url("https://cdn.jsdelivr.net/npm/@fontsource-variable/source-serif-4@5/files/source-serif-4-latin-opsz-normal.woff2") format("woff2-variations");font-weight:200 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Kepler Sub";src:url("https://cdn.jsdelivr.net/npm/@fontsource-variable/source-serif-4@5/files/source-serif-4-latin-opsz-italic.woff2") format("woff2-variations");font-weight:200 900;font-style:italic;font-display:swap}
+/* PP Neue Montreal, licensed and embedded. It is a STATIC family — one file per
+   weight — so each cut gets its own @font-face under a shared family name.
+   Declaring one file across a range (the way the variable substitute did) makes
+   every weight on the page render from that single cut, which reads as "the
+   weights aren't working". Same trap as Kepler, §3.13.
+     400 → Book    body copy, paragraphs
+     500 → Medium  buttons, card titles, figures, "Account" */
+@font-face{font-family:"PP Neue Montreal";src:url("/fonts/PPNeueMontreal-Book.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"PP Neue Montreal";src:url("/fonts/PPNeueMontreal-Medium.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"PP Neue Montreal Mono";src:url("/fonts/PPNeueMontrealMono-Book.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+

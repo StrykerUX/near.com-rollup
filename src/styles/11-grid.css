@@ -1,0 +1,153 @@
+/* ==========================================================================
+   PAGE GRID
+   Every full-width section now sits on one 12-column grid instead of each
+   container inventing its own fr ratio. The columns are the single source of
+   truth for horizontal rhythm, so a card edge in the testimonial band lines up
+   with a column edge in the security band and with the footer above it.
+   Sections keep their own vertical spacing; only the horizontal structure is
+   shared. Wide gutters between major blocks are bought with an EMPTY COLUMN
+   rather than a large gap, so the gutter is still on the grid.
+   ========================================================================== */
+:root{ --cols:12; --colgap:clamp(16px,1.7vw,28px); }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(var(--cols),minmax(0,1fr));
+  column-gap:var(--colgap);
+}
+
+/* copy | evidence. 5 + empty + 6, so the gutter is a real column. */
+/* .split AND .split.flip both listed on purpose. The original .split.flip rule
+   carries two classes, so it out-specifies a lone .split and was still handing
+   this section its old two-column template. The items were then placed on
+   columns 1-6 and 8-12, which the browser satisfied by inventing IMPLICIT auto
+   tracks — tracks 3 to 7 sized to 0 and the card column collapsed to 424px
+   against a 672px copy. Matching the specificity is the whole fix. */
+.split,
+.split.flip{
+  display:grid;
+  grid-template-columns:repeat(var(--cols),minmax(0,1fr));
+  column-gap:var(--colgap);
+  row-gap:36px;
+  align-items:center;
+}
+.split > :first-child{grid-column:1 / span 5}
+.split > :last-child {grid-column:7 / span 6}
+/* Flipped sections lead with the evidence, so the cards take 7 columns and the
+   copy 4, with column 8 left empty as the gutter. Explicit placement, not
+   source order plus a reversed template. */
+.split.flip > :first-child{grid-column:9 / -1}
+.split.flip > :last-child {grid-column:1 / span 7}
+
+/* .top is a modifier the markup already carried and that this rewrite ate:
+   the original .split.top{align-items:flex-start} sits EARLIER in the sheet, so
+   the align-items:center above overrode it at equal specificity. Both sections
+   in the page use .top, and in both the headline is meant to start on the same
+   line as the evidence beside it. MEASURED before: the Secure by design
+   headline sat 202px below the first card at 1440, 197px at 1280.
+   .top.flip carries three classes so it also clears .split.flip. */
+.split.top,
+.split.top.flip{align-items:start}
+
+/* footer: brand block, then the single real column hard right */
+.fgrid{
+  grid-template-columns:repeat(var(--cols),minmax(0,1fr));
+  column-gap:var(--colgap);
+}
+.fgrid > :first-child{grid-column:1 / span 5}
+.fgrid > :last-child {grid-column:10 / -1}
+
+@media(max-width:1080px){
+  /* One column below the split breakpoint. The selectors have to carry the
+     same :first-child / :last-child weight as the placement rules above, or
+     those win on specificity and the copy stays pinned to columns 9-12 — at
+     390 that left it 106px wide. */
+  .split > :first-child,.split > :last-child,
+  .split.flip > :first-child,.split.flip > :last-child{grid-column:1 / -1}
+}
+@media(max-width:760px){
+  .fgrid > :first-child,.fgrid > :last-child{grid-column:1 / -1}
+}
+
+/* --- primary CTA hover --------------------------------------------------- */
+/* Instant flip to translucent white with black type. transition:none is the
+   point — no easing in either direction, so the state change lands on the
+   frame the pointer arrives. The wiping panel this replaced is gone entirely,
+   along with the overflow/isolation it needed.
+   The inset hairline matters more than it looks: over the light panel a .82
+   white composites to roughly #FCFCFB, near enough to the ground that the pill
+   would lose its silhouette and leave the label floating. The ring keeps the
+   shape readable on the gradient and on the light shell alike. */
+.btn-primary{position:relative;transition:none}
+.btn-primary:hover,
+.btn-primary:focus-visible{
+  background:rgba(255,255,255,.82);
+  color:#000;
+  /* NO backdrop-filter. It was the stutter behind the ripple: adding one on
+     :hover promotes a new compositing layer at the moment of hover and forces
+     the backdrop under the button to be captured and re-blurred, which lands
+     on the same frame the ripple launches. The file's own shader notes flag
+     this exact cost on a box that is changing. A flat translucent white needs
+     no layer and starts clean. */
+  /* Inset hairline only. The outer drop shadow used to appear on the same
+     frame as the ripple, darkening the gradient right where the first ring
+     was brightening it — dark-then-bright in two frames reads as a flicker. */
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.11);
+}
+.btn-primary:active{transform:translateY(1px)}
+/* THE HERO CTA WAS NOT HOVERABLE AT ALL. .lockup sits at z-index 4 with
+   pointer-events:auto while .herotype is at 3, so the lockup covered the
+   button and swallowed every pointerenter — elementFromPoint at the button
+   centre returned DIV.lockup. Raising the hero's z-index is not an option:
+   the first card deliberately arrives OVER the fading hero type, and that
+   layering is the whole transition. So the lockup stops taking the pointer
+   for exactly the window in which the hero owns the screen. .herotype.live
+   is only true while out < 0.5, and card 0 does not arrive until out ~0.63,
+   so this never competes with the sequence. */
+.herotype.live ~ .lockup{pointer-events:none}
+
+/* --- footer ------------------------------------------------------------- */
+/* The column heading moved h5 -> h4 to close the heading-order skip, so the
+   label styling has to follow it. Without this the eyebrow renders as a
+   full-size heading. */
+.fcol h4{
+  font-family:var(--font-mono);font-size:var(--fs-micro);text-transform:uppercase;
+  letter-spacing:.16em;color:rgba(255,255,255,.45);font-weight:400;margin:0 0 16px;
+}
+/* Four link columns became one. Placement is on the page grid above; this
+   rule only carries the row gap for the stacked state. */
+.fgrid{row-gap:38px}
+.socials a svg{width:15px;height:15px;display:block}
+.socials a{display:grid;place-items:center}
+
+/* --- mobile sticky CTA -------------------------------------------------- */
+/* Only ever exists below 768. On desktop the hero button and the closing CTA
+   are both reachable without one, and a fixed bar would fight the stage. */
+.mobcta{display:none}
+@media(max-width:799px){
+  .mobcta{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    position:fixed;left:10px;right:10px;bottom:10px;z-index:80;
+    padding:10px 12px 10px 18px;border-radius:100px;
+    background:rgba(12,16,14,.72);
+    backdrop-filter:blur(20px) saturate(1.5);
+    -webkit-backdrop-filter:blur(20px) saturate(1.5);
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 8px 34px rgba(0,0,0,.34);
+    opacity:0;transform:translate3d(0,120%,0);pointer-events:none;
+    transition:opacity 320ms var(--ease-out),transform 320ms var(--ease-out);
+  }
+  .hero-gone .mobcta{opacity:1;transform:none;pointer-events:auto}
+  .mobcta span{
+    order:-1;font-family:var(--font-mono,var(--font-body));
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:rgba(255,255,255,.66);
+  }
+  .mobcta .btn{padding:9px 18px;font-size:.9rem}
+  /* keep the footer clear of the bar */
+  footer{padding-bottom:86px}
+}
+@media(prefers-reduced-motion:reduce){
+  .mobcta{transition:none}
+  .herocta{transform:none}
+}
+

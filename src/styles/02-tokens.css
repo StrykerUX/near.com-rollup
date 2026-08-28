@@ -1,0 +1,95 @@
+:root{
+  /* kepler-std-condensed-display is the Typekit family — it renders on ANY
+     machine, which the local() names never could. They stay behind it so a
+     locally-installed Kepler still wins, and the substitute stays last so the
+     page holds together offline or if the kit fails to load. */
+  /* v03 TYPE LAW (2026-08-07): ROMAN display type is PP NEUE MONTREAL
+     MEDIUM at -2 tracking. ONLY italics stay Kepler (Condensed Display
+     Italic, unchanged). --font-display-it is the serif chain below. */
+  --font-display:"PP Neue Montreal","Helvetica Neue",Arial,sans-serif;
+  --font-display-it:"kepler-std-condensed-display","Kepler It","Kepler Local","Kepler Std","Kepler Sub",Georgia,"Times New Roman",serif;
+  --font-body:"PP Neue Montreal","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"PP Neue Montreal Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  /* ── GLOBAL KEPLER TYPE LAW (standing, applies to EVERY Kepler use) ──
+     roman  = Kepler Std MEDIUM Condensed Display, letter-spacing -2% (-.02em)
+     italic = Kepler Std Condensed Display ITALIC, letter-spacing -2% (-.02em)
+     Roman asks for 500 so any source that ships the Medium cut serves it.
+     Typekit's kepler-std-condensed-display ships 400/700 only, so on kit-only
+     machines 500 resolves to the 400 cut (no synthesis) until Medium is added
+     to the gtm1rhn web project. The local() chains lead with the Medium cut. */
+  --w-roman:500;
+  --w-italic:400;
+  /* Condensed is the narrowest width Kepler ships. This squeezes past it. */
+  --it-x:0.86;
+  /* social-proof marquee: gap between quote cards, and travel speed in px/sec */
+  --mgap:14px;
+  --mspeed:42;
+  /* the light panel's bottom corner radius. The final CTA starts full-bleed and
+     has to match it exactly, so it lives here rather than inline. */
+  --lb-rad:clamp(24px,3vw,44px);
+  /* final-CTA contract: 0 = full bleed, 1 = resting inset. Driven by JS. */
+  --cta-t:1;
+  /* card 0 vertical rhythm. The card shell shrinks at three breakpoints and the
+     home screen has to fit all of them, so the five things that cost height are
+     variables — the media queries override numbers, never layout. */
+  --c0-gap:16px;    /* under the header            */
+  --c0-big:2.05rem; /* the total-balance figure    */
+  --c0-seg:20px;    /* above Receive / Send        */
+  --c0-bal:18px;    /* above the Balances group    */
+  --c0-row:12px;    /* inside each balance box     */
+  --c0-tab:10px;    /* above the tab bar           */
+  --c0-av:38px;     /* avatar + icon button size   */
+  --c0-title:1.15rem;/* the word Account           */
+  --c0-bgap:9px;    /* between balance containers  */
+  --c0-bv:1.0625rem;/* figure inside a container   */
+  /* Card 0 is the whole app home screen, so it is TALLER than the other three.
+     --m-h is the standard shell; --m-h0 is card 0's. paintCards() animates
+     between them off the same curve as the slide, so the shell shrinks into
+     the Swap card rather than snapping. The viewport clamp is a backstop: the
+     lockup lives in a 100vh sticky and a tall card must not push out of it. */
+  --m-h:696px;  /* 18:9 against the 348px width */
+  --m-h0-x:0px;   /* card 0 no longer taller — kept as a knob */
+  --m-h0-cap:190px; /* no shell may outgrow the 100vh sticky */
+  /* no-JS fallback only. measureShell() overwrites this with a plain px value
+     on load and on resize — a calc()/min() custom property is a token stream,
+     so parseFloat() on it returns NaN and the JS height animation dies. */
+  --m-h0:calc(var(--m-h) + var(--m-h0-x));
+  --cta-pad:clamp(56px,8vw,110px);
+
+  --near-green:#00EC97; --near-black:#000;
+  --green-300:#3FEFAD; --green-500:#00C880; --green-600:#00A268; --green-deep:#0A2E26;
+
+  /* light zone — sampled from the near.com reference */
+  --l-bg:#F3F2EF; --l-surface:#FFF; --l-gray:#E7E6E1; --l-gray-2:#DCDBD5;
+  --l-fg:#0B0D0D; --l-fg-2:#4A4E4D; --l-fg-3:#767A78;
+  --l-border:rgba(11,13,13,.10); --l-border-strong:rgba(11,13,13,.20);
+
+  --fg:#F2F2F1; --fg-2:#B4B9B9; --fg-3:#8A9090;
+  --border:rgba(255,255,255,.14); --border-strong:rgba(255,255,255,.28);
+
+  --fs-display:clamp(3rem,7vw,7rem);
+  --fs-h1:clamp(2.55rem,4.2vw,3.35rem);
+  --fs-h4:1.45rem;
+  --fs-body-lg:1.28rem; --fs-body:1.145rem; --fs-body-sm:1rem;
+  --fs-caption:.875rem; --fs-micro:.74rem;
+
+  --radius-sm:8px; --radius-md:12px; --radius-lg:20px; --radius-pill:999px;
+  --space-5:24px; --space-6:32px; --space-7:48px; --space-8:64px; --space-9:96px;
+
+  --glow-green-sm:0 0 16px rgba(0,236,151,.45);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --dur:240ms; --dur-slow:480ms;
+  --rollmark-src:url('/img/rollmark.png');
+  --roll3d-src:url('/img/roll3d.webp');
+  --rollw-src:url('/img/rollw.png');
+  --shell:1280px; --gut:clamp(20px,5vw,64px);
+
+  /* driven from JS */
+  --surge:0;
+  --cue-out:0;
+  --lock-o:1; --card-o:1; --card-y:2000; --card-s:1; --card-pk:1.33;
+  --fade-light:0;
+  --ci-t:0px; --ci-r:0px; --ci-b:0px; --ci-l:0px; --ci-rad:0px;
+}
+

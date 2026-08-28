@@ -1,0 +1,16 @@
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:90;color:#fff;
+  display:flex;align-items:center;gap:var(--space-6);
+  /* fixed at its final size — no resize on scroll, nothing to shift */
+  height:62px;padding-inline:var(--gut);border-bottom:1px solid transparent;
+  transition:background var(--dur-slow) var(--ease-out),
+             border-color var(--dur-slow) var(--ease-out),color var(--dur-slow) var(--ease-out);
+}
+.nav.on-light{background:rgba(243,242,239,.5);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom-color:var(--l-border);color:var(--l-fg)}
+.brand{display:flex;align-items:center;flex:none}
+.brand svg{height:22px;width:auto}
+.navspacer{flex:1}
+

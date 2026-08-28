@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ============================================================
+   near.com × THE ROLLUP — ported stylesheet
+   ------------------------------------------------------------
+   The thirteen files below are the original single-file
+   stylesheet, split at its own section banners and imported in
+   SOURCE ORDER. That order is load-bearing: the later blocks are
+   a version history (v04 → v08) and each one overrides the last.
+   Reordering these imports changes the page.
 
+   They are imported UNLAYERED on purpose. Unlayered CSS outranks
+   everything inside Tailwind's @layer cascade, so preflight and
+   stray utilities can never win against a hand-tuned rule.
+   ============================================================ */
+@import "../styles/01-fonts.css";
+@import "../styles/02-tokens.css";
+@import "../styles/03-base.css";
+@import "../styles/04-type.css";
+@import "../styles/05-buttons.css";
+@import "../styles/06-nav.css";
+@import "../styles/07-stage.css";
+@import "../styles/08-light.css";
+@import "../styles/09-responsive.css";
+@import "../styles/10-conversion.css";
+@import "../styles/11-grid.css";
+@import "../styles/12-motion.css";
+@import "../styles/13-rollup.css";
+@import "../styles/14-refactor.css";
+
+/* ============================================================
+   TAILWIND v4 THEME BRIDGE
+   The design tokens above are the single source of truth. This
+   re-exports them as Tailwind theme keys so utilities and the
+   ported CSS can never drift apart — `bg-near-green` and
+   `var(--near-green)` resolve to the same value by construction.
+   ============================================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-display: var(--font-display);
+  --font-display-it: var(--font-display-it);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+  --color-near-green: var(--near-green);
+  --color-near-black: var(--near-black);
+  --color-green-300: var(--green-300);
+  --color-green-500: var(--green-500);
+  --color-green-600: var(--green-600);
+  --color-green-deep: var(--green-deep);
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  --color-l-bg: var(--l-bg);
+  --color-l-surface: var(--l-surface);
+  --color-l-gray: var(--l-gray);
+  --color-l-gray-2: var(--l-gray-2);
+  --color-l-fg: var(--l-fg);
+  --color-l-fg-2: var(--l-fg-2);
+  --color-l-fg-3: var(--l-fg-3);
+
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+
+  --text-display: var(--fs-display);
+  --text-h1: var(--fs-h1);
+  --text-h4: var(--fs-h4);
+  --text-body-lg: var(--fs-body-lg);
+  --text-body: var(--fs-body);
+  --text-body-sm: var(--fs-body-sm);
+  --text-caption: var(--fs-caption);
+  --text-micro: var(--fs-micro);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-pill: var(--radius-pill);
+
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-7: var(--space-7);
+  --spacing-8: var(--space-8);
+  --spacing-9: var(--space-9);
+
+  --ease-out-quint: var(--ease-out);
 }

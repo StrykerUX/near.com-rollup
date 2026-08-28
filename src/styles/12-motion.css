@@ -1,0 +1,106 @@
+/* ==========================================================================
+   v04 MOTION PASS  2026-08-25
+   ========================================================================== */
+
+/* --- 1. transition:all is gone ------------------------------------------
+   Ten rules transitioned EVERY property. That makes the browser watch all of
+   them, and it silently animates anything a future edit happens to change —
+   including layout properties, which is how a hover starts costing a reflow.
+   One token, named properties, same visual result. background-color rather
+   than the background shorthand: the colour is the only animatable part. */
+:root{
+  --tr-ui:
+    background-color var(--dur) var(--ease-out),
+    border-color     var(--dur) var(--ease-out),
+    color            var(--dur) var(--ease-out),
+    opacity          var(--dur) var(--ease-out),
+    transform        var(--dur) var(--ease-out);
+  --dur-press:120ms;
+}
+
+/* --- 2. hover motion is pointer-gated -----------------------------------
+   Touch fires a synthetic hover on tap and then STRANDS it: the card stays
+   lifted, the arrow stays nudged, until something else is tapped. Colour-only
+   hovers are left ungated — a stuck tint is invisible, a stuck transform is a
+   bug. These five were the transform-carrying ones. */
+.btn:hover .arw,
+.balrow:hover .bar,
+.card:hover,
+.mmid .rot:hover,
+.swmid .rot:hover{transform:none}
+
+@media (hover:hover) and (pointer:fine){
+  .btn:hover .arw       {transform:translateX(3px)}
+  .balrow:hover .bar    {transform:translateX(3px)}
+  .card:hover           {transform:translateY(-2px)}
+  .mmid .rot:hover,
+  .swmid .rot:hover     {transform:rotate(180deg)}
+}
+
+/* --- 3. press feedback on the tour's controls ---------------------------
+   Everything inside the phone answered to hover and nothing answered to a
+   press, which is what made it read as a picture of an app rather than an app.
+   96.5% for a beat is below the threshold of "something moved" and above the
+   threshold of "something responded". 120ms, because press feedback has to
+   land inside the same moment as the click.
+   No :active on .balrow's arrow or the tab labels — one element per press. */
+.tab,.pt,.et,.etr,.balrow,.picker,.seg button,.pacts button,.swreview,.eye{
+  transition:var(--tr-ui);
+}
+/* NOT behind the hover gate. That gate exists because touch fires a FALSE
+   hover; :active on touch is a real press, and press feedback is the state a
+   touch user needs most — there is no hover to tell them the target is live. */
+.tab:active,.pt:active,.et:active,.etr:active,
+.balrow:active,.picker:active,.seg button:active,
+.pacts button:active,.eye:active{
+  transform:scale(.965);
+  transition-duration:var(--dur-press);
+}
+/* .swreview already had its own translateY(1px) press. It was inheriting the
+   240ms UI duration from --tr-ui above, which turns a press into a slow sink.
+   Press feedback has to land inside the same moment as the click. */
+.swreview:active{transition-duration:var(--dur-press)}
+
+/* --- 4. the FAQ rows had no hover at all --------------------------------
+   A full-width clickable row with no affordance. The glyph is what the eye is
+   already on when it reaches for one of these, so the glyph is what answers:
+   it brightens and leans a degree toward the rotation it is about to make.
+   No transform on the row itself — 8 rows of type shifting under the cursor is
+   noise, not feedback. */
+@media (hover:hover) and (pointer:fine){
+  .acc-btn:hover .plus{color:var(--near-green);transform:rotate(8deg)}
+  .acc-btn[aria-expanded="true"]:hover .plus{transform:rotate(53deg)}
+  .acc-btn:hover .t{color:var(--l-fg)}
+}
+.acc-btn .t{transition:color var(--dur) var(--ease-out)}
+.acc-btn .plus{transition:transform var(--dur) var(--ease-out),color var(--dur) var(--ease-out)}
+
+/* --- 5. the testimonial reveal was 15 cards at once ---------------------
+   Simultaneous entry reads as a single block wiping in, and it also meant
+   fifteen concurrent blur transitions on one frame. A left-to-right stagger
+   across the first eight costs nothing and turns the wipe into a sweep. The
+   rest are off-screen when the rail reveals, so they need no delay. */
+.marquee.mq-in .qcard:nth-child(1){transition-delay:0ms}
+.marquee.mq-in .qcard:nth-child(2){transition-delay:45ms}
+.marquee.mq-in .qcard:nth-child(3){transition-delay:90ms}
+.marquee.mq-in .qcard:nth-child(4){transition-delay:135ms}
+.marquee.mq-in .qcard:nth-child(5){transition-delay:180ms}
+.marquee.mq-in .qcard:nth-child(6){transition-delay:225ms}
+.marquee.mq-in .qcard:nth-child(7){transition-delay:270ms}
+.marquee.mq-in .qcard:nth-child(8){transition-delay:315ms}
+
+/* --- 6. reduced motion: gentler, not zero -------------------------------
+   The old block set transition-duration to .01ms on EVERYTHING, which removes
+   the fades that carry meaning along with the movement that causes trouble.
+   Restricting transition-property instead keeps colour and opacity working and
+   makes every transform and filter snap — which is the actual ask. Animations
+   still collapse to a single iteration, so the scroll cue stops looping. */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    transition-property:opacity,color,background-color,border-color,box-shadow,fill,stroke !important;
+    transition-duration:160ms !important;
+  }
+  .marquee.mq-in .qcard{transition-delay:0ms !important}
+  .rv{opacity:1;transform:none}
+}
+
