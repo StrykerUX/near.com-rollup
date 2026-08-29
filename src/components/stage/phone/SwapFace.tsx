@@ -3,8 +3,10 @@ import { fmt } from '@/lib/format';
 import { findToken } from '@/lib/tokens';
 import { useFlow } from './flows/player';
 import { SETTLE_STEPS, swapScript, type SwapState } from './flows/swap';
+import { Enter } from './ui/Enter';
 import { ProgressList } from './ui/ProgressList';
 import { Sheet } from './ui/Sheet';
+import { Ticker } from './ui/Ticker';
 import { SheetPortal } from './ui/SheetSlot';
 import { TokenDot } from './TokenDot';
 import { IconSlippage, IconSwapDir } from './icons';
@@ -20,14 +22,15 @@ const SEND = 6635.6169;
  * off the same two prices, so no two numbers here can disagree.
  */
 export function SwapFace() {
-  const { state: s } = useFlow<SwapState>(2, swapScript);
+  const { state: s, live, pass, looping } = useFlow<SwapState>(2, swapScript);
   const to = findToken(s.to);
   const out = (SEND * FROM.price) / to.price;
   const rate = to.price / FROM.price;
   const settling = s.screen === 'settling' || s.screen === 'done';
+  const tap = (id: string) => (s.tap === id ? ' tapped' : '');
 
   return (
-    <div className="face sface" data-face="1">
+    <div className={'face sface' + (looping ? ' looping' : '')} data-face="1">
       <div className="sleg">
         <TokenDot token={FROM} size={30} />
         <span className="slegt">
@@ -38,23 +41,31 @@ export function SwapFace() {
 
       <span className="sarrow" aria-hidden="true"><IconSwapDir /></span>
 
-      <div className="sleg">
+      {/* The receiving leg RE-QUOTES. A swap screen whose output figure never
+          moves is quoting a price from the past, and this is the one number on
+          the card a trader would look at twice. */}
+      <div className={'sleg' + tap('picker')} key={`leg${to.sym}${pass}`}>
         <TokenDot token={to} size={30} />
         <span className="slegt">
-          <b>{fmt(out, 4)} {to.sym}</b>
+          <b>
+            {/* no flash here: a re-quote every second and a half is normal,
+                and colouring each one turns a quiet refresh into an alarm */}
+            <Ticker base={out} amp={out * 0.0009} dp={4} every={1600} live={live} />
+            {' '}{to.sym}
+          </b>
           <em>${fmt(out * to.price, 0)}</em>
         </span>
       </div>
 
       {settling ? (
-        <div className="ssettle">
+        <div className="ssettle enter-one" key={`st${pass}`}>
           <ProgressList steps={SETTLE_STEPS} at={s.step} />
           {s.screen === 'done' ? (
-            <button className="sagain" type="button" tabIndex={-1}>↻ Swap again</button>
+            <span className="sagain enter-one">↻ Swap again</span>
           ) : null}
         </div>
       ) : (
-        <>
+        <Enter k={`f${pass}`} className="sform">
           <dl className="srows">
             <div>
               <dt>Exchange rate</dt>
@@ -69,10 +80,10 @@ export function SwapFace() {
               <dd>{fmt(out * 0.995, 4)} {to.sym}</dd>
             </div>
           </dl>
-          <button className="sreview" type="button" tabIndex={-1}>
+          <span className={'sreview' + tap('review') + tap('swap')}>
             {s.screen === 'review' ? 'Swap' : 'Review trade'}
-          </button>
-        </>
+          </span>
+        </Enter>
       )}
 
       <SheetPortal>

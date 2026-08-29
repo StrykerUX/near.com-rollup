@@ -45,30 +45,3 @@ export function subscribeActiveFace(fn: (i: number) => void) {
     faceSubs.delete(fn);
   };
 }
-
-/* ------------------------------------------------------------------
-   STAGE PROGRESS
-   The demo screens are a function of scroll, exactly as the cards above
-   them are. This publishes the SMOOTHED position the composition is
-   drawn from — not the raw scroll — so the phone and the card it sits
-   in move on the same clock and can never disagree.
-   ------------------------------------------------------------------ */
-
-let stageProgress = 0;
-const progressSubs = new Set<(p: number) => void>();
-
-export function setStageProgress(p: number) {
-  /* a scrub that has settled writes the same number every frame; the flows
-     have nothing to do with those and should not be woken for them */
-  if (Math.abs(p - stageProgress) < 0.0004) return;
-  stageProgress = p;
-  progressSubs.forEach((fn) => fn(p));
-}
-
-export function subscribeStageProgress(fn: (p: number) => void) {
-  progressSubs.add(fn);
-  fn(stageProgress);
-  return () => {
-    progressSubs.delete(fn);
-  };
-}

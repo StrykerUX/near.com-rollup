@@ -1,8 +1,11 @@
 'use client';
 import { useFlow } from './flows/player';
 import { AVAILABLE, DEPOSIT_STEPS, earnScript, type EarnState } from './flows/earn';
+import { Enter } from './ui/Enter';
+import { LiveDot } from './ui/LiveDot';
 import { ProgressList } from './ui/ProgressList';
 import { Sheet } from './ui/Sheet';
+import { Ticker } from './ui/Ticker';
 import { SheetPortal } from './ui/SheetSlot';
 
 const VAULTS = [
@@ -18,11 +21,13 @@ const VAULTS = [
  * expands.
  */
 export function EarnFace() {
-  const { state: s } = useFlow<EarnState>(3, earnScript);
+  const { state: s, live, pass, looping } = useFlow<EarnState>(3, earnScript);
   const settling = s.screen === 'depositing' || s.screen === 'done';
+  const tap = (id: string) => (s.tap === id ? ' tapped' : '');
 
   return (
-    <div className="face eface" data-face="3">
+    <div className={'face eface' + (looping ? ' looping' : '')} data-face="3">
+      <Enter k={`l${pass}`} className="elist">
       <p className="psub"><span className="pbeta">Beta</span>Put your idle assets to work.</p>
 
       <div className="etabs" role="tablist" aria-label="Earn types">
@@ -41,7 +46,7 @@ export function EarnFace() {
         <div className="etrs" role="listbox" aria-label="Vaults">
           {VAULTS.map((v, i) => (
             <div
-              className="etr"
+              className={'etr' + (i === 1 ? tap('vaultrow') : '')}
               role="option"
               key={v.name}
               aria-selected={s.screen !== 'list' && i === 1}
@@ -57,6 +62,7 @@ export function EarnFace() {
           ))}
         </div>
       </div>
+      </Enter>
 
       <SheetPortal>
         <Sheet open={s.screen !== 'list'}>
@@ -70,21 +76,23 @@ export function EarnFace() {
           </div>
 
           <dl className="vstat">
-            <div><dt>APY</dt><dd>5.80%</dd></div>
-            <div><dt>TVL</dt><dd>$854,153</dd></div>
+            <div><dt>APY <LiveDot /></dt><dd>5.80%</dd></div>
+            {/* a vault's TVL creeps all day; frozen it reads as a brochure */}
+            <div>
+              <dt>TVL</dt>
+              <dd>$<Ticker base={854153} amp={640} dp={0} every={2800} live={live} /></dd>
+            </div>
           </dl>
 
           {settling ? (
-            <div className="vsettle">
+            <div className="vsettle enter-one" key={`d${pass}`}>
               <b className="vsettleh">Depositing {AVAILABLE} USDC</b>
               <ProgressList steps={DEPOSIT_STEPS} at={s.step} />
               <span className="vref">Reference ID <i>Cc.X9D…FtYC</i></span>
-              {s.screen === 'done' ? (
-                <button className="vclose" type="button" tabIndex={-1}>Close</button>
-              ) : null}
+              {s.screen === 'done' ? <span className="vclose enter-one">Close</span> : null}
             </div>
           ) : (
-            <>
+            <Enter k={`v${pass}`} className="vform">
               <dl className="vfees">
                 <div><dt>Deposit fee</dt><dd>Variable, up to 0.01%</dd></div>
                 <div><dt>Withdrawal fee</dt><dd>Fixed, 0.05%</dd></div>
@@ -105,14 +113,14 @@ export function EarnFace() {
                 <span className="vavail">
                   <span className="vico" aria-hidden="true">$</span>
                   <span className="vatext"><i>Available</i><b>{AVAILABLE} USDC</b></span>
-                  <span className={'vmax' + (s.maxed ? ' on' : '')}>Use max</span>
+                  <span className={'vmax' + (s.maxed ? ' on' : '') + tap('max')}>Use max</span>
                 </span>
               </div>
 
-              <button className={'vcta' + (s.amount ? '' : ' off')} type="button" tabIndex={-1}>
+              <span className={'vcta' + (s.amount ? '' : ' off') + tap('deposit')}>
                 {s.amount ? 'Deposit' : 'Enter an amount'}
-              </button>
-            </>
+              </span>
+            </Enter>
           )}
         </Sheet>
       </SheetPortal>

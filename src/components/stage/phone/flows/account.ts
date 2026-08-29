@@ -17,6 +17,8 @@ export type AccountState = {
   payWith: 'NEAR' | 'vault';
   /** lights the row while the source is changing */
   swapping: boolean;
+  /** which control the flow just pressed — see the note in perps.ts */
+  tap: string | null;
 };
 
 const initial: AccountState = {
@@ -26,16 +28,20 @@ const initial: AccountState = {
   focus: false,
   payWith: 'NEAR',
   swapping: false,
+  tap: null,
 };
 
 const beats: Beat<AccountState>[] = [
-  { w: 5, set: { screen: 'home' } },
-  /* w:2 — see the note in perps.ts: below that this beat is narrower than one
-     wheel notch and the typing is never seen */
-  { w: 2, set: { screen: 'send', focus: true, amount: '1', pressed: '1' } },
-  { w: 4, set: { amount: '100', pressed: null } },
-  { w: 1, set: { swapping: true } },
-  { w: 7, set: { payWith: 'vault', swapping: false, focus: false } },
+  { ms: 3000, set: { screen: 'home' } },
+  /* A press and the screen it opens are TWO beats. Collapsed into one, the
+     control that was tapped unmounts on the same frame it lights up — the
+     press is never seen and the two screens read as unrelated slides. */
+  { ms: 210, set: { tap: 'send' } },
+  /* short and sharp: the only beat that says the amount was typed */
+  { ms: 320, set: { screen: 'send', focus: true, amount: '1', pressed: '1', tap: null } },
+  { ms: 1600, set: { amount: '100', pressed: null, tap: null } },
+  { ms: 620, set: { swapping: true, tap: 'paywith' } },
+  { ms: 4200, set: { payWith: 'vault', swapping: false, focus: false, tap: null } },
 ];
 
 export const accountScript: Script<AccountState> = {

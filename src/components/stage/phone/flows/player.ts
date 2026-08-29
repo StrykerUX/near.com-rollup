@@ -1,38 +1,27 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
-import { subscribeActiveFace, subscribeStageProgress } from '@/stage/bus';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { subscribeActiveFace } from '@/stage/bus';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { dwellT } from '@/lib/schedule';
 
 /**
  * THE FLOW PLAYER
  * ==================================================================
- * Each demo screen is a SCRIPT: an ordered list of beats, each with a weight
+ * Each demo screen is a SCRIPT: an ordered list of beats, each with a duration
  * and a patch. The state at any moment is `initial` plus every patch up to the
- * current beat.
+ * current beat, which makes a flow a pure function of elapsed time.
  *
- * THE SCRIPT IS SCRUBBED BY SCROLL, NOT PLAYED ON A CLOCK.
+ * The flow keeps its OWN clock. It is not scrubbed by scroll: a screen that
+ * only moves while the reader's wheel does is a screen that is dead the moment
+ * they stop, and stopping is exactly when they are looking at it.
  *
- * Each card owns a band of the stage — the dwell the reader is given to look at
- * it — and its flow runs across exactly that band. Scroll into Perps and the
- * order ticket fills in as you go; keep scrolling and it holds finished while
- * the card leaves; scroll back up and it unwinds, because it is the same
- * composition run backwards rather than a second animation with its own
- * direction. That is the rule the stage engine one level up is built on, and
- * the phone had no business keeping its own clock against it.
- *
- * A beat therefore carries a WEIGHT, not a duration: its share of the card's
- * dwell.
- *
- * That share is the constraint the scripts are written against. A card's dwell
- * is ~9% of the stage, and one wheel notch is a fifth of it — so a script with
- * a beat per keystroke would jump eighteen of them per notch and the typing
- * would never be seen. Few, large, legible states; each one gets real scroll.
+ * A flow runs only while its card is the landed one on stage, and it rewinds
+ * when the card leaves — coming back to a screen halfway through a keypad entry
+ * reads as something left dirty.
  */
 
 export type Beat<S> = {
-  /** this beat's share of the card's dwell — relative, units are arbitrary */
-  w: number;
+  /** how long this beat holds, in ms */
+  ms: number;
   /** applied when the beat begins, and it stays applied */
   set?: Partial<S>;
 };
@@ -45,18 +34,23 @@ export type Script<S> = {
    * held still. Given as a beat index.
    */
   restFrame: number;
+  /**
+   * How long the finished screen holds before the loop starts over. It is
+   * separate from the last beat's duration because this is the pause that makes
+   * a loop read as a loop rather than as a rewind — the outcome gets to sit
+   * there, and then the screen fades out and begins again.
+   */
+  outro?: number;
 };
 
-/** Cumulative beat ends, normalised to 0..1 across the whole script. */
-function timeline<S>(beats: Beat<S>[]) {
+function timeline<S>(beats: Beat<S>[], outro: number) {
   const ends: number[] = [];
   let t = 0;
   for (const b of beats) {
-    t += b.w;
+    t += b.ms;
     ends.push(t);
   }
-  const total = t || 1;
-  return ends.map((e) => e / total);
+  return { ends, total: t + outro };
 }
 
 function stateAt<S>(script: Script<S>, index: number): S {
@@ -70,38 +64,68 @@ function stateAt<S>(script: Script<S>, index: number): S {
 export type FlowState<S> = {
   state: S;
   beatIndex: number;
-  /** true while this card is the landed one — the chart uses it to idle */
+  /** true while this card is the landed one on stage */
   live: boolean;
+  /**
+   * Counts up once per loop. Handing it to a `key` is what lets a screen play
+   * its entrance again on the next pass instead of only on first mount.
+   */
+  pass: number;
+  /** true during the outro hold, so the screen can fade before it restarts */
+  looping: boolean;
 };
 
-/**
- * @param faceIndex the DISPLAY index of the card this flow belongs to
- */
 export function useFlow<S>(faceIndex: number, script: Script<S>): FlowState<S> {
-  const marks = useMemo(() => timeline(script.beats), [script]);
+  const outro = script.outro ?? 900;
+  const tl = useMemo(() => timeline(script.beats, outro), [script.beats, outro]);
   const reduce = useReducedMotion();
   const [live, setLive] = useState(false);
-  const [scrubIndex, setScrubIndex] = useState(0);
+  const [tick, setTick] = useState({ i: -1, pass: 0, looping: false });
+  const last = useRef(tick);
+  last.current = tick;
 
   useEffect(() => subscribeActiveFace((i) => setLive(i === faceIndex)), [faceIndex]);
 
   useEffect(() => {
-    if (reduce) return;
-    return subscribeStageProgress((p) => {
-      const t = dwellT(p, faceIndex);
-      /* The last mark is 1, so a card the page has moved past resolves to its
-         final beat and holds there — the screen you scroll away from is the
-         finished one. */
+    if (reduce || !live) return;
+    let raf = 0;
+    let t0 = 0;
+    raf = requestAnimationFrame(function step(now) {
+      raf = requestAnimationFrame(step);
+      if (!t0) t0 = now;
+      const elapsed = now - t0;
+      const pass = Math.floor(elapsed / tl.total);
+      const t = elapsed % tl.total;
+      const looping = t >= tl.ends[tl.ends.length - 1];
       let i = 0;
-      while (i < marks.length - 1 && t > marks[i]) i++;
-      setScrubIndex(t <= 0 ? 0 : i);
+      while (i < tl.ends.length - 1 && t >= tl.ends[i]) i++;
+      /* The beat index is the ONLY thing that re-renders. Everything that has
+         to move continuously — the chart, the ticking figures, a progress
+         ring — runs on its own rAF inside the component that draws it, exactly
+         as the stage engine keeps its per-frame work out of React. */
+      const p = last.current;
+      if (p.i !== i || p.pass !== pass || p.looping !== looping) {
+        setTick({ i, pass, looping });
+      }
     });
-  }, [faceIndex, marks, reduce]);
+    return () => cancelAnimationFrame(raf);
+  }, [live, reduce, tl]);
 
-  /* Reduced motion gets one honest frame and no scrub — but still only on the
+  useEffect(() => {
+    if (!live && !reduce) setTick({ i: -1, pass: 0, looping: false });
+  }, [live, reduce]);
+
+  /* Reduced motion gets one honest frame and no loop — but still only on the
      card that is on stage. Resting every face at its rest frame at once put two
      open sheets into the shell's single portal slot. */
-  const beatIndex = reduce ? (live ? script.restFrame : -1) : scrubIndex;
+  const beatIndex = reduce ? (live ? script.restFrame : -1) : tick.i;
   const state = useMemo(() => stateAt(script, beatIndex), [script, beatIndex]);
-  return { state, beatIndex, live };
+
+  return {
+    state,
+    beatIndex,
+    live,
+    pass: reduce ? 0 : tick.pass,
+    looping: reduce ? false : tick.looping,
+  };
 }

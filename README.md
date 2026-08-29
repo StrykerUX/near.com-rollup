@@ -55,9 +55,9 @@ src/
                       useKeplerProbe · useSqueezeItalics
   components/
     stage/            Stage · Hero · Lockup · StepDots · GradientField
-    stage/phone/      the demo app: four scroll-scrubbed screens + chrome
-    stage/phone/ui/   Sheet · Keypad · ProgressList · FieldRow · Chart
-    stage/phone/flows/ the scripts, and the player that scrubs them
+    stage/phone/      the demo app: four looping screens + chrome
+    stage/phone/ui/   Sheet · Keypad · ProgressList · Chart · Ticker · Enter
+    stage/phone/flows/ the scripts, and the player that runs them
     light/            marquee · security · faq · final CTA · footer
     marks/            vector marks lifted verbatim
 ```
@@ -122,8 +122,9 @@ invalidates the engine's cached child lists. A breakpoint does not.
 ## The demo screens
 
 The four screens inside the phone shell are rebuilt against the real near.com
-app — recordings of Perps, Swap, Earn and Universal Send — and each one is
-**scrubbed by scroll**, per section.
+app — recordings of Perps, Swap, Earn and Universal Send. Each one runs its own
+looping flow on its own clock, and only while its card is the landed one on
+stage.
 
 | Card | Flow |
 |---|---|
@@ -132,32 +133,58 @@ app — recordings of Perps, Swap, Earn and Universal Send — and each one is
 | Swap | Token sheet with search, then `Finding best price → Executing trade → Trade complete`. |
 | Earn | Vault list, the vault's fees, Use max, and a deposit that settles. |
 
-### A flow is a script, and scroll is its clock
+### A flow is a script
 
-Each card owns a band of the stage — the dwell the reader is given to look at
-it — and its flow runs across exactly that band. Scroll into Perps and the order
-ticket fills in as you go. Keep scrolling and it holds finished while the card
-leaves. Scroll back up and it unwinds, because it is the same composition run
-backwards rather than a second animation with its own direction.
+`flows/player.ts` walks an ordered list of beats, each with a duration and a
+patch. The state at any moment is `initial` plus every patch up to the current
+beat — a pure function of elapsed time.
 
-That is the rule the stage engine one level up is built on, and the phone had no
-business keeping its own clock against it. `dwellT(p, k)` in `lib/schedule.ts`
-is the mapping; `flows/player.ts` walks the beats. Flows and cards read the same
-schedule, so retuning `W_REST` moves both.
+The flow keeps its OWN clock rather than being scrubbed by scroll. A screen that
+only moves while the reader's wheel does is dead the moment they stop, and
+stopping is exactly when they are looking at it.
 
-**A beat carries a weight, not a duration** — its share of the card's dwell. That
-share is the constraint the scripts are written against: a dwell is ~9% of the
-stage and one wheel notch is a fifth of it, so a script with a beat per keystroke
-would jump eighteen of them per notch and the typing would never be seen. Few,
-large, legible states; each one gets real scroll. Nothing below w:2, which is
-about one notch.
+**The beat index is the only thing that re-renders.** Everything continuous — the
+candle chart, the ticking figures, a progress ring — runs on its own rAF inside
+the component that draws it, exactly as the stage engine keeps its per-frame
+work out of React.
 
-**The beat index is the only thing that re-renders.** The one genuinely
-continuous element — the live candle — runs on its own rAF inside the component
-that draws it, and stops dead when its card is not the one on stage.
+`prefers-reduced-motion` gets one frame per card — the beat named `restFrame` —
+and no loop.
 
-`prefers-reduced-motion` gets one frame per card, the beat named `restFrame`,
-and no scrub at all.
+### The four things that separate a screen that is running from a picture
+
+The demo played correctly long before it felt alive. These are what closed the
+gap, and they are all in `15-demo.css`:
+
+**1 · States arrive, they do not appear.** `ui/Enter.tsx` takes a key that
+changes with the screen and the loop pass, so React remounts it and the CSS
+entrance plays *again* — without the key it fires once on mount and every state
+after that snaps, which is what makes a scripted screen read as a slideshow. The
+rise is 6px: enough to read as settling, small enough not to compete with the
+card slide behind it.
+
+**2 · Figures never sit perfectly still.** The single biggest tell of a mocked
+screen is that every number on it is frozen. `ui/Ticker.tsx` walks a figure
+around its resting value on deterministic value noise and flashes it green on a
+rise, red on a fall, the way a tape does. The amplitudes are deliberately small;
+the difference between "moves a little" and "does not move" is the whole point.
+It writes to the DOM directly — four of these re-rendering their parents would
+be four component trees rebuilt for a changing digit.
+
+**3 · Controls answer a press.** A press and the screen it opens are **two
+beats**. Collapsed into one, the control that was tapped unmounts on the same
+frame it lights up: the press is never seen and the two screens read as
+unrelated slides. Splitting them is what connects a cause to its effect.
+
+**4 · The loop breathes out.** A loop that cuts from its last frame to its first
+reads as a rewind. The finished screen dissolves over an outro hold, and the
+next pass then arrives on the stagger from (1).
+
+> The loop fade uses `filter: opacity()`, not `opacity`. The stage engine writes
+> `opacity` and `transform` **inline** on every `.cswap > .face` on every frame
+> it paints, so a class can never win against them and the fade would silently
+> do nothing. `filter` is the one compositing property the engine does not
+> touch. Do not "simplify" it back.
 
 ### Why the stop loss is wrong on purpose
 
@@ -171,7 +198,8 @@ stops looking like a picture of an app.
 At 320px inside a phone shell there is no crosshair to hit, no axis to zoom and
 no dataset to stream. Everything a library buys costs ~45KB here and buys
 nothing. The series is a seeded walk, so every reader sees the same chart and a
-screenshot taken in CI matches one taken by hand. Only the last candle is live.
+screenshot taken in CI matches one taken by hand. Only the last candle is live,
+and it stops dead when its card leaves the stage.
 
 ### Two structural notes
 
@@ -195,9 +223,10 @@ and the blinking caret already says "this is being typed" for free.
 
 The screens are a readout. There are no `:hover` or `:active` rules in
 `15-demo.css` on purpose — a control that lights up under a cursor it will never
-receive is a promise the tour does not keep. `.tokenmenu` in the ported sheet is
-now unreferenced for the same reason; it is left in place because those files are
-verbatim and their value is that they stay that way.
+receive is a promise the tour does not keep. The `.tapped` animation is the flow
+pressing its own buttons, not the reader pressing them. `.tokenmenu` in the
+ported sheet is now unreferenced for the same reason; it is left in place
+because those files are verbatim and their value is that they stay that way.
 
 ---
 

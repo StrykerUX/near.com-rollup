@@ -50,7 +50,13 @@
 
 /* ---- long / short ------------------------------------------------------ */
 .pside { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px }
-.pside button { border-radius: 10px; padding: 10px 0; font-weight: 500; font-size: var(--fs-body-sm) }
+/* Spans, not buttons. These are a readout of a screen the reader cannot touch,
+   and the ported sheet's `button` reset does not reach them — so the box lives
+   on the class, where it belongs anyway. */
+.plong, .pshort {
+  display: block; border-radius: 10px; padding: 10px 0; text-align: center;
+  font-weight: 500; font-size: var(--fs-body-sm);
+}
 .plong { background: rgba(38, 194, 129, .16); color: #4ADEA1 }
 .pshort { background: rgba(229, 72, 77, .16); color: #FF8A8D }
 
@@ -133,7 +139,7 @@
 .perr { flex: none; font-size: var(--fs-micro); color: #FF8A8D; margin-top: -3px }
 
 .popen {
-  flex: none; border-radius: 999px; padding: 11px 0; text-align: center;
+  display: block; flex: none; border-radius: 999px; padding: 11px 0; text-align: center;
   font-weight: 500; font-size: var(--fs-body-sm); background: #fff; color: #0B0F0D;
   transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
 }
@@ -176,7 +182,10 @@
 .pposv.up { color: #26C281 }
 .pposv.down { color: #E5484D }
 .pposacts { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px }
-.pposacts button { border-radius: 10px; padding: 9px 0; font-weight: 500; font-size: var(--fs-caption) }
+.pmod, .pcls {
+  display: block; border-radius: 10px; padding: 9px 0; text-align: center;
+  font-weight: 500; font-size: var(--fs-caption);
+}
 .pmod { background: rgba(255, 255, 255, .10); color: #fff }
 .pcls { background: rgba(229, 72, 77, .18); color: #FF8A8D }
 .pposrow {
@@ -372,7 +381,7 @@
 }
 .schip svg { width: 12px; height: 12px }
 .sreview {
-  flex: none; border-radius: 999px; padding: 12px 0; text-align: center;
+  display: block; flex: none; border-radius: 999px; padding: 12px 0; text-align: center;
   font-weight: 500; font-size: var(--fs-body-sm);
   background: rgba(255, 255, 255, .92); color: #0B0F0D;
   transition: background var(--dur) var(--ease-out);
@@ -383,7 +392,7 @@
   gap: 16px; padding-top: 6px;
 }
 .sagain {
-  align-self: stretch; border-radius: 999px; padding: 11px 0; text-align: center;
+  display: block; align-self: stretch; border-radius: 999px; padding: 11px 0; text-align: center;
   font-weight: 500; font-size: var(--fs-caption);
   border: 1px solid rgba(255, 255, 255, .22); color: #fff;
 }
@@ -499,7 +508,7 @@
 }
 .vref i { font-style: normal; color: rgba(255, 255, 255, .7) }
 .vclose {
-  margin-top: auto; border-radius: 999px; padding: 12px 0; text-align: center;
+  display: block; margin-top: auto; border-radius: 999px; padding: 12px 0; text-align: center;
   font-weight: 500; font-size: var(--fs-body-sm);
   background: rgba(255, 255, 255, .92); color: #0B0F0D;
 }
@@ -577,7 +586,7 @@
 }
 .upaybal i { font-style: normal; color: rgba(255, 255, 255, .42) }
 .ucta {
-  flex: none; margin-top: 12px; border-radius: 999px; padding: 12px 0; text-align: center;
+  display: block; flex: none; margin-top: 12px; border-radius: 999px; padding: 12px 0; text-align: center;
   font-weight: 500; font-size: var(--fs-body-sm);
   background: rgba(255, 255, 255, .92); color: #0B0F0D;
   transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
@@ -650,3 +659,107 @@
   .uamt { padding-top: 13px }
   .uamt > b { font-size: 1.45rem }
 }
+
+/* =========================================================================
+   LIVENESS
+   -------------------------------------------------------------------------
+   Four things separate a screen that is running from a screen that is a
+   picture, and the demo had none of them:
+
+     1  states arrive instead of appearing        .enter
+     2  figures never sit perfectly still         .tk-up / .tk-dn, LiveDot
+     3  controls answer a press                   .tapped
+     4  the loop breathes out before it restarts  .looping
+
+   All four are CSS. The scripts say WHAT is on screen; this file says how it
+   gets there.
+   ========================================================================= */
+
+/* ---- 1 · arrival ------------------------------------------------------- */
+/* Every direct child rises a little and resolves, one after another. The
+   distance is small on purpose: 6px reads as settling, 20px reads as a slide
+   transition and starts competing with the card slide behind it. */
+@keyframes enterUp {
+  from { opacity: 0; transform: translateY(6px) }
+  to   { opacity: 1; transform: none }
+}
+.enter > * { animation: enterUp 380ms var(--ease-out) backwards }
+.enter > *:nth-child(1) { animation-delay: 0ms }
+.enter > *:nth-child(2) { animation-delay: 45ms }
+.enter > *:nth-child(3) { animation-delay: 90ms }
+.enter > *:nth-child(4) { animation-delay: 135ms }
+.enter > *:nth-child(5) { animation-delay: 180ms }
+.enter > *:nth-child(6) { animation-delay: 215ms }
+.enter > *:nth-child(n + 7) { animation-delay: 250ms }
+
+/* A block that is itself the arrival — a sheet's content, a settling panel —
+   comes in as one piece rather than staggering its own rows. */
+.enter-one { animation: enterUp 420ms var(--ease-out) backwards }
+
+/* ---- 2 · figures that move --------------------------------------------- */
+@keyframes tkUp { from { color: #34E39B } to { color: inherit } }
+@keyframes tkDn { from { color: #FF7A7E } to { color: inherit } }
+/* the tape flash: a rise or a fall tints the digits and lets go. 520ms is long
+   enough to catch out of the corner of an eye and short enough that a run of
+   quotes does not leave the figure permanently coloured. */
+.tk-up { animation: tkUp 520ms var(--ease-out) }
+.tk-dn { animation: tkDn 520ms var(--ease-out) }
+
+.livedot {
+  width: 5px; height: 5px; border-radius: 50%; flex: none; display: inline-block;
+  background: #26C281; vertical-align: 1px;
+  animation: livepulse 2s var(--ease-out) infinite;
+}
+@keyframes livepulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(38, 194, 129, .5) }
+  50%      { opacity: .55; box-shadow: 0 0 0 4px rgba(38, 194, 129, 0) }
+}
+
+/* ---- 3 · controls that answer ------------------------------------------ */
+/* The flow "taps" a control on the beat that changes because of it. Without
+   this the state simply differs between two frames and nothing connects the
+   two — which is exactly how a slideshow of screenshots reads. */
+.tapped {
+  animation: tap 260ms var(--ease-out);
+}
+@keyframes tap {
+  0%   { transform: scale(1) }
+  38%  { transform: scale(.965) }
+  100% { transform: scale(1) }
+}
+/* the primary CTA also flares, because it is the one press with a consequence */
+.popen.tapped, .vcta.tapped, .ucta.tapped, .sreview.tapped {
+  animation: tapCta 300ms var(--ease-out);
+}
+@keyframes tapCta {
+  0%   { transform: scale(1);   box-shadow: 0 0 0 0 rgba(255, 255, 255, .30) }
+  38%  { transform: scale(.972); box-shadow: 0 0 0 5px rgba(255, 255, 255, 0) }
+  100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(255, 255, 255, 0) }
+}
+
+/* ---- 4 · the loop breathes --------------------------------------------- */
+/* A loop that cuts from its last frame to its first reads as a rewind. The
+   screen dissolves first, so the restart is a beat of the sequence rather than
+   a seam in it — and the next pass then arrives on the stagger above.
+   
+   FILTER, NOT OPACITY. The stage engine writes `opacity` and `transform`
+   INLINE on every `.cswap > .face` on every frame it paints; a class can never
+   win against that, and the fade would silently do nothing. `filter` is the one
+   compositing property the engine does not touch, so it is the one this can
+   safely borrow. Do not "simplify" this back to opacity. */
+.face.looping {
+  filter: opacity(0) blur(1.5px);
+  transition: filter 480ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter > *, .enter-one { animation: none }
+  .tk-up, .tk-dn, .tapped, .livedot { animation: none }
+  .face.looping { filter: none; transition: none }
+}
+
+/* The .enter wrappers exist only to key the entrance animation; they must not
+   also become a layout box. `display: contents` drops them out of the flex
+   column so the blocks inside keep answering to the rules that already size
+   them, and `.enter > *` still matches for the stagger. */
+.pmarket, .pflat, .pposwrap, .ahome, .asend, .elist, .vform, .sform { display: contents }

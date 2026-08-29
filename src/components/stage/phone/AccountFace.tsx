@@ -2,54 +2,66 @@
 import { findToken } from '@/lib/tokens';
 import { useFlow } from './flows/player';
 import { accountScript, type AccountState } from './flows/account';
+import { Enter } from './ui/Enter';
 import { FieldRow } from './ui/FieldRow';
 import { Keypad } from './ui/Keypad';
+import { LiveDot } from './ui/LiveDot';
+import { Ticker } from './ui/Ticker';
 import { TokenDot } from './TokenDot';
 import { IconReceive, IconSend } from './icons';
 
 const ZEC = findToken('ZEC');
 const NEAR = findToken('NEAR');
 
-const BALANCES = [
-  { name: 'Crypto', value: '$6,806.76', note: 'NEAR, USDC', tone: 'plain' as const },
-  { name: 'Perps', value: '$1,075.98', note: '+$5.1 unrealized P&L', tone: 'up' as const },
-  { name: 'Earn', value: '$2,347.81', note: '5.1% blended APY', tone: 'info' as const },
-];
+
 
 /**
  * 1 · ACCOUNT — the home screen, and the send it opens.
  */
 export function AccountFace() {
-  const { state: s } = useFlow<AccountState>(1, accountScript);
+  const { state: s, live, pass, looping } = useFlow<AccountState>(1, accountScript);
+  const tap = (id: string) => (s.tap === id ? ' tapped' : '');
 
   if (s.screen === 'home') {
     return (
-      <div className="face aface" data-face="0">
-        <div className="totrow">
-          <span className="klabel">Total balance</span>
-        </div>
-        <div className="kbig">$10,230.56</div>
-
-        <div className="seg" role="group" aria-label="Account actions">
-          <span className="segb"><IconReceive />Receive</span>
-          <span className="segb"><IconSend />Send</span>
-        </div>
-
-        <div className="balgrp">
-          <span className="klabel">Balances</span>
-          <div className="ballist">
-            {BALANCES.map((b) => (
-              <div className="balrow" key={b.name}>
-                <span className="brt">
-                  <span className="bn">{b.name}</span>
-                  <span className="bar" aria-hidden="true">&rarr;</span>
-                </span>
-                <span className="bv">{b.value}</span>
-                <span className={'bnote ' + b.tone}>{b.note}</span>
-              </div>
-            ))}
+      <div className={'face aface' + (looping ? ' looping' : '')} data-face="0">
+        <Enter k={`h${pass}`} className="ahome">
+          <div className="totrow">
+            <span className="klabel">Total balance</span>
           </div>
-        </div>
+          <div className="kbig">
+            $<Ticker base={10230.56} amp={7.4} dp={2} every={2600} live={live} />
+          </div>
+
+          <div className="seg" role="group" aria-label="Account actions">
+            <span className="segb"><IconReceive />Receive</span>
+            <span className={'segb' + tap('send')}><IconSend />Send</span>
+          </div>
+
+          <div className="balgrp">
+            <span className="klabel">Balances</span>
+            <div className="ballist">
+              <div className="balrow">
+                <span className="brt"><span className="bn">Crypto</span><span className="bar" aria-hidden="true">&rarr;</span></span>
+                <span className="bv">$6,806.76</span>
+                <span className="bnote plain">NEAR, USDC</span>
+              </div>
+              <div className="balrow">
+                <span className="brt"><span className="bn">Perps</span><span className="bar" aria-hidden="true">&rarr;</span></span>
+                <span className="bv">$1,075.98</span>
+                {/* the one figure on this screen that is genuinely moving */}
+                <span className="bnote up">
+                  <LiveDot /> +$<Ticker base={5.1} amp={2.2} dp={2} every={1000} live={live} flash /> unrealized P&amp;L
+                </span>
+              </div>
+              <div className="balrow">
+                <span className="brt"><span className="bn">Earn</span><span className="bar" aria-hidden="true">&rarr;</span></span>
+                <span className="bv">$2,347.81</span>
+                <span className="bnote info">5.1% blended APY</span>
+              </div>
+            </div>
+          </div>
+        </Enter>
       </div>
     );
   }
@@ -62,7 +74,8 @@ export function AccountFace() {
   const packed = s.focus;
 
   return (
-    <div className="face aface send" data-face="0">
+    <div className={'face aface send' + (looping ? ' looping' : '')} data-face="0">
+      <Enter k={`s${pass}-${packed}`} className="asend">
       {packed ? null : (
         <>
           <h3 className="usend">Universal Send</h3>
@@ -89,7 +102,7 @@ export function AccountFace() {
 
         <span className="upay">
           <i className="upaylbl">Pay with</i>
-          <span className={'upayrow' + (s.swapping ? ' swapping' : '')}>
+          <span className={'upayrow' + (s.swapping ? ' swapping' : '') + tap('paywith')}>
             {s.payWith === 'NEAR' ? (
               <>
                 <TokenDot token={NEAR} size={20} />
@@ -108,9 +121,10 @@ export function AccountFace() {
         </span>
       </div>
 
-      <button className={'ucta' + (s.amount ? '' : ' off')} type="button" tabIndex={-1}>
+      <span className={'ucta' + (s.amount ? '' : ' off')}>
         {s.amount ? 'Review send' : 'Enter amount'}
-      </button>
+      </span>
+      </Enter>
 
       {s.focus ? <Keypad pressed={s.pressed} /> : null}
     </div>

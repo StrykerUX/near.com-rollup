@@ -91,25 +91,6 @@ export function yForT(t: number, stage: HTMLElement) {
   return Math.round(stage.offsetTop + p * (stage.offsetHeight - window.innerHeight));
 }
 
-/**
- * How far through card `k`'s own dwell the page is, 0..1.
- *
- * This is what drives the demo screens. Each card owns a band of scroll — its
- * rest band, the one the reader is given to actually look at it — and its flow
- * plays across exactly that band. Before the card lands the flow sits at 0;
- * once the page moves on to the next card it holds at 1, so the screen you
- * scroll away from is the finished one.
- *
- * Deriving it here rather than in the player means the flows and the cards read
- * the same schedule: retune W_REST and both follow.
- */
-export function dwellT(p: number, k: number) {
-  const start = SCH_LAND0 + k * SCH_CYC;
-  return clamp01((p - start) / SCH_REST);
-}
-
-const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
-
 /* ---- feel dials ------------------------------------------------------- */
 
 /**

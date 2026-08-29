@@ -15,6 +15,8 @@ export type SwapState = {
   to: 'ZEC' | 'NEAR';
   /** index into the settlement checklist */
   step: number;
+  /** which control the flow just pressed — see the note in perps.ts */
+  tap: string | null;
 };
 
 const initial: SwapState = {
@@ -23,25 +25,30 @@ const initial: SwapState = {
   query: '',
   to: 'ZEC',
   step: 0,
+  tap: null,
 };
 
 export const SETTLE_STEPS = ['Finding best price', 'Executing trade', 'Trade complete'];
 
 const beats: Beat<SwapState>[] = [
-  { w: 4, set: { screen: 'form', sheet: 'none' } },
+  { ms: 2400, set: { screen: 'form', sheet: 'none' } },
   /* pick the destination */
-  { w: 2, set: { sheet: 'token' } },
-  { w: 2, set: { query: 'nea' } },
-  { w: 3, set: { to: 'NEAR', sheet: 'none', query: '' } },
+  { ms: 950, set: { sheet: 'token', tap: 'picker' } },
+  { ms: 950, set: { query: 'nea', tap: null } },
+  { ms: 1100, set: { to: 'NEAR', sheet: 'none', query: '' } },
   /* confirm */
-  { w: 3, set: { screen: 'review' } },
+  { ms: 2000, set: { screen: 'review', tap: 'review' } },
   /* settle. The middle beat is the long one — routing is where the time
      actually goes, and a checklist whose rows tick at equal speed reads as a
      progress bar with extra steps. */
-  { w: 2, set: { screen: 'settling', step: 0 } },
-  { w: 3, set: { step: 1 } },
-  { w: 1, set: { step: 2 } },
-  { w: 5, set: { screen: 'done', step: 3 } },
+  /* A press and the screen it opens are TWO beats. Collapsed into one, the
+     control that was tapped unmounts on the same frame it lights up — the
+     press is never seen and the two screens read as unrelated slides. */
+  { ms: 280, set: { tap: 'swap' } },
+  { ms: 1100, set: { screen: 'settling', step: 0, tap: null } },
+  { ms: 1900, set: { step: 1 } },
+  { ms: 700, set: { step: 2 } },
+  { ms: 3000, set: { screen: 'done', step: 3 } },
 ];
 
 export const swapScript: Script<SwapState> = {

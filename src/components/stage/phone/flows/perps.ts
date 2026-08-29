@@ -21,6 +21,12 @@ export type PerpsState = {
   pressed: string | null;
   /** index into the submit checklist */
   step: number;
+  /**
+   * Which control the flow just "pressed". Without it a state simply differs
+   * between two frames and nothing connects them, which is how a slideshow of
+   * screenshots reads.
+   */
+  tap: string | null;
 };
 
 const initial: PerpsState = {
@@ -34,6 +40,7 @@ const initial: PerpsState = {
   focus: null,
   pressed: null,
   step: 0,
+  tap: null,
 };
 
 /** The entry the position opens at. The chart draws its line at this price. */
@@ -42,23 +49,27 @@ export const SUBMIT_STEPS = ['Set leverage', 'Submit order'];
 
 const beats: Beat<PerpsState>[] = [
   /* the market, as you find it */
-  { w: 4, set: { screen: 'flat' } },
+  { ms: 2200, set: { screen: 'flat' } },
   /* sizing */
-  /* w:2, not 1 — a beat narrower than a wheel notch is a beat nobody sees,
-     and this one is the only thing that says the amount was typed */
-  { w: 2, set: { screen: 'ticket', focus: 'amount', amount: '7', pressed: '7' } },
-  { w: 3, set: { amount: '700', pressed: null } },
+  /* A press and the screen it opens are TWO beats. Collapsed into one, the
+     control that was tapped unmounts on the same frame it lights up — the
+     press is never seen and the two screens read as unrelated slides. */
+  { ms: 190, set: { tap: 'long' } },
+  /* short and sharp: the only beat that says the amount was typed */
+  { ms: 300, set: { screen: 'ticket', focus: 'amount', amount: '7', pressed: '7', tap: null } },
+  { ms: 1200, set: { amount: '700', pressed: null, tap: null } },
   /* protection */
-  { w: 3, set: { protect: true, focus: 'tp', tp: '82000' } },
+  { ms: 1700, set: { protect: true, focus: 'tp', tp: '82000', tap: 'protect' } },
   /* the stop loss that will not do */
-  { w: 3, set: { focus: 'sl', sl: '799' } },
-  { w: 3, set: { sl: '79980' } },
+  { ms: 2100, set: { focus: 'sl', sl: '799', tap: null } },
+  { ms: 1500, set: { sl: '79980' } },
   /* submit */
-  { w: 2, set: { screen: 'submitting', focus: null, step: 0 } },
-  { w: 2, set: { step: 1 } },
-  { w: 1, set: { step: 2 } },
+  { ms: 280, set: { tap: 'open' } },
+  { ms: 950, set: { screen: 'submitting', focus: null, step: 0, tap: null } },
+  { ms: 1050, set: { step: 1 } },
+  { ms: 700, set: { step: 2 } },
   /* and it holds here while the card leaves */
-  { w: 5, set: { screen: 'position' } },
+  { ms: 3800, set: { screen: 'position' } },
 ];
 
 export const perpsScript: Script<PerpsState> = {
