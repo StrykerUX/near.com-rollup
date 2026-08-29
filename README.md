@@ -119,6 +119,82 @@ invalidates the engine's cached child lists. A breakpoint does not.
 
 ---
 
+## `/demo/perps` — the whole arc, one screen at a time
+
+A fourth route, and the only one that is not part of the composed page. `/` is a
+scrolling argument with a phone in it; `/demo/perps` is the app, at size, with
+the argument written beside it.
+
+It was rebuilt off `_refs/rec-perps.MP4` at one frame per second — eight
+chapters, twenty-four steps, and everything the recording actually does:
+
+| Chapter | What the app does |
+|---|---|
+| La cuenta | Crypto $7,811.50 · Perps $86.99 · Earn $2,347.79 on one card |
+| El mercado | BTC candles, Long/Short, Positions/Orders/**Trades (26)** |
+| Fondear | $1,000 from near.com paid in NEAR — review sheet, **passkey**, three-part settlement |
+| El ticket | Available to trade, size, the **Adjust leverage** sheet, the Market/Limit menu |
+| Protección | The ⇄ that swaps the unit, and the two rules the ticket enforces |
+| Abrir | A second passkey, then Set leverage / Submit order / Update TP/SL |
+| La posición | Entry drawn on the chart, size, margin, liquidation, Orders (2) / Trades (27) |
+| De vuelta | The same balances card, with Perps at $1,086.99 |
+
+Three things about it are worth knowing.
+
+**The rail is navigation, not a caption.** Every step is a button that seeks. A
+step's beats are authored as a group, and its FIRST beat is its entrance — so
+clicking a step applies that beat immediately and starts the clock after it,
+which is why the leading `ms` on a first beat costs a reader nothing.
+
+**Touching the app takes the wheel.** Any control whose guard passes is live.
+Firing an anchored transition moves the playhead to the step that transition
+belongs to, so a gesture scrubs the script instead of forking it — tap *Short*
+in the market and the story continues from sizing a short. Left alone for
+`IDLE_MS`, the clock resumes from there.
+
+**The numbers are derived, and derived once.** `state.ts` holds the recording's
+figures and the formulas that reproduce the rest:
+
+```ts
+/* Read straight off two frames of the leverage sheet: at 10x the ticket
+   estimates liquidation 7% below, at 20x it estimates 2% — which is
+   1/lev − 0.03 both times. */
+export const MMR = 0.03;
+```
+
+The recording quotes a third liquidation figure (3.7%) on the position card for
+the same position. We use one formula everywhere: a demo that shows two
+liquidation prices for one position is a bug a reader finds before they find
+the feature.
+
+The same rule sent the live price through the chart. The header used to run its
+own `Ticker`, which meant the quote at the top and the candles under it were two
+different walks — and with a position open the entry line could sit below a
+price the position bar called a loss. `Chart` now takes an optional `readout`
+and writes the price, the change and (through `onTick`) the position's P&L
+straight to the DOM, off the candles it is actually drawing.
+
+### Bugs this page turned up
+
+- **`auto` ran while the clock was paused.** The machine's self-advancing states
+  exist for when a reader holds the wheel and no script is running. The
+  condition also matched "paused", which quietly made the pause button a lie:
+  stop the script on a submitted order and the checklist finished anyway.
+- **A closed sheet was moved, not hidden.** `translate: 100%` shifts a sheet by
+  its own height — enough for a sheet sitting on the bottom edge, 90px short for
+  the passkey dialog that floats above it. Its top stayed on screen, so a Sign In
+  prompt peeked under every other screen. Now visibility flips after the slide.
+- **A sheet that fades while it slides is transparent for the length of the
+  slide**, and what showed through on the way out of a submitted ticket was a
+  market that had already grown a position. The layer clips; sliding is enough.
+- **A zero-size frame killed the chart.** `if (!fit()) return` skipped the
+  rest of the frame *and* the next request — one unmeasured frame after mount
+  and the canvas was frozen for the life of the component. It now schedules
+  before it draws. (Latent; `/demo/perps` is where it was found.)
+
+`pnpm check:flows` walks this machine too — 82 beats, `account → market → fund →
+funding → market → account`.
+
 ## Three versions of the same app
 
 There are three routes. They are the same page, the same four screens and the

@@ -24,18 +24,32 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
 
-const SRC = 'src/components/stage/phone/flows';
-const MODULES = ['machine', 'perps', 'swap', 'earn', 'account'];
+const FLOWS = 'src/components/stage/phone/flows';
+const DEMO = 'src/components/demo/perps';
+/* [source file, name it is written out under] */
+const MODULES = [
+  [`${FLOWS}/machine.ts`, 'machine'],
+  [`${FLOWS}/perps.ts`, 'perps'],
+  [`${FLOWS}/swap.ts`, 'swap'],
+  [`${FLOWS}/earn.ts`, 'earn'],
+  [`${FLOWS}/account.ts`, 'account'],
+  /* the standalone /demo/perps machine — same contract, its own arc */
+  [`${DEMO}/state.ts`, 'state'],
+  [`${DEMO}/script.ts`, 'script'],
+];
 
 /* The flow files are types plus plain data — no JSX, no bundler features — so
-   a bare transpile is enough to run them under node. */
+   a bare transpile is enough to run them under node. Only two imports survive
+   the type erasure, and both are rewritten to the flat temp directory. */
 const dir = mkdtempSync(join(tmpdir(), 'flows-'));
-for (const f of MODULES) {
+for (const [src, f] of MODULES) {
   const js = ts
-    .transpileModule(readFileSync(`${SRC}/${f}.ts`, 'utf8'), {
+    .transpileModule(readFileSync(src, 'utf8'), {
       compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
     })
-    .outputText.replace(/from ['"]\.\/machine['"]/g, "from './machine.mjs'");
+    .outputText
+    .replace(/from ['"](\.\/|@\/components\/stage\/phone\/flows\/)machine['"]/g, "from './machine.mjs'")
+    .replace(/from ['"]\.\/state['"]/g, "from './state.mjs'");
   writeFileSync(join(dir, `${f}.mjs`), js);
 }
 const load = (f) => import(pathToFileURL(join(dir, `${f}.mjs`)).href);
@@ -46,6 +60,7 @@ const machines = {
   swap: (await load('swap')).swap,
   earn: (await load('earn')).earn,
   account: (await load('account')).account,
+  'demo/perps': (await load('script')).MACHINE,
 };
 
 let fail = 0;

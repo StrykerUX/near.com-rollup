@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 
 /**
  * THE CANDLE CHART
@@ -62,6 +62,23 @@ function series(count: number, seed = 7): Candle[] {
 export type ChartProps = {
   /** draws the dashed entry line and its chip */
   entry?: number | null;
+  /**
+   * Where to WRITE the live quote, if the screen shows it in its own header.
+   * The alternative — a second walk driving that figure — is how a header ends
+   * up quoting a price the candles disagree with, which is exactly the kind of
+   * detail that makes a mock read as a mock. Written straight to the DOM for
+   * the same reason the rest of this file is: it changes every frame.
+   */
+  readout?: {
+    price?: RefObject<HTMLElement | null>;
+    change?: RefObject<HTMLElement | null>;
+    /**
+     * Called with the live price every frame, for figures this component has
+     * no business computing — an open position's P&L, say. WRITE THE DOM from
+     * it; a setState here would re-render the tree sixty times a second.
+     */
+    onTick?: (last: number) => void;
+  };
   /** 'long' tints the entry chip; null hides the position marker */
   side?: 'long' | 'short' | null;
   /**
@@ -73,15 +90,15 @@ export type ChartProps = {
   live?: boolean;
 };
 
-export function Chart({ entry = null, side = null, live = true }: ChartProps) {
+export function Chart({ entry = null, side = null, live = true, readout }: ChartProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   /* The draw loop reads these every frame but must not re-subscribe when they
      change — mirroring them into a ref from an effect keeps the rAF stable and
      the render pure. */
-  const props = useRef({ entry, side });
+  const props = useRef({ entry, side, readout });
   useEffect(() => {
-    props.current = { entry, side };
-  }, [entry, side]);
+    props.current = { entry, side, readout };
+  }, [entry, side, readout]);
 
   useEffect(() => {
     const cv = ref.current;
@@ -109,6 +126,14 @@ export function Chart({ entry = null, side = null, live = true }: ChartProps) {
     };
 
     const draw = (now: number) => {
+      /* SCHEDULE FIRST, DRAW SECOND.
+         `fit()` fails on any frame where the canvas measures zero — the frame
+         right after a mount, before layout has run, is the common one. This
+         used to return without asking for another frame, which did not skip a
+         frame: it killed the loop for the life of the component, and the chart
+         sat frozen on whatever it had last drawn while the header it feeds
+         quoted a price from the server render. */
+      if (live) raf = requestAnimationFrame(draw);
       if (!t0) t0 = now;
       if (!fit()) return;
 
@@ -174,6 +199,26 @@ export function Chart({ entry = null, side = null, live = true }: ChartProps) {
 
       const last = view[view.length - 1].c;
 
+      /* the header's quote, if this screen has one: same number, one source */
+      const out = props.current.readout;
+      if (out) {
+        const open = view[0].o;
+        const d = last - open;
+        const pc = (d / open) * 100;
+        if (out.price?.current) {
+          out.price.current.textContent =
+            '$' + last.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        }
+        out.onTick?.(last);
+        if (out.change?.current) {
+          const el = out.change.current;
+          el.textContent =
+            (d >= 0 ? '+' : '\u2212') + '$' + Math.abs(d).toFixed(2)
+            + '  ' + (d >= 0 ? '+' : '\u2212') + Math.abs(pc).toFixed(2) + '%';
+          el.classList.toggle('up', d >= 0);
+        }
+      }
+
       /* the live price line and its chip, pinned to the right axis */
       const py = Math.round(y(last)) + 0.5;
       ctx.strokeStyle = 'rgba(38,194,129,.55)';
@@ -200,7 +245,6 @@ export function Chart({ entry = null, side = null, live = true }: ChartProps) {
         chip(ctx, w - 50, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F');
       }
 
-      if (live) raf = requestAnimationFrame(draw);
     };
 
     raf = requestAnimationFrame(draw);
