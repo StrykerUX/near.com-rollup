@@ -1,0 +1,264 @@
+/* =========================================================================
+   THE THREE MODES
+   -------------------------------------------------------------------------
+   15-demo.css opens by saying there are no :hover states in it on purpose:
+   "a control that lights up under a cursor it will never receive is a promise
+   the tour does not keep." That is still true — of the DEMO. Two of the three
+   modes DO receive the cursor, so the promise is now conditional, and every
+   rule that makes one is scoped to `.can`.
+
+   `.can` is written by the machine, not by the mode: a control gets it when
+   the mode allows a pointer AND the flow's own guard says yes right now. So
+   "Open long" goes quiet while the stop loss is above entry, in exactly the
+   same way it goes quiet in the script. There is one source of truth for
+   whether a thing can be done, and this is its stylesheet half.
+   ========================================================================= */
+
+/* ---- a control that will actually respond ------------------------------ */
+.can { cursor: pointer; -webkit-tap-highlight-color: transparent }
+/* the lift is tiny and the transition short: these are 12px controls inside a
+   340px phone, and anything more reads as a web page rather than a native app */
+.can { transition: background-color 140ms var(--ease-out), border-color 140ms var(--ease-out),
+  color 140ms var(--ease-out), filter 140ms var(--ease-out), transform 140ms var(--ease-out) }
+.can:hover { filter: brightness(1.14) }
+.can:active { transform: scale(.975) }
+.can:focus-visible {
+  outline: 2px solid var(--near-green, #00EC97); outline-offset: 2px; border-radius: 8px;
+}
+
+/* Rows and list items get a ground rather than a brightness bump — brightening
+   a transparent row does nothing at all, which is the kind of dead hover that
+   makes a reader stop trying controls. */
+.tmrow.can:hover, .etr.can:hover, .balrow.can:hover, .frow.can:hover,
+.ptrow.can:hover { background: rgba(255, 255, 255, .07); filter: none }
+.tmrow.on { background: rgba(0, 236, 151, .10) }
+
+/* The keypad is the one place a reader presses fast and repeatedly, so its
+   feedback has to be immediate and its target has to stay put. */
+.kpkey.can:active { transform: scale(.93) }
+.kpwrap.can { pointer-events: auto }
+
+/* A SHEET THAT OPENS MUST TAKE THE POINTER.
+   `.sheetslot` is pointer-events:none so a closed sheet never eats a click
+   meant for the screen underneath. An OPEN one has to take them back, or the
+   token list is a picture of a token list. */
+.sheet.open { pointer-events: auto }
+
+/* ---- the reader has the wheel ------------------------------------------
+   Guided pauses its script the moment anyone touches a control, and picks it
+   back up after a few idle seconds. That has to be VISIBLE, or the resume
+   reads as the screen overriding you rather than waiting for you. */
+/* It rides over the TAB BAR, not over the screen. Anchored to the bottom of
+   the face it sat squarely on whatever primary button that screen ends with —
+   the one control a reader is most likely to be reaching for next. The tab row
+   is the only strip in the shell with nothing on it to read. */
+.morph:has(.face.held) > .tabbar { position: relative }
+.morph:has(.face.held) > .tabbar::after {
+  content: 'You have the wheel — resuming shortly';
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 12; pointer-events: none; white-space: nowrap;
+  font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .1em;
+  text-transform: uppercase; color: rgba(255, 255, 255, .62);
+  background: rgba(10, 14, 13, .82); border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 999px; padding: 5px 11px;
+  animation: heldIn 320ms var(--ease-out) backwards;
+}
+@keyframes heldIn { from { opacity: 0; transform: translate(-50%, calc(-50% + 6px)) } }
+/* free mode never resumes anything, so it never claims it is about to */
+.morph[data-mode="free"]:has(.face.held) > .tabbar::after { content: none }
+
+/* ---- demo runs slower, and it lands softer ------------------------------
+   The player already stretches every beat (PACE in flows/mode.tsx). Stretching
+   the beats alone makes a fast animation wait longer between jumps, which is
+   worse than either — so the entrances stretch with them. */
+.morph[data-mode="demo"] .enter > * { animation-duration: 520ms }
+.morph[data-mode="demo"] .enter > *:nth-child(2) { animation-delay: 70ms }
+.morph[data-mode="demo"] .enter > *:nth-child(3) { animation-delay: 140ms }
+.morph[data-mode="demo"] .enter > *:nth-child(4) { animation-delay: 210ms }
+.morph[data-mode="demo"] .enter > *:nth-child(5) { animation-delay: 280ms }
+.morph[data-mode="demo"] .enter > *:nth-child(6) { animation-delay: 350ms }
+.morph[data-mode="demo"] .enter > *:nth-child(n+7) { animation-delay: 420ms }
+.morph[data-mode="demo"] .sheet-body,
+.morph[data-mode="demo"] .sheet-scrim { transition-duration: 620ms }
+/* the loop's breath, longer to match */
+.morph[data-mode="demo"] .face.looping { transition-duration: 640ms }
+
+/* =========================================================================
+   SCREENS THE INTERACTIVE MODES NEEDED
+   Each of these is in the recordings and was previously off-screen because
+   the script never went there. A mode that lets a reader wander has to have
+   somewhere for them to land.
+   ========================================================================= */
+
+/* ---- perps · the leverage sheet ---------------------------------------- */
+.lsheet { display: flex; flex-direction: column; gap: 12px; padding-bottom: 4px }
+.lval { font-size: 2rem; font-weight: 500; letter-spacing: -.03em; line-height: 1 }
+.lval i { font-style: normal; font-size: 1rem; opacity: .5; margin-left: 2px }
+.ltrack {
+  position: relative; height: 4px; border-radius: 2px; margin: 6px 8px 2px;
+  background: rgba(255, 255, 255, .12);
+}
+.lfill { position: absolute; inset: 0 auto 0 0; border-radius: 2px; background: var(--near-green, #00EC97);
+  transition: width 220ms var(--ease-out) }
+.lknob {
+  position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; transform: translate(-50%, -50%); box-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+  transition: left 220ms var(--ease-out);
+}
+.lsteps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px }
+.lstep {
+  display: block; text-align: center; padding: 7px 0; border-radius: 8px;
+  background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .10);
+  font-family: var(--font-mono); font-size: var(--fs-micro); letter-spacing: .04em;
+  color: rgba(255, 255, 255, .74);
+}
+.lstep.on { background: rgba(0, 236, 151, .16); border-color: rgba(0, 236, 151, .42); color: #7BF3C4 }
+.lnote { font-size: var(--fs-micro); color: rgba(255, 255, 255, .5); line-height: 1.5 }
+.lnote b { color: rgba(255, 255, 255, .84); font-weight: 500 }
+.lsave {
+  display: block; text-align: center; padding: 12px 0; border-radius: 12px;
+  background: #fff; color: #0B0F0E; font-weight: 500; font-size: var(--fs-body-sm);
+}
+
+/* ---- perps · the trades tab -------------------------------------------- */
+.ptrades { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2px; margin-top: 6px }
+.ptrow {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 6px; border-radius: 8px;
+}
+.ptrow > span { display: flex; flex-direction: column; gap: 1px; min-width: 0 }
+.ptrow b { font-weight: 500; font-size: var(--fs-body-sm) }
+.ptrow em {
+  font-style: normal; font-family: var(--font-mono); font-size: var(--fs-micro);
+  color: rgba(255, 255, 255, .42); letter-spacing: .03em;
+}
+.ptrow i { font-style: normal; font-family: var(--font-mono); font-size: var(--fs-micro) }
+.ptrow i.up { color: #26C281 }
+.ptrow i.dn { color: #E5484D }
+.pempty.tall { flex: 1; justify-content: center }
+
+/* ---- swap · the size chips --------------------------------------------- */
+/* The chips are the cheapest real control on the card: every figure under
+   them is derived from the size they set, so one tap moves the whole screen. */
+.spct { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 2px }
+.spc {
+  display: block; text-align: center; padding: 6px 0; border-radius: 8px;
+  background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .10);
+  font-family: var(--font-mono); font-size: var(--fs-micro); letter-spacing: .05em;
+  color: rgba(255, 255, 255, .68);
+}
+.spc.on { background: rgba(0, 236, 151, .14); border-color: rgba(0, 236, 151, .38); color: #7BF3C4 }
+.schev { margin-left: auto; opacity: .45; font-size: 13px; line-height: 1 }
+
+/* ---- swap · a search field you can type in ------------------------------ */
+.tmi {
+  flex: 1; min-width: 0; background: none; border: 0; outline: none; padding: 0;
+  color: inherit; font: inherit; font-size: var(--fs-body-sm);
+}
+.tmi::placeholder { color: rgba(255, 255, 255, .35) }
+.tmnone {
+  padding: 18px 4px; text-align: center; font-size: var(--fs-micro);
+  color: rgba(255, 255, 255, .45);
+}
+
+/* ---- account · the notice the real screen makes you tick ---------------- */
+.uwarn {
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: start;
+  padding: 9px 11px; border-radius: 10px; margin-top: 2px;
+  background: rgba(214, 158, 46, .12); border: 1px solid rgba(214, 158, 46, .30);
+  font-size: var(--fs-micro); line-height: 1.45; color: rgba(255, 255, 255, .78);
+}
+.uwi {
+  width: 14px; height: 14px; border-radius: 50%; flex: none; font-style: normal;
+  background: rgba(214, 158, 46, .85); color: #1A1200; display: grid; place-items: center;
+  font-size: 10px; font-weight: 700; line-height: 1;
+}
+.uwt { min-width: 0 }
+.uwack {
+  grid-column: 2; display: flex; align-items: center; gap: 6px;
+  color: rgba(255, 255, 255, .58);
+}
+.uwarn.on { background: rgba(38, 194, 129, .10); border-color: rgba(38, 194, 129, .30) }
+.uwarn.on .uwack { color: rgba(255, 255, 255, .82) }
+.paynote {
+  margin-top: 10px; font-size: var(--fs-micro); line-height: 1.5;
+  color: rgba(255, 255, 255, .5);
+}
+
+/* ---- account · the review before an irreversible transfer -------------- */
+.urev { display: flex; flex-direction: column; gap: 12px }
+.urevlead {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border-radius: 12px; background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .10);
+}
+
+/* =========================================================================
+   THE MODE SWITCH
+   Three routes, not a toggle: a reader who finds the version they want can
+   send someone that link. It folds to a puck because the stage is the point
+   and this is scaffolding around it.
+   ========================================================================= */
+.modesw { position: fixed; right: 18px; bottom: 18px; z-index: 60; font-family: var(--font-mono) }
+.modesw-puck {
+  display: flex; align-items: center; gap: 8px; padding: 9px 13px;
+  border-radius: 999px; border: 1px solid rgba(255, 255, 255, .16);
+  background: rgba(12, 16, 15, .78); backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  color: rgba(255, 255, 255, .88); cursor: pointer;
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  transition: border-color 160ms var(--ease-out), background-color 160ms var(--ease-out);
+}
+.modesw-puck:hover { border-color: rgba(255, 255, 255, .3) }
+.modesw-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--near-green, #00EC97);
+  box-shadow: 0 0 0 3px rgba(0, 236, 151, .18);
+}
+.modesw-chev { font-style: normal; opacity: .55; transition: transform 200ms var(--ease-out) }
+.modesw.open .modesw-chev { transform: rotate(180deg) }
+
+.modesw-menu {
+  position: absolute; right: 0; bottom: calc(100% + 8px); width: 268px;
+  display: flex; flex-direction: column; gap: 2px; padding: 6px;
+  border-radius: 14px; border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(12, 16, 15, .92); backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  opacity: 0; transform: translateY(6px); pointer-events: none;
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+.modesw.open .modesw-menu { opacity: 1; transform: none; pointer-events: auto }
+.modesw-item {
+  display: block; padding: 9px 11px; border-radius: 10px; text-decoration: none;
+  color: rgba(255, 255, 255, .82);
+}
+.modesw-item:hover { background: rgba(255, 255, 255, .07) }
+.modesw-item.on { background: rgba(0, 236, 151, .12) }
+.modesw-item b {
+  display: block; font-weight: 500; font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase; margin-bottom: 3px;
+}
+.modesw-item.on b { color: #7BF3C4 }
+.modesw-item span {
+  display: block; font-family: var(--font-body); font-size: 11px; line-height: 1.4;
+  letter-spacing: 0; text-transform: none; color: rgba(255, 255, 255, .5);
+}
+
+/* The light zone inverts the page under it; the puck has to survive that. */
+html.ui-light .modesw-puck,
+html.ui-light .modesw-menu { background: rgba(255, 255, 255, .90); border-color: rgba(0, 0, 0, .12) }
+html.ui-light .modesw-puck { color: #14181A }
+html.ui-light .modesw-item { color: #14181A }
+html.ui-light .modesw-item span { color: rgba(0, 0, 0, .5) }
+
+@media (max-width: 640px) {
+  .modesw { right: 12px; bottom: 12px }
+  .modesw-menu { width: min(268px, calc(100vw - 24px)) }
+}
+
+/* Reduced motion holds one frame and takes no pointer in the scripted modes,
+   so nothing here should suggest otherwise. */
+@media (prefers-reduced-motion: reduce) {
+  .can:active, .kpkey.can:active { transform: none }
+  .morph:has(.face.held) > .tabbar::after { animation: none }
+  .lfill, .lknob { transition: none }
+}

@@ -1,3 +1,4 @@
+'use client';
 import { NearGlyph } from '@/components/marks';
 import { CH_TITLES } from '@/lib/schedule';
 import { AccountFace } from './AccountFace';
@@ -7,6 +8,7 @@ import { PerpsFace } from './PerpsFace';
 import { SwapFace } from './SwapFace';
 import { TabBar } from './TabBar';
 import { SheetSlotProvider } from './ui/SheetSlot';
+import { useMode } from './flows/mode';
 
 /**
  * The phone shell: one chrome, four screens.
@@ -23,8 +25,13 @@ import { SheetSlotProvider } from './ui/SheetSlot';
  * see flows/player.ts. Nothing in here takes a pointer.
  */
 export function PhoneShell() {
+  /* the mode reaches the stylesheet here and nowhere else: the interactive
+     affordances and the demo's slower entrances are both CSS, and both keyed
+     off this one attribute */
+  const mode = useMode();
+
   return (
-    <div className="morph" id="morph">
+    <div className="morph" id="morph" data-mode={mode}>
       <SheetSlotProvider>
         <div className="hhead">
           <span className="avatar" aria-hidden="true"><NearGlyph /></span>

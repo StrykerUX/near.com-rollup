@@ -119,29 +119,89 @@ invalidates the engine's cached child lists. A breakpoint does not.
 
 ---
 
+## Three versions of the same app
+
+There are three routes. They are the same page, the same four screens and the
+same state machines — only the driver behind the phone changes.
+
+| Route | Mode | Who fires the transitions |
+|---|---|---|
+| `/` | **Demo** | The script, at 1.4× the authored duration. Nothing takes a pointer. |
+| `/guided` | **Guided** | The script — until a reader touches a control the machine currently declares open. That pauses the clock and moves the playhead to what they just did. Left alone ~4.6s, the story picks itself back up. |
+| `/live` | **Live** | Nobody but the reader. No clock at all. |
+
+`ModeSwitch` (bottom right) links between them. They are routes rather than a
+toggle so that a reader can send someone the one they mean.
+
+### The one thing that makes three versions possible
+
+A flow is a **machine**, not a slideshow: a set of named pure transitions, plus
+a script that fires them in order.
+
+```ts
+type Machine<S, A> = {
+  initial: S;
+  actions: Record<A, (s: S, arg?: string) => Partial<S> | null>;
+  beats:   { ms: number; do?: A; arg?: string; set?: Partial<S> }[];
+  guided:  (s: S) => A[];              // the rail
+  anchor?: Partial<Record<A, number>>; // where a gesture lands on the script
+};
+```
+
+The autoplay and the reader press **the same transitions**. That is what keeps
+the three modes from drifting apart, and it is why a screen the reader drove
+into is a screen the script knows how to resume from. `set` is reserved for
+things nobody can press — a checklist row advancing, a highlight going out.
+
+A transition returning `null` is a refusal. `Open long` declines while the stop
+loss is above the entry price in *all three modes*, because it is the same
+guard; the same `null` also strips the control's button role, so a dead control
+is also unfocusable and unannounced.
+
+**The rail.** `guided(state)` lists what a reader may fire from here. It is
+generous where the screen's argument lives — the whole order ticket, the token
+picker, the vault's amount — and shut during settlement, where there is nothing
+to decide and an interruption would only break a sequence they are waiting on.
+That is the difference between "you may explore" and "you may break the story".
+
+**The anchor.** After an anchored gesture the playhead *moves to it*. Without
+that, the script would resume from its own place and immediately undo what the
+reader just did — the single thing that makes a half-interactive demo feel like
+it is fighting you. Tap **Short** on the flat screen and the demo picks up at
+protection, sizing a short.
+
+While the reader has the wheel, a pill rides over the tab bar: *you have the
+wheel — resuming shortly*. A resume that is not announced reads as the screen
+overriding you rather than waiting for you.
+
 ## The demo screens
 
 The four screens inside the phone shell are rebuilt against the real near.com
-app — recordings of Perps, Swap, Earn and Universal Send. Each one runs its own
-looping flow on its own clock, and only while its card is the landed one on
-stage.
+app — recordings of Perps, Swap, Earn and Universal Send.
 
 | Card | Flow |
 |---|---|
-| Perps | Size a long, set a stop loss the form refuses, fix it, open the position. Live candle chart with an entry line. |
-| Account | Universal Send, funded from the **Earn vault** — the sentence the copy makes, happening. |
-| Swap | Token sheet with search, then `Finding best price → Executing trade → Trade complete`. |
-| Earn | Vault list, the vault's fees, Use max, and a deposit that settles. |
+| Perps | Size a long, set a stop loss the form refuses, fix it, open the position. Live candle chart with an entry line. Market/**Limit** with a resting price, a leverage sheet, and Positions/Orders/Trades. |
+| Account | Universal Send — token and network, the amber notice you have to tick, and a **Pay with** sheet that offers a yield vault beside a wallet balance. The sentence the copy makes, happening. |
+| Swap | Size chips, a token sheet you can type in, then `Finding best price → Executing trade → Trade complete`. |
+| Earn | Vaults/Staking, two vaults, the vault's fees, Deposit/Withdraw, Use max, and a deposit that settles. |
 
-### A flow is a script
+### One state, three drivers
 
-`flows/player.ts` walks an ordered list of beats, each with a duration and a
-patch. The state at any moment is `initial` plus every patch up to the current
-beat — a pure function of elapsed time.
+`flows/player.ts` holds the state and nothing else does. The clock and the
+reader both reach it through the machine's transitions, so there is no second
+copy of the truth to fall out of step.
 
 The flow keeps its OWN clock rather than being scrubbed by scroll. A screen that
 only moves while the reader's wheel does is dead the moment they stop, and
 stopping is exactly when they are looking at it.
+
+> **`cur` is the state; `view` is only its render mirror.** The clock carries a
+> beat's leftover milliseconds in `cur.current.t`, and `view` only changes on a
+> beat boundary. An innocent-looking `cur.current = view` on every render threw
+> that remainder away, restarting the current beat's timer on every unrelated
+> re-render — and on a screen that re-renders often enough, the script never
+> reached its next beat at all. There is exactly one writer of that ref.
 
 **The beat index is the only thing that re-renders.** Everything continuous — the
 candle chart, the ticking figures, a progress ring — runs on its own rAF inside
@@ -201,6 +261,23 @@ nothing. The series is a seeded walk, so every reader sees the same chart and a
 screenshot taken in CI matches one taken by hand. Only the last candle is live,
 and it stops dead when its card leaves the stage.
 
+### Three compositions of one ticket, and why
+
+The real app scrolls the order ticket. This one composes it, because there is no
+scrollbar to inherit and no scroll position to restore between loops:
+
+- **sizing** — a number is being typed into the top of the ticket. The
+  protection toggle, the primary button and the estimates go; the keypad is over
+  them and none of them is something you act on mid-entry.
+- **protection** — the keypad is attached to take-profit or stop-loss. The side
+  selector, the balance line and the amount are off the top, exactly as they are
+  in the recording.
+- **at rest** — the whole ticket, no pad.
+
+The way out of the first two is the `✓` on the keypad's accessory bar, which is
+what the real app uses and — with the primary button behind the pad — the only
+way back to it.
+
 ### Two structural notes
 
 **Sheets are portalled.** `.sheet` is `inset:0` on its positioned ancestor, and
@@ -219,14 +296,33 @@ writes and its width comes from the grid: nothing about that box is derived from
 its contents. Below 560px the keypad goes entirely — it is 150 of those 309px,
 and the blinking caret already says "this is being typed" for free.
 
-### Nothing here takes a pointer
+### Making a control live without changing what it is
 
-The screens are a readout. There are no `:hover` or `:active` rules in
-`15-demo.css` on purpose — a control that lights up under a cursor it will never
-receive is a promise the tour does not keep. The `.tapped` animation is the flow
-pressing its own buttons, not the reader pressing them. `.tokenmenu` in the
-ported sheet is now unreferenced for the same reason; it is left in place
-because those files are verbatim and their value is that they stay that way.
+`15-demo.css` opens by saying it has no `:hover` rules on purpose — *a control
+that lights up under a cursor it will never receive is a promise the tour does
+not keep*. That is still true of the demo. Two of the three modes do receive the
+cursor, so the promise is now conditional, and every rule that makes one lives
+in `16-modes.css` scoped to `.can`.
+
+`.can` is written by the machine, not by the mode: a control gets it when the
+mode allows a pointer **and** the flow's own guard says yes right now. One
+source of truth for whether a thing can be done; that file is its stylesheet
+half.
+
+**The tag never changes.** Every control is a `<span>` carrying a hand-tuned
+class, and `ui/tap.ts` adds the button role, a tab stop, a click and the two
+keys a button owes the keyboard. Swapping the tags to `<button>` would drag the
+UA button box and the preflight reset onto exactly the controls whose boxes were
+hardest to get right — that regression has already cost us once.
+
+`press()` also calls `preventDefault` on **mousedown**. These controls sit inside
+a sticky stage whose scroll position *is* the composition; letting a click move
+focus makes the browser scroll the control into view and nudge the page a few
+pixels on every single tap. Tab still reaches them and the focus ring still
+shows.
+
+The `.tapped` animation stays what it always was: the flow pressing its own
+buttons.
 
 ---
 
@@ -300,6 +396,16 @@ Nearly every dial is in `src/lib/schedule.ts`:
 `#stage { height: 588vh }` in `07-stage.css` and the weights above are a matched
 pair. Change one without the other and the last trigger runs off the end of the
 sticky.
+
+The demo phone has two of its own, in `phone/flows/mode.tsx`:
+
+- `PACE` — a per-mode multiplier on every beat. Demo is `1.4`. Stretching the
+  beats **alone** would only make a fast animation wait longer between jumps,
+  which is worse than either, so the entrances stretch with them under
+  `.morph[data-mode="demo"]` in `16-modes.css`.
+- `IDLE_MS` — how long guided waits after a gesture before resuming. `4600`:
+  long enough to finish a thought, short enough that a card left alone always
+  heals back into the demo.
 
 ---
 

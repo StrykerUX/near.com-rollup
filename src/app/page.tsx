@@ -1,15 +1,6 @@
-import { Nav } from '@/components/Nav';
-import { Stage } from '@/components/stage/Stage';
-import { QuoteBand } from '@/components/stage/QuoteBand';
-import { LightZone } from '@/components/light/LightZone';
+import { Site } from '@/components/Site';
 
+/** 1 · DEMO — the product tour. It plays itself, slowly, and takes no pointer. */
 export default function Home() {
-  return (
-    <>
-      <Nav />
-      <Stage />
-      <QuoteBand />
-      <LightZone />
-    </>
-  );
+  return <Site mode="demo" />;
 }

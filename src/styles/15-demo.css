@@ -525,12 +525,29 @@
   background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .12);
 }
 .segb svg { width: 15px; height: 15px }
-/* the note under each balance is what the real home screen leads with — a
-   figure with no character next to it says nothing about the account */
+/* THE NOTE BESIDE EACH BALANCE, NOT UNDER IT.
+   It is what the real home screen leads with — a figure with no character next
+   to it says nothing about the account. But it is a line the ported row never
+   had, and three of them added ~66px to a card whose height the stage engine
+   derives, which pushed the Earn row out through the tab bar. On its own line
+   under the value it costs a row 22px; on the value's baseline it costs
+   nothing, and the pairing reads better anyway: the number and the one fact
+   about it, together. */
+.balrow { display: grid; grid-template-columns: 1fr auto; align-items: baseline }
+.balrow .brt { grid-column: 1 / -1 }
 .bnote {
-  grid-column: 1 / -1; font-family: var(--font-mono); font-size: var(--fs-micro);
-  letter-spacing: .03em; color: rgba(255, 255, 255, .45); margin-top: 3px;
+  justify-self: end; font-family: var(--font-mono); font-size: var(--fs-micro);
+  letter-spacing: .03em; color: rgba(255, 255, 255, .45); margin-top: 5px;
+  display: flex; align-items: center; gap: 4px; white-space: nowrap;
 }
+/* the figure has first claim on the row: the note is what gets clipped if
+   anything does, never the balance */
+.balrow .bv { min-width: 0 }
+/* …and the group gives back the 15px the third row was still short by. The
+   ported spacing was tuned for a card carrying TWO balance rows and a shorter
+   list; the rebuild's home screen carries three. */
+.aface .balgrp { margin-top: 10px; padding: 10px }
+.aface .ballist { margin-top: 8px; gap: 7px }
 .bnote.up { color: #26C281 }
 .bnote.info { color: #7FD8FF }
 
@@ -763,3 +780,26 @@
    column so the blocks inside keep answering to the rules that already size
    them, and `.enter > *` still matches for the stagger. */
 .pmarket, .pflat, .pposwrap, .ahome, .asend, .elist, .vform, .sform { display: contents }
+
+/* =========================================================================
+   TWO THINGS THE SCREENS COLLIDED OVER
+   Both were live in the autoplay long before anything took a pointer; the
+   interactive modes only made them easy to sit and look at.
+   ========================================================================= */
+
+/* 1 · The keypad is absolutely positioned over the bottom of the face, and the
+   estimate rows sat straight under it — legible enough at a glance to read as
+   a rendering fault rather than as content behind a sheet. The pad and the
+   estimates never need to be read at the same time: the estimates are what you
+   check BEFORE you commit, and the pad is up only while you are still typing
+   the number they are derived from. */
+.pface:has(.kpwrap) .pest { display: none }
+/* and with a Limit price field in the stack there is no room for the
+   protection toggle either while the pad is up */
+.ptick.sizing .pprot, .ptick.sizing .popen { display: none }
+
+/* 2 · `.pempty` is flex:1 with min-height:0, so on a short viewport it
+   collapsed under its own two lines of text and spilled them over the markets
+   row beneath. It shares the leftover column height with the chart, and both
+   now state the height they actually need. */
+.pempty { min-height: 66px; overflow: hidden }

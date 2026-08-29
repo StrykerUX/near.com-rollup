@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { live as can, press } from './tap';
 
 /**
  * The tappable row the app uses for Token / Network / Recipient: a leading
@@ -6,7 +7,7 @@ import type { ReactNode } from 'react';
  * so a row that is driving a sheet says so.
  */
 export function FieldRow({
-  mark, label, value, open, muted,
+  mark, label, value, open, muted, on,
 }: {
   mark?: ReactNode;
   label: string;
@@ -14,9 +15,11 @@ export function FieldRow({
   open?: boolean;
   /** the placeholder state — "Select recipient" rather than a real choice */
   muted?: boolean;
+  /** null in demo mode, and for the rows that genuinely lead nowhere */
+  on?: (() => void) | null;
 }) {
   return (
-    <div className={'frow' + (open ? ' open' : '') + (muted ? ' muted' : '')}>
+    <div className={'frow' + (open ? ' open' : '') + (muted ? ' muted' : '') + can(on)} {...press(on)}>
       <span className="fmark">{mark}</span>
       <span className="ftext">
         <span className="flabel">{label}</span>
