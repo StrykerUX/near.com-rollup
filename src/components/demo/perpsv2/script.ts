@@ -174,6 +174,38 @@ export const perpsV2Flow = buildFlow<PD, PDAction>({
     submit: 'open',
     posOpen: 'detail',
   },
+  /**
+   * WHERE EACH TRANSITION IS PRESSED.
+   *
+   * The machine says what happens; this says where on the glass. The deck
+   * resolves the NEXT beat's target while the clock is still counting down to
+   * it, so the hand is already on the control when the state changes — which
+   * is the whole difference between a screen using itself and a person using
+   * it.
+   */
+  target: (a, arg, s) => {
+    switch (a) {
+      case 'key': return arg ? `key:${arg}` : null;
+      case 'done': return 'done';
+      case 'tab': return `tab:${arg}`;
+      case 'openTicket': return `side:${arg}`;
+      case 'side': return `seg:${arg}`;
+      case 'focus': return arg ? `field:${arg}` : null;
+      case 'unit': return `unit:${arg ?? 'tp'}`;
+      case 'otypeMenu': return 'otype';
+      case 'levSheet': return 'lev';
+      case 'levSet': return 'levslider';
+      case 'levSave': return 'save';
+      case 'prot': return 'prot';
+      case 'submit': return 'submit';
+      /* six `ostep`s fire; only the first is a person pressing anything. The
+         rest are the network coming back, and a hand hovering over a checklist
+         that is ticking itself is a lie about who is doing the work. */
+      case 'ostep': return s.over === 'passkey' && s.auth === 'ask' ? 'passkey' : null;
+      case 'posOpen': return 'posbar';
+      default: return null;
+    }
+  },
   auto: (s) => {
     if (s.screen === 'funding' && s.fstep < FUND_STEPS.length) return { after: 1500, do: 'fstep' };
     if (s.over === 'passkey') {

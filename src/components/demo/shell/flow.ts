@@ -30,8 +30,23 @@ export type Step<S, A extends string> = {
   beats: Beat<S, A>[];
 };
 
+/**
+ * WHERE A TRANSITION IS PHYSICALLY PRESSED.
+ *
+ * The machine knows what happens; this says WHERE on the glass it happens, by
+ * naming the `data-tap` of the control. It is what lets a hand travel to a
+ * control before the beat that presses it fires — the difference between a
+ * screen whose state changes and a screen somebody is using.
+ *
+ * The state passed is the one the beat is about to act on, so an action whose
+ * target depends on where it is in a sequence (the passkey button exists only
+ * on the first of six `ostep`s) can say so.
+ */
+export type TapTarget<S, A extends string> = (a: A, arg: string | undefined, s: S) => string | null;
+
 export type DemoFlow<S, A extends string> = {
   machine: Machine<S, A>;
+  target?: TapTarget<S, A>;
   chapters: Chapter[];
   steps: Step<S, A>[];
   /** the beat index each step starts at */
@@ -66,6 +81,8 @@ export type FlowSpec<S, A extends string> = {
   outro?: number;
   /** states that advance themselves, with no script running */
   auto?: Machine<S, A>['auto'];
+  /** where each transition is pressed, for flows that draw a hand */
+  target?: TapTarget<S, A>;
 };
 
 /** a digit run, typed rather than pasted */
@@ -120,5 +137,8 @@ export function buildFlow<S, A extends string>(spec: FlowSpec<S, A>): DemoFlow<S
     return k;
   };
 
-  return { machine, chapters: spec.chapters, steps: spec.steps, starts, frameAt, stepOf };
+  return {
+    machine, chapters: spec.chapters, steps: spec.steps, starts, frameAt, stepOf,
+    target: spec.target,
+  };
 }

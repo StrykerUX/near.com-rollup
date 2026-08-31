@@ -8,6 +8,7 @@ import { live, press } from '@/components/stage/phone/ui/tap';
 import { TokenDot } from '@/components/stage/phone/TokenDot';
 import { findToken } from '@/lib/tokens';
 import { fmt } from '@/lib/format';
+import { Hand } from '@/components/demo/shell/Hand';
 import { Layer, StatusBar, Tabs } from '@/components/demo/shell/Frame';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
@@ -41,7 +42,12 @@ const CRYPTO_AFTER = 6806.76;
 
 const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
 
-export function Phone({ d, holdPrice = false }: { d: Deck; holdPrice?: boolean }) {
+export function Phone({ d, holdPrice = false, hand = false }: {
+  d: Deck;
+  holdPrice?: boolean;
+  /** draw the touch point that travels between controls — v2 only */
+  hand?: boolean;
+}) {
   const { s } = d;
   /* v2 holds the market still while a protection field is being typed into.
      The long version lets it run: by the time it reaches that step it has
@@ -64,6 +70,9 @@ export function Phone({ d, holdPrice = false }: { d: Deck; holdPrice?: boolean }
       <LevSheet d={d} />
       <ReviewSheet d={d} />
       <Passkey d={d} />
+
+      {/* last, so it is over every sheet — a finger is */}
+      {hand ? <Hand hand={d.hand} on={d.playing && !d.held} /> : null}
     </div>
   );
 }
@@ -211,8 +220,8 @@ function Market({ d, paused = false }: { d: Deck; paused?: boolean }) {
 
       {s.pos ? <PositionBar d={d} /> : (
         <div className="dsides">
-          <span className={'dside long' + live(long)} {...press(long)}>Long</span>
-          <span className={'dside short' + live(short)} {...press(short)}>Short</span>
+          <span className={'dside long' + live(long)} {...press(long)} data-tap="side:long">Long</span>
+          <span className={'dside short' + live(short)} {...press(short)} data-tap="side:short">Short</span>
         </div>
       )}
 
@@ -229,7 +238,7 @@ function PositionBar({ d }: { d: Deck }) {
   const btc = size / s.pos.entry;
   return (
     <div className="dposbar">
-      <div className={'dposh' + live(open)} {...press(open)}>
+      <div className={'dposh' + live(open)} {...press(open)} data-tap="posbar">
         <span>Position: <b className={s.pos.side}>{s.pos.side === 'long' ? 'Long' : 'Short'} {s.pos.lev}x</b></span>
         <span className="dposp"><b data-pnl className="down">&minus;$1.58</b> <i data-pnlp>&minus;0.23%</i></span>
         <span className={'dposc' + (s.posOpen ? ' on' : '')}>⌄</span>
@@ -265,7 +274,8 @@ function Lists({ d }: { d: Deck }) {
         {TABS.map(([k, label]) => {
           const on = d.can('tab', k);
           return (
-            <span className={'dlt' + (s.tab === k ? ' on' : '') + live(on)} key={k} {...press(on)}>
+            <span className={'dlt' + (s.tab === k ? ' on' : '') + live(on)} key={k} {...press(on)}
+                  data-tap={'tab:' + k}>
               {label}
             </span>
           );
@@ -455,14 +465,15 @@ function Ticket({ d }: { d: Deck }) {
             {(['long', 'short'] as const).map((k) => {
               const on = d.can('side', k);
               return (
-                <span className={'dsg ' + k + (s.side === k ? ' on' : '') + live(on)} key={k} {...press(on)}>
+                <span className={'dsg ' + k + (s.side === k ? ' on' : '') + live(on)} key={k} {...press(on)}
+                      data-tap={'seg:' + k}>
                   {k === 'long' ? 'Long' : 'Short'}
                 </span>
               );
             })}
           </span>
           <span className={'dot' + (s.over === 'otype' ? ' on' : '') + live(d.can('otypeMenu'))}
-                {...press(d.can('otypeMenu'))}>
+                {...press(d.can('otypeMenu'))} data-tap="otype">
             {s.otype} <i>{s.over === 'otype' ? '⌃' : '⌄'}</i>
           </span>
         </div>
@@ -476,12 +487,13 @@ function Ticket({ d }: { d: Deck }) {
         <div className="dfield">
           <span className="dflab">Amount</span>
           <span className={'dfin' + (s.focus === 'amount' ? ' on' : '') + live(d.can('focus', 'amount'))}
-                {...press(d.can('focus', 'amount'))}>
+                {...press(d.can('focus', 'amount'))} data-tap="field:amount">
             <i className="dcur">$</i>
             <b>{s.amount}</b>
             {s.focus === 'amount' ? <i className="dcaret" /> : null}
           </span>
-          <span className={'dlev' + live(d.can('levSheet'))} {...press(d.can('levSheet'))}>{s.lev}x <i>⌄</i></span>
+          <span className={'dlev' + live(d.can('levSheet'))} {...press(d.can('levSheet'))}
+                data-tap="lev">{s.lev}x <i>⌄</i></span>
         </div>
 
         {s.otype === 'Limit' ? (
@@ -496,7 +508,8 @@ function Ticket({ d }: { d: Deck }) {
           </div>
         ) : null}
 
-        <span className={'dchk' + (s.prot ? ' on' : '') + live(d.can('prot'))} {...press(d.can('prot'))}>
+        <span className={'dchk' + (s.prot ? ' on' : '') + live(d.can('prot'))} {...press(d.can('prot'))}
+              data-tap="prot">
           <i className="dbox" />Add profit taker/stop loss
         </span>
 
@@ -515,7 +528,8 @@ function Ticket({ d }: { d: Deck }) {
             <div className="dochk"><ProgressList steps={ORDER_STEPS} at={s.ostep} /></div>
           </>
         ) : (
-          <span className={'dcta' + (c.ok ? '' : ' off') + live(submit)} {...press(submit)}>{c.label}</span>
+          <span className={'dcta' + (c.ok ? '' : ' off') + live(submit)} {...press(submit)}
+                data-tap="submit">{c.label}</span>
         )}
 
         <dl className="dest">
@@ -546,13 +560,14 @@ function Protect({ d, which, label, bad, err }: {
     <div className="dfield prot">
       <span className="dflab">{label}</span>
       <span className={'dfin wide' + (s.focus === which ? ' on' : '') + (bad ? ' bad' : '') + live(focus)}
-            {...press(focus)}>
+            {...press(focus)} data-tap={'field:' + which}>
         {unit === '$' ? <i className="dcur">$</i> : null}
         <b>{val}</b>
         {s.focus === which ? <i className="dcaret" /> : null}
         <span className="dunit">
           <i>{unit}</i>
-          <span className={'dswap' + live(swap)} {...press(swap)} aria-label="Switch unit">⇄</span>
+          <span className={'dswap' + live(swap)} {...press(swap)} data-tap={'unit:' + which}
+                aria-label="Switch unit">⇄</span>
         </span>
       </span>
       {bad ? <em className="derr">{err}</em> : null}
@@ -592,7 +607,7 @@ function LevSheet({ d }: { d: Deck }) {
         <b className="dsh">Adjust leverage</b>
         <div className="dslide">
           <input
-            type="range" min={1} max={50} value={s.levDraft} className="drange"
+            type="range" min={1} max={50} value={s.levDraft} className="drange" data-tap="levslider"
             aria-label="Leverage"
             onChange={(e) => {
               const fn = d.can('levSet', e.target.value);
@@ -602,7 +617,8 @@ function LevSheet({ d }: { d: Deck }) {
           />
           <span className="dlevbox">{s.levDraft} <i>x</i></span>
         </div>
-        <span className={'dcta light' + live(d.can('levSave'))} {...press(d.can('levSave'))}>Save</span>
+        <span className={'dcta light' + live(d.can('levSave'))} {...press(d.can('levSave'))}
+              data-tap="save">Save</span>
       </div>
     </Layer>
   );
@@ -625,7 +641,7 @@ function Passkey({ d }: { d: Deck }) {
         </em>
         {s.auth === 'ask' ? (
           <>
-            <span className={'dcta blue' + live(use)} {...press(use)}>Use Passkey</span>
+            <span className={'dcta blue' + live(use)} {...press(use)} data-tap="passkey">Use Passkey</span>
             <span className="dghost">More Options</span>
           </>
         ) : (

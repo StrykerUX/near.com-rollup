@@ -522,3 +522,51 @@
   .pdindex a { flex-direction: column; gap: 10px }
   .pdimeta { text-align: left; display: flex; gap: 12px; padding: 0 }
 }
+
+/* =========================================================================
+   THE HAND
+   -------------------------------------------------------------------------
+   A touch point, not a mouse cursor: these are phone screens, and an arrow
+   pointing at them would be the one thing on the page that is not from the
+   recordings. It travels on `translate` alone so the transition never touches
+   layout, and it sits above every sheet because a finger does.
+   ========================================================================= */
+
+.dhand {
+  position: absolute; left: 0; top: 0; z-index: 20; pointer-events: none;
+  width: 30px; height: 30px; margin: -15px 0 0 -15px;
+  translate: var(--tx, 50%) var(--ty, 50%);
+  transition: translate 300ms cubic-bezier(.33, 1, .38, 1), opacity 200ms linear;
+  display: grid; place-items: center;
+}
+.dhand.off { opacity: 0 }
+.dhand i {
+  display: block; width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255, 255, 255, .16);
+  border: 1.5px solid rgba(255, 255, 255, .55);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .5);
+  transition: scale 160ms var(--ease-out), background 160ms linear;
+}
+/* the press: the dot squashes and a ring leaves it */
+.dhand.press i { scale: .74; background: rgba(255, 255, 255, .4) }
+.dhand.press::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, .6);
+  animation: dring 520ms var(--ease-out) forwards;
+}
+@keyframes dring {
+  from { scale: .6; opacity: .9 }
+  to { scale: 2.1; opacity: 0 }
+}
+
+/* and the control answers. A press with no response on the control is a dot
+   moving over a picture; this is what makes it land. */
+[data-tap].tapped {
+  filter: brightness(1.35);
+  transition: filter 60ms linear;
+}
+.kpkey.tapped { background: rgba(255, 255, 255, .45); filter: none }
+
+@media (prefers-reduced-motion: reduce) {
+  .dhand { display: none }
+}

@@ -48,7 +48,7 @@ export function Keypad({
       <div className="kpbar">
         <span className="kpnav"><i className="kpup" /><i className="kpdown" /></span>
         <span className={'kpdone' + (onDone ? ' can' : '')} {...press(onDone ?? null)}
-          aria-label={onDone ? 'Done' : undefined}>✓</span>
+          data-tap="done" aria-label={onDone ? 'Done' : undefined}>✓</span>
       </div>
       <div className="kpgrid">
         {KEYS.map(([k, sub]) => {
@@ -57,6 +57,8 @@ export function Keypad({
             <span
               className={'kpkey' + (pressed === k || hit === k ? ' on' : '') + (fn ? ' can' : '')}
               key={k}
+              /* named so a demo's hand can find it; harmless everywhere else */
+              data-tap={'key:' + k}
               aria-label={onKey ? (k === '⌫' ? 'Delete' : k) : undefined}
               {...press(fn && (() => { setHit(k); fn(); }))}
             >

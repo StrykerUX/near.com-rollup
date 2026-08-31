@@ -26,8 +26,23 @@ export const PACE = 1.25;
 /** how long the script waits after a gesture before it resumes */
 export const IDLE_MS = 5200;
 
+/**
+ * WHERE THE HAND IS.
+ *
+ * `next` is the control the script is about to press — the hand travels there
+ * during the pause before the beat fires, which is the whole trick: a person
+ * reaches for a button before they press it, and a demo that only ever shows
+ * the aftermath reads as a slideshow of states.
+ *
+ * `last` is the one just pressed, so the ripple lands where the press did, and
+ * `n` counts presses so the ripple can be replayed on the same control twice
+ * in a row (typing 7, 0, 0).
+ */
+export type Hand = { next: string | null; last: string | null; n: number };
+
 export type Deck<S, A extends string> = {
   s: S;
+  hand: Hand;
   /** which step is showing */
   step: number;
   playing: boolean;
@@ -75,6 +90,10 @@ export function useDeck<S, A extends string>(flow: DemoFlow<S, A>): Deck<S, A> {
      every unrelated re-render and restart the beat's timer from zero. There is
      exactly one writer of this ref: the code below. */
   const [view, setView] = useState<Cur<S>>(() => ({ s: { ...m.initial }, i: -1, t: 0, pass: 0 }));
+  /* the press counter and the control it landed on. A ref, because the clock
+     writes them on the frame a beat turns over and React only needs them on
+     the render that follows. */
+  const hand = useRef<Hand>({ next: null, last: null, n: 0 });
   const cur = useRef<Cur<S>>(view);
   const commit = useCallback((next: Cur<S>) => {
     cur.current = next;
@@ -121,6 +140,10 @@ export function useDeck<S, A extends string>(flow: DemoFlow<S, A>): Deck<S, A> {
         const nx = beats[i + 1];
         if (t < nx.ms) break;
         t -= nx.ms;
+        /* the target is resolved against the state the beat is ABOUT to act
+           on, which is the state we still hold here */
+        const hit = nx.do ? flow.target?.(nx.do, nx.arg, s) ?? null : null;
+        if (hit) hand.current = { ...hand.current, last: hit, n: hand.current.n + 1 };
         i += 1;
         s = applyBeat(m, s, nx);
         dirty = true;
@@ -133,7 +156,7 @@ export function useDeck<S, A extends string>(flow: DemoFlow<S, A>): Deck<S, A> {
       if (dirty) setView(next);
     });
     return () => cancelAnimationFrame(raf);
-  }, [playing, reduce, m, beats, outro]);
+  }, [playing, reduce, m, beats, outro, flow]);
 
   /* the hold badge is a render concern; the clock keeps its own copy in a ref
      so it never waits for React to hear that the reader let go */
@@ -157,6 +180,13 @@ export function useDeck<S, A extends string>(flow: DemoFlow<S, A>): Deck<S, A> {
   );
 
   const stepNow = stepOf(view.i);
+
+  /* where the hand is heading: the next beat that presses something */
+  const nextTarget = useMemo(() => {
+    const nx = beats[view.i + 1];
+    if (!nx?.do) return null;
+    return flow.target?.(nx.do, nx.arg, view.s) ?? null;
+  }, [beats, view.i, view.s, flow]);
   const next = useCallback(() => seek(stepOf(cur.current.i) + 1), [seek, stepOf]);
   const prev = useCallback(() => seek(stepOf(cur.current.i) - 1), [seek, stepOf]);
   const toggle = useCallback(() => setPlaying((p) => !p), []);
@@ -214,6 +244,7 @@ export function useDeck<S, A extends string>(flow: DemoFlow<S, A>): Deck<S, A> {
   /* Reduced motion gets one honest frame and no loop. */
   return {
     s: reduce ? frameAt(m.restFrame) : view.s,
+    hand: { ...hand.current, next: nextTarget },
     step: reduce ? stepOf(m.restFrame) : stepNow,
     playing: reduce ? false : playing,
     held,

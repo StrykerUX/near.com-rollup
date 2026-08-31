@@ -18,7 +18,7 @@ export function PerpsV2Demo() {
         rules are enforced against a fixed entry price.
       </>}
     >
-      <Phone d={deck} holdPrice />
+      <Phone d={deck} holdPrice hand />
     </DemoPage>
   );
 }
