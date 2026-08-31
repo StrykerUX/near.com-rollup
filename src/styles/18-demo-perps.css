@@ -221,3 +221,67 @@
 .pd .kpkey { padding: 7px 0 6px }
 .pd .kpkey b { font-size: 19px }
 
+
+/* =========================================================================
+   THINGS ARRIVING — `[data-motion="rich"]`, which is /demo/perps-v2
+   -------------------------------------------------------------------------
+   Everything below is an ENTRANCE, never an exit. React unmounts these the
+   instant the state changes, and animating that out means keeping a dead
+   element alive to watch it leave — machinery for a moment nobody looks at,
+   because what leaves is almost always behind the thing that replaced it.
+   What arrives is what the eye follows.
+
+   One curve, one distance, three durations. A vocabulary this small is what
+   makes the screen read as one surface rather than a set of widgets that each
+   animate their own way.
+   ========================================================================= */
+
+@keyframes drise {
+  from { opacity: 0; translate: 0 9px }
+  to { opacity: 1; translate: 0 0 }
+}
+@keyframes dpop {
+  from { opacity: 0; scale: .94 }
+  to { opacity: 1; scale: 1 }
+}
+
+/* the pair of protection fields, opened by one checkbox and arriving as one */
+.pdev[data-motion] .dfield.prot { animation: drise 340ms var(--ease-out) both }
+
+/* the refusal. It appears UNDER the field it belongs to and pushes the button
+   down, so it needs to be seen arriving or the button looks like it moved on
+   its own. */
+.pdev[data-motion] .derr { animation: drise 240ms var(--ease-out) both }
+
+/* the checklist the order settles through, and the spinner that replaces the
+   button while it does */
+.pdev[data-motion] .dochk { animation: drise 320ms var(--ease-out) both }
+
+/* the order-type menu is a popover: it belongs to the chip it hangs off, so it
+   grows out of it rather than sliding in from somewhere */
+.pdev[data-motion] .dmenu { animation: dpop 200ms var(--ease-out) both; transform-origin: top right }
+
+/* THE HANDOFF. The ticket slides away and the position bar takes the place the
+   Long/Short buttons were in. The delay is the sheet's own travel: arriving
+   underneath it while it is still leaving reads as two things happening, which
+   is exactly what it is not. */
+.pdev[data-motion] .dposbar { animation: drise 380ms var(--ease-out) 160ms both }
+.pdev[data-motion] .dposd { animation: drise 260ms var(--ease-out) both }
+.pdev[data-motion] .dlid { animation: drise 240ms var(--ease-out) both }
+
+/* the list under the tabs. Rows arrive one after another, because a list that
+   appears whole reads as a screenshot of a list. */
+.pdev[data-motion] .dlist .dli { animation: drise 280ms var(--ease-out) both }
+.pdev[data-motion] .dlist .dli:nth-child(2) { animation-delay: 50ms }
+.pdev[data-motion] .dlist .dli:nth-child(3) { animation-delay: 100ms }
+.pdev[data-motion] .dempty { animation: drise 300ms var(--ease-out) both }
+
+/* the keypad comes up from under the sheet, the way a keyboard does */
+.pdev[data-motion] .kpwrap { animation: kprise 300ms var(--ease-out) both }
+@keyframes kprise {
+  from { translate: 0 100% }
+  to { translate: 0 0 }
+}
+
+/* the tick lands rather than appearing */
+.pdev[data-motion] .dchk.on .dbox::after { animation: dpop 180ms var(--ease-out) both }

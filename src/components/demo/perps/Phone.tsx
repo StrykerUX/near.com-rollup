@@ -54,8 +54,13 @@ export function Phone({ d, holdPrice = false, hand = false }: {
      already spent four chapters establishing that the price moves. */
   const paused = holdPrice && (s.focus === 'tp' || s.focus === 'sl');
   return (
+    /* `data-motion` rides with the hand on purpose: they are one decision.
+       This page is showing a person using the app, so the things a person
+       makes appear have to arrive rather than exist. The long version keeps
+       its plainer motion — it has four more chapters to fill and a screen that
+       animates every list row for twenty-four steps is a screen that fidgets. */
     <div className="pdev" data-screen={s.screen} data-held={d.held || undefined}
-         data-pos={s.pos ? '1' : undefined}>
+         data-pos={s.pos ? '1' : undefined} data-motion={hand ? 'rich' : undefined}>
       <StatusBar />
       <div className="pdview">
         {s.screen === 'account' ? <Account d={d} /> : null}
@@ -515,9 +520,9 @@ function Ticket({ d }: { d: Deck }) {
 
         {s.prot ? (
           <>
-            <Protect d={d} which="tp" label="Take profit" bad={tpBad(s)}
+            <Protect d={d} which="tp" label="Take profit" bad={tpBad(s)} delay={0}
                      err="Take profit must be above entry price" />
-            <Protect d={d} which="sl" label="Stop loss" bad={slBad(s)}
+            <Protect d={d} which="sl" label="Stop loss" bad={slBad(s)} delay={70}
                      err="Stop loss must be below entry price" />
           </>
         ) : null}
@@ -548,8 +553,10 @@ function Ticket({ d }: { d: Deck }) {
   );
 }
 
-function Protect({ d, which, label, bad, err }: {
+function Protect({ d, which, label, bad, err, delay = 0 }: {
   d: Deck; which: 'tp' | 'sl'; label: string; bad: boolean; err: string;
+  /** the two fields arrive one after the other, as a pair being opened */
+  delay?: number;
 }) {
   const { s } = d;
   const val = which === 'tp' ? s.tp : s.sl;
@@ -557,7 +564,7 @@ function Protect({ d, which, label, bad, err }: {
   const focus = d.can('focus', which);
   const swap = d.can('unit', which);
   return (
-    <div className="dfield prot">
+    <div className="dfield prot" style={delay ? { animationDelay: `${delay}ms` } : undefined}>
       <span className="dflab">{label}</span>
       <span className={'dfin wide' + (s.focus === which ? ' on' : '') + (bad ? ' bad' : '') + live(focus)}
             {...press(focus)} data-tap={'field:' + which}>

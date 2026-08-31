@@ -147,6 +147,10 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
        frames it is allowed to */
     let clock = 0;
     let prev = 0;
+    /* when the entry line first had a price to draw at, so it can arrive
+       rather than appear — a line that is simply there in the next frame reads
+       as a rendering artefact, not as a position that was just opened */
+    let entryAt = 0;
     let w = 0;
     let h = 0;
 
@@ -272,18 +276,27 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
       ctx.setLineDash([]);
       chip(ctx, w - 50, py, '$' + last.toFixed(1), '#26C281', '#04140E');
 
-      /* the entry line, when a position is open */
+      /* the entry line, when a position is open. It draws OUT FROM ITS CHIP:
+         the price is what the position is anchored to, so the line grows from
+         the label leftward across the chart rather than switching on. */
       const e = props.current.entry;
+      if (!e) entryAt = 0;
+      else if (!entryAt) entryAt = clock;
       if (e) {
+        const a = Math.min(1, Math.max(0, (clock - entryAt) / 520));
         const ey = Math.round(y(e)) + 0.5;
+        const right = w - 52;
+        ctx.save();
+        ctx.globalAlpha = a;
         ctx.strokeStyle = 'rgba(120,170,255,.6)';
         ctx.setLineDash([2, 4]);
         ctx.beginPath();
-        ctx.moveTo(0, ey);
-        ctx.lineTo(w - 52, ey);
+        ctx.moveTo(right * (1 - a), ey);
+        ctx.lineTo(right, ey);
         ctx.stroke();
         ctx.setLineDash([]);
         chip(ctx, w - 50, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F');
+        ctx.restore();
       }
 
     };
