@@ -4,8 +4,20 @@ import { actions, initial, type EA, type EAAction } from './state';
 /**
  * EARN — the script
  * ==================================================================
- * Four chapters, sixteen steps. The first three put money into a vault; the
+ * Four chapters, seventeen steps. The first three put money into a vault; the
  * fourth spends out of one, which is the half the recording is named after.
+ *
+ * ONE DELIBERATE DEPARTURE FROM THE RECORDING, which deposits into Taler and
+ * then pays out of Gauntlet — leaving the second half looking like a
+ * coincidence, two unrelated vaults that happen to sit in the same list. This
+ * deposits into Gauntlet and pays out of Gauntlet, so the balance the Pay with
+ * picker offers is the one the reader just watched grow. Same feature, argued
+ * rather than merely shown. What it costs is Gauntlet's fee sheet, which the
+ * recording never opens — `state.ts` says so where those figures are written.
+ *
+ * The deposit also returns to the account card before Universal Send opens,
+ * rather than going there from the vault list, because the Earn row is where a
+ * deposit and a payment are the same money.
  */
 
 const type_ = (act: EAAction, chars: string, lead?: number, gap?: number) =>
@@ -50,8 +62,8 @@ const STEPS: Step<EA, EAAction>[] = [
   {
     id: 'sheet', ch: 'vaults',
     title: 'Who runs it, and what it charges',
-    note: 'The vault names its curator and its chain before it names its yield, and states all three fees — deposit, withdrawal, performance — before asking for anything.',
-    beats: [{ ms: 2400, do: 'openVault', arg: 'taler' }],
+    note: 'Gauntlet USDC: curated by Gauntlet, built on Ethereum, 4.52% against $432.92M. The sheet names who runs it and where before it names the yield, and states all three fees — deposit, withdrawal, performance — before asking for anything. Taler carries a Promo chip against a 0% performance fee; this one carries none, and charges 10% of the yield it earns.',
+    beats: [{ ms: 2400, do: 'openVault', arg: 'gauntlet' }],
   },
 
   {
@@ -94,15 +106,21 @@ const STEPS: Step<EA, EAAction>[] = [
   {
     id: 'after', ch: 'deposit',
     title: 'The vault is bigger by exactly that',
-    note: 'Closing returns to the list with Taler up by the deposit. Nothing was rounded on the way through.',
+    note: 'Closing returns to the list with Gauntlet up by the deposit — $1,343 to $1,366 at the rounding the row uses. Nothing was rounded on the way in: the balance behind it carries all six decimals of the 22.555228.',
     beats: [{ ms: 2000, do: 'close' }, { ms: 2400 }],
+  },
+  {
+    id: 'card', ch: 'deposit',
+    title: 'And so is the account',
+    note: 'Earn is the sum of both vaults, so the card moved with them: $2,389.54 became $2,412.10. A deposit that only changes the screen you made it on is a deposit you have to go looking for afterwards.',
+    beats: [{ ms: 2200, do: 'home' }, { ms: 2400 }],
   },
 
   {
     id: 'send', ch: 'spend',
     title: 'Universal Send',
-    note: 'Send any token to any network, pay with any asset you own. Three rows — token, network, recipient — and the amount under them.',
-    beats: [{ ms: 2600, do: 'home' }, { ms: 1600, do: 'toSend' }],
+    note: 'Send any token to any network, pay with any asset you own. Three rows — token, network, recipient — and the amount under them. It opens from the account card, which is where the money just landed.',
+    beats: [{ ms: 2400, do: 'toSend' }],
   },
   {
     id: 'warn', ch: 'spend',
@@ -122,7 +140,7 @@ const STEPS: Step<EA, EAAction>[] = [
   {
     id: 'paywith', ch: 'spend',
     title: 'Pay with — Your vaults',
-    note: 'This is the feature. The picker offers the two vault balances above the wallet tokens: paying out of yield is a choice made in passing, not a withdrawal you have to plan first.',
+    note: 'This is the feature, and the deposit is what makes it land. The picker offers both vault balances above the wallet tokens, and the one being picked is Gauntlet — $1,365.59, the 22.555228 included. Nothing was withdrawn to get here: paying out of yield is a choice made in passing, not a plan you have to make first.',
     beats: [
       { ms: 2400, do: 'payPicker' },
       { ms: 2600, do: 'pickPay', arg: 'gauntlet' },
@@ -131,7 +149,7 @@ const STEPS: Step<EA, EAAction>[] = [
   {
     id: 'amount', ch: 'spend',
     title: '100 ZEC, paid from Gauntlet',
-    note: 'The amount is in the token being sent; the balance under it is in the asset paying for it. The app is holding both sides of a conversion nobody had to ask for.',
+    note: 'The amount is in the token being sent; the balance under it is in the asset paying for it — the same Gauntlet vault, deposit and all. The app is holding both sides of a conversion nobody had to ask for.',
     beats: [...type_('skey', '100', 1800, 260), { ms: 2000 }],
   },
   {

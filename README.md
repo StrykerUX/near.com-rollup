@@ -128,9 +128,9 @@ beside it. `/demo` indexes them.
 | Route | Recording | Steps | What it shows |
 |---|---|---|---|
 | `/demo/perps` | 5m 41s | 24 | Fund with a passkey, build a ticket, hit both validation rules, open a position |
-| `/demo/perps-v2` | the same, cut | 13 | The trade alone: market → position → the same market with it on |
+| `/demo/perps-v2` | the same, cut | 16 | The trade alone: $5,000 of margin into a $100,000 position, and back to the card |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
-| `/demo/earn` | 48s | 16 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
+| `/demo/earn` | 48s | 17 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
 | `/demo/confidential-send` | 10s | 8 | A shielded asset sent from the same screen and the same list as any other |
 
@@ -190,11 +190,23 @@ feature.
 ### Perps v2, and the one thing it does that v1 does not
 
 `/demo/perps-v2` is the same machine as `/demo/perps` — same transitions, same
-guards, same figures — starting from `initialFunded` and cut to four chapters.
-The long version has to earn its opening: it establishes that the perps balance
-starts at $86.99 and that funding it is a passkey away, which is twenty-four
-steps before anyone takes a position. That is the right length for an argument
-and the wrong length for a demo of the trade.
+guards — starting from `initialFunded` and carrying the long version's steps 11
+through 24: the ticket onwards. The long version has to earn its opening, and
+establishing that the perps balance starts at $86.99 and that funding it is a
+passkey away costs ten steps before anyone takes a position. That is the right
+length for an argument and the wrong length for a demo of the trade.
+
+Two figures differ, and both because the funding chapter is gone. The opening
+balance is $5,428.61 rather than what that chapter lands on, so $5,000 of margin
+at 20x is $100,000 of notional — a demo of a leveraged product whose example
+trade is $14,000 is a demo of the form, not of the leverage. And the account
+card's unrealized P&L, which had been pinned at the recording's +$5.10, is
+applied as the rate that figure represents (0.0364% of notional) so a $100,000
+position does not report the P&L of a $14,000 one.
+
+It also shows one refusal rather than two. The take profit is typed wrong,
+refused and corrected; the stop loss goes in once and is accepted. One refusal
+on a screen is a lesson, two in a row is a queue.
 
 The one addition is a `paused` prop on `Chart`. It is not `live`: `live`
 switches the loop off for a card nobody is looking at, while `paused` keeps

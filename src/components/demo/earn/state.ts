@@ -12,6 +12,9 @@ import type { Act } from '@/components/stage/phone/flows/machine';
 export const CRYPTO_BAL = 6698.54;
 export const PERPS_BAL = 1053.89;
 
+/** one row of a vault's fee disclosure: what it is called, and what it costs */
+export type Fee = readonly [row: string, value: string];
+
 export type Vault = {
   id: 'gauntlet' | 'taler';
   name: string;
@@ -19,18 +22,48 @@ export type Vault = {
   apr: string;
   /** what this account already has in it, frame 0:06 */
   balance: number;
+  /**
+   * This vault is running a promotion. It is what puts the chip beside the
+   * name in the list AND on the fee row the promotion applies to — one flag,
+   * because a vault advertising a promo it does not charge for is the kind of
+   * inconsistency a reader spots before they spot the feature.
+   */
   promo?: boolean;
   desc: string;
+  /** stated in this vault's own sheet, before it asks for money */
+  fees: readonly Fee[];
 };
 
 export const VAULTS: Vault[] = [
   {
     id: 'gauntlet', name: 'Gauntlet USDC', tvl: '$432.92M', apr: '4.52%', balance: 1343.03,
     desc: 'This yield vault is curated by Gauntlet, and is built on Ethereum.',
+    /*
+     * NOT READ OFF THE RECORDING. The recording opens Taler's sheet and only
+     * Taler's, so Gauntlet's disclosure was never on screen and there is no
+     * frame to quote. These three rows are the SHAPE the sheet takes, not
+     * figures anybody observed.
+     *
+     * The last one is the one that had to be decided rather than copied:
+     * Taler's 0% is a promotion with an end date on it, so a vault carrying no
+     * promo chip cannot also charge nothing — the chip next door would mean
+     * nothing. Deposit and withdrawal are the app's own rails and match.
+     */
+    fees: [
+      ['Deposit fee', 'Variable, up to 0.01%'],
+      ['Withdrawal fee', 'Fixed, 0.05%'],
+      ['Performance fee', '10% of yield earned'],
+    ],
   },
   {
     id: 'taler', name: 'Taler USDC', tvl: '$854.15K', apr: '5.80%', balance: 1046.51, promo: true,
     desc: 'This yield vault is provided by Taler, a NEAR ecosystem company, and managed by the TAU Labs team, and is built on Ethereum.',
+    /* every figure here was on screen: this is the sheet the recording opens */
+    fees: [
+      ['Deposit fee', 'Variable, up to 0.01%'],
+      ['Withdrawal fee', 'Fixed, 0.05%'],
+      ['Performance fee', '0% through Oct 31, 2026. Future rate to be announced.'],
+    ],
   },
 ];
 
@@ -38,11 +71,6 @@ export const vaultOf = (id: string) => VAULTS.find((v) => v.id === id)!;
 
 /** the wallet balance the deposit comes out of, frame 0:22 */
 export const USDC_AVAIL = 22.555228;
-export const FEES = [
-  ['Deposit fee', 'Variable, up to 0.01%'],
-  ['Withdrawal fee', 'Fixed, 0.05%'],
-  ['Performance fee', '0% through Oct 31, 2026. Future rate to be announced.'],
-] as const;
 export const REFERENCE = 'CcX9D…FtYC';
 export const DEPOSIT_STEPS = ['Confirm in wallet', 'Depositing', 'Deposited'];
 

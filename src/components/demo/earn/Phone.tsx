@@ -9,7 +9,7 @@ import { Layer, StatusBar, Tabs } from '@/components/demo/shell/Frame';
 import { AccountScreen, PasskeySheet, UniversalSendScreen, usd } from '@/components/demo/shell/Screens';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
-  CRYPTO_BAL, DEPOSIT_STEPS, FEES, NEAR_QTY, NEAR_USD, PERPS_BAL, REFERENCE,
+  CRYPTO_BAL, DEPOSIT_STEPS, NEAR_QTY, NEAR_USD, PERPS_BAL, REFERENCE,
   TOKENS, USDC_AVAIL, VAULTS,
   balanceOf, earnTotal, needsAck, payBalance, payLabel, sendUsd, vaultOf,
   type EA, type EAAction,
@@ -164,9 +164,12 @@ function VaultSheet({ d }: { d: Deck }) {
           <div><dt>TVL</dt><dd>{v.tvl}</dd></div>
         </dl>
         <dl className="dvfees">
-          {FEES.map(([k, val]) => (
+          {/* The chip belongs to the vault, not to the row: it used to be
+              hardcoded onto Performance fee, so opening a vault that charges a
+              performance fee still advertised a promotion on it. */}
+          {v.fees.map(([k, val]) => (
             <div key={k}>
-              <dt>{k}{k === 'Performance fee' ? <i className="dpromo">Promo</i> : null}</dt>
+              <dt>{k}{v.promo && k === 'Performance fee' ? <i className="dpromo">Promo</i> : null}</dt>
               <dd>{val}</dd>
             </div>
           ))}
