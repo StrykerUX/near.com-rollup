@@ -1,5 +1,4 @@
 'use client';
-import { useEffect, useRef } from 'react';
 import { ProgressList } from '@/components/stage/phone/ui/ProgressList';
 import { live, press } from '@/components/stage/phone/ui/tap';
 import { TokenDot } from '@/components/stage/phone/TokenDot';
@@ -51,27 +50,13 @@ const dot = (sym: string) => {
 
 export function Phone({ d }: { d: Deck }) {
   const { s } = d;
-  const dev = useRef<HTMLDivElement>(null);
-
-  /**
-   * USE PASSKEY IS THE ONE CONTROL THIS FLOW CANNOT NAME IN ITS OWN MARKUP.
-   *
-   * The sheet comes out of `shell/Screens`, shared by every demo that signs,
-   * and it takes a handler rather than a tap id — so the button reaches the
-   * DOM with nothing for `Hand` to look up, and the hand blinks out at the one
-   * beat the signing chapter is entirely about. Naming it from here fixes that
-   * without settling the shell's vocabulary on behalf of the other four flows.
-   */
-  useEffect(() => {
-    dev.current?.querySelector('.dsheet.pass .dcta')?.setAttribute('data-tap', 'passkey');
-  }, [s.over, s.auth]);
 
   return (
     /* `data-motion` rides with the hand on purpose: they are one decision.
        This page is showing a person using the app, so the things that person
        makes appear — the quote under the amount, the picker's rows, the
        checklist — have to arrive rather than exist. */
-    <div className="pdev" data-screen={s.screen} data-motion="rich" ref={dev}>
+    <div className="pdev" data-screen={s.screen} data-motion="rich">
       <StatusBar time="12:07" />
       {/* keyed so a screen change remounts its blocks and they re-lay
           rather than being swapped between two frames */}
@@ -169,9 +154,10 @@ function TokenRow({ d, h }: { d: Deck; h: Holding }) {
   const chip = h.yield ? d.can('vault') : null;
   return (
     /* The two USD Coin balances carry the same id, and so does the chip on
-       each of them. That is not a collision to fix: `actions` and `vault` both
-       take a SYMBOL, so the machine cannot tell those two rows apart either —
-       the hand landing on the first one is the app's own answer. */
+       each of them. That is not a collision to fix: `actions` names a SYMBOL
+       and `vault` names nothing at all, so the machine cannot tell those two
+       rows apart either — the hand landing on the first one is the app's own
+       answer, not a near miss. */
     <div className={'dli' + live(open)} {...press(open)} data-tap={'tok:' + h.sym}>
       <TokenDot token={dot(h.sym)} size={26} />
       <span className="dlit">

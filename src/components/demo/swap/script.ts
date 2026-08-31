@@ -105,7 +105,9 @@ const STEPS: Step<SW, SWAction>[] = [
     note: 'Face ID against the passkey saved for near.com. No password, no seed phrase, and nothing moves until it comes back.',
     beats: [
       { ms: 2600, do: 'swap' },
-      { ms: 1200, do: 'authOk' },
+      /* the hand has to cross the whole screen to the passkey button, and the
+         sheet it is on is still sliding for the first half of that */
+      { ms: 1500, do: 'authOk' },
       { ms: 1300, do: 'step' },
       { ms: 900, do: 'step' },
     ],
@@ -147,7 +149,9 @@ const STEPS: Step<SW, SWAction>[] = [
     note: 'Another passkey, then the same three-part settlement, and a reference ID you can copy if it ever needs chasing.',
     beats: [
       { ms: 2000, do: 'deposit' },
-      { ms: 1200, do: 'vstep' },
+      /* the same journey as the swap's signature, so it gets the same lead:
+         this `vstep` IS the passkey being pressed, not the network answering */
+      { ms: 1500, do: 'vstep' },
       { ms: 1200, do: 'vstep' },
       { ms: 1000, do: 'vstep' },
       { ms: 1600, do: 'vstep' },
@@ -184,6 +188,49 @@ export const swapFlow = buildFlow<SW, SWAction>({
     vmax: 'vdeposit',
     deposit: 'vdeposit',
     close: 'vdone',
+  },
+  /**
+   * WHERE EACH TRANSITION IS PRESSED.
+   *
+   * The machine says what happens; this says where on the glass. The deck
+   * resolves the NEXT beat's target while the clock is still counting down to
+   * it, so the hand is already on the control when the state changes — which
+   * is the whole difference between a screen using itself and a person using
+   * it.
+   *
+   * `row:crypto` is the shell's own id for a balance row on the account card,
+   * not this flow's: the card is shared by four demos and naming its rows here
+   * would mean naming them four times.
+   */
+  target: (a, arg, s) => {
+    switch (a) {
+      case 'toAssets': return 'row:crypto';
+      case 'bucket': return `seg:${arg}`;
+      case 'actions': return `tok:${arg}`;
+      case 'toSwap': return 'act:swap';
+      case 'max': return 'max';
+      case 'picker': return 'picker';
+      case 'search': return 'search';
+      case 'pick': return `pick:${arg}`;
+      case 'review': return 'review';
+      case 'swap': return 'swap';
+      case 'authOk': return 'passkey';
+      case 'again': return 'again';
+      /* the chip is on every row that has a yield, but the deposit only ever
+         comes out of the first USD Coin balance — see `vaultBal` */
+      case 'vault': return 'chip:USDC';
+      case 'vmax': return 'vmax';
+      case 'deposit': return 'deposit';
+      case 'close': return 'close';
+      /* Five `step`s and six `vstep`s fire, and one press hides among them:
+         the vault's first `vstep` IS the passkey button, where the swap's is
+         spelled `authOk`. Everything after that is the network coming back,
+         and a hand hovering over a checklist that is ticking itself is a lie
+         about who is doing the work. */
+      case 'step':
+      case 'vstep': return s.over === 'passkey' && s.auth === 'ask' ? 'passkey' : null;
+      default: return null;
+    }
   },
   /* both settlements tick on their own when no clock is running */
   auto: (s) => {
