@@ -41,15 +41,19 @@ const CRYPTO_AFTER = 6806.76;
 
 const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
 
-export function Phone({ d }: { d: Deck }) {
+export function Phone({ d, holdPrice = false }: { d: Deck; holdPrice?: boolean }) {
   const { s } = d;
+  /* v2 holds the market still while a protection field is being typed into.
+     The long version lets it run: by the time it reaches that step it has
+     already spent four chapters establishing that the price moves. */
+  const paused = holdPrice && (s.focus === 'tp' || s.focus === 'sl');
   return (
     <div className="pdev" data-screen={s.screen} data-held={d.held || undefined}
          data-pos={s.pos ? '1' : undefined}>
       <StatusBar />
       <div className="pdview">
         {s.screen === 'account' ? <Account d={d} /> : null}
-        {s.screen === 'market' ? <Market d={d} /> : null}
+        {s.screen === 'market' ? <Market d={d} paused={paused} /> : null}
         {s.screen === 'fund' || s.screen === 'funding' ? <Fund d={d} /> : null}
       </div>
       {s.screen === 'account' || s.screen === 'market'
@@ -150,7 +154,7 @@ function Account({ d }: { d: Deck }) {
 
 /* ---- 2 · the market --------------------------------------------------- */
 
-function Market({ d }: { d: Deck }) {
+function Market({ d, paused = false }: { d: Deck; paused?: boolean }) {
   const { s } = d;
   const back = d.can('home');
   const acct = d.can('acct');
@@ -201,7 +205,7 @@ function Market({ d }: { d: Deck }) {
 
       <div className="dchart">
         <Chart entry={s.pos ? s.pos.entry : null} side={s.pos?.side ?? null} live
-               readout={{ price, change, onTick }} />
+               paused={paused} readout={{ price, change, onTick }} />
       </div>
       <div className="dtf"><span>1H ⌄</span><i className="dtfi" /></div>
 

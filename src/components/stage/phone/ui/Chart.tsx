@@ -103,6 +103,20 @@ export type ChartProps = {
   /** 'long' tints the entry chip; null hides the position marker */
   side?: 'long' | 'short' | null;
   /**
+   * HOLD THE MARKET STILL.
+   *
+   * Not the same as `live`. `live` switches the loop off for a card nobody is
+   * looking at; `paused` keeps drawing and stops the CLOCK, so the candles
+   * hold where they are and resume from there rather than from the top.
+   *
+   * It exists for one moment: typing a stop loss. The rule the ticket enforces
+   * is against a fixed entry price, and a reader who types 78,200 while the
+   * quote above it walks 400 points cannot tell whether the refusal is about
+   * their number or about the market. Holding the price makes the rule
+   * legible; letting it run makes it look arbitrary.
+   */
+  paused?: boolean;
+  /**
    * The market only ticks while its card is on stage. Everything else on this
    * page is a function of scroll; the live candle is the one thing that is
    * genuinely continuous, so it is also the one thing that has to be switched
@@ -111,15 +125,15 @@ export type ChartProps = {
   live?: boolean;
 };
 
-export function Chart({ entry = null, side = null, live = true, readout }: ChartProps) {
+export function Chart({ entry = null, side = null, live = true, paused = false, readout }: ChartProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   /* The draw loop reads these every frame but must not re-subscribe when they
      change — mirroring them into a ref from an effect keeps the rAF stable and
      the render pure. */
-  const props = useRef({ entry, side, readout });
+  const props = useRef({ entry, side, readout, paused });
   useEffect(() => {
-    props.current = { entry, side, readout };
-  }, [entry, side, readout]);
+    props.current = { entry, side, readout, paused };
+  }, [entry, side, readout, paused]);
 
   useEffect(() => {
     const cv = ref.current;
@@ -129,7 +143,10 @@ export function Chart({ entry = null, side = null, live = true, readout }: Chart
 
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let raf = 0;
-    let t0 = 0;
+    /* the market's own clock, in milliseconds, which only advances on the
+       frames it is allowed to */
+    let clock = 0;
+    let prev = 0;
     let w = 0;
     let h = 0;
 
@@ -154,15 +171,17 @@ export function Chart({ entry = null, side = null, live = true, readout }: Chart
          sat frozen on whatever it had last drawn while the header it feeds
          quoted a price from the server render. */
       if (live) raf = requestAnimationFrame(draw);
-      if (!t0) t0 = now;
+      if (!prev) prev = now;
+      if (!props.current.paused) clock += now - prev;
+      prev = now;
       if (!fit()) return;
 
       /* The live candle: its close travels from the previous close toward its
          own, so the body grows out of the last one instead of appearing. */
-      const phase = reduce ? 1 : ((now - t0) % CANDLE_MS) / CANDLE_MS;
+      const phase = reduce ? 1 : (clock % CANDLE_MS) / CANDLE_MS;
       /* no modulo: the window walks forward for as long as anyone watches, and
          `walk` is what keeps the price in range rather than the array's end */
-      const shift = reduce ? 0 : Math.floor((now - t0) / CANDLE_MS);
+      const shift = reduce ? 0 : Math.floor(clock / CANDLE_MS);
       const view: Candle[] = [];
       for (let i = 0; i < CANDLES; i++) {
         const src = candle(i + shift);

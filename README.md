@@ -128,6 +128,7 @@ beside it. `/demo` indexes them.
 | Route | Recording | Steps | What it shows |
 |---|---|---|---|
 | `/demo/perps` | 5m 41s | 24 | Fund with a passkey, build a ticket, hit both validation rules, open a position |
+| `/demo/perps-v2` | the same, cut | 13 | The trade alone: market → position → the same market with it on |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
 | `/demo/earn` | 48s | 16 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
@@ -185,6 +186,36 @@ The perps recording quotes a *third* liquidation figure (3.7%) on the position
 card for the same position. We use one formula everywhere: a demo that shows two
 liquidation prices for one position is a bug a reader finds before they find the
 feature.
+
+### Perps v2, and the one thing it does that v1 does not
+
+`/demo/perps-v2` is the same machine as `/demo/perps` — same transitions, same
+guards, same figures — starting from `initialFunded` and cut to four chapters.
+The long version has to earn its opening: it establishes that the perps balance
+starts at $86.99 and that funding it is a passkey away, which is twenty-four
+steps before anyone takes a position. That is the right length for an argument
+and the wrong length for a demo of the trade.
+
+The one addition is a `paused` prop on `Chart`. It is not `live`: `live`
+switches the loop off for a card nobody is looking at, while `paused` keeps
+drawing and stops the market's own clock, so the candles hold where they are
+and resume from there rather than from the top.
+
+```ts
+/* the market's own clock, in milliseconds, which only advances on the
+   frames it is allowed to */
+if (!props.current.paused) clock += now - prev;
+```
+
+It is on for exactly one moment: while a take-profit or stop-loss field has the
+keypad. Both rules are enforced against a **fixed** entry price, and a reader
+typing 78,200 while the quote above it walks 400 points cannot tell whether the
+refusal is about their number or about the market. Holding the price makes the
+rule legible; letting it run makes it look arbitrary.
+
+The device takes it as a prop rather than deciding for itself, so v1 keeps its
+running market — by the time it reaches that step it has already spent four
+chapters establishing that the price moves.
 
 ### What the headless walk caught
 

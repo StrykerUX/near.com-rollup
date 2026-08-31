@@ -17,6 +17,14 @@ const DEMOS = [
       'Fund the perps balance with a passkey, build a ticket, run into the two rules the market imposes, open the position and watch it settle in three parts.',
   },
   {
+    href: '/demo/perps-v2',
+    name: 'Perps v2',
+    len: 'the same recording, cut',
+    steps: 13,
+    blurb:
+      'The trade on its own — no account, no funding. Opens on the market, takes a position, ends on the same screen with it. The market is held still while the stop loss and take profit are typed, because both rules are enforced against a fixed entry price.',
+  },
+  {
     href: '/demo/swap',
     name: 'Swap',
     len: '1m 14s',

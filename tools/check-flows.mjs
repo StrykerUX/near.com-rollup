@@ -38,6 +38,7 @@ const MODULES = [
   /* the standalone /demo/perps machine — same contract, its own arc */
   [`${DEMO}/perps/state.ts`, 'perps-state'],
   [`${DEMO}/perps/script.ts`, 'perps-script'],
+  [`${DEMO}/perpsv2/script.ts`, 'perpsv2-script'],
   [`${DEMO}/swap/state.ts`, 'swap-state'],
   [`${DEMO}/swap/script.ts`, 'swap-script'],
   [`${DEMO}/earn/state.ts`, 'earn-state'],
@@ -62,7 +63,9 @@ for (const [src, f] of MODULES) {
     .replace(/from ['"]@\/components\/demo\/shell\/flow['"]/g, "from './flow.mjs'")
     /* each demo's script imports `./state`; they are written out side by side,
        so the rewrite has to know which one it is looking at */
-    .replace(/from ['"]\.\/state['"]/g, `from './${f.replace('-script', '')}-state.mjs'`);
+    .replace(/from ['"]\.\/state['"]/g, `from './${f.replace('-script', '')}-state.mjs'`)
+    /* v2 shares the long version's state module rather than copying it */
+    .replace(/from ['"]@\/components\/demo\/perps\/state['"]/g, "from './perps-state.mjs'");
   writeFileSync(join(dir, `${f}.mjs`), js);
 }
 const load = (f) => import(pathToFileURL(join(dir, `${f}.mjs`)).href);
@@ -74,6 +77,7 @@ const machines = {
   earn: (await load('earn')).earn,
   account: (await load('account')).account,
   'demo/perps': (await load('perps-script')).perpsFlow.machine,
+  'demo/perps-v2': (await load('perpsv2-script')).perpsV2Flow.machine,
   'demo/swap': (await load('swap-script')).swapFlow.machine,
   'demo/earn': (await load('earn-script')).earnFlow.machine,
   'demo/confidential-deposit': (await load('condeposit-script')).conDepositFlow.machine,

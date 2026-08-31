@@ -152,6 +152,16 @@ export const initial: PD = {
   tap: null,
 };
 
+/**
+ * WHERE PERPS v2 STARTS.
+ *
+ * The long version earns its opening chapters: it has to show that the perps
+ * balance begins at $86.99 and that funding it is a passkey away. v2 is about
+ * the trade, so it opens where the trade opens — on the market, with the money
+ * already there. Same machine, same transitions, different first frame.
+ */
+export const initialFunded: PD = { ...initial, screen: 'market', perps: PERPS_BAL_1 };
+
 /* ---- derived, all of it ---------------------------------------------- */
 
 /** margin already committed to open positions */
