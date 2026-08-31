@@ -38,7 +38,9 @@ export function Phone({ d }: { d: Deck }) {
   return (
     <div className="pdev" data-screen={s.screen}>
       <StatusBar time="12:10" />
-      <div className="pdview">
+      {/* keyed so a screen change remounts its blocks and they re-lay
+          rather than being swapped between two frames */}
+      <div className="pdview" key={s.screen + s.stage}>
         {s.screen === 'account' ? <Account d={d} /> : <Receive d={d} />}
       </div>
       <Tabs on="Home" />

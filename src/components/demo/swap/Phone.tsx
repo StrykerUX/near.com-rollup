@@ -52,7 +52,9 @@ export function Phone({ d }: { d: Deck }) {
   return (
     <div className="pdev" data-screen={s.screen}>
       <StatusBar time="12:07" />
-      <div className="pdview">
+      {/* keyed so a screen change remounts its blocks and they re-lay
+          rather than being swapped between two frames */}
+      <div className="pdview" key={s.screen}>
         {s.screen === 'account' ? <Account d={d} /> : null}
         {s.screen === 'assets' ? <Assets d={d} /> : null}
         {s.screen === 'swap' ? <SwapScreen d={d} /> : null}

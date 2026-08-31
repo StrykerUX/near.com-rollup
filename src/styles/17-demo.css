@@ -570,3 +570,100 @@
 @media (prefers-reduced-motion: reduce) {
   .dhand { display: none }
 }
+
+/* =========================================================================
+   THINGS ARRIVING — `[data-motion="rich"]`
+   -------------------------------------------------------------------------
+   Every demo that draws a hand also opts into this, because they are one
+   decision: the page is showing a person using the app, and the things a
+   person makes appear have to arrive rather than exist.
+
+   One curve, one distance, three durations. A vocabulary this small is what
+   makes the screen read as one surface rather than a set of widgets that each
+   animate their own way.
+
+   Every rule here is an ENTRANCE, never an exit. React unmounts these the
+   instant the state changes, and animating that out means keeping a dead
+   element alive to watch it leave — machinery for a moment nobody looks at,
+   because what leaves is almost always behind the thing that replaced it.
+   ========================================================================= */
+
+@keyframes drise {
+  from { opacity: 0; translate: 0 9px }
+  to { opacity: 1; translate: 0 0 }
+}
+@keyframes dpop {
+  from { opacity: 0; scale: .94 }
+  to { opacity: 1; scale: 1 }
+}
+
+/* -------------------------------------------------------------------------
+   THE SCREEN CHANGE, WHICH IS THE ONE THAT WAS ACTUALLY ABRUPT.
+
+   A sheet already slides. A whole screen did not: the account was replaced by
+   the assets list between two frames, with nothing connecting them. The
+   obvious fix — fade the container — is worse, because both screens sit on the
+   same black and fading one out to bring the other in flashes that black in
+   between.
+
+   So the container never moves. Its CONTENTS re-lay, top to bottom, and the
+   screen assembles itself in three hundred milliseconds. The background is
+   continuous the whole way through because it was never part of the
+   transition. Each flow keys `.pdview` on its screen name, which is what makes
+   these children remount and the animation run.
+
+   The screens declare `display: contents`, so these children are the screen's
+   own blocks — the header, the title, the card, the list — rather than one
+   wrapper. That is why the stagger reads as a page settling rather than a box
+   appearing.
+   ------------------------------------------------------------------------- */
+.pdev[data-motion] .pdview > * { animation: drise 300ms var(--ease-out) both }
+.pdev[data-motion] .pdview > *:nth-child(2) { animation-delay: 35ms }
+.pdev[data-motion] .pdview > *:nth-child(3) { animation-delay: 70ms }
+.pdev[data-motion] .pdview > *:nth-child(4) { animation-delay: 100ms }
+.pdev[data-motion] .pdview > *:nth-child(5) { animation-delay: 125ms }
+.pdev[data-motion] .pdview > *:nth-child(6) { animation-delay: 145ms }
+.pdev[data-motion] .pdview > *:nth-child(n + 7) { animation-delay: 160ms }
+
+/* the refusal, wherever it appears. It arrives UNDER the field it belongs to
+   and pushes the button down, so it has to be seen arriving or the button
+   looks like it moved on its own. */
+.pdev[data-motion] .derr { animation: drise 240ms var(--ease-out) both }
+
+/* a checklist, and the spinner that replaces the button while it runs */
+.pdev[data-motion] .dochk,
+.pdev[data-motion] .dchecks { animation: drise 320ms var(--ease-out) both }
+
+/* a popover belongs to the control it hangs off, so it grows out of it rather
+   than sliding in from somewhere it has no relationship with */
+.pdev[data-motion] .dmenu { animation: dpop 200ms var(--ease-out) both; transform-origin: top right }
+
+/* rows arrive one after another: a list that appears whole reads as a
+   screenshot of a list */
+.pdev[data-motion] .dlist > .dli,
+.pdev[data-motion] .dsheet .dli { animation: drise 280ms var(--ease-out) both }
+.pdev[data-motion] .dlist > .dli:nth-child(2),
+.pdev[data-motion] .dsheet .dli:nth-child(2) { animation-delay: 45ms }
+.pdev[data-motion] .dlist > .dli:nth-child(3),
+.pdev[data-motion] .dsheet .dli:nth-child(3) { animation-delay: 90ms }
+.pdev[data-motion] .dlist > .dli:nth-child(n + 4),
+.pdev[data-motion] .dsheet .dli:nth-child(n + 4) { animation-delay: 125ms }
+.pdev[data-motion] .dempty { animation: drise 300ms var(--ease-out) both }
+
+/* the notice, the amount card, the rows a form is made of */
+.pdev[data-motion] .dwarn,
+.pdev[data-motion] .dvfees,
+.pdev[data-motion] .dref { animation: drise 300ms var(--ease-out) both }
+
+/* the keypad comes up from under whatever it belongs to, the way a keyboard
+   does. The ticket in /demo/perps-v2 also animates it back down — see
+   `18-demo-perps.css` — because there it lives inside a sheet whose height it
+   changes. */
+.pdev[data-motion] .kpwrap { animation: kprise 300ms var(--ease-out) both }
+@keyframes kprise {
+  from { translate: 0 100% }
+  to { translate: 0 0 }
+}
+
+/* the tick lands rather than appearing */
+.pdev[data-motion] .dchk.on .dbox::after { animation: dpop 180ms var(--ease-out) both }

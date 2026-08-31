@@ -62,7 +62,9 @@ export function Phone({ d, holdPrice = false, hand = false }: {
     <div className="pdev" data-screen={s.screen} data-held={d.held || undefined}
          data-pos={s.pos ? '1' : undefined} data-motion={hand ? 'rich' : undefined}>
       <StatusBar />
-      <div className="pdview">
+      {/* keyed so a screen change remounts its blocks and they re-lay
+          rather than being swapped between two frames */}
+      <div className="pdview" key={s.screen}>
         {s.screen === 'account' ? <Account d={d} /> : null}
         {s.screen === 'market' ? <Market d={d} paused={paused} /> : null}
         {s.screen === 'fund' || s.screen === 'funding' ? <Fund d={d} /> : null}
