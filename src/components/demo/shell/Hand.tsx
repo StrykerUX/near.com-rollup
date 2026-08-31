@@ -20,19 +20,28 @@ import type { Hand as HandState } from './deck';
  * underneath.
  */
 
-/** how long the hand rests on a control after pressing it, before it moves on */
-const DWELL = 360;
+/**
+ * How long the hand rests on a control after pressing it, before it aims at
+ * the next one. It has to be SHORTER than the shortest gap in a script, or the
+ * hand never travels — it only ever teleports on the press, which is the exact
+ * effect the whole component exists to avoid. 200 leaves room for the 300ms
+ * glide inside the ~375ms a typed digit gets.
+ */
+const DWELL = 200;
 /** how long the pressed control stays lit */
 const FLASH = 240;
 /**
- * The hand re-reads where it is pointing on a slow tick rather than once per
- * change. Controls MOVE under it: a sheet slides for half a second before the
- * key inside it is where it will end up, the ticket reflows when a field
- * appears, the window resizes. Measuring once on change and hoping meant the
- * hand simply vanished whenever it measured mid-slide. Two rect reads eight
- * times a second is nothing, and it is always right.
+ * Controls MOVE under the hand: a sheet slides for half a second before the key
+ * inside it is where it will end up, the ticket reflows when a field appears,
+ * the window resizes. Measuring once per change and hoping meant the hand
+ * simply vanished whenever it measured mid-slide.
+ *
+ * So it re-reads when a transition or an entrance ENDS — which is exactly when
+ * a control has finished moving — and keeps a slow tick as the safety net for
+ * everything that moves without announcing it. Two rect reads five times a
+ * second is nothing.
  */
-const TICK = 130;
+const TICK = 200;
 
 /**
  * WHERE A CONTROL IS, IN THE DEVICE'S OWN PIXELS — or nowhere.
@@ -87,8 +96,18 @@ export function Hand({ hand, on }: { hand: HandState; on: boolean }) {
     if (!el || !dev) return;
     const beat = () => place(dev, el, want.current);
     beat();
+
+    /* capture, because these fire on the sheet and the fields, not on `dev` */
+    dev.addEventListener('transitionend', beat, true);
+    dev.addEventListener('animationend', beat, true);
+    window.addEventListener('resize', beat);
     const id = window.setInterval(beat, TICK);
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+      dev.removeEventListener('transitionend', beat, true);
+      dev.removeEventListener('animationend', beat, true);
+      window.removeEventListener('resize', beat);
+    };
   }, []);
 
   /* the press: land, light the control, dwell, then aim at the next one */

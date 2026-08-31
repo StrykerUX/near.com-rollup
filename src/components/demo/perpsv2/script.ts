@@ -63,7 +63,7 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'size', ch: 'ticket',
     title: 'Size here is margin, not notional',
     note: '$700 of the $1,087. That number is what you put at risk; leverage decides what it turns into.',
-    beats: [...type_('key', '700', 1800, 190), { ms: 1100, do: 'done' }],
+    beats: [...type_('key', '700', 1500, 300), { ms: 1300, do: 'done' }],
   },
   {
     id: 'lev', ch: 'ticket',
@@ -71,11 +71,11 @@ const STEPS: Step<PD, PDAction>[] = [
     note: 'The sheet takes 10x to 20x and the ticket recomputes: estimated trade value $7,000 to $14K, and estimated liquidation from 7% below entry to 2%.',
     beats: [
       { ms: 1700, do: 'levSheet' },
-      { ms: 1100, do: 'levSet', arg: '13' },
-      { ms: 300, do: 'levSet', arg: '17' },
-      { ms: 300, do: 'levSet', arg: '21' },
-      { ms: 420, do: 'levSet', arg: '20' },
-      { ms: 1500, do: 'levSave' },
+      { ms: 1000, do: 'levSet', arg: '13' },
+      { ms: 280, do: 'levSet', arg: '17' },
+      { ms: 280, do: 'levSet', arg: '21' },
+      { ms: 320, do: 'levSet', arg: '20' },
+      { ms: 1400, do: 'levSave' },
     ],
   },
 
@@ -96,16 +96,18 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'unit', ch: 'protect',
     title: 'The ⇄ swaps the unit',
     note: 'And empties both fields, which is right: 82000 means one thing as a price and nothing at all as a percentage.',
-    beats: [...type_('key', '82000', 1400), { ms: 1600, do: 'unit', arg: 'tp' }],
+    beats: [...type_('key', '82000', 1300, 300), { ms: 1700, do: 'unit', arg: 'tp' }],
   },
   {
     id: 'tperr', ch: 'protect',
     title: 'A take profit sits above the entry',
     note: 'At $2 the ticket refuses — “Take profit must be above entry price” — and the button stops saying Open long and starts saying Review take profit. Corrected to $82,000, it comes back.',
     beats: [
-      { ms: 1300, do: 'key', arg: '2' },
+      { ms: 1400, do: 'key', arg: '2' },
+      /* the long pause is a person reading the refusal, which is the only
+         reason the refusal is on the screen at all */
       { ms: 2600, do: 'key', arg: '⌫' },
-      ...type_('key', '82000', 700, 175),
+      ...type_('key', '82000', 850, 300),
     ],
   },
   {
@@ -114,14 +116,15 @@ const STEPS: Step<PD, PDAction>[] = [
     note: '$79,974 is above the $79,654 entry — the same rule, mirrored. At $78,200 the ticket accepts and the market starts moving again.',
     beats: [
       { ms: 1800, do: 'focus', arg: 'sl' },
-      ...type_('key', '79974', 900),
+      ...type_('key', '79974', 1100, 300),
       { ms: 2800, do: 'key', arg: '⌫' },
-      { ms: 130, do: 'key', arg: '⌫' },
-      { ms: 130, do: 'key', arg: '⌫' },
-      { ms: 130, do: 'key', arg: '⌫' },
-      { ms: 130, do: 'key', arg: '⌫' },
-      ...type_('key', '78200', 700, 180),
-      { ms: 1200, do: 'done' },
+      /* clearing is faster than typing — nobody reads what they are deleting */
+      { ms: 200, do: 'key', arg: '⌫' },
+      { ms: 200, do: 'key', arg: '⌫' },
+      { ms: 200, do: 'key', arg: '⌫' },
+      { ms: 200, do: 'key', arg: '⌫' },
+      ...type_('key', '78200', 850, 300),
+      { ms: 1300, do: 'done' },
     ],
   },
 
@@ -132,7 +135,8 @@ const STEPS: Step<PD, PDAction>[] = [
     note: 'A passkey. The order carries three things — the leverage, the order itself and the protections — and sends them as one signed intent.',
     beats: [
       { ms: 2200, do: 'submit' },
-      { ms: 1200, do: 'ostep' },
+      /* the hand has to cross the whole screen to the passkey button */
+      { ms: 1500, do: 'ostep' },
       { ms: 1300, do: 'ostep' },
       { ms: 900, do: 'ostep' },
       { ms: 1500, do: 'ostep' },

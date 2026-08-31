@@ -76,8 +76,13 @@ export function Phone({ d, holdPrice = false, hand = false }: {
       <ReviewSheet d={d} />
       <Passkey d={d} />
 
-      {/* last, so it is over every sheet — a finger is */}
-      {hand ? <Hand hand={d.hand} on={d.playing && !d.held} /> : null}
+      {/* Last, so it is over every sheet — a finger is.
+          It stays put when the clock is paused: someone who stops the script
+          to look at a screen is asking what happens next, and the hand resting
+          on the control that is about to be pressed answers that. It only
+          leaves when a READER takes over, because then their own cursor is
+          the pointer and two of them is one too many. */}
+      {hand ? <Hand hand={d.hand} on={!d.held} /> : null}
     </div>
   );
 }
