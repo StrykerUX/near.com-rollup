@@ -624,6 +624,9 @@
 .pdev[data-motion] .pdview > *:nth-child(5) { animation-delay: 125ms }
 .pdev[data-motion] .pdview > *:nth-child(6) { animation-delay: 145ms }
 .pdev[data-motion] .pdview > *:nth-child(n + 7) { animation-delay: 160ms }
+/* a list animates its own rows, below. Letting it rise as a block as well
+   would be two staggers on the same pixels, which reads as a stutter. */
+.pdev[data-motion] .pdview > .dlist { animation: none }
 
 /* the refusal, wherever it appears. It arrives UNDER the field it belongs to
    and pushes the button down, so it has to be seen arriving or the button
