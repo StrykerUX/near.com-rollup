@@ -4,6 +4,7 @@ import { live, press } from '@/components/stage/phone/ui/tap';
 import { TokenDot } from '@/components/stage/phone/TokenDot';
 import { findToken } from '@/lib/tokens';
 import { fmt } from '@/lib/format';
+import { Hand } from '@/components/demo/shell/Hand';
 import { Layer, StatusBar, Tabs } from '@/components/demo/shell/Frame';
 import { AccountScreen, UniversalSendScreen, usd } from '@/components/demo/shell/Screens';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -34,7 +35,11 @@ const dot = (sym: string) => {
 export function Phone({ d }: { d: Deck }) {
   const { s } = d;
   return (
-    <div className="pdev" data-screen={s.screen}>
+    /* `data-motion` rides with the hand because the two are one decision. This
+       page is showing a person using the app, so the things that person makes
+       appear — the keypad, the token list, the notice that belongs to one
+       route — have to arrive rather than already be there. */
+    <div className="pdev" data-screen={s.screen} data-motion="rich">
       <StatusBar time="12:12" />
       {/* keyed so a screen change remounts its blocks and they re-lay
           rather than being swapped between two frames */}
@@ -43,6 +48,14 @@ export function Phone({ d }: { d: Deck }) {
       </div>
       <Tabs on="Home" />
       <TokenPicker d={d} />
+
+      {/* Last, so it is over the picker — a finger is.
+          It stays put when the clock is paused: someone who stops the script to
+          look at the notice is asking what happens next, and the hand resting
+          on the box that clears it answers that. It leaves only when a READER
+          takes over, because then their own cursor is the pointer and two of
+          them is one too many. */}
+      <Hand hand={d.hand} on={!d.held} />
     </div>
   );
 }
@@ -51,11 +64,15 @@ function Account({ d }: { d: Deck }) {
   return (
     <AccountScreen
       explore
+      /* Send is a button on this card, not a token row. It was wired to the
+         Crypto row because the shared screen's buttons were inert spans; they
+         take handlers now, so the transition is fired by the control that
+         actually means it. */
+      onSend={d.can('toSend')}
       rows={[
         {
           label: 'Crypto',
           value: CRYPTO_BAL,
-          on: d.can('toSend'),
           sub: <>
             <TokenDot token={dot('NEAR')} size={13} /><TokenDot token={dot('USDC')} size={13} />
             <i>NEAR, USDC</i>
@@ -92,7 +109,8 @@ function Send({ d }: { d: Deck }) {
       warn={needsAck(s) ? (
         <div className="dwarn">
           <span>⚠ Some exchanges may not credit this transfer.</span>
-          <span className={'dchk' + (s.ack ? ' on' : '') + live(ack)} {...press(ack)}>
+          <span className={'dchk' + (s.ack ? ' on' : '') + live(ack)} {...press(ack)}
+                data-tap="ack">
             <i className="dbox" />I understand.
           </span>
         </div>
@@ -114,6 +132,8 @@ function TokenPicker({ d }: { d: Deck }) {
         <b className="dsh">Select token</b>
         <span className="dsearch"><i>⌕</i><em>Search tokens</em></span>
 
+        {/* the balance row: it is a reading, not a control, so it carries no
+            `data-tap` — the hand must never be able to aim at it */}
         <span className="dgroup">Your tokens</span>
         <div className="dli">
           <TokenDot token={dot('NEAR')} size={26} />
@@ -127,7 +147,8 @@ function TokenPicker({ d }: { d: Deck }) {
         {TOKENS.map((t) => {
           const on = d.can('pick', t.sym);
           return (
-            <div className={'dli' + live(on)} key={t.sym} {...press(on)}>
+            <div className={'dli' + live(on)} key={t.sym} {...press(on)}
+                 data-tap={'tok:' + t.sym}>
               <TokenDot token={dot(t.sym)} size={26} />
               <span className="dlit"><b>{t.sym === 'BTCL' ? 'BTC' : t.sym}</b><em>{t.name}</em></span>
               {s.token === t.sym ? <i className="dtick">✓</i> : null}

@@ -1,8 +1,10 @@
 /* =========================================================================
-   /demo/confidential-deposit — the screens only this flow has
+   /demo/confidential-deposit and -send — what only these two flows have
    -------------------------------------------------------------------------
    A three-stage header, a list of rules where the colour carries the meaning,
    the network picker that names what it refuses, and the code at the end.
+   Almost all of it belongs to the deposit; the send flow borrows the shared
+   Universal Send screen and adds one rule, at the bottom.
    ========================================================================= */
 
 .drecv { display: contents }
@@ -87,3 +89,36 @@
 .dli.off { opacity: .38 }
 .dli.internal { padding: 10px 0 }
 .dgroup i { font-style: normal; opacity: .6 }
+
+/* =========================================================================
+   THINGS ARRIVING — the two `17-demo.css` cannot reach
+   -------------------------------------------------------------------------
+   Both flows opt into `[data-motion="rich"]`, and the shared vocabulary there
+   covers everything that is a list row, a notice, a keypad or a tick. Two
+   things on the deposit screen are none of those, and both are the moment the
+   flow turns over. They reuse `drise` and `dpop` rather than inventing a
+   curve: a screen with two motions is one surface, a screen with four is a set
+   of widgets.
+   ========================================================================= */
+
+/* THE HEADER IS THE ONLY THING THAT SAYS THE FLOW MOVED. Important, Configure
+   and Deposit are three 11px dots and two hairlines, and advancing repaints
+   one dot, one rail and two labels — a change small enough to be missed
+   entirely at the moment it is the whole news. `.pdview` is keyed on the stage,
+   so the marks remount and re-lay left to right, which walks the eye along the
+   rail it just filled in. */
+.pdev[data-motion] .dstages li { animation: drise 280ms var(--ease-out) both }
+.pdev[data-motion] .dstages li:nth-child(2) { animation-delay: 55ms }
+.pdev[data-motion] .dstages li:nth-child(3) { animation-delay: 110ms }
+
+/* THE CODE IS THE PAYLOAD OF THE WHOLE FLOW, and it replaces a spinner inside
+   a box that is already there. Swapped in, it is a flicker in a white square
+   and the one thing the reader waited three chapters for reads as a repaint;
+   scaled up out of the spinner it occupied, it arrives, which is what
+   "issued" means. The white card itself never moves — it was holding the wait,
+   and animating it would throw away the only continuity in the moment. */
+.pdev[data-motion] .dqrsvg { animation: dpop 320ms var(--ease-out) both }
+/* the address is the same news in text, so it comes with the code rather than
+   after it — the offset is a beat, not a queue */
+.pdev[data-motion] .daddr { animation: drise 300ms var(--ease-out) 60ms both }
+

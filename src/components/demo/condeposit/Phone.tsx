@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { live, press } from '@/components/stage/phone/ui/tap';
 import { TokenDot } from '@/components/stage/phone/TokenDot';
 import { findToken } from '@/lib/tokens';
+import { Hand } from '@/components/demo/shell/Hand';
 import { Layer, StatusBar, Tabs } from '@/components/demo/shell/Frame';
 import { AccountScreen } from '@/components/demo/shell/Screens';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -36,7 +37,11 @@ const STAGES = ['Important', 'Configure', 'Deposit'] as const;
 export function Phone({ d }: { d: Deck }) {
   const { s } = d;
   return (
-    <div className="pdev" data-screen={s.screen}>
+    /* `data-motion` rides with the hand because the two are one decision. This
+       page is showing a person using the app, so the things that person makes
+       appear — the picker they just opened, the code they just asked for —
+       have to arrive rather than already be there. */
+    <div className="pdev" data-screen={s.screen} data-motion="rich">
       <StatusBar time="12:10" />
       {/* keyed so a screen change remounts its blocks and they re-lay
           rather than being swapped between two frames */}
@@ -46,6 +51,14 @@ export function Phone({ d }: { d: Deck }) {
       <Tabs on="Home" />
       <TokenPicker d={d} />
       <NetworkPicker d={d} />
+
+      {/* Last, so it is over both pickers — a finger is.
+          It stays put when the clock is paused: someone who stops the script on
+          the Important screen is asking what happens next, and the hand resting
+          on the box that unlocks Continue answers that. It leaves only when a
+          READER takes over, because then their own cursor is the pointer and
+          two of them is one too many. */}
+      <Hand hand={d.hand} on={!d.held} />
     </div>
   );
 }
@@ -54,11 +67,15 @@ function Account({ d }: { d: Deck }) {
   return (
     <AccountScreen
       explore
+      /* Receive is a button on this card, not a token row. It was wired to the
+         Crypto row because the shared screen's buttons were inert spans; they
+         take handlers now, so a flow whose whole subject is a deposit ADDRESS
+         starts from the control that says Receive. */
+      onReceive={d.can('toReceive')}
       rows={[
         {
           label: 'Crypto',
           value: CRYPTO_BAL,
-          on: d.can('toReceive'),
           sub: <>
             <TokenDot token={dot('NEAR')} size={13} /><TokenDot token={dot('USDC')} size={13} />
             <i>NEAR, USDC</i>
@@ -121,10 +138,11 @@ function Important({ d }: { d: Deck }) {
           <li key={r.text} data-tone={r.tone}><i /><span>{r.text}</span></li>
         ))}
       </ul>
-      <span className={'dchk' + (s.ack ? ' on' : '') + live(ack)} {...press(ack)}>
+      <span className={'dchk' + (s.ack ? ' on' : '') + live(ack)} {...press(ack)} data-tap="ack">
         <i className="dbox" />{ACK}
       </span>
-      <span className={'dcta' + (go ? ' light' : ' off') + live(go)} {...press(go)}>Continue</span>
+      <span className={'dcta' + (go ? ' light' : ' off') + live(go)} {...press(go)}
+            data-tap="continue">Continue</span>
     </div>
   );
 }
@@ -135,10 +153,12 @@ function Configure({ d }: { d: Deck }) {
   return (
     <>
       <Row mark={<TokenDot token={dot(s.token)} size={22} />} label="Token" value={s.token}
-           on={d.can('tokenPicker')} />
+           on={d.can('tokenPicker')} tap="token" />
       <Row mark={<span className={'dnetm' + (s.network ? ' set' : '')} />} label="Network"
-           value={s.network ?? 'Select network'} muted={!s.network} on={d.can('netPicker')} />
-      <span className={'dcta' + (go ? ' light' : ' off') + live(go)} {...press(go)}>Continue</span>
+           value={s.network ?? 'Select network'} muted={!s.network} on={d.can('netPicker')}
+           tap="network" />
+      <span className={'dcta' + (go ? ' light' : ' off') + live(go)} {...press(go)}
+            data-tap="continue">Continue</span>
     </>
   );
 }
@@ -175,19 +195,22 @@ function Deposit({ d }: { d: Deck }) {
       </ul>
       <em className="dfsub small">
         Need different deposit details?{' '}
-        <span className={'dlink' + live(d.can('again'))} {...press(d.can('again'))}>Create a new address.</span>
+        <span className={'dlink' + live(d.can('again'))} {...press(d.can('again'))}
+              data-tap="again">Create a new address.</span>
         {' '}Creating another address will not deactivate this one.
       </em>
     </>
   );
 }
 
-function Row({ mark, label, value, muted, on }: {
+function Row({ mark, label, value, muted, on, tap }: {
   mark: React.ReactNode; label: string; value: string;
   muted?: boolean; on: (() => void) | null;
+  /** what the hand calls this row when it comes to press it */
+  tap?: string;
 }) {
   return (
-    <div className={'dfrow' + (muted ? ' muted' : '') + live(on)} {...press(on)}>
+    <div className={'dfrow' + (muted ? ' muted' : '') + live(on)} {...press(on)} data-tap={tap}>
       <span className="dfmark">{mark}</span>
       <span className="dftext"><em>{label}</em><b>{value}</b></span>
       <span className="dchev2">⌄</span>
@@ -209,7 +232,7 @@ function TokenPicker({ d }: { d: Deck }) {
         {TOKENS.map((t) => {
           const on = d.can('pickToken', t);
           return (
-            <div className={'dli' + live(on)} key={t} {...press(on)}>
+            <div className={'dli' + live(on)} key={t} {...press(on)} data-tap={'tok:' + t}>
               <TokenDot token={dot(t)} size={26} />
               <span className="dlit"><b>{t}</b><em>{dot(t).name}</em></span>
               {s.token === t ? <i className="dtick">✓</i> : null}
@@ -255,7 +278,7 @@ function NetworkPicker({ d }: { d: Deck }) {
         {ok.map((n) => {
           const on = d.can('pickNet', n);
           return (
-            <div className={'dli' + live(on)} key={n} {...press(on)}>
+            <div className={'dli' + live(on)} key={n} {...press(on)} data-tap={'net:' + n}>
               <span className="dnetm set" />
               <span className="dlit"><b>{n}</b></span>
               {s.network === n ? <i className="dtick">✓</i> : null}
@@ -264,7 +287,10 @@ function NetworkPicker({ d }: { d: Deck }) {
         })}
 
         {/* named, not hidden. A network you cannot find and a network that will
-            eat your deposit look identical if the list simply omits it. */}
+            eat your deposit look identical if the list simply omits it.
+            No `data-tap` on any of them: they refuse to be pressed, and a hand
+            that could travel here would be aiming at a control that is not
+            one — which is the one thing a pointer must never do. */}
         {no.length ? <span className="dgroup">Unsupported networks <i>ⓘ</i></span> : null}
         {no.map((n) => (
           <div className="dli off" key={n}>

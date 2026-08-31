@@ -1,5 +1,5 @@
 import { buildFlow, typing, type Chapter, type Step } from '@/components/demo/shell/flow';
-import { actions, initial, type CD, type CDAction } from './state';
+import { actions, initial, supported, type CD, type CDAction } from './state';
 
 /**
  * A ONE-TIME CONFIDENTIAL DEPOSIT — the script
@@ -60,7 +60,7 @@ const STEPS: Step<CD, CDAction>[] = [
     id: 'refused', ch: 'configure',
     title: 'Networks it will not take',
     note: 'Searching Tro turns up Tron under Unsupported networks, greyed. The picker names what it refuses instead of hiding it — a network you cannot find and a network that will eat your deposit look identical otherwise.',
-    beats: [...type_('search', 'Tro', 1800, 300), { ms: 2600 }],
+    beats: [...type_('search', 'Tro', 1800, 400), { ms: 2600 }],
   },
   {
     id: 'switch', ch: 'configure',
@@ -71,7 +71,7 @@ const STEPS: Step<CD, CDAction>[] = [
       { ms: 1400, do: 'tokenPicker' },
       { ms: 2000, do: 'pickToken', arg: 'USDT' },
       { ms: 1600, do: 'netPicker' },
-      ...type_('search', 'Tro', 1400, 300),
+      ...type_('search', 'Tro', 1600, 400),
       { ms: 2200, do: 'pickNet', arg: 'Tron' },
     ],
   },
@@ -117,6 +117,48 @@ export const conDepositFlow = buildFlow<CD, CDAction>({
     pickToken: 'switch',
     pickNet: 'issue',
     issue: 'address',
+  },
+  /**
+   * WHERE EACH TRANSITION IS PRESSED.
+   *
+   * The machine says what happens; this says where on the glass. The deck
+   * resolves the NEXT beat's target while the clock is still counting down to
+   * it, so the hand is already on the control when the state changes — which
+   * is the difference between a screen whose state changes and a screen
+   * somebody is using.
+   */
+  target: (a, arg, s) => {
+    switch (a) {
+      case 'toReceive': return 'receive';
+      case 'ack': return 'ack';
+      case 'continue': return 'continue';
+      /* Both pickers TOGGLE. Opening one is a press on the row; CLOSING it is
+         a press on the scrim, which the shell draws and does not name — and
+         the row the hand would otherwise fall back to is underneath the sheet
+         doing the covering, so it would sit on top of that sheet pointing
+         through it at something nobody can reach. It leaves instead. */
+      case 'tokenPicker': return s.over === 'token' ? null : 'token';
+      case 'netPicker': return s.over === 'network' ? null : 'network';
+      case 'pickToken': return arg ? `tok:${arg}` : null;
+      /* the same guard the row itself is drawn with: only the supported half
+         of the list is pressable, and the refused half is on screen precisely
+         to be read rather than tapped */
+      case 'pickNet': return arg && supported(s).includes(arg) ? `net:${arg}` : null;
+      /* Three characters into the network search, from a keyboard this mock
+         never draws. The field is a picture of a field — it carries no press
+         of its own — so parking the hand there would both claim the finger
+         typed them and aim it at something no reader can tap. It goes off the
+         glass for the run instead, the way it does while the address mints,
+         and comes back for the press that follows. */
+      case 'search': return null;
+      /* not a press at all: Continue asked for an address and this is the app
+         answering. It also fires from `auto`, with nobody at the screen. A
+         hand hovering over a spinner is a lie about who is doing the work. */
+      case 'issue': return null;
+      case 'again': return 'again';
+      /* `home` and `back` are the chevron, and no beat ever presses it */
+      default: return null;
+    }
   },
   /* the address issues itself once the screen is up */
   auto: (s) => (s.stage === 'deposit' && !s.issued ? { after: 1400, do: 'issue' } : null),

@@ -86,4 +86,32 @@ export const conSendFlow = buildFlow<CS, CSAction>({
     picker: 'pick',
     pick: 'amount',
   },
+  /**
+   * WHERE EACH TRANSITION IS PRESSED.
+   *
+   * The machine says what happens; this says where on the glass. The deck
+   * resolves the NEXT beat's target while the clock is still counting down to
+   * it, so the hand is already on the control when the state changes — which
+   * is the difference between a screen whose state changes and a screen
+   * somebody is using.
+   */
+  target: (a, arg, s) => {
+    switch (a) {
+      case 'toSend': return 'send';
+      /* the row opens the picker, and the same transition closes it — but then
+         the thing pressed is the scrim, which the shell draws and does not
+         name, and the row it would otherwise aim at is under the sheet doing
+         the covering. Here the script only ever opens it; `pick` is what
+         closes it, on a row of its own. */
+      case 'picker': return s.over === 'token' ? null : 'row:token';
+      case 'pick': return arg ? `tok:${arg}` : null;
+      case 'ack': return 'ack';
+      /* the keypad names its own keys and its own ✓ — see `Keypad` */
+      case 'key': return arg ? `key:${arg}` : null;
+      case 'done': return 'done';
+      /* `focus` is the amount field taking the keypad back, and `home` is the
+         chevron; no beat presses either */
+      default: return null;
+    }
+  },
 });
