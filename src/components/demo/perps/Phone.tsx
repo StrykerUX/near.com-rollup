@@ -71,7 +71,7 @@ export function Phone({ d, holdPrice = false, hand = false }: {
         ? <Tabs on={s.screen === 'account' ? 'Home' : 'Perps'} /> : null}
 
       <MyAccount d={d} />
-      <Ticket d={d} />
+      <Ticket d={d} rich={hand} />
       <LevSheet d={d} />
       <ReviewSheet d={d} />
       <Passkey d={d} />
@@ -458,7 +458,7 @@ function ReviewSheet({ d }: { d: Deck }) {
 
 /* ---- 4-6 · the ticket ------------------------------------------------- */
 
-function Ticket({ d }: { d: Deck }) {
+function Ticket({ d, rich = false }: { d: Deck; rich?: boolean }) {
   const { s } = d;
   const c = cta(s);
   const size = notional(s);
@@ -550,7 +550,19 @@ function Ticket({ d }: { d: Deck }) {
           </div>
         </dl>
 
-        {padUp ? <Keypad pressed={s.pressed} onKey={(k) => d.can('key', k)} onDone={d.can('done')} /> : null}
+        {/* THE PAD LEAVES AS SLOWLY AS IT ARRIVED.
+            Unmounting it is a layout jump: everything above it drops by two
+            hundred pixels in one frame, at the exact moment a person has just
+            finished typing and is looking at what they typed. In the rich
+            version it stays mounted and inert, and its height animates shut —
+            `.dsheet.tk.pad` is the only thing that changes. */}
+        {rich || padUp ? (
+          <Keypad
+            pressed={s.pressed}
+            onKey={padUp ? (k) => d.can('key', k) : null}
+            onDone={padUp ? d.can('done') : null}
+          />
+        ) : null}
 
         <OtypeMenu d={d} />
       </div>

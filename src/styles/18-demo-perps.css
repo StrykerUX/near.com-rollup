@@ -276,11 +276,18 @@
 .pdev[data-motion] .dlist .dli:nth-child(3) { animation-delay: 100ms }
 .pdev[data-motion] .dempty { animation: drise 300ms var(--ease-out) both }
 
-/* the keypad comes up from under the sheet, the way a keyboard does */
-.pdev[data-motion] .kpwrap { animation: kprise 300ms var(--ease-out) both }
-@keyframes kprise {
-  from { translate: 0 100% }
-  to { translate: 0 0 }
+/* The keypad comes up from under the sheet the way a keyboard does — and goes
+   back down the same way. It stays mounted so the height can animate; a pad
+   that unmounts drops everything above it two hundred pixels in one frame, at
+   the moment a person has just finished typing and is looking at what they
+   typed. */
+.pdev[data-motion] .kpwrap {
+  max-height: 260px; overflow: hidden;
+  transition: max-height 320ms var(--ease-out), translate 320ms var(--ease-out),
+              opacity 200ms linear;
+}
+.pdev[data-motion] .dsheet.tk:not(.pad) .kpwrap {
+  max-height: 0; translate: 0 100%; opacity: 0;
 }
 
 /* the tick lands rather than appearing */
