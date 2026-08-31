@@ -1,9 +1,11 @@
 'use client';
+import { useEffect, useRef } from 'react';
 import { ProgressList } from '@/components/stage/phone/ui/ProgressList';
 import { live, press } from '@/components/stage/phone/ui/tap';
 import { TokenDot } from '@/components/stage/phone/TokenDot';
 import { findToken } from '@/lib/tokens';
 import { fmt } from '@/lib/format';
+import { Hand } from '@/components/demo/shell/Hand';
 import { Layer, StatusBar, Tabs } from '@/components/demo/shell/Frame';
 import { AccountScreen, PasskeySheet, usd } from '@/components/demo/shell/Screens';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -49,8 +51,27 @@ const dot = (sym: string) => {
 
 export function Phone({ d }: { d: Deck }) {
   const { s } = d;
+  const dev = useRef<HTMLDivElement>(null);
+
+  /**
+   * USE PASSKEY IS THE ONE CONTROL THIS FLOW CANNOT NAME IN ITS OWN MARKUP.
+   *
+   * The sheet comes out of `shell/Screens`, shared by every demo that signs,
+   * and it takes a handler rather than a tap id — so the button reaches the
+   * DOM with nothing for `Hand` to look up, and the hand blinks out at the one
+   * beat the signing chapter is entirely about. Naming it from here fixes that
+   * without settling the shell's vocabulary on behalf of the other four flows.
+   */
+  useEffect(() => {
+    dev.current?.querySelector('.dsheet.pass .dcta')?.setAttribute('data-tap', 'passkey');
+  }, [s.over, s.auth]);
+
   return (
-    <div className="pdev" data-screen={s.screen}>
+    /* `data-motion` rides with the hand on purpose: they are one decision.
+       This page is showing a person using the app, so the things that person
+       makes appear — the quote under the amount, the picker's rows, the
+       checklist — have to arrive rather than exist. */
+    <div className="pdev" data-screen={s.screen} data-motion="rich" ref={dev}>
       <StatusBar time="12:07" />
       {/* keyed so a screen change remounts its blocks and they re-lay
           rather than being swapped between two frames */}
@@ -70,6 +91,14 @@ export function Phone({ d }: { d: Deck }) {
         auth={s.auth}
         onUse={d.can('authOk')}
       />
+
+      {/* Last, so it sits over every sheet — a finger does.
+          It is tied to `held`, not to the clock: someone who pauses the script
+          to look at a screen is asking what happens next, and the hand resting
+          on the control that is about to be pressed answers that. It leaves
+          only when a READER takes the wheel, because from then on their own
+          cursor is the pointer and two of them is one too many. */}
+      <Hand hand={d.hand} on={!d.held} />
     </div>
   );
 }
@@ -117,7 +146,8 @@ function Assets({ d }: { d: Deck }) {
         {(['main', 'conf'] as const).map((k) => {
           const on = d.can('bucket', k);
           return (
-            <span className={'dsg' + (s.bucket === k ? ' on' : '') + live(on)} key={k} {...press(on)}>
+            <span className={'dsg' + (s.bucket === k ? ' on' : '') + live(on)} key={k} {...press(on)}
+                  data-tap={'seg:' + k}>
               <em>{k === 'main' ? 'Main' : 'Confidential'}</em>
               <b>{usd(k === 'main' ? MAIN_BAL : confidential(s))}</b>
             </span>
@@ -138,7 +168,11 @@ function TokenRow({ d, h }: { d: Deck; h: Holding }) {
      are two different intentions, and the app treats them that way */
   const chip = h.yield ? d.can('vault') : null;
   return (
-    <div className={'dli' + live(open)} {...press(open)}>
+    /* The two USD Coin balances carry the same id, and so does the chip on
+       each of them. That is not a collision to fix: `actions` and `vault` both
+       take a SYMBOL, so the machine cannot tell those two rows apart either —
+       the hand landing on the first one is the app's own answer. */
+    <div className={'dli' + live(open)} {...press(open)} data-tap={'tok:' + h.sym}>
       <TokenDot token={dot(h.sym)} size={26} />
       <span className="dlit">
         <b>{h.name}</b>
@@ -149,7 +183,9 @@ function TokenRow({ d, h }: { d: Deck; h: Holding }) {
         <i className={h.chg.startsWith('−') ? 'down' : 'dgain'}>{h.chg}</i>
       </span>
       {h.yield
-        ? <span className={'dchip' + live(chip)} {...press(chip)}>Earn {h.yield}</span>
+        ? <span className={'dchip' + live(chip)} {...press(chip)} data-tap={'chip:' + h.sym}>
+            Earn {h.yield}
+          </span>
         : null}
     </div>
   );
@@ -170,10 +206,11 @@ function ActionSheet({ d }: { d: Deck }) {
           </span>
         </div>
         <div className="dacts">
-          <span className={'dact' + live(d.can('toSwap'))} {...press(d.can('toSwap'))}>⇄ Swap</span>
-          <span className="dact">➤ Send</span>
-          <span className="dact">▥ Earn</span>
-          <span className="dact">← Move to Main</span>
+          <span className={'dact' + live(d.can('toSwap'))} {...press(d.can('toSwap'))}
+                data-tap="act:swap">⇄ Swap</span>
+          <span className="dact" data-tap="act:send">➤ Send</span>
+          <span className="dact" data-tap="act:earn">▥ Earn</span>
+          <span className="dact" data-tap="act:main">← Move to Main</span>
         </div>
       </div>
     </Layer>
@@ -198,7 +235,8 @@ function SwapScreen({ d }: { d: Deck }) {
         </div>
         <div className="dchecks"><ProgressList steps={SWAP_STEPS} at={s.step} /></div>
         {finished
-          ? <span className={'dghost' + live(d.can('again'))} {...press(d.can('again'))}>↺ Swap again</span>
+          ? <span className={'dghost' + live(d.can('again'))} {...press(d.can('again'))}
+                  data-tap="again">↺ Swap again</span>
           : null}
       </div>
     );
@@ -219,7 +257,9 @@ function SwapScreen({ d }: { d: Deck }) {
         </span>
         <span className="dlegm">
           <i>{usd((Number(s.amount) || 0) * price(s.from))} ⇅</i>
-          <span className={'dbal' + live(max)} {...press(max)}>{fmt(fromBal(s), 6)} {s.from}</span>
+          <span className={'dbal' + live(max)} {...press(max)} data-tap="max">
+            {fmt(fromBal(s), 6)} {s.from}
+          </span>
         </span>
       </div>
 
@@ -228,7 +268,7 @@ function SwapScreen({ d }: { d: Deck }) {
       <div className="dleg">
         <span className="dlegv">
           <b className={s.amount ? '' : 'off'}>{s.amount ? fmt(out(s), 3) : '0'}</b>
-          <span className={'dtokchip' + live(pick)} {...press(pick)}>
+          <span className={'dtokchip' + live(pick)} {...press(pick)} data-tap="picker">
             <TokenDot token={dot(s.to)} size={17} />{s.to} ⌄
           </span>
         </span>
@@ -238,7 +278,8 @@ function SwapScreen({ d }: { d: Deck }) {
         </span>
       </div>
 
-      <span className={'dcta' + (review ? '' : ' off') + live(review)} {...press(review)}>
+      <span className={'dcta' + (review ? '' : ' off') + live(review)} {...press(review)}
+            data-tap="review">
         {Number(s.amount) > 0 ? 'Review trade' : 'Please enter an amount'}
       </span>
 
@@ -280,7 +321,11 @@ function TokenPicker({ d }: { d: Deck }) {
       <div className="dsheet picker">
         <span className="dgrab" />
         <b className="dsh">Select token</b>
-        <span className="dsearch">
+        {/* The field is not a control — there is no keyboard on this screen to
+            press — but it is where the letters land, and a hand that vanished
+            for the length of a typed word would read as the app searching for
+            itself. */}
+        <span className="dsearch" data-tap="search">
           <i>⌕</i>
           <b>{s.query || <em>Search tokens</em>}</b>
           {s.query ? <span className="dcaret" /> : null}
@@ -305,7 +350,7 @@ function PickRow({ d, sym, name, note, usdv }: {
 }) {
   const on = d.can('pick', sym);
   return (
-    <div className={'dli' + live(on)} {...press(on)}>
+    <div className={'dli' + live(on)} {...press(on)} data-tap={'pick:' + sym}>
       <TokenDot token={dot(sym)} size={26} />
       <span className="dlit"><b>{sym}</b><em>{name}</em></span>
       {usdv !== undefined
@@ -329,7 +374,7 @@ function ReviewSheet({ d }: { d: Deck }) {
           <Leg sym={s.to} qty={out(s)} dp={5} />
         </div>
         <Quote s={s} />
-        <span className={'dcta light' + live(go)} {...press(go)}>Swap</span>
+        <span className={'dcta light' + live(go)} {...press(go)} data-tap="swap">Swap</span>
       </div>
     </Layer>
   );
@@ -374,7 +419,8 @@ function VaultSheet({ d }: { d: Deck }) {
             <div className="dchecks left"><ProgressList steps={EARN_STEPS} at={s.vstep} /></div>
             <div className="dref"><span>Reference ID</span><b>{REFERENCE} ⧉</b></div>
             {finished
-              ? <span className={'dcta light' + live(d.can('close'))} {...press(d.can('close'))}>Close</span>
+              ? <span className={'dcta light' + live(d.can('close'))} {...press(d.can('close'))}
+                      data-tap="close">Close</span>
               : null}
           </>
         ) : (
@@ -386,9 +432,10 @@ function VaultSheet({ d }: { d: Deck }) {
             <div className="davailrow">
               <TokenDot token={dot('USDC')} size={17} />
               <span>Available<i>{fmt(vaultBal(), 2)} USDC</i></span>
-              <span className={'dmax' + live(max)} {...press(max)}>Use max</span>
+              <span className={'dmax' + live(max)} {...press(max)} data-tap="vmax">Use max</span>
             </div>
-            <span className={'dcta' + (go ? ' light' : ' off') + live(go)} {...press(go)}>
+            <span className={'dcta' + (go ? ' light' : ' off') + live(go)} {...press(go)}
+                  data-tap="deposit">
               {Number(s.vamount) > 0 ? 'Deposit' : 'Enter an amount'}
             </span>
             <em className="dvsettings">Manage Quick Earn defaults in Settings →</em>

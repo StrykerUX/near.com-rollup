@@ -208,6 +208,15 @@
 .dmi em { display: block; font-style: normal; font-size: 11px; color: rgba(255, 255, 255, .5); margin-top: 1px }
 .dtick { margin-left: auto; font-style: normal; color: var(--near-green) }
 
+/* SHARED, AND FILED HERE FOR HISTORICAL REASONS.
+   The field, keypad, menu and checkbox atoms above and below this line were
+   written for the perps ticket and stayed in this file when the demo styles
+   were split. Swap, earn and both confidential flows use them, and they work
+   because every one of these stylesheets is loaded globally — but this is not
+   where a reader would look for them. Moving them into `17-demo.css` is a
+   cascade change (17 loads first), so it is worth doing deliberately rather
+   than in passing. */
+
 /* the keypad, borrowed whole from the phone shell */
 .pd .kpwrap { margin: 12px -16px -12px; background: rgba(10, 13, 12, .96) }
 /* A KEY FLASHES, IT DOES NOT LATCH.
