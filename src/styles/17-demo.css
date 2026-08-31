@@ -23,6 +23,48 @@
   font-family: var(--font-body); padding: 0 0 80px;
 }
 
+/* =========================================================================
+   NO KEPLER PAST THIS POINT
+   -------------------------------------------------------------------------
+   `04-type.css` styles `em` as an ELEMENT: every one on the site is set in the
+   Kepler italic stack at 1.22x with a .9 line-height, an inline-block box and
+   -2 tracking. That is the display voice of the marketing page, where an `em`
+   is a word set against a Montreal roman and the whole effect is deliberate.
+
+   These screens use `em` for what the tag means inside an app — the small line
+   under a figure, the name under a ticker, the label on a tab, the sentence
+   under a sheet title. There are dozens of them, and every one was inheriting
+   a serif it was never meant to be, at a size nobody asked for. The ones with
+   an explicit `font-size` in their own rule hid half of it, which is why it
+   read as "some labels look wrong" rather than as one cause.
+
+   The app UI is Montreal, all of it. Per-element rules still win over this —
+   `.dlit em` and its dozen siblings are (0,2,1) — so the deliberate sizes and
+   block displays are untouched; only the marketing voice is taken back out.
+
+   `i` is here for a smaller version of the same problem: the UA sets it
+   italic, PP Neue Montreal ships no italic cut, and the browser answers by
+   synthesising a slant.
+
+   `:where()` is doing real work in that selector, not tidying it. `.pd em`
+   is (0,1,1) and beats `.dfsub`, `.dvdesc` and every other single-class rule
+   that sets a deliberate size — so a plain reset silently retyped half these
+   screens at the device's 13px. Wrapped in `:where()` the selector weighs
+   (0,1,0): still enough to beat the bare `em` element rule, never enough to
+   beat a rule that has an opinion. Written first in the file for the same
+   reason, so an equal-weight class later on wins on order.
+   ========================================================================= */
+.pd :where(em, i) {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  display: inline;
+  transform: none;
+}
+
 /* ---- the page's own head ---------------------------------------------- */
 
 .pdtop { max-width: 1180px; margin: 0 auto; padding: 30px 24px 4px }
