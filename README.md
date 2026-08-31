@@ -217,6 +217,60 @@ The device takes it as a prop rather than deciding for itself, so v1 keeps its
 running market — by the time it reaches that step it has already spent four
 chapters establishing that the price moves.
 
+### The transitions, and the hand that makes them read
+
+`/demo/perps-v2` is the one page that shows a *person* using the app rather
+than an app using itself. Three pieces, and they only work together.
+
+**A hand that reaches before it presses.** The machine already knew what
+happens; a flow can now also declare where, by naming a control's `data-tap`:
+
+```ts
+target: (a, arg, s) => {
+  case 'key':   return `key:${arg}`
+  case 'ostep': return s.auth === 'ask' ? 'passkey' : null
+}
+```
+
+The deck resolves the NEXT beat's target while the clock is still counting down
+to it, so the pointer is already on the control when the state changes, and it
+carries the one just pressed so the ripple lands where the press did. `ostep`
+fires six times and only the first is a person pressing anything — a hand
+hovering over a checklist that is ticking itself is a lie about who is doing
+the work.
+
+Two things this took. A closed sheet is translated down by its own height and
+hidden but still laid out, so the keypad inside the ticket has a real rect four
+hundred pixels below the phone; the hand chased it there once. And controls
+move under it, so it re-reads on `transitionend` and `animationend` — exactly
+when a control has finished moving — with a slow tick as the safety net.
+
+**A tempo the hand can keep.** The original timings were written for a script
+with nobody driving it: digits at 190ms, backspaces at 130ms, both faster than
+a hand can travel. Typed digits are 300ms now, clearing is 200ms because nobody
+reads what they delete, and `DWELL` is 200ms so the pointer still has time to
+glide inside a digit's ~375ms. The 2600ms pause on the refusal stays: that one
+is a person reading the error, which is the only reason the error is on screen.
+
+**Things arrive instead of appearing.** One curve, one distance, three
+durations, all behind `[data-motion]`:
+
+```css
+@keyframes drise { from { opacity: 0; translate: 0 9px } }
+```
+
+Every rule is an entrance, never an exit — React unmounts these the instant the
+state changes, and what leaves is almost always behind what replaced it. Three
+exceptions earned their machinery: the position bar arrives delayed by the
+ticket's own slide, because landing under a sheet that is still leaving reads
+as two events; the entry line draws out from its price chip rather than
+switching on; and the keypad stays mounted and animates shut, because
+unmounting it drops everything above it two hundred pixels in one frame.
+
+`/demo/perps` keeps the plainer motion and no hand. It has four more chapters
+to fill, and a screen that animates every list row for twenty-four steps
+fidgets.
+
 ### What the headless walk caught
 
 `pnpm check:flows` drives every machine with no browser: each scripted beat must
