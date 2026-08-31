@@ -74,7 +74,7 @@ function Account({ d }: { d: Deck }) {
           label: 'Crypto',
           value: CRYPTO_BAL,
           sub: <>
-            <TokenDot token={dot('NEAR')} size={13} /><TokenDot token={dot('USDC')} size={13} />
+            <TokenDot token={dot('NEAR')} size={18} /><TokenDot token={dot('USDC')} size={18} />
             <i>NEAR, USDC</i>
           </>,
         },
@@ -100,7 +100,7 @@ function Send({ d }: { d: Deck }) {
       cta={Number(s.amount) > 0 ? 'Review send' : 'Enter amount'}
       pay={
         <div className="davailrow">
-          <TokenDot token={dot('NEAR')} size={17} />
+          <TokenDot token={dot('NEAR')} size={18} />
           <span className="dpaysel">NEAR ⌄</span>
           <span className="dpaybal">Balance<i>{fmt(NEAR_QTY, 4)}</i></span>
           <span className="dmax">Use max</span>

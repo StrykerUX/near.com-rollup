@@ -9,17 +9,17 @@
 .dearn, .dsend2 { display: contents }
 
 .dbeta, .dpromo {
-  font-style: normal; font-size: 9px; letter-spacing: .04em; padding: 1px 5px;
+  font-style: normal; font-size: 12px; letter-spacing: .04em; padding: 1px 5px;
   border-radius: 4px; background: rgba(90, 150, 255, .18); color: #9CC0FF;
   vertical-align: 3px; margin-left: 6px;
 }
 
 .dnote {
-  display: block; font-style: normal; font-size: 11px; line-height: 1.45;
+  display: block; font-style: normal; font-size: 12px; line-height: 1.45;
   color: rgba(255, 255, 255, .45); margin-top: 12px;
 }
 .dvhead {
-  display: flex; justify-content: space-between; font-size: 11px;
+  display: flex; justify-content: space-between; font-size: 12px;
   color: rgba(255, 255, 255, .4); margin-top: 14px; padding-bottom: 6px;
   border-bottom: 1px solid rgba(255, 255, 255, .07);
 }
@@ -44,7 +44,7 @@
   background: rgba(255, 255, 255, .12);
 }
 .dftext { flex: 1; min-width: 0 }
-.dftext em { display: block; font-style: normal; font-size: 10.5px; color: rgba(255, 255, 255, .45) }
+.dftext em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45) }
 .dftext b { display: block; font-size: 13px; font-weight: 500; margin-top: 1px }
 .dfrow.muted .dftext b { color: rgba(255, 255, 255, .5) }
 
@@ -53,14 +53,14 @@
 .damt.big > b i { font-style: normal; color: rgba(255, 255, 255, .35); font-size: 1.15rem }
 .damt.big > em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45); margin-top: 2px }
 .dpaylab {
-  display: block; font-size: 10.5px; color: rgba(255, 255, 255, .4);
+  display: block; font-size: 12px; color: rgba(255, 255, 255, .4);
   margin: 16px 0 6px; padding-top: 11px; border-top: 1px solid rgba(255, 255, 255, .07);
 }
 .damt.big .davailrow { margin-top: 0 }
 .dpaysel { font-size: 12px; white-space: nowrap }
 .dpaybal {
   display: flex; flex-direction: column; text-align: right; margin-left: auto;
-  font-size: 10.5px; color: rgba(255, 255, 255, .4);
+  font-size: 12px; color: rgba(255, 255, 255, .4);
 }
 .dpaybal i { font-style: normal; color: rgba(255, 255, 255, .8); font-family: var(--font-mono) }
 
@@ -68,9 +68,9 @@
 .dwarn {
   margin-top: 11px; flex: none; border-radius: 11px; padding: 10px 12px;
   background: rgba(214, 158, 46, .12); border: 1px solid rgba(214, 158, 46, .28);
-  display: grid; gap: 7px; font-size: 11.5px; color: #F0C86A;
+  display: grid; gap: 7px; font-size: 12px; color: #F0C86A;
 }
-.dwarn .dchk { margin-top: 0; color: #F0C86A; font-size: 11.5px }
+.dwarn .dchk { margin-top: 0; color: #F0C86A; font-size: 12px }
 .dwarn .dbox { border-color: rgba(240, 200, 106, .5) }
 .dwarn .dchk.on .dbox { background: #F0C86A; border-color: #F0C86A }
 .dwarn .dchk.on .dbox::after { color: #2A1F06 }

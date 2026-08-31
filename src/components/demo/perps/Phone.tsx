@@ -129,7 +129,7 @@ function Account({ d }: { d: Deck }) {
             <em>Crypto</em>
             <b>{usd(crypto)}</b>
             <span className="dpills">
-              <TokenDot token={NEAR} size={13} /><TokenDot token={USDC} size={13} />
+              <TokenDot token={NEAR} size={18} /><TokenDot token={USDC} size={18} />
               <i>NEAR, USDC</i>
             </span>
           </span>
@@ -423,7 +423,7 @@ function Fund({ d }: { d: Deck }) {
           <div className="damt">
             <b className={s.fundAmt ? '' : 'off'}>${s.fundAmt || '0'}</b>
             <span className="dpayrow">
-              <TokenDot token={NEAR} size={17} />
+              <TokenDot token={NEAR} size={18} />
               <span>Pay NEAR ⌄</span>
               <i>${fmt(NEAR_AVAIL)} available</i>
             </span>
@@ -449,9 +449,9 @@ function ReviewSheet({ d }: { d: Deck }) {
         <b className="drevt">Confirm send to<br />Perps account</b>
         <dl className="drevl">
           <div><dt>Estimated time</dt><dd>{FUND_ETA}</dd></div>
-          <div><dt>Recipient receives</dt><dd>{fmt(Number(s.fundAmt) || 0)} USDC <TokenDot token={USDC} size={13} /></dd></div>
-          <div><dt>Fee</dt><dd>0 NEAR <TokenDot token={NEAR} size={13} /></dd></div>
-          <div><dt>You pay at most</dt><dd>{FUND_PAY_NEAR} NEAR <TokenDot token={NEAR} size={13} /></dd></div>
+          <div><dt>Recipient receives</dt><dd>{fmt(Number(s.fundAmt) || 0)} USDC <TokenDot token={USDC} size={18} /></dd></div>
+          <div><dt>Fee</dt><dd>0 NEAR <TokenDot token={NEAR} size={18} /></dd></div>
+          <div><dt>You pay at most</dt><dd>{FUND_PAY_NEAR} NEAR <TokenDot token={NEAR} size={18} /></dd></div>
           <div><dt>Maximum slippage</dt><dd>{FUND_SLIPPAGE}</dd></div>
         </dl>
         <em className="drevn">You&rsquo;re responsible for where your funds go. Transfers are irreversible.</em>

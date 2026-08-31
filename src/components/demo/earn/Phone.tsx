@@ -81,7 +81,7 @@ function Account({ d }: { d: Deck }) {
           label: 'Crypto',
           value: CRYPTO_BAL,
           sub: <>
-            <TokenDot token={dot('NEAR')} size={13} /><TokenDot token={dot('USDC')} size={13} />
+            <TokenDot token={dot('NEAR')} size={18} /><TokenDot token={dot('USDC')} size={18} />
             <i>NEAR, USDC</i>
           </>,
         },
@@ -217,7 +217,7 @@ function VaultSheet({ d }: { d: Deck }) {
               <em>{usd(Number(s.amount) || 0)}</em>
             </div>
             <div className="davailrow">
-              <TokenDot token={dot('USDC')} size={17} />
+              <TokenDot token={dot('USDC')} size={18} />
               <span>Available<i>{fmt(USDC_AVAIL, 2)} USDC</i></span>
               <span className={'dmax' + live(max)} {...press(max)} data-tap="max">Use max</span>
             </div>
@@ -252,7 +252,7 @@ function Send({ d }: { d: Deck }) {
       onAmount={d.can('focus', 'send')}
       pay={
         <div className="davailrow">
-          <TokenDot token={dot(s.pay === 'NEAR' ? 'NEAR' : 'USDC')} size={17} />
+          <TokenDot token={dot(s.pay === 'NEAR' ? 'NEAR' : 'USDC')} size={18} />
           <span className={'dpaysel' + live(pay)} {...press(pay)} data-tap="paysel">{payLabel(s)} ⌄</span>
           <span className="dpaybal">Balance<i>
             {s.pay === 'NEAR' ? fmt(NEAR_QTY, 4) : `~${fmt(payBalance(s), 2)} USDC`}

@@ -21,6 +21,13 @@
 .pd {
   min-height: 100vh; background: #05070A; color: #fff;
   font-family: var(--font-body); padding: 0 0 80px;
+
+  /* NOTHING IN THIS UI IS SET BELOW 12px.
+     `--fs-micro` is .74rem, which is 11.84 — under the floor by a rounding
+     error, and used for the transport counter, the chapter numbers and the
+     back link. Redefining it here rather than chasing every call site keeps
+     the token meaning what it means everywhere else on the site. */
+  --fs-micro: 12px;
 }
 
 /* =========================================================================
@@ -137,7 +144,7 @@
   transition: background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
 }
 .pdctl button:hover { background: rgba(255, 255, 255, .15); border-color: rgba(255, 255, 255, .3) }
-.pdctl .pdplay { background: var(--near-green); color: #04140E; border-color: transparent; font-size: 10px }
+.pdctl .pdplay { background: var(--near-green); color: #04140E; border-color: transparent; font-size: 12px }
 .pdctl .pdplay:hover { background: #4dffb8 }
 .pdcount {
   margin-left: auto; font-family: var(--font-mono); font-size: var(--fs-micro);
@@ -270,7 +277,7 @@
 .drowl { flex: 1; display: block }
 .drowl em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .55) }
 .drowl > b { display: block; font-size: 17px; font-weight: 500; margin-top: 1px }
-.dpills { display: flex; align-items: center; gap: 5px; margin-top: 4px; font-size: 11px; color: rgba(255, 255, 255, .5) }
+.dpills { display: flex; align-items: center; gap: 5px; margin-top: 4px; font-size: 12px; color: rgba(255, 255, 255, .5) }
 .dpills i { font-style: normal }
 .dpills i.dgain {
   background: rgba(38, 194, 129, .14); color: #26C281; border-radius: 5px; padding: 1px 5px;
@@ -292,8 +299,8 @@
   display: block; height: 40px; border-radius: 8px; margin-bottom: 8px;
   background: linear-gradient(120deg, rgba(0, 236, 151, .22), rgba(0, 236, 151, .04));
 }
-.dexpc b { display: block; font-size: 11.5px; font-weight: 500; line-height: 1.25 }
-.dexpc em { display: block; font-style: normal; font-size: 10.5px; color: rgba(255, 255, 255, .45); margin-top: 3px; line-height: 1.3 }
+.dexpc b { display: block; font-size: 12px; font-weight: 500; line-height: 1.25 }
+.dexpc em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45); margin-top: 3px; line-height: 1.3 }
 
 /* ---- the tab bar -------------------------------------------------------- */
 
@@ -304,7 +311,7 @@
 }
 .dtab { display: grid; justify-items: center; gap: 3px; color: rgba(255, 255, 255, .42) }
 .dtab svg { width: 21px; height: 21px }
-.dtab em { font-style: normal; font-size: 9px }
+.dtab em { font-style: normal; font-size: 12px }
 .dtab[aria-current] { color: var(--near-green) }
 .dtab[aria-current] .fl { fill: rgba(0, 236, 151, .22) }
 
@@ -404,7 +411,7 @@
 .drevl div { display: flex; justify-content: space-between; align-items: center; font-size: 12px }
 .drevl dt { color: rgba(255, 255, 255, .5) }
 .drevl dd { margin: 0; display: flex; align-items: center; gap: 5px; font-family: var(--font-mono) }
-.drevn { display: block; font-style: normal; font-size: 10.5px; color: rgba(255, 255, 255, .38); margin-top: 14px; line-height: 1.4 }
+.drevn { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .38); margin-top: 14px; line-height: 1.4 }
 
 /* the passkey */
 .dsheet.pass { border-radius: 22px; margin: auto 10px 90px; padding: 22px 20px 20px; text-align: center }
@@ -463,13 +470,13 @@
 
 /* the yield chip that rides on a token row */
 .dchip {
-  flex: none; align-self: center; font-size: 10px; padding: 3px 7px; border-radius: 6px;
+  flex: none; align-self: center; font-size: 12px; padding: 3px 7px; border-radius: 6px;
   background: rgba(90, 150, 255, .14); color: #9CC0FF; white-space: nowrap;
 }
 
 /* a group heading inside a picker: Your tokens, More tokens, Your vaults */
 .dgroup {
-  display: block; font-size: 11px; color: rgba(255, 255, 255, .42);
+  display: block; font-size: 12px; color: rgba(255, 255, 255, .42);
   margin: 12px 0 2px; flex: none;
 }
 
@@ -487,18 +494,18 @@
 .dvico { display: block; margin-bottom: 9px }
 .dsh.big { font-size: 1.05rem; margin-bottom: 6px }
 .dvdesc {
-  display: block; font-style: normal; font-size: 11.5px; line-height: 1.45;
+  display: block; font-style: normal; font-size: 12px; line-height: 1.45;
   color: rgba(255, 255, 255, .5); margin-bottom: 14px;
 }
 .dvstat { margin: 0 0 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px }
-.dvstat dt { font-size: 11px; color: rgba(255, 255, 255, .45) }
+.dvstat dt { font-size: 12px; color: rgba(255, 255, 255, .45) }
 .dvstat dd { margin: 0; font-size: 1.15rem; font-weight: 500 }
 .dvfees { margin: 0; display: grid; gap: 8px; border-top: 1px solid rgba(255, 255, 255, .07); padding-top: 11px }
-.dvfees div { display: grid; grid-template-columns: 108px 1fr; gap: 10px; font-size: 11px }
+.dvfees div { display: grid; grid-template-columns: 108px 1fr; gap: 10px; font-size: 12px }
 .dvfees dt { color: rgba(255, 255, 255, .45); display: flex; flex-direction: column; align-items: flex-start; gap: 3px }
 .dvfees dd { margin: 0; color: rgba(255, 255, 255, .82); line-height: 1.35 }
 .dpromo {
-  font-style: normal; font-size: 9px; letter-spacing: .04em; padding: 1px 5px; border-radius: 4px;
+  font-style: normal; font-size: 12px; letter-spacing: .04em; padding: 1px 5px; border-radius: 4px;
   background: rgba(90, 150, 255, .18); color: #9CC0FF;
 }
 
@@ -507,15 +514,15 @@
 .damt.tight > b { font-size: 1.5rem }
 .damt.tight > b i { font-style: normal; color: rgba(255, 255, 255, .4); font-size: 1rem }
 .damt.tight > em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45); margin-top: 3px }
-.davailrow { display: flex; align-items: center; gap: 8px; margin-top: 11px; font-size: 11.5px }
+.davailrow { display: flex; align-items: center; gap: 8px; margin-top: 11px; font-size: 12px }
 .davailrow > span { display: flex; flex-direction: column; color: rgba(255, 255, 255, .45) }
 .davailrow > span i { font-style: normal; color: rgba(255, 255, 255, .82) }
 .dmax {
-  margin-left: auto; padding: 5px 10px; border-radius: 7px; font-size: 11px;
+  margin-left: auto; padding: 5px 10px; border-radius: 7px; font-size: 12px;
   background: rgba(255, 255, 255, .1);
 }
 .dvsettings {
-  display: block; font-style: normal; text-align: center; font-size: 11px;
+  display: block; font-style: normal; text-align: center; font-size: 12px;
   color: rgba(255, 255, 255, .4); margin-top: 11px;
 }
 
@@ -523,7 +530,7 @@
 .dref {
   display: flex; justify-content: space-between; align-items: center;
   border-top: 1px solid rgba(255, 255, 255, .07); margin-top: 12px; padding-top: 10px;
-  font-size: 11px; color: rgba(255, 255, 255, .45);
+  font-size: 12px; color: rgba(255, 255, 255, .45);
 }
 .dref b { font-weight: 400; font-family: var(--font-mono); color: rgba(255, 255, 255, .8) }
 

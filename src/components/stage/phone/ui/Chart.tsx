@@ -80,6 +80,21 @@ function candle(k: number): Candle {
   };
 }
 
+/**
+ * The axis labels and the price chips. Canvas draws text with no stylesheet to
+ * inherit from, so the floor the rest of the UI keeps — nothing under 12px —
+ * has to be stated here or the one place it is broken is the one place no
+ * audit of the CSS can see.
+ */
+const LABEL_PX = 12;
+/**
+ * How much of the right edge belongs to the price axis. It was a bare 54,
+ * tuned by eye against 9px labels; at 12px "$80,200" is wider than that and
+ * the candles ran under it. Derived now, so the next change to LABEL_PX moves
+ * the gutter with it.
+ */
+const AXIS_W = Math.round(LABEL_PX * 4.6) + 8;
+
 export type ChartProps = {
   /** draws the dashed entry line and its chip */
   entry?: number | null;
@@ -207,7 +222,7 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
       ctx.clearRect(0, 0, w, h);
 
       /* gridlines on round hundreds, labelled at the right edge like the app */
-      ctx.font = '9px ui-monospace, SFMono-Regular, Menlo, monospace';
+      ctx.font = `${LABEL_PX}px ui-monospace, SFMono-Regular, Menlo, monospace`;
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
       const stepPx = 200;
@@ -225,7 +240,7 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
       }
 
       /* candles — the right ~54px is the price axis, kept clear */
-      const plotW = w - 54;
+      const plotW = w - AXIS_W;
       const cw = plotW / CANDLES;
       const body = Math.max(1.5, cw * 0.62);
       view.forEach((c, i) => {
@@ -271,10 +286,10 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(0, py);
-      ctx.lineTo(w - 52, py);
+      ctx.lineTo(w - AXIS_W + 2, py);
       ctx.stroke();
       ctx.setLineDash([]);
-      chip(ctx, w - 50, py, '$' + last.toFixed(1), '#26C281', '#04140E');
+      chip(ctx, w, py, '$' + last.toFixed(1), '#26C281', '#04140E');
 
       /* the entry line, when a position is open. It draws OUT FROM ITS CHIP:
          the price is what the position is anchored to, so the line grows from
@@ -285,7 +300,7 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
       if (e) {
         const a = Math.min(1, Math.max(0, (clock - entryAt) / 520));
         const ey = Math.round(y(e)) + 0.5;
-        const right = w - 52;
+        const right = w - AXIS_W + 2;
         ctx.save();
         ctx.globalAlpha = a;
         ctx.strokeStyle = 'rgba(120,170,255,.6)';
@@ -295,7 +310,7 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
         ctx.lineTo(right, ey);
         ctx.stroke();
         ctx.setLineDash([]);
-        chip(ctx, w - 50, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F');
+        chip(ctx, w, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F');
         ctx.restore();
       }
 
@@ -315,17 +330,22 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
   return <canvas className="pchart" ref={ref} aria-hidden="true" />;
 }
 
-/** the small filled label the app pins against the price axis */
+/**
+ * The small filled label the app pins against the price axis. It is placed by
+ * its RIGHT edge, not its left: the width depends on the text and on
+ * LABEL_PX, and a left offset guessed against one of those ran the widest
+ * quotes off the canvas the moment the other changed.
+ */
 function chip(
-  ctx: CanvasRenderingContext2D, x: number, y: number,
+  ctx: CanvasRenderingContext2D, right: number, y: number,
   text: string, bg: string, fg: string,
 ) {
-  ctx.font = '9px ui-monospace, SFMono-Regular, Menlo, monospace';
+  ctx.font = `${LABEL_PX}px ui-monospace, SFMono-Regular, Menlo, monospace`;
   const wdt = ctx.measureText(text).width + 8;
-  const hgt = 13;
+  const hgt = LABEL_PX + 5;
   ctx.fillStyle = bg;
   const r = 3;
-  const x0 = x;
+  const x0 = right - wdt - 1;
   const y0 = y - hgt / 2;
   ctx.beginPath();
   ctx.moveTo(x0 + r, y0);

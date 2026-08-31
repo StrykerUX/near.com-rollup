@@ -15,7 +15,11 @@ export function TokenDot({ token, size = 20 }: { token: Token; size?: number }) 
         color: token.ink,
         width: size + 'px',
         height: size + 'px',
-        fontSize: (size < 24 ? 9 : 11) + 'px',
+        /* THE LETTER IS TYPE. It stands in for a brand mark the icon set does
+           not have, and it was set at 9px in the small dots — under the floor
+           this UI keeps. A dot smaller than about 18px cannot hold 12px, so
+           the callers that wanted 13 were raised rather than exempted. */
+        fontSize: Math.max(12, Math.round(size * 0.42)) + 'px',
       }}
     >
       {glyph ? (

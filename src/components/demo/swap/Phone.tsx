@@ -101,7 +101,7 @@ function Account({ d }: { d: Deck }) {
           value: total(s),
           on: d.can('toAssets'),
           sub: <>
-            <TokenDot token={dot('USDT')} size={13} /><TokenDot token={dot('USDC')} size={13} />
+            <TokenDot token={dot('USDT')} size={18} /><TokenDot token={dot('USDC')} size={18} />
             <i>USDT, USDC</i>
           </>,
         },
@@ -239,7 +239,7 @@ function SwapScreen({ d }: { d: Deck }) {
       <div className="dleg">
         <span className="dlegv">
           <b className={s.amount ? '' : 'off'}>{s.amount || `Enter amount ${s.from}`}</b>
-          <span className="dtokchip"><TokenDot token={dot(s.from)} size={17} />{s.from} ⌄</span>
+          <span className="dtokchip"><TokenDot token={dot(s.from)} size={18} />{s.from} ⌄</span>
         </span>
         <span className="dlegm">
           <i>{usd((Number(s.amount) || 0) * price(s.from))} ⇅</i>
@@ -255,7 +255,7 @@ function SwapScreen({ d }: { d: Deck }) {
         <span className="dlegv">
           <b className={s.amount ? '' : 'off'}>{s.amount ? fmt(out(s), 3) : '0'}</b>
           <span className={'dtokchip' + live(pick)} {...press(pick)} data-tap="picker">
-            <TokenDot token={dot(s.to)} size={17} />{s.to} ⌄
+            <TokenDot token={dot(s.to)} size={18} />{s.to} ⌄
           </span>
         </span>
         <span className="dlegm">
@@ -416,7 +416,7 @@ function VaultSheet({ d }: { d: Deck }) {
               <em>{usd(Number(s.vamount) || 0)}</em>
             </div>
             <div className="davailrow">
-              <TokenDot token={dot('USDC')} size={17} />
+              <TokenDot token={dot('USDC')} size={18} />
               <span>Available<i>{fmt(vaultBal(), 2)} USDC</i></span>
               <span className={'dmax' + live(max)} {...press(max)} data-tap="vmax">Use max</span>
             </div>

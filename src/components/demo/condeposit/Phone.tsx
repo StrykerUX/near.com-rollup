@@ -77,7 +77,7 @@ function Account({ d }: { d: Deck }) {
           label: 'Crypto',
           value: CRYPTO_BAL,
           sub: <>
-            <TokenDot token={dot('NEAR')} size={13} /><TokenDot token={dot('USDC')} size={13} />
+            <TokenDot token={dot('NEAR')} size={18} /><TokenDot token={dot('USDC')} size={18} />
             <i>NEAR, USDC</i>
           </>,
         },
