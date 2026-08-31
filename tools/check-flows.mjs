@@ -25,17 +25,27 @@ import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
 
 const FLOWS = 'src/components/stage/phone/flows';
-const DEMO = 'src/components/demo/perps';
+const DEMO = 'src/components/demo';
+const SHELL = 'src/components/demo/shell';
 /* [source file, name it is written out under] */
 const MODULES = [
   [`${FLOWS}/machine.ts`, 'machine'],
+  [`${SHELL}/flow.ts`, 'flow'],
   [`${FLOWS}/perps.ts`, 'perps'],
   [`${FLOWS}/swap.ts`, 'swap'],
   [`${FLOWS}/earn.ts`, 'earn'],
   [`${FLOWS}/account.ts`, 'account'],
   /* the standalone /demo/perps machine — same contract, its own arc */
-  [`${DEMO}/state.ts`, 'state'],
-  [`${DEMO}/script.ts`, 'script'],
+  [`${DEMO}/perps/state.ts`, 'perps-state'],
+  [`${DEMO}/perps/script.ts`, 'perps-script'],
+  [`${DEMO}/swap/state.ts`, 'swap-state'],
+  [`${DEMO}/swap/script.ts`, 'swap-script'],
+  [`${DEMO}/earn/state.ts`, 'earn-state'],
+  [`${DEMO}/earn/script.ts`, 'earn-script'],
+  [`${DEMO}/condeposit/state.ts`, 'condeposit-state'],
+  [`${DEMO}/condeposit/script.ts`, 'condeposit-script'],
+  [`${DEMO}/consend/state.ts`, 'consend-state'],
+  [`${DEMO}/consend/script.ts`, 'consend-script'],
 ];
 
 /* The flow files are types plus plain data — no JSX, no bundler features — so
@@ -49,7 +59,10 @@ for (const [src, f] of MODULES) {
     })
     .outputText
     .replace(/from ['"](\.\/|@\/components\/stage\/phone\/flows\/)machine['"]/g, "from './machine.mjs'")
-    .replace(/from ['"]\.\/state['"]/g, "from './state.mjs'");
+    .replace(/from ['"]@\/components\/demo\/shell\/flow['"]/g, "from './flow.mjs'")
+    /* each demo's script imports `./state`; they are written out side by side,
+       so the rewrite has to know which one it is looking at */
+    .replace(/from ['"]\.\/state['"]/g, `from './${f.replace('-script', '')}-state.mjs'`);
   writeFileSync(join(dir, `${f}.mjs`), js);
 }
 const load = (f) => import(pathToFileURL(join(dir, `${f}.mjs`)).href);
@@ -60,7 +73,11 @@ const machines = {
   swap: (await load('swap')).swap,
   earn: (await load('earn')).earn,
   account: (await load('account')).account,
-  'demo/perps': (await load('script')).MACHINE,
+  'demo/perps': (await load('perps-script')).perpsFlow.machine,
+  'demo/swap': (await load('swap-script')).swapFlow.machine,
+  'demo/earn': (await load('earn-script')).earnFlow.machine,
+  'demo/confidential-deposit': (await load('condeposit-script')).conDepositFlow.machine,
+  'demo/confidential-send': (await load('consend-script')).conSendFlow.machine,
 };
 
 let fail = 0;

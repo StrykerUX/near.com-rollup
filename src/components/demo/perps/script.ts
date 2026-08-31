@@ -1,32 +1,21 @@
-import { applyBeat, type Beat, type Machine } from '@/components/stage/phone/flows/machine';
-import { actions, initial, type PD, type PDAction } from './state';
+import { buildFlow, typing, type Chapter, type Step } from '@/components/demo/shell/flow';
+import { FUND_STEPS, actions, initial, type PD, type PDAction } from './state';
 
 /**
- * THE SCRIPT, WRITTEN AS STEPS
+ * PERPS, STEP BY STEP — the script
  * ==================================================================
- * The page has to do two things with the same timeline: play it, and let a
- * reader jump around inside it. So the beats are not one flat list — they are
- * grouped into named steps, each of which says what feature it is showing.
+ * Eight chapters and twenty-four steps, read off `_refs/rec-perps.MP4` at one
+ * frame per second. The grouping is not decoration: a step is the unit the
+ * rail navigates by, and its first beat is what a reader lands on.
  *
- * A step's FIRST beat is its entrance: seeking to a step applies that beat at
- * once and starts the clock after it. Which is why the leading `ms` on a first
- * beat is the pause the PREVIOUS step gets to hold for — it costs nothing when
- * a reader jumps straight here.
+ * See `shell/flow.ts` for what a step is, and for how a reader's gesture finds
+ * its place in the script.
  */
 
-export type Chapter = { id: string; name: string; blurb: string };
+const type_ = (act: PDAction, chars: string, lead?: number, gap?: number) =>
+  typing<PD, PDAction>(act, chars, lead, gap);
 
-export type Step = {
-  id: string;
-  ch: string;
-  /** what this step is called in the rail */
-  title: string;
-  /** what the app is doing, and which number moved */
-  note: string;
-  beats: Beat<PD, PDAction>[];
-};
-
-export const CHAPTERS: Chapter[] = [
+const CHAPTERS: Chapter[] = [
   { id: 'account', name: 'The account', blurb: 'One screen for custody, perps and yield.' },
   { id: 'market', name: 'The market', blurb: 'Price, positions, and the state of your perps account.' },
   { id: 'fund', name: 'Funding', blurb: 'Moving balance from near.com into the perps account, signed with a passkey.' },
@@ -37,11 +26,7 @@ export const CHAPTERS: Chapter[] = [
   { id: 'back', name: 'Back out', blurb: 'The same balance, seen from the account.' },
 ];
 
-/** a digit run, typed rather than pasted */
-const type_ = (act: PDAction, chars: string, lead = 900, gap = 165): Beat<PD, PDAction>[] =>
-  chars.split('').map((c, i) => ({ ms: i === 0 ? lead : gap, do: act, arg: c }));
-
-export const STEPS: Step[] = [
+const STEPS: Step<PD, PDAction>[] = [
   /* ---- 1 · the account ----------------------------------------------- */
   {
     id: 'balances', ch: 'account',
@@ -264,89 +249,38 @@ export const STEPS: Step[] = [
   },
 ];
 
-/* ---- flattening ------------------------------------------------------- */
-
-export const BEATS: Beat<PD, PDAction>[] = STEPS.flatMap((s) => s.beats);
-
-/** the beat index each step starts at */
-export const STARTS: number[] = (() => {
-  const out: number[] = [];
-  let n = 0;
-  for (const s of STEPS) {
-    out.push(n);
-    n += s.beats.length;
-  }
-  return out;
-})();
-
-/** which step a beat index belongs to */
-export function stepOf(i: number) {
-  if (i < 0) return 0;
-  let k = 0;
-  for (let j = 0; j < STARTS.length; j++) if (STARTS[j] <= i) k = j;
-  return k;
-}
-
-/**
- * WHERE A READER'S GESTURE LANDS.
- *
- * Firing an anchored transition moves the playhead to that step, so the script
- * resumes from what the reader just did instead of yanking the screen back to
- * its own place. That single behaviour is the difference between a demo that
- * lets you touch it and one that fights you.
- */
-const ANCHOR: Partial<Record<PDAction, string>> = {
-  openPerps: 'toperps',
-  acct: 'myaccount',
-  deposit: 'fund',
-  fundReview: 'review',
-  fundSend: 'passkey',
-  closeFund: 'toticket',
-  openTicket: 'size',
-  levSheet: 'lev',
-  levSave: 'otype',
-  otypeMenu: 'otype',
-  prot: 'unit',
-  unit: 'tperr',
-  submit: 'checklist',
-  posOpen: 'detail',
-  home: 'home',
-  closePos: 'home',
-};
-
-const stepIndex = (id: string) => STEPS.findIndex((s) => s.id === id);
-
-export const anchor: Partial<Record<PDAction, number>> = Object.fromEntries(
-  Object.entries(ANCHOR).map(([a, id]) => [a, STARTS[stepIndex(id)]]),
-) as Partial<Record<PDAction, number>>;
-
-/**
- * The machine, assembled. `guided` is deliberately wide open: this page's
- * whole promise is that you can touch it, and the anchors above are what keeps
- * that from breaking the story. The guards in `state.ts` are the only thing
- * that ever refuses.
- */
-export const MACHINE: Machine<PD, PDAction> = {
+export const perpsFlow = buildFlow<PD, PDAction>({
   initial,
   actions,
-  beats: BEATS,
-  restFrame: STARTS[stepIndex('detail')],
+  chapters: CHAPTERS,
+  steps: STEPS,
+  restStep: 'detail',
   outro: 4200,
-  guided: () => Object.keys(actions) as PDAction[],
-  anchor,
+  anchor: {
+    openPerps: 'toperps',
+    acct: 'myaccount',
+    deposit: 'fund',
+    fundReview: 'review',
+    fundSend: 'passkey',
+    closeFund: 'toticket',
+    openTicket: 'size',
+    levSheet: 'lev',
+    levSave: 'otype',
+    otypeMenu: 'otype',
+    prot: 'unit',
+    unit: 'tperr',
+    submit: 'checklist',
+    posOpen: 'detail',
+    home: 'home',
+    closePos: 'home',
+  },
   /* the two settlements tick on their own when no clock is running */
   auto: (s) => {
-    if (s.screen === 'funding' && s.fstep < 3) return { after: 1500, do: 'fstep' };
-    if (s.over === 'passkey' && s.auth !== 'done') return { after: 1100, do: s.submitting ? 'ostep' : 'fstep' };
-    if (s.over === 'passkey' && s.auth === 'done') return { after: 700, do: s.submitting ? 'ostep' : 'fstep' };
+    if (s.screen === 'funding' && s.fstep < FUND_STEPS.length) return { after: 1500, do: 'fstep' };
+    if (s.over === 'passkey') {
+      return { after: s.auth === 'done' ? 700 : 1100, do: s.submitting ? 'ostep' : 'fstep' };
+    }
     if (s.submitting && s.over === 'none') return { after: 1500, do: 'ostep' };
     return null;
   },
-};
-
-/** the state at a given beat index — the pure function the page rides */
-export function frameAt(i: number): PD {
-  let s = { ...initial };
-  for (let k = 0; k <= i && k < BEATS.length; k++) s = applyBeat(MACHINE, s, BEATS[k]);
-  return s;
-}
+});

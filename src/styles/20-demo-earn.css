@@ -1,0 +1,76 @@
+/* =========================================================================
+   /demo/earn — the screens only this flow has
+   -------------------------------------------------------------------------
+   The vault list, and Universal Send with its three rows and its warning.
+   The vault sheet itself is shared with `/demo/swap` and lives in
+   `17-demo.css`, because they are the same sheet in the same app.
+   ========================================================================= */
+
+.dearn, .dsend2 { display: contents }
+
+.dbeta, .dpromo {
+  font-style: normal; font-size: 9px; letter-spacing: .04em; padding: 1px 5px;
+  border-radius: 4px; background: rgba(90, 150, 255, .18); color: #9CC0FF;
+  vertical-align: 3px; margin-left: 6px;
+}
+
+.dnote {
+  display: block; font-style: normal; font-size: 11px; line-height: 1.45;
+  color: rgba(255, 255, 255, .45); margin-top: 12px;
+}
+.dvhead {
+  display: flex; justify-content: space-between; font-size: 11px;
+  color: rgba(255, 255, 255, .4); margin-top: 14px; padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+.dearn .dli { padding: 11px 0 }
+.dearn .dliv b { font-size: 13px }
+
+.dseg.wide.two .dsg { padding: 9px 6px }
+.dseg.wide.two .dsg em { font-size: 12.5px; color: rgba(255, 255, 255, .55) }
+.dseg.wide.two .dsg.on em { color: #fff }
+
+/* ---- Universal Send ---------------------------------------------------- */
+
+/* the three rows the send is made of. A row that leads nowhere still shows its
+   chevron, because the absence of one would read as "not yet loaded". */
+.dfrow {
+  display: flex; align-items: center; gap: 10px; margin-top: 9px; flex: none;
+  padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, .05);
+}
+.dfmark { flex: none; display: block }
+.dbagm {
+  display: block; width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
+}
+.dftext { flex: 1; min-width: 0 }
+.dftext em { display: block; font-style: normal; font-size: 10.5px; color: rgba(255, 255, 255, .45) }
+.dftext b { display: block; font-size: 13px; font-weight: 500; margin-top: 1px }
+.dfrow.muted .dftext b { color: rgba(255, 255, 255, .5) }
+
+.damt.big { margin-top: 14px; padding: 20px 14px 13px; text-align: center }
+.damt.big > b { display: block; font-size: 1.9rem; font-weight: 500 }
+.damt.big > b i { font-style: normal; color: rgba(255, 255, 255, .35); font-size: 1.15rem }
+.damt.big > em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45); margin-top: 2px }
+.dpaylab {
+  display: block; font-size: 10.5px; color: rgba(255, 255, 255, .4);
+  margin: 16px 0 6px; padding-top: 11px; border-top: 1px solid rgba(255, 255, 255, .07);
+}
+.damt.big .davailrow { margin-top: 0 }
+.dpaysel { font-size: 12px; white-space: nowrap }
+.dpaybal {
+  display: flex; flex-direction: column; text-align: right; margin-left: auto;
+  font-size: 10.5px; color: rgba(255, 255, 255, .4);
+}
+.dpaybal i { font-style: normal; color: rgba(255, 255, 255, .8); font-family: var(--font-mono) }
+
+/* the warning that knows where it applies */
+.dwarn {
+  margin-top: 11px; flex: none; border-radius: 11px; padding: 10px 12px;
+  background: rgba(214, 158, 46, .12); border: 1px solid rgba(214, 158, 46, .28);
+  display: grid; gap: 7px; font-size: 11.5px; color: #F0C86A;
+}
+.dwarn .dchk { margin-top: 0; color: #F0C86A; font-size: 11.5px }
+.dwarn .dbox { border-color: rgba(240, 200, 106, .5) }
+.dwarn .dchk.on .dbox { background: #F0C86A; border-color: #F0C86A }
+.dwarn .dchk.on .dbox::after { color: #2A1F06 }

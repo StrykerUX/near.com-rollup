@@ -29,7 +29,11 @@
 @import "../styles/14-refactor.css";
 @import "../styles/15-demo.css";
 @import "../styles/16-modes.css";
-@import "../styles/17-perps-demo.css";
+@import "../styles/17-demo.css";
+@import "../styles/18-demo-perps.css";
+@import "../styles/19-demo-swap.css";
+@import "../styles/20-demo-earn.css";
+@import "../styles/21-demo-confidential.css";
 
 /* ============================================================
    TAILWIND v4 THEME BRIDGE

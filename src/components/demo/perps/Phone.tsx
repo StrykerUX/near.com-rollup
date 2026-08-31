@@ -8,13 +8,16 @@ import { live, press } from '@/components/stage/phone/ui/tap';
 import { TokenDot } from '@/components/stage/phone/TokenDot';
 import { findToken } from '@/lib/tokens';
 import { fmt } from '@/lib/format';
-import type { Deck } from './player';
+import { Layer, StatusBar, Tabs } from '@/components/demo/shell/Frame';
+import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
   CRYPTO_BAL, EARN_BAL, ENTRY, FUND_ETA, FUND_PAY_NEAR, FUND_SLIPPAGE, FUND_STEPS,
   MARK_0, NEAR_AVAIL, ORDER_STEPS, PERPS_BAL_0,
   avail, btcSize, cta, liqPct, liqPrice, money, notional, slBad, tpBad,
-  type PD,
+  type PD, type PDAction,
 } from './state';
+
+type Deck = GenericDeck<PD, PDAction>;
 
 /**
  * THE APP
@@ -49,7 +52,8 @@ export function Phone({ d }: { d: Deck }) {
         {s.screen === 'market' ? <Market d={d} /> : null}
         {s.screen === 'fund' || s.screen === 'funding' ? <Fund d={d} /> : null}
       </div>
-      {s.screen === 'account' || s.screen === 'market' ? <Tabs screen={s.screen} /> : null}
+      {s.screen === 'account' || s.screen === 'market'
+        ? <Tabs on={s.screen === 'account' ? 'Home' : 'Perps'} /> : null}
 
       <MyAccount d={d} />
       <Ticket d={d} />
@@ -61,41 +65,6 @@ export function Phone({ d }: { d: Deck }) {
 }
 
 /* ---- chrome ----------------------------------------------------------- */
-
-function StatusBar() {
-  return (
-    <div className="dstat" aria-hidden="true">
-      <span className="dtime">12:03</span>
-      <span className="dnotch" />
-      <span className="dsig">
-        <i className="dbars" /><i className="dwifi" /><i className="dbat" />
-      </span>
-    </div>
-  );
-}
-
-const TAB_ICONS: Record<string, React.ReactNode> = {
-  Home: <path className="fl" d="M12 4.6l7.4 5.9V18a1.9 1.9 0 0 1-1.9 1.9H6.5A1.9 1.9 0 0 1 4.6 18v-7.5z" />,
-  Assets: <rect className="fl" x="4.4" y="6.4" width="15.2" height="11.2" rx="2.6" />,
-  Swap: <path d="M7 9.4h9l-2.4-2.4M17 14.6H8l2.4 2.4" />,
-  Perps: <><path d="M8.2 4.8v2.4M12 4.2v3M15.8 5.4v2.4" /><rect className="fl" x="6.9" y="7.2" width="2.6" height="9.6" rx="1.1" /><rect className="fl" x="14.5" y="7.8" width="2.6" height="7.2" rx="1.1" /></>,
-  Menu: <><rect className="fl" x="4.5" y="4.5" width="6.2" height="6.2" rx="1.9" /><rect className="fl" x="13.3" y="4.5" width="6.2" height="6.2" rx="1.9" /><rect className="fl" x="4.5" y="13.3" width="6.2" height="6.2" rx="1.9" /><rect className="fl" x="13.3" y="13.3" width="6.2" height="6.2" rx="1.9" /></>,
-};
-
-function Tabs({ screen }: { screen: PD['screen'] }) {
-  const on = screen === 'account' ? 'Home' : 'Perps';
-  return (
-    <nav className="dtabs" aria-label="App sections">
-      {(['Home', 'Assets', 'Swap', 'Perps', 'Menu'] as const).map((t) => (
-        <span className="dtab" key={t} aria-current={t === on ? 'page' : undefined}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
-               strokeLinecap="round" strokeLinejoin="round">{TAB_ICONS[t]}</svg>
-          <em>{t}</em>
-        </span>
-      ))}
-    </nav>
-  );
-}
 
 /* ---- 1 · the account -------------------------------------------------- */
 
@@ -668,17 +637,3 @@ function Passkey({ d }: { d: Deck }) {
 }
 
 /* ---- the layer every sheet rides on ----------------------------------- */
-
-function Layer({ open, onScrim, children }: {
-  open: boolean;
-  /** what tapping outside does; null makes the sheet modal, as the app does */
-  onScrim: (() => void) | null;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={'dlayer' + (open ? ' open' : '')} aria-hidden={!open}>
-      <span className={'dscrim' + live(onScrim)} {...press(open ? onScrim : null)} />
-      {children}
-    </div>
-  );
-}

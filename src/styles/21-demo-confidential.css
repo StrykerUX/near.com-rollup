@@ -1,0 +1,89 @@
+/* =========================================================================
+   /demo/confidential-deposit — the screens only this flow has
+   -------------------------------------------------------------------------
+   A three-stage header, a list of rules where the colour carries the meaning,
+   the network picker that names what it refuses, and the code at the end.
+   ========================================================================= */
+
+.drecv { display: contents }
+
+.dsub2 { display: block; font-size: 13px; font-weight: 500; margin-top: 12px }
+.dalpha, .dintern {
+  font-style: normal; font-size: 9px; letter-spacing: .04em; padding: 1px 5px;
+  border-radius: 4px; background: rgba(90, 150, 255, .18); color: #9CC0FF;
+  vertical-align: 2px; margin-left: 6px;
+}
+.dintern { background: rgba(38, 194, 129, .16); color: #6BE3AE; margin: 0 }
+.dfsub.small { font-size: 10.5px; margin-top: 12px }
+.dlink { color: #9CC0FF; text-decoration: underline }
+
+/* the three stages. The rail between them fills as they are passed, which is
+   the only thing that says these are ordered rather than merely three. */
+.dstages {
+  list-style: none; margin: 16px 0 0; padding: 0; flex: none;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+}
+.dstages li { position: relative; display: grid; justify-items: center; gap: 7px }
+.dstages li i {
+  width: 11px; height: 11px; border-radius: 50%; display: block;
+  border: 1.5px solid rgba(255, 255, 255, .28); background: #05070A; position: relative; z-index: 1;
+}
+.dstages li[data-state='on'] i { border-color: #fff; background: #fff }
+.dstages li[data-state='done'] i { border-color: transparent; background: #26C281 }
+.dstages li span { font-size: 10.5px; color: rgba(255, 255, 255, .42) }
+.dstages li[data-state='off'] span { color: rgba(255, 255, 255, .28) }
+.dstages li[data-state='on'] span { color: #fff }
+.dstages li:not(:last-child)::after {
+  content: ''; position: absolute; top: 5px; left: 50%; width: 100%; height: 1.5px;
+  background: rgba(255, 255, 255, .16);
+}
+.dstages li[data-state='done']::after { background: rgba(38, 194, 129, .5) }
+
+.dcard.flat { margin-top: 16px; padding: 4px 13px 13px }
+
+/* THE COLOUR IS THE CONTENT. A green dot is a condition; a red dot is a way
+   to lose the deposit, and the two must not be scanned as one list. */
+.drules { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 9px }
+.drules li {
+  display: grid; grid-template-columns: 9px 1fr; gap: 9px; align-items: start;
+  font-size: 11.5px; line-height: 1.4; color: rgba(255, 255, 255, .8);
+}
+.drules li i { width: 7px; height: 7px; border-radius: 50%; margin-top: 4px; display: block }
+.drules li[data-tone='ok'] i { background: #26C281 }
+.drules li[data-tone='no'] i { background: #E5484D }
+.drules li[data-tone='no'] { color: #F09A9D }
+.drules li u { text-decoration: underline }
+.drules.deposit { margin-top: 14px }
+
+.dnetm {
+  display: block; width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255, 255, 255, .08); border: 1px dashed rgba(255, 255, 255, .22);
+}
+.dnetm.set { background: rgba(255, 255, 255, .14); border-style: solid }
+.dnetm.near { background: var(--near-green); border: 0 }
+
+/* the code, and the wait before it */
+.dqrwrap {
+  margin-top: 14px; flex: none; background: rgba(255, 255, 255, .045);
+  border-radius: 16px; padding: 14px;
+}
+.dqrt { display: block; text-align: center; font-size: 13px; font-weight: 500 }
+.dqrt em { display: block; font-style: normal; font-size: 11px; color: rgba(255, 255, 255, .5); margin-top: 2px }
+.dinfo { font-style: normal; color: #E0A33A }
+.dqr {
+  width: 132px; height: 132px; margin: 13px auto 0; border-radius: 8px; background: #fff;
+  display: grid; place-items: center;
+}
+.dqrsvg { width: 118px; height: 118px; display: block; shape-rendering: crispEdges }
+.dqr .dspin { border-top-color: #111; border-color: rgba(0, 0, 0, .15); border-top-color: #111 }
+.daddr {
+  display: flex; justify-content: space-between; align-items: center; margin-top: 13px;
+  padding-top: 11px; border-top: 1px solid rgba(255, 255, 255, .07); font-size: 11px;
+  color: rgba(255, 255, 255, .45);
+}
+.daddr b { font-weight: 400; font-family: var(--font-mono); color: rgba(255, 255, 255, .85) }
+
+/* a refused row: present, named, and plainly not selectable */
+.dli.off { opacity: .38 }
+.dli.internal { padding: 10px 0 }
+.dgroup i { font-style: normal; opacity: .6 }

@@ -119,81 +119,111 @@ invalidates the engine's cached child lists. A breakpoint does not.
 
 ---
 
-## `/demo/perps` — the whole arc, one screen at a time
+## `/demo/*` — the five recordings, rebuilt
 
-A fourth route, and the only one that is not part of the composed page. `/` is a
-scrolling argument with a phone in it; `/demo/perps` is the app, at size, with
-the argument written beside it.
+Five routes that are not part of the composed page. `/` is a scrolling argument
+with a phone in it; `/demo/*` is the app, at size, with the argument written
+beside it. `/demo` indexes them.
 
-It was rebuilt off `_refs/rec-perps.MP4` at one frame per second — eight
-chapters, twenty-four steps, and everything the recording actually does:
+| Route | Recording | Steps | What it shows |
+|---|---|---|---|
+| `/demo/perps` | 5m 41s | 24 | Fund with a passkey, build a ticket, hit both validation rules, open a position |
+| `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
+| `/demo/earn` | 48s | 16 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
+| `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
+| `/demo/confidential-send` | 10s | 8 | A shielded asset sent from the same screen and the same list as any other |
 
-| Chapter | What the app does |
-|---|---|
-| The account | Crypto $7,811.50 · Perps $86.99 · Earn $2,347.79 on one card |
-| The market | BTC candles, Long/Short, Positions/Orders/**Trades (26)** |
-| Funding | $1,000 from near.com paid in NEAR — review sheet, **passkey**, three-part settlement |
-| The ticket | Available to trade, size, the **Adjust leverage** sheet, the Market/Limit menu |
-| Protection | The ⇄ that swaps the unit, and the two rules the ticket enforces |
-| Opening | A second passkey, then Set leverage / Submit order / Update TP/SL |
-| The position | Entry drawn on the chart, size, margin, liquidation, Orders (2) / Trades (27) |
-| Back out | The same balances card, with Perps at $1,086.99 |
+Each was read at **one frame per second** — the perps ticket at that rate is
+where the take-profit error, the unit swap and the leverage recomputation came
+from; a five-second sample had none of them.
 
-Three things about it are worth knowing.
+### How a demo page is built
+
+Four files per flow, and a shared shell:
+
+```
+shell/flow.ts     Chapter, Step, buildFlow — turns steps into a Machine
+shell/deck.ts     useDeck — one state, three drivers (clock, rail, finger)
+shell/Frame.tsx   the page, the rail, the transport, the device chrome
+shell/Screens.tsx the account card, the passkey, Universal Send
+
+<flow>/state.ts   the recording's figures, the derived ones, the transitions
+<flow>/script.ts  chapters and steps; each step's beats
+<flow>/Phone.tsx  the screens
+```
+
+Three things are true of all five.
 
 **The rail is navigation, not a caption.** Every step is a button that seeks. A
-step's beats are authored as a group, and its FIRST beat is its entrance — so
-clicking a step applies that beat immediately and starts the clock after it,
+step's beats are authored as a group and its FIRST beat is its entrance, so
+clicking a step applies that beat immediately and starts the clock after it —
 which is why the leading `ms` on a first beat costs a reader nothing.
 
 **Touching the app takes the wheel.** Any control whose guard passes is live.
 Firing an anchored transition moves the playhead to the step that transition
-belongs to, so a gesture scrubs the script instead of forking it — tap *Short*
-in the market and the story continues from sizing a short. Left alone for
-`IDLE_MS`, the clock resumes from there.
+belongs to, so a gesture scrubs the script instead of forking it. Anchors are
+declared by step id, not beat index:
 
-**The numbers are derived, and derived once.** `state.ts` holds the recording's
-figures and the formulas that reproduce the rest:
+```ts
+anchor: { pickPay: 'amount', payPicker: 'paywith' }
+```
+
+Beat indices shift every time a step gains a keystroke, and an anchor that
+silently drifted one beat left would be the worst kind of bug — it would still
+work.
+
+**Every figure is derived, once, from the recording.** `state.ts` holds what was
+on screen and the formula that reproduces the rest:
 
 ```ts
 /* Read straight off two frames of the leverage sheet: at 10x the ticket
-   estimates liquidation 7% below, at 20x it estimates 2% — which is
-   1/lev − 0.03 both times. */
+   estimates liquidation 7% below, at 20x it estimates 2% — 1/lev − 0.03. */
 export const MMR = 0.03;
 ```
 
-The recording quotes a third liquidation figure (3.7%) on the position card for
-the same position. We use one formula everywhere: a demo that shows two
-liquidation prices for one position is a bug a reader finds before they find
-the feature.
+The perps recording quotes a *third* liquidation figure (3.7%) on the position
+card for the same position. We use one formula everywhere: a demo that shows two
+liquidation prices for one position is a bug a reader finds before they find the
+feature.
 
-The same rule sent the live price through the chart. The header used to run its
-own `Ticker`, which meant the quote at the top and the candles under it were two
-different walks — and with a position open the entry line could sit below a
-price the position bar called a loss. `Chart` now takes an optional `readout`
-and writes the price, the change and (through `onTick`) the position's P&L
-straight to the DOM, off the candles it is actually drawing.
+### What the headless walk caught
 
-### Bugs this page turned up
+`pnpm check:flows` drives every machine with no browser: each scripted beat must
+be allowed by its own guard, `restFrame` and every anchor must name a real beat,
+and a breadth-first walk of free mode must find no refused `auto` and no dead
+end. It found all of these before a browser could.
 
-- **`auto` ran while the clock was paused.** The machine's self-advancing states
-  exist for when a reader holds the wheel and no script is running. The
-  condition also matched "paused", which quietly made the pause button a lie:
-  stop the script on a submitted order and the checklist finished anyway.
+- **A self-refusing stop loss.** The perps script typed a corrected value that
+  was still above the entry price, so `submit` refused itself and the script
+  never reached the position.
+- **The passkey was modal in the markup and not in the machine.** Opening the
+  token picker from under it stranded `signing` with nothing left to advance the
+  settlement. Both confidential-adjacent flows now wrap every other transition
+  in a `modal()` guard.
+- **A checklist that could not tick its last row.** `step` stopped at
+  `length - 1`, so the final row span forever. The index now runs one past the
+  last row, and the balance moves with that tick.
+- **`auto` ran while the clock was paused.** Self-advancing states exist for when
+  a reader holds the wheel; the condition also matched "paused", which made the
+  pause button a lie — stop the script on a submitted order and the checklist
+  finished anyway.
+
+### And what the browser caught
+
 - **A closed sheet was moved, not hidden.** `translate: 100%` shifts a sheet by
-  its own height — enough for a sheet sitting on the bottom edge, 90px short for
-  the passkey dialog that floats above it. Its top stayed on screen, so a Sign In
-  prompt peeked under every other screen. Now visibility flips after the slide.
+  its own height — enough for one sitting on the bottom edge, 90px short for the
+  passkey dialog that floats above it, whose top then stayed on screen under
+  every other screen.
 - **A sheet that fades while it slides is transparent for the length of the
   slide**, and what showed through on the way out of a submitted ticket was a
-  market that had already grown a position. The layer clips; sliding is enough.
-- **A zero-size frame killed the chart.** `if (!fit()) return` skipped the
-  rest of the frame *and* the next request — one unmeasured frame after mount
-  and the canvas was frozen for the life of the component. It now schedules
-  before it draws. (Latent; `/demo/perps` is where it was found.)
-
-`pnpm check:flows` walks this machine too — 82 beats, `account → market → fund →
-funding → market → account`.
+  market that had already grown a position.
+- **The header quoted its own price walk** while the candles ran another, so with
+  a position open the entry line could sit below a price the position bar called
+  a loss. `Chart` now takes an optional `readout` and writes the price, the
+  change and (through `onTick`) the P&L to the DOM off the candles it draws.
+- **A rule's text was split into grid cells.** `.drules li` is a two-column grid;
+  a bare text run beside an `<i>` becomes a grid item of its own, so "Only send
+  USDT on the Tron network" laid out as two overlapping fragments.
 
 ## Three versions of the same app
 
