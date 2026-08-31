@@ -31,6 +31,7 @@ const CHAPTERS: Chapter[] = [
   { id: 'ticket', name: 'Taking a position', blurb: 'The size you risk, and what leverage turns it into.' },
   { id: 'protect', name: 'Protection', blurb: 'Two rules — read against a price that has been held still.' },
   { id: 'position', name: 'The position', blurb: 'The same perp screen, with the trade on it.' },
+  { id: 'back', name: 'Back out', blurb: 'The same balance, seen from the account.' },
 ];
 
 const STEPS: Step<PD, PDAction>[] = [
@@ -38,23 +39,13 @@ const STEPS: Step<PD, PDAction>[] = [
   {
     id: 'market', ch: 'market',
     title: 'BTC, price and candles',
-    note: 'The pair and its picker, the price and its change, candles with the axis on the right. Positions is empty and says so; Trades already carries 26.',
+    note: 'The pair and its picker, the price and its change, candles with the axis on the right. Positions is empty and says so — the three lists under the chart are where the trade about to be made will land.',
     beats: [{ ms: 500 }],
-  },
-  {
-    id: 'lists', ch: 'market',
-    title: 'Positions · Orders · Trades',
-    note: 'Three lists under one chart. They are where the trade you are about to make will land, which is why they are on screen before you make it.',
-    beats: [
-      { ms: 2800, do: 'tab', arg: 'trd' },
-      { ms: 1900, do: 'tab', arg: 'ord' },
-      { ms: 1700, do: 'tab', arg: 'pos' },
-    ],
   },
   {
     id: 'sides', ch: 'market',
     title: 'Long or Short',
-    note: 'The two buttons are the whole entry point. Either one opens the same ticket with the sign reversed — and $1,087 available to trade.',
+    note: 'The two buttons are the whole entry point. Either one opens the same ticket with the sign reversed — and $5,429 available to trade.',
     beats: [{ ms: 2400, do: 'openTicket', arg: 'long' }],
   },
 
@@ -62,13 +53,13 @@ const STEPS: Step<PD, PDAction>[] = [
   {
     id: 'size', ch: 'ticket',
     title: 'Size here is margin, not notional',
-    note: '$700 of the $1,087. That number is what you put at risk; leverage decides what it turns into.',
-    beats: [...type_('key', '700', 1500, 300), { ms: 1300, do: 'done' }],
+    note: '$5,000 of the $5,429. That number is what you put at risk, and it is the only one you can lose; leverage decides what it turns into.',
+    beats: [...type_('key', '5000', 1500, 300), { ms: 1300, do: 'done' }],
   },
   {
     id: 'lev', ch: 'ticket',
     title: 'Leverage, and everything it moves',
-    note: 'The sheet takes 10x to 20x and the ticket recomputes: estimated trade value $7,000 to $14K, and estimated liquidation from 7% below entry to 2%.',
+    note: 'The sheet takes 10x to 20x and the whole ticket recomputes: $5,000 of margin becomes $100K of notional, 1.25543 BTC, and the estimated liquidation climbs from 7% below the entry to 2%.',
     beats: [
       { ms: 1700, do: 'levSheet' },
       { ms: 1000, do: 'levSet', arg: '13' },
@@ -76,6 +67,16 @@ const STEPS: Step<PD, PDAction>[] = [
       { ms: 280, do: 'levSet', arg: '21' },
       { ms: 320, do: 'levSet', arg: '20' },
       { ms: 1400, do: 'levSave' },
+    ],
+  },
+
+  {
+    id: 'otype', ch: 'ticket',
+    title: 'Market or Limit',
+    note: 'The menu explains each in one line: at the current price, or at one you name. Limit opens a second field — and the ticket will not submit without it.',
+    beats: [
+      { ms: 2000, do: 'otypeMenu' },
+      { ms: 2800, do: 'otypeMenu' },
     ],
   },
 
@@ -113,17 +114,10 @@ const STEPS: Step<PD, PDAction>[] = [
   {
     id: 'slerr', ch: 'protect',
     title: 'A stop loss sits below it',
-    note: '$79,974 is above the $79,654 entry — the same rule, mirrored. At $78,200 the ticket accepts and the market starts moving again.',
+    note: 'The same rule mirrored: below the entry on a long, above it on a short. $78,200 is 1.8% under $79,654 and the ticket takes it without argument — one refusal on this screen is a lesson, two in a row is a queue.',
     beats: [
       { ms: 1800, do: 'focus', arg: 'sl' },
-      ...type_('key', '79974', 1100, 300),
-      { ms: 2800, do: 'key', arg: '⌫' },
-      /* clearing is faster than typing — nobody reads what they are deleting */
-      { ms: 200, do: 'key', arg: '⌫' },
-      { ms: 200, do: 'key', arg: '⌫' },
-      { ms: 200, do: 'key', arg: '⌫' },
-      { ms: 200, do: 'key', arg: '⌫' },
-      ...type_('key', '78200', 850, 300),
+      ...type_('key', '78200', 1100, 300),
       { ms: 1300, do: 'done' },
     ],
   },
@@ -139,6 +133,13 @@ const STEPS: Step<PD, PDAction>[] = [
       { ms: 1500, do: 'ostep' },
       { ms: 1300, do: 'ostep' },
       { ms: 900, do: 'ostep' },
+    ],
+  },
+  {
+    id: 'checklist', ch: 'position',
+    title: 'Set leverage · Submit order · Update TP/SL',
+    note: 'The order settles in parts and the checklist marks them off in order. When the last one closes, the ticket empties and the position exists.',
+    beats: [
       { ms: 1500, do: 'ostep' },
       { ms: 1500, do: 'ostep' },
       { ms: 1900, do: 'ostep' },
@@ -153,12 +154,25 @@ const STEPS: Step<PD, PDAction>[] = [
   {
     id: 'detail', ch: 'position',
     title: 'Size, margin, liquidation',
-    note: '$14,000 of notional, 0.17576 BTC, $700 of margin, and the price the position closes itself at. Orders (2) is the take profit and the stop loss, now living as orders.',
+    note: '$100,000 of notional, 1.25543 BTC, $5,000 of margin, and the price the position closes itself at. The margin is the number that was typed; everything else was derived from it.',
+    beats: [{ ms: 2400, do: 'posOpen' }],
+  },
+  {
+    id: 'orders', ch: 'position',
+    title: 'Orders (2) and Trades (27)',
+    note: 'The take profit and the stop loss are not settings: they are two live orders, sitting in the list that was empty when this started. The opening trade is already in the history.',
     beats: [
-      { ms: 2400, do: 'posOpen' },
       { ms: 2800, do: 'tab', arg: 'ord' },
+      { ms: 2400, do: 'tab', arg: 'trd' },
       { ms: 2400, do: 'tab', arg: 'pos' },
+      { ms: 1800, do: 'posOpen' },
     ],
+  },
+  {
+    id: 'home', ch: 'back',
+    title: 'The balance, from the account',
+    note: 'Out of the market and back to the card the whole app hangs off. Perps reads $5,428.61 with its unrealized P&L underneath — the same money, seen from the other end.',
+    beats: [{ ms: 1600, do: 'home' }],
   },
 ];
 
@@ -172,11 +186,14 @@ export const perpsV2Flow = buildFlow<PD, PDAction>({
   anchor: {
     openTicket: 'size',
     levSheet: 'lev',
-    levSave: 'prot',
+    levSave: 'otype',
+    otypeMenu: 'otype',
     prot: 'hold',
     unit: 'tperr',
     submit: 'open',
     posOpen: 'detail',
+    tab: 'orders',
+    home: 'home',
   },
   /**
    * WHERE EACH TRANSITION IS PRESSED.
@@ -207,6 +224,7 @@ export const perpsV2Flow = buildFlow<PD, PDAction>({
          that is ticking itself is a lie about who is doing the work. */
       case 'ostep': return s.over === 'passkey' && s.auth === 'ask' ? 'passkey' : null;
       case 'posOpen': return 'posbar';
+      case 'home': return 'back';
       default: return null;
     }
   },

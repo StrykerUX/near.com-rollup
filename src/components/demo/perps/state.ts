@@ -159,8 +159,15 @@ export const initial: PD = {
  * balance begins at $86.99 and that funding it is a passkey away. v2 is about
  * the trade, so it opens where the trade opens — on the market, with the money
  * already there. Same machine, same transitions, different first frame.
+ *
+ * The balance is its own figure rather than the one the funding chapter lands
+ * on, because v2 does not have that chapter to contradict. It is sized for the
+ * position the page is there to show: $5,000 of margin at 20x is $100,000 of
+ * notional, and a demo of a leveraged product whose example trade is $14,000
+ * is a demo of the form, not of the leverage.
  */
-export const initialFunded: PD = { ...initial, screen: 'market', perps: PERPS_BAL_1 };
+export const PERPS_BAL_V2 = 5428.61;
+export const initialFunded: PD = { ...initial, screen: 'market', perps: PERPS_BAL_V2 };
 
 /* ---- derived, all of it ---------------------------------------------- */
 

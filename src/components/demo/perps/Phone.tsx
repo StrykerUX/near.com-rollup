@@ -97,7 +97,10 @@ function Account({ d }: { d: Deck }) {
   const crypto = funded ? CRYPTO_AFTER : CRYPTO_BAL;
   /* the headline is the sum of the three rows under it, always */
   const total = crypto + s.perps + EARN_BAL;
-  const pnl = s.pos ? 5.1 : null;
+  /* The recording shows +$5.10 unrealized on its $14,006 position — 0.0364% of
+     notional. Applied as a rate rather than pinned as a figure, so a page that
+     opens a $100,000 position does not report the P&L of a $14,000 one. */
+  const pnl = s.pos ? s.pos.size * 0.000364 : null;
   const perps = d.can('openPerps');
 
   return (
@@ -207,7 +210,7 @@ function Market({ d, paused = false }: { d: Deck; paused?: boolean }) {
   return (
     <div className="dmkt" ref={wrap}>
       <div className="dmhead">
-        <span className={'dback' + live(back)} {...press(back)} aria-label="Back">‹</span>
+        <span className={'dback' + live(back)} {...press(back)} data-tap="back" aria-label="Back">‹</span>
         <span className={'dbrief' + live(acct)} {...press(acct)} aria-label="My account">▤</span>
       </div>
 

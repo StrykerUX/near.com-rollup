@@ -20,9 +20,9 @@ const DEMOS = [
     href: '/demo/perps-v2',
     name: 'Perps v2',
     len: 'the same recording, cut',
-    steps: 13,
+    steps: 16,
     blurb:
-      'The trade on its own — no account, no funding. Opens on the market, takes a position, ends on the same screen with it. The market is held still while the stop loss and take profit are typed, because both rules are enforced against a fixed entry price.',
+      'The trade on its own — no account, no funding. $5,000 of margin into a $100,000 position, with the market held still while the stop loss and take profit are typed, because both rules are enforced against a fixed entry price.',
   },
   {
     href: '/demo/swap',
