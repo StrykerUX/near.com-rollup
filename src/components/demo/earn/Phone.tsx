@@ -5,6 +5,7 @@ import { live, press } from '@/components/stage/phone/ui/tap';
 import { TokenDot } from '@/components/stage/phone/TokenDot';
 import { findToken } from '@/lib/tokens';
 import { fmt } from '@/lib/format';
+import { Hand } from '@/components/demo/shell/Hand';
 import { Layer, StatusBar, Tabs } from '@/components/demo/shell/Frame';
 import { AccountScreen, PasskeySheet, UniversalSendScreen, usd } from '@/components/demo/shell/Screens';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -43,7 +44,7 @@ const dot = (sym: string) => {
 export function Phone({ d }: { d: Deck }) {
   const { s } = d;
   return (
-    <div className="pdev" data-screen={s.screen}>
+    <div className="pdev" data-screen={s.screen} data-motion="rich">
       <StatusBar time="12:09" />
       {/* keyed so a screen change remounts its blocks and they re-lay
           rather than being swapped between two frames */}
@@ -58,6 +59,12 @@ export function Phone({ d }: { d: Deck }) {
       <TokenPicker d={d} />
       <PayPicker d={d} />
       <PasskeySheet open={s.over === 'passkey'} auth={s.auth} onUse={d.can('step')} />
+
+      {/* Last, so it is over every sheet — a finger is. It rests on the control
+          that is about to be pressed when someone pauses to look, and leaves
+          only when a READER takes over, because then their own cursor is the
+          pointer and two of them is one too many. */}
+      <Hand hand={d.hand} on={!d.held} />
     </div>
   );
 }
@@ -68,6 +75,7 @@ function Account({ d }: { d: Deck }) {
   return (
     <AccountScreen
       explore
+      onSend={d.can('toSend')}
       rows={[
         {
           label: 'Crypto',
@@ -96,7 +104,8 @@ function Earn({ d }: { d: Deck }) {
   return (
     <div className="dearn">
       <div className="dmhead">
-        <span className={'dback' + live(d.can('home'))} {...press(d.can('home'))} aria-label="Back">‹</span>
+        <span className={'dback' + live(d.can('home'))} {...press(d.can('home'))} data-tap="back"
+              aria-label="Back">‹</span>
       </div>
       <b className="dftitle">Earn <i className="dbeta">Beta</i></b>
       <em className="dfsub">Put your idle assets to work.</em>
@@ -105,7 +114,8 @@ function Earn({ d }: { d: Deck }) {
         {(['vaults', 'staking'] as const).map((k) => {
           const on = d.can('tab', k);
           return (
-            <span className={'dlt' + (s.tab === k ? ' on' : '') + live(on)} key={k} {...press(on)}>
+            <span className={'dlt' + (s.tab === k ? ' on' : '') + live(on)} key={k} {...press(on)}
+                  data-tap={'tab:' + k}>
               {k === 'vaults' ? 'Vaults' : 'Staking'}
             </span>
           );
@@ -122,7 +132,7 @@ function Earn({ d }: { d: Deck }) {
           {VAULTS.map((v) => {
             const on = d.can('openVault', v.id);
             return (
-              <div className={'dli' + live(on)} key={v.id} {...press(on)}>
+              <div className={'dli' + live(on)} key={v.id} {...press(on)} data-tap={'vault:' + v.id}>
                 <TokenDot token={dot('USDC')} size={26} />
                 <span className="dlit">
                   <b>{v.name}{v.promo ? <i className="dpromo">Promo</i> : null}</b>
@@ -183,7 +193,8 @@ function VaultSheet({ d }: { d: Deck }) {
             <div className="dchecks left"><ProgressList steps={DEPOSIT_STEPS} at={s.step} /></div>
             <div className="dref"><span>Reference ID</span><b>{REFERENCE} ⧉</b></div>
             {finished
-              ? <span className={'dcta light' + live(d.can('close'))} {...press(d.can('close'))}>Close</span>
+              ? <span className={'dcta light' + live(d.can('close'))} {...press(d.can('close'))}
+                      data-tap="close">Close</span>
               : null}
           </>
         ) : (
@@ -192,7 +203,8 @@ function VaultSheet({ d }: { d: Deck }) {
               {(['Deposit', 'Withdraw'] as const).map((k) => {
                 const on = d.can('side', k);
                 return (
-                  <span className={'dsg' + (s.side === k ? ' on' : '') + live(on)} key={k} {...press(on)}>
+                  <span className={'dsg' + (s.side === k ? ' on' : '') + live(on)} key={k} {...press(on)}
+                        data-tap={'side:' + k}>
                     <em>{k}</em>
                   </span>
                 );
@@ -207,9 +219,10 @@ function VaultSheet({ d }: { d: Deck }) {
             <div className="davailrow">
               <TokenDot token={dot('USDC')} size={17} />
               <span>Available<i>{fmt(USDC_AVAIL, 2)} USDC</i></span>
-              <span className={'dmax' + live(max)} {...press(max)}>Use max</span>
+              <span className={'dmax' + live(max)} {...press(max)} data-tap="max">Use max</span>
             </div>
-            <span className={'dcta' + (go ? ' light' : ' off') + live(go)} {...press(go)}>
+            <span className={'dcta' + (go ? ' light' : ' off') + live(go)} {...press(go)}
+                  data-tap="deposit">
               {Number(s.amount) > 0 ? s.side : 'Enter an amount'}
             </span>
           </>
@@ -236,10 +249,11 @@ function Send({ d }: { d: Deck }) {
       amount={s.samount}
       usd={usd(sendUsd(s), 0)}
       cta={Number(s.samount) > 0 ? 'Review send' : 'Enter amount'}
+      onAmount={d.can('focus', 'send')}
       pay={
         <div className="davailrow">
           <TokenDot token={dot(s.pay === 'NEAR' ? 'NEAR' : 'USDC')} size={17} />
-          <span className={'dpaysel' + live(pay)} {...press(pay)}>{payLabel(s)} \u2304</span>
+          <span className={'dpaysel' + live(pay)} {...press(pay)} data-tap="paysel">{payLabel(s)} ⌄</span>
           <span className="dpaybal">Balance<i>
             {s.pay === 'NEAR' ? fmt(NEAR_QTY, 4) : `~${fmt(payBalance(s), 2)} USDC`}
           </i></span>
@@ -248,8 +262,8 @@ function Send({ d }: { d: Deck }) {
       }
       warn={needsAck(s) ? (
         <div className="dwarn">
-          <span>\u26a0 Some exchanges may not credit this transfer.</span>
-          <span className={'dchk' + (s.ack ? ' on' : '') + live(ack)} {...press(ack)}>
+          <span>⚠ Some exchanges may not credit this transfer.</span>
+          <span className={'dchk' + (s.ack ? ' on' : '') + live(ack)} {...press(ack)} data-tap="ack">
             <i className="dbox" />I understand.
           </span>
         </div>
@@ -286,7 +300,7 @@ function PickRow({ d, sym, name, right, note }: {
 }) {
   const on = d.can('pickToken', sym);
   return (
-    <div className={'dli' + live(on)} {...press(on)}>
+    <div className={'dli' + live(on)} {...press(on)} data-tap={'pick:' + sym}>
       <TokenDot token={dot(sym)} size={26} />
       <span className="dlit"><b>{sym}</b><em>{name}</em></span>
       {right ? <span className="dliv"><b>{right}</b><i>{note}</i></span> : null}
@@ -311,7 +325,7 @@ function PayPicker({ d }: { d: Deck }) {
         {VAULTS.map((v) => {
           const on = d.can('pickPay', v.id);
           return (
-            <div className={'dli' + live(on)} key={v.id} {...press(on)}>
+            <div className={'dli' + live(on)} key={v.id} {...press(on)} data-tap={'pay:' + v.id}>
               <TokenDot token={dot('USDC')} size={26} />
               <span className="dlit"><b>{v.name}</b><em>Yield vault</em></span>
               <span className="dliv">
@@ -323,7 +337,8 @@ function PayPicker({ d }: { d: Deck }) {
         })}
 
         <span className="dgroup">Your tokens</span>
-        <div className={'dli' + live(d.can('pickPay', 'NEAR'))} {...press(d.can('pickPay', 'NEAR'))}>
+        <div className={'dli' + live(d.can('pickPay', 'NEAR'))} {...press(d.can('pickPay', 'NEAR'))}
+             data-tap="pay:NEAR">
           <TokenDot token={dot('NEAR')} size={26} />
           <span className="dlit"><b>NEAR</b><em>Near</em></span>
           <span className="dliv"><b>{usd(NEAR_USD)}</b><i>{fmt(NEAR_QTY, 4)}</i></span>

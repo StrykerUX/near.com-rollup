@@ -150,7 +150,15 @@ const STEPS: Step<EA, EAAction>[] = [
     id: 'amount', ch: 'spend',
     title: '100 ZEC, paid from Gauntlet',
     note: 'The amount is in the token being sent; the balance under it is in the asset paying for it — the same Gauntlet vault, deposit and all. The app is holding both sides of a conversion nobody had to ask for.',
-    beats: [...type_('skey', '100', 1800, 260), { ms: 2000 }],
+    beats: [
+      /* the pad has to be UP before digits land in the figure above it. The
+         script typed straight into the amount with nothing on screen to type
+         with, which reads as the number filling itself in. */
+      { ms: 1700, do: 'focus', arg: 'send' },
+      ...type_('skey', '100', 1200, 300),
+      { ms: 1500, do: 'done' },
+      { ms: 1600 },
+    ],
   },
   {
     id: 'missing', ch: 'spend',
@@ -178,6 +186,40 @@ export const earnFlow = buildFlow<EA, EAAction>({
     pickToken: 'paywith',
     payPicker: 'paywith',
     pickPay: 'amount',
+  },
+  /**
+   * WHERE EACH TRANSITION IS PRESSED.
+   *
+   * The machine says what happens; this says where on the glass. The deck
+   * resolves the NEXT beat's target while the clock is still counting down to
+   * it, so the hand is already on the control when the state changes.
+   */
+  target: (a, arg, s) => {
+    switch (a) {
+      case 'toEarn': return 'row:earn';
+      case 'home': return 'back';
+      case 'tab': return `tab:${arg}`;
+      case 'openVault': return `vault:${arg ?? 'gauntlet'}`;
+      case 'side': return `side:${arg}`;
+      case 'max': return 'max';
+      case 'deposit': return 'deposit';
+      case 'close': return 'close';
+      case 'toSend': return 'send';
+      case 'tokenPicker': return 'row:token';
+      case 'pickToken': return `pick:${arg}`;
+      case 'payPicker': return 'paysel';
+      case 'pickPay': return `pay:${arg}`;
+      case 'ack': return 'ack';
+      case 'focus': return arg === 'send' ? 'amount' : null;
+      case 'skey': return arg ? `key:${arg}` : null;
+      case 'done': return 'done';
+      /* `step` runs six times to drive the passkey and then the checklist, and
+         only the first of them is a person pressing anything. The rest are the
+         network coming back — a hand hovering over a checklist that is ticking
+         itself is a lie about who is doing the work. */
+      case 'step': return s.over === 'passkey' && s.auth === 'ask' ? 'passkey' : null;
+      default: return null;
+    }
   },
   auto: (s) => {
     if (s.over === 'passkey') return { after: s.auth === 'done' ? 700 : 1100, do: 'step' };
