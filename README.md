@@ -281,7 +281,39 @@ unmounting it drops everything above it two hundred pixels in one frame.
 
 `/demo/perps` keeps the plainer motion and no hand. It has four more chapters
 to fill, and a screen that animates every list row for twenty-four steps
-fidgets.
+fidgets. Every other demo — swap, earn and both confidential flows — opts in.
+
+### What the hand is not allowed to point at
+
+Adding it to five pages turned the `target` map into the place where a flow has
+to be honest about who is doing the work, and most of that is written as
+`null`:
+
+- **A settlement checklist.** Eleven of swap's beats are `step` and `vstep`
+  advancing a spinner, and exactly one press hides among them. A hand hovering
+  over a list that is ticking itself claims a finger caused it.
+- **A refused control.** The confidential deposit picker lists the networks it
+  will not take, greyed and without handlers, precisely so they can be read.
+  `pickNet` resolves through the same guard the row is drawn with, so the
+  pointer can never land on something that would not answer.
+- **Typing that comes from a keyboard the mock does not draw.** The network
+  search field carries no press of its own — it is a picture of a field. The
+  hand goes off the glass for the run and comes back for the press after it.
+- **An address being minted.** `issue` is Continue's answer, not a tap, and it
+  also fires from `auto` with nobody at the screen.
+
+### What the hand found
+
+Pointing at a control is a claim that the control exists, so adding the hand
+surfaced three places where a script did something no reader could:
+
+- Universal Send opened from a beat while the account card's Receive and Send
+  buttons were inert spans. They take handlers now, and two flows start from
+  them.
+- An amount was typed straight into a figure with no keypad on screen, so
+  100 ZEC appeared to fill itself in.
+- The shared passkey sheet reached the DOM with nothing to aim at, which had a
+  flow stamping a tap id onto another component's markup after render.
 
 ### What the headless walk caught
 
