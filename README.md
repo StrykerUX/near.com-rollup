@@ -130,14 +130,14 @@ chapters, twenty-four steps, and everything the recording actually does:
 
 | Chapter | What the app does |
 |---|---|
-| La cuenta | Crypto $7,811.50 · Perps $86.99 · Earn $2,347.79 on one card |
-| El mercado | BTC candles, Long/Short, Positions/Orders/**Trades (26)** |
-| Fondear | $1,000 from near.com paid in NEAR — review sheet, **passkey**, three-part settlement |
-| El ticket | Available to trade, size, the **Adjust leverage** sheet, the Market/Limit menu |
-| Protección | The ⇄ that swaps the unit, and the two rules the ticket enforces |
-| Abrir | A second passkey, then Set leverage / Submit order / Update TP/SL |
-| La posición | Entry drawn on the chart, size, margin, liquidation, Orders (2) / Trades (27) |
-| De vuelta | The same balances card, with Perps at $1,086.99 |
+| The account | Crypto $7,811.50 · Perps $86.99 · Earn $2,347.79 on one card |
+| The market | BTC candles, Long/Short, Positions/Orders/**Trades (26)** |
+| Funding | $1,000 from near.com paid in NEAR — review sheet, **passkey**, three-part settlement |
+| The ticket | Available to trade, size, the **Adjust leverage** sheet, the Market/Limit menu |
+| Protection | The ⇄ that swaps the unit, and the two rules the ticket enforces |
+| Opening | A second passkey, then Set leverage / Submit order / Update TP/SL |
+| The position | Entry drawn on the chart, size, margin, liquidation, Orders (2) / Trades (27) |
+| Back out | The same balances card, with Perps at $1,086.99 |
 
 Three things about it are worth knowing.
 

@@ -27,14 +27,14 @@ export type Step = {
 };
 
 export const CHAPTERS: Chapter[] = [
-  { id: 'account', name: 'La cuenta', blurb: 'Una sola pantalla para custodia, perps y rendimiento.' },
-  { id: 'market', name: 'El mercado', blurb: 'Precio, posiciones y el estado de tu cuenta de perps.' },
-  { id: 'fund', name: 'Fondear', blurb: 'Mover saldo de near.com a la cuenta de perps, firmado con passkey.' },
-  { id: 'ticket', name: 'El ticket', blurb: 'Tamaño, apalancamiento y tipo de orden.' },
-  { id: 'protect', name: 'Protección', blurb: 'Take profit y stop loss, con las reglas que el mercado impone.' },
-  { id: 'open', name: 'Abrir', blurb: 'Firmar y ver la orden liquidarse por partes.' },
-  { id: 'position', name: 'La posición', blurb: 'Lo que queda vivo después de la orden.' },
-  { id: 'back', name: 'De vuelta', blurb: 'El mismo saldo, visto desde la cuenta.' },
+  { id: 'account', name: 'The account', blurb: 'One screen for custody, perps and yield.' },
+  { id: 'market', name: 'The market', blurb: 'Price, positions, and the state of your perps account.' },
+  { id: 'fund', name: 'Funding', blurb: 'Moving balance from near.com into the perps account, signed with a passkey.' },
+  { id: 'ticket', name: 'The ticket', blurb: 'Size, leverage and order type.' },
+  { id: 'protect', name: 'Protection', blurb: 'Take profit and stop loss, and the rules the market imposes.' },
+  { id: 'open', name: 'Opening', blurb: 'Sign it, and watch the order settle in parts.' },
+  { id: 'position', name: 'The position', blurb: 'What stays alive once the order is done.' },
+  { id: 'back', name: 'Back out', blurb: 'The same balance, seen from the account.' },
 ];
 
 /** a digit run, typed rather than pasted */
@@ -42,31 +42,31 @@ const type_ = (act: PDAction, chars: string, lead = 900, gap = 165): Beat<PD, PD
   chars.split('').map((c, i) => ({ ms: i === 0 ? lead : gap, do: act, arg: c }));
 
 export const STEPS: Step[] = [
-  /* ---- 1 · la cuenta ------------------------------------------------- */
+  /* ---- 1 · the account ----------------------------------------------- */
   {
     id: 'balances', ch: 'account',
-    title: 'Balances en una tarjeta',
-    note: 'Crypto $7,811.50, Perps $86.99 y Earn $2,347.79 conviven en la misma cuenta. La fila de Perps anuncia su propia oferta: hasta 50x.',
+    title: 'Balances on one card',
+    note: 'Crypto $7,811.50, Perps $86.99 and Earn $2,347.79 live in the same account. The Perps row makes its own offer: up to 50x leverage.',
     beats: [{ ms: 500 }],
   },
   {
     id: 'toperps', ch: 'account',
-    title: 'Entrar a Perps',
-    note: 'La fila es la puerta. No hay onboarding, ni una segunda app: el mercado abre sobre la misma cuenta.',
+    title: 'Into Perps',
+    note: 'The row is the door. No onboarding, no second app \u2014 the market opens on the account you already have.',
     beats: [{ ms: 3000, do: 'openPerps' }],
   },
 
-  /* ---- 2 · el mercado ------------------------------------------------ */
+  /* ---- 2 · the market ------------------------------------------------ */
   {
     id: 'chart', ch: 'market',
-    title: 'BTC, precio y velas',
-    note: 'Par arriba con su selector, precio y variación, velas con eje de precio a la derecha y marco temporal 1H abajo. Long y Short son lo único que pide la pantalla.',
+    title: 'BTC, price and candles',
+    note: 'The pair and its picker up top, price and change under it, candles with the price axis on the right, timeframe below. Long and Short are the only things the screen asks for.',
     beats: [{ ms: 2900 }],
   },
   {
     id: 'tabs', ch: 'market',
-    title: 'Positions · Orders · Trades',
-    note: 'Las tres listas viven bajo el chart. Trades ya trae 26 operaciones; Positions está vacía y lo dice con todas sus letras.',
+    title: 'Positions \u00b7 Orders \u00b7 Trades',
+    note: 'All three lists live under the chart. Trades already carries 26; Positions is empty, and says so in full rather than showing nothing.',
     beats: [
       { ms: 2600, do: 'tab', arg: 'trd' },
       { ms: 1900, do: 'tab', arg: 'ord' },
@@ -76,33 +76,33 @@ export const STEPS: Step[] = [
   {
     id: 'myaccount', ch: 'market',
     title: 'My account',
-    note: 'Equity $86.99, PNL sin realizar $0.00, margen en uso $0.00 y disponible $86.99. Con ese saldo no hay operación posible — de ahí sale Deposit.',
+    note: 'Total equity $86.99, unrealized PNL $0.00, margin in use $0.00, available $86.99. No trade is possible on that balance \u2014 which is what Deposit is for.',
     beats: [{ ms: 2300, do: 'acct' }],
   },
 
-  /* ---- 3 · fondear --------------------------------------------------- */
+  /* ---- 3 · funding --------------------------------------------------- */
   {
     id: 'fund', ch: 'fund',
     title: 'Fund Perps Account',
-    note: 'Mueve USDC de tu cuenta near.com a la de perps. El saldo que paga no tiene que ser USDC: aquí paga NEAR y la ruta convierte.',
+    note: 'Moves USDC from your near.com account into the perps one. What pays for it need not be USDC: here NEAR pays, and the route converts on the way.',
     beats: [{ ms: 2700, do: 'deposit' }],
   },
   {
     id: 'amount', ch: 'fund',
-    title: 'Cuánto, y con qué pagas',
-    note: '$1,000 al teclado, y la fila «Pay NEAR» dice de dónde salen: $7,682 disponibles.',
+    title: 'How much, and what pays',
+    note: '$1,000 on the keypad, and the Pay NEAR row says where it comes from: $7,682 available.',
     beats: [...type_('fkey', '1000', 2000), { ms: 900 }],
   },
   {
     id: 'review', ch: 'fund',
     title: 'Review send',
-    note: 'La hoja pone el precio completo antes de firmar: recibe 1000 USDC, comisión 0 NEAR, pagas como máximo 539.096 NEAR, deslizamiento máximo 0.50%, ~22 segundos.',
+    note: 'The sheet states the whole price before you sign: 1,000 USDC received, 0 NEAR in fees, 539.096 NEAR at most, 0.50% maximum slippage, about 22 seconds.',
     beats: [{ ms: 1700, do: 'fundReview' }],
   },
   {
     id: 'passkey', ch: 'fund',
-    title: 'Firmar con passkey',
-    note: 'No hay contraseña ni frase semilla: Face ID contra la passkey guardada para near.com. Nada se mueve hasta que esa firma vuelve.',
+    title: 'Sign with a passkey',
+    note: 'No password and no seed phrase: Face ID against the passkey saved for near.com. Nothing moves until that signature comes back.',
     beats: [
       { ms: 3000, do: 'fundSend' },
       { ms: 1100, do: 'authOk' },
@@ -112,8 +112,8 @@ export const STEPS: Step[] = [
   },
   {
     id: 'settle', ch: 'fund',
-    title: 'Processing · Sending · Complete',
-    note: 'El envío se liquida por partes y cada parte se marca sola. Al cerrar la última, el saldo de perps pasa de $86.99 a $1,086.99.',
+    title: 'Processing \u00b7 Sending \u00b7 Complete',
+    note: 'The send settles in parts, and each part ticks itself off. When the last one closes, the perps balance goes from $86.99 to $1,086.99.',
     beats: [
       { ms: 1500, do: 'fstep' },
       { ms: 2100, do: 'fstep' },
@@ -124,11 +124,11 @@ export const STEPS: Step[] = [
     ],
   },
 
-  /* ---- 4 · el ticket ------------------------------------------------- */
+  /* ---- 4 · the ticket ------------------------------------------------ */
   {
     id: 'toticket', ch: 'ticket',
-    title: 'Long o Short',
-    note: 'De vuelta al mercado, con $1,087 disponibles para operar. El lado que elijas abre el mismo ticket con distinto signo.',
+    title: 'Long or Short',
+    note: 'Back on the market, with $1,087 available to trade. Whichever side you pick opens the same ticket with the sign reversed.',
     beats: [
       { ms: 2600, do: 'closeFund' },
       { ms: 2400, do: 'openTicket', arg: 'long' },
@@ -136,14 +136,14 @@ export const STEPS: Step[] = [
   },
   {
     id: 'size', ch: 'ticket',
-    title: 'El tamaño es margen, no nocional',
-    note: '$700 de los $1,087. Ese número es lo que arriesgas; el apalancamiento decide en qué se convierte.',
+    title: 'Size here is margin, not notional',
+    note: '$700 of the $1,087. That number is what you put at risk; leverage decides what it turns into.',
     beats: [...type_('key', '700', 1700, 190), { ms: 1100, do: 'done' }],
   },
   {
     id: 'lev', ch: 'ticket',
-    title: 'Apalancamiento',
-    note: 'La hoja mueve 10x a 20x y todo el ticket se recalcula: valor estimado de $7,000 a $14K, y la liquidación estimada sube de 7% a 2% por debajo de la entrada.',
+    title: 'Leverage',
+    note: 'The sheet moves 10x to 20x and the whole ticket recomputes: estimated trade value $7,000 to $14K, and estimated liquidation climbs from 7% below entry to 2%.',
     beats: [
       { ms: 1700, do: 'levSheet' },
       { ms: 1100, do: 'levSet', arg: '13' },
@@ -156,31 +156,31 @@ export const STEPS: Step[] = [
   },
   {
     id: 'otype', ch: 'ticket',
-    title: 'Market o Limit',
-    note: 'El menú explica cada uno en una línea: al precio actual, o a un precio que tú pones. Limit abre un campo más — y el ticket no se envía sin él.',
+    title: 'Market or Limit',
+    note: 'The menu explains each in one line: at the current price, or at one you name. Limit opens a second field \u2014 and the ticket will not submit without it.',
     beats: [
       { ms: 2000, do: 'otypeMenu' },
       { ms: 3000, do: 'otypeMenu' },
     ],
   },
 
-  /* ---- 5 · protección ------------------------------------------------ */
+  /* ---- 5 · protection ------------------------------------------------ */
   {
     id: 'prot', ch: 'protect',
     title: 'Add profit taker / stop loss',
-    note: 'Una casilla abre los dos campos. Ambos nacen en porcentaje: una distancia respecto a la entrada, no un precio.',
+    note: 'One checkbox opens both fields. Both start as percentages \u2014 a distance from the entry, not a price.',
     beats: [{ ms: 2200, do: 'prot' }],
   },
   {
     id: 'unit', ch: 'protect',
-    title: 'El ⇄ cambia la unidad',
-    note: 'Y limpia el campo, que es lo correcto: 82000 significa una cosa como precio y ninguna como porcentaje.',
+    title: 'The \u21c4 swaps the unit',
+    note: 'And empties both fields, which is right: 82000 means one thing as a price and nothing at all as a percentage.',
     beats: [...type_('key', '82000', 1500), { ms: 1600, do: 'unit', arg: 'tp' }],
   },
   {
     id: 'tperr', ch: 'protect',
-    title: 'El take profit va arriba de la entrada',
-    note: 'Con $2 el ticket se niega: «Take profit must be above entry price», y el botón deja de decir Open long para decir Review take profit. Corregido a $82,000, vuelve.',
+    title: 'A take profit sits above the entry',
+    note: 'At $2 the ticket refuses \u2014 \u201cTake profit must be above entry price\u201d \u2014 and the button stops saying Open long and starts saying Review take profit. Corrected to $82,000, it comes back.',
     beats: [
       { ms: 1300, do: 'key', arg: '2' },
       { ms: 2600, do: 'key', arg: '⌫' },
@@ -189,8 +189,8 @@ export const STEPS: Step[] = [
   },
   {
     id: 'slerr', ch: 'protect',
-    title: 'El stop loss va abajo',
-    note: '$79,974 queda por encima de la entrada de $79,654 — es la misma regla, invertida. A $78,200 el ticket acepta.',
+    title: 'A stop loss sits below it',
+    note: '$79,974 is above the $79,654 entry \u2014 the same rule, mirrored. At $78,200 the ticket accepts.',
     beats: [
       { ms: 1800, do: 'focus', arg: 'sl' },
       ...type_('key', '79974', 900),
@@ -204,11 +204,11 @@ export const STEPS: Step[] = [
     ],
   },
 
-  /* ---- 6 · abrir ----------------------------------------------------- */
+  /* ---- 6 · opening --------------------------------------------------- */
   {
     id: 'submit', ch: 'open',
     title: 'Open long',
-    note: 'Otra passkey. La orden lleva tres cosas —apalancamiento, orden y protecciones— y las manda como una sola intención firmada.',
+    note: 'Another passkey. The order carries three things \u2014 the leverage, the order itself and the protections \u2014 and sends them as one signed intent.',
     beats: [
       { ms: 2400, do: 'submit' },
       { ms: 1200, do: 'ostep' },
@@ -218,8 +218,8 @@ export const STEPS: Step[] = [
   },
   {
     id: 'checklist', ch: 'open',
-    title: 'Set leverage · Submit order · Update TP/SL',
-    note: 'La orden se liquida por partes y el checklist las marca en orden. Al cerrar la última, el ticket se vacía y la posición existe.',
+    title: 'Set leverage \u00b7 Submit order \u00b7 Update TP/SL',
+    note: 'The order settles in parts and the checklist marks them off in order. When the last one closes, the ticket empties and the position exists.',
     beats: [
       { ms: 1500, do: 'ostep' },
       { ms: 1500, do: 'ostep' },
@@ -227,23 +227,23 @@ export const STEPS: Step[] = [
     ],
   },
 
-  /* ---- 7 · la posición ----------------------------------------------- */
+  /* ---- 7 · the position ---------------------------------------------- */
   {
     id: 'entry', ch: 'position',
-    title: 'La entrada, dibujada',
-    note: 'La línea azul de $79,654 queda en el chart y la barra de posición aparece bajo él, con Modify y Close a la mano.',
+    title: 'The entry, drawn',
+    note: 'The blue $79,654 line stays on the chart, and the position bar appears beneath it with Modify and Close within reach.',
     beats: [{ ms: 2800 }],
   },
   {
     id: 'detail', ch: 'position',
-    title: 'Tamaño, margen, liquidación',
-    note: 'La barra se despliega: $14,000 de nocional, 0.17575 BTC, $700 de margen y el precio al que la posición se cierra sola.',
+    title: 'Size, margin, liquidation',
+    note: 'The bar unfolds: $14,000 of notional, 0.17576 BTC, $700 of margin, and the price at which the position closes itself.',
     beats: [{ ms: 2400, do: 'posOpen' }],
   },
   {
     id: 'orders', ch: 'position',
-    title: 'Orders (2) y Trades (27)',
-    note: 'El take profit y el stop loss no son ajustes: son dos órdenes vivas. Y la operación de apertura ya está en el historial.',
+    title: 'Orders (2) and Trades (27)',
+    note: 'The take profit and the stop loss are not settings: they are two live orders. And the opening trade is already in the history.',
     beats: [
       { ms: 2800, do: 'tab', arg: 'ord' },
       { ms: 2400, do: 'tab', arg: 'trd' },
@@ -255,11 +255,11 @@ export const STEPS: Step[] = [
     ],
   },
 
-  /* ---- 8 · de vuelta ------------------------------------------------- */
+  /* ---- 8 · back out -------------------------------------------------- */
   {
     id: 'home', ch: 'back',
-    title: 'El saldo, desde la cuenta',
-    note: 'La misma tarjeta del principio: Perps ya no dice $86.99 sino $1,086.99, con su P&L sin realizar debajo.',
+    title: 'The balance, from the account',
+    note: 'The same card as the start: Perps no longer reads $86.99 but $1,086.99, with its unrealized P&L underneath.',
     beats: [{ ms: 1400, do: 'home' }],
   },
 ];

@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import { PerpsDemo } from '@/components/demo/perps/PerpsDemo';
 
 export const metadata: Metadata = {
-  title: 'Perps, paso a paso — near.com',
+  title: 'Perps, step by step — near.com',
   description:
-    'La app de perpetuos de near.com reconstruida cuadro por cuadro: fondear con passkey, armar el ticket, las reglas de take profit y stop loss, y la posición que sale de ahí.',
+    "near.com's perpetuals app rebuilt frame by frame: funding with a passkey, building the ticket, the take profit and stop loss rules, and the position that comes out of it.",
 };
 
 export default function Page() {

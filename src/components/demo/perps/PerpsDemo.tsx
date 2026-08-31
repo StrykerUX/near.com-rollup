@@ -6,7 +6,7 @@ import { useDeck } from './player';
 import { CHAPTERS, STEPS } from './script';
 
 /**
- * PERPS, PASO A PASO
+ * PERPS, STEP BY STEP
  * ==================================================================
  * The page is two columns that share one clock: the app, and the argument for
  * what the app is doing. Neither is a caption on the other — the rail is
@@ -21,16 +21,16 @@ export function PerpsDemo() {
     <main className="pd">
       <header className="pdtop">
         <Link className="pdback" href="/">← near.com × The Rollup</Link>
-        <h1>Perps, paso a paso</h1>
+        <h1>Perps, step by step</h1>
         <p>
-          La app de perpetuos de near.com, reconstruida cuadro por cuadro: fondear con passkey,
-          armar el ticket, chocar con las dos reglas que impone el mercado y abrir la posición.
-          Corre sola — y acepta que la toques.
+          near.com&rsquo;s perpetuals app, rebuilt frame by frame: fund it with a passkey, build
+          the ticket, run into the two rules the market imposes, and open the position. It plays
+          on its own &mdash; and it lets you take the controls.
         </p>
         <nav className="pdlinks">
           <Link href="/">Demo</Link>
-          <Link href="/guided">Guiada</Link>
-          <Link href="/live">Libre</Link>
+          <Link href="/guided">Guided</Link>
+          <Link href="/live">Live</Link>
         </nav>
       </header>
 
@@ -38,7 +38,7 @@ export function PerpsDemo() {
         <div className="pdstage">
           <div className="pdphone">
             <Phone d={d} />
-            {d.held ? <span className="pdheld">Tienes el control · retoma sola</span> : null}
+            {d.held ? <span className="pdheld">You have the wheel &middot; resuming shortly</span> : null}
           </div>
           <Transport d={d} />
         </div>
@@ -59,12 +59,12 @@ function Transport({ d }: { d: ReturnType<typeof useDeck> }) {
     <div className="pdbar">
       <span className="pdprog"><i style={{ transform: `scaleX(${d.progress})` }} /></span>
       <div className="pdctl">
-        <button type="button" onClick={d.prev} aria-label="Paso anterior">‹</button>
+        <button type="button" onClick={d.prev} aria-label="Previous step">‹</button>
         <button type="button" onClick={d.toggle} className="pdplay"
-                aria-label={d.playing ? 'Pausar' : 'Reproducir'}>
+                aria-label={d.playing ? 'Pause' : 'Play'}>
           {d.playing ? '❙❙' : '▶'}
         </button>
-        <button type="button" onClick={d.next} aria-label="Paso siguiente">›</button>
+        <button type="button" onClick={d.next} aria-label="Next step">›</button>
         <span className="pdcount">{d.step + 1} / {STEPS.length}</span>
       </div>
     </div>
