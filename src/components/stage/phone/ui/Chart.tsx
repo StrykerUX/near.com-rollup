@@ -38,25 +38,46 @@ function rng(seed: number) {
 }
 
 /**
- * A gently rising walk with real wicks. The drift is positive because the
- * screen it sits behind is showing a long that is in profit — a chart falling
- * under a green PNL is the kind of detail that makes a mock look fake.
+ * THE PRICE IS A FUNCTION OF THE CANDLE'S NUMBER, NOT A LIST TO SCROLL
+ * ------------------------------------------------------------------
+ * This used to be a 46-entry array of a drifting random walk, and the view
+ * scrolled through it with `data[(i + shift) % CANDLES]`. That wraps — and
+ * the walk was 620 points higher at the end than at the start, so the moment
+ * the window crossed the seam the chart FELL OFF A CLIFF and started climbing
+ * again from the bottom. The candles either side of that seam were both
+ * honest; the join between them was not.
+ *
+ * So there is no array and no seam. `walk(k)` is three sines at periods with
+ * no common multiple: continuous by construction, bounded (±840), and never
+ * visibly repeating. Candle k opens at walk(k) and closes at walk(k+1), which
+ * means every candle's open IS the previous candle's close — the one property
+ * the wrap destroyed.
+ *
+ * It also fixed something the drift was papering over. A permanently rising
+ * chart was chosen so a long would read as being in profit; a market that only
+ * goes up is a worse lie than a position that is sometimes down, and the
+ * recordings show the P&L crossing zero repeatedly.
  */
-function series(count: number, seed = 7): Candle[] {
-  const r = rng(seed);
-  const out: Candle[] = [];
-  let price = BASE_PRICE - 620;
-  for (let i = 0; i < count; i++) {
-    const drift = 16;
-    const vol = 110;
-    const o = price;
-    const c = o + drift + (r() - 0.5) * vol;
-    const hi = Math.max(o, c) + r() * vol * 0.45;
-    const lo = Math.min(o, c) - r() * vol * 0.45;
-    out.push({ o, h: hi, l: lo, c });
-    price = c;
-  }
-  return out;
+function walk(k: number) {
+  return (
+    Math.sin(k * 0.083 + 1.7) * 420 +
+    Math.sin(k * 0.21) * 300 +
+    Math.sin(k * 0.53 + 0.4) * 120
+  );
+}
+
+/** the wicks, keyed to the candle's own number so they never move once drawn */
+function candle(k: number): Candle {
+  const r = rng(k * 2654435761);
+  const o = BASE_PRICE + walk(k);
+  const c = BASE_PRICE + walk(k + 1);
+  const reach = 34 + r() * 74;
+  return {
+    o,
+    c,
+    h: Math.max(o, c) + r() * reach,
+    l: Math.min(o, c) - r() * reach,
+  };
 }
 
 export type ChartProps = {
@@ -106,7 +127,6 @@ export function Chart({ entry = null, side = null, live = true, readout }: Chart
     const ctx = cv.getContext('2d');
     if (!ctx) return;
 
-    const data = series(CANDLES);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let raf = 0;
     let t0 = 0;
@@ -140,10 +160,12 @@ export function Chart({ entry = null, side = null, live = true, readout }: Chart
       /* The live candle: its close travels from the previous close toward its
          own, so the body grows out of the last one instead of appearing. */
       const phase = reduce ? 1 : ((now - t0) % CANDLE_MS) / CANDLE_MS;
-      const shift = reduce ? 0 : Math.floor((now - t0) / CANDLE_MS) % CANDLES;
+      /* no modulo: the window walks forward for as long as anyone watches, and
+         `walk` is what keeps the price in range rather than the array's end */
+      const shift = reduce ? 0 : Math.floor((now - t0) / CANDLE_MS);
       const view: Candle[] = [];
       for (let i = 0; i < CANDLES; i++) {
-        const src = data[(i + shift) % CANDLES];
+        const src = candle(i + shift);
         view.push(i === CANDLES - 1
           ? { ...src, c: src.o + (src.c - src.o) * phase,
               h: src.o + (src.h - src.o) * phase, l: src.o + (src.l - src.o) * phase }
