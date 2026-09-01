@@ -33,6 +33,14 @@ const DEMOS = [
       'Half as much on screen and nothing to follow. No pointer — the control about to change lights itself, and every derived figure travels to its new value, so the link between the slider and the number that answered is the thing you watch.',
   },
   {
+    href: '/demo/perps-v4',
+    name: 'Perps v4',
+    len: 'the marketing cut',
+    steps: 8,
+    blurb:
+      'The same trade as a film. One line of copy at a time, and a camera that pushes in on whatever the moment is about — the map that used to move a pointer now moves the frame.',
+  },
+  {
     href: '/demo/swap',
     name: 'Swap',
     len: '1m 14s',

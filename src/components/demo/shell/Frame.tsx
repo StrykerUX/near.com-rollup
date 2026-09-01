@@ -39,6 +39,7 @@ export function DemoPage<S, A extends string>({
           <Link href="/demo/perps">Perps</Link>
           <Link href="/demo/perps-v2">Perps v2</Link>
           <Link href="/demo/perps-v3">Perps v3</Link>
+          <Link href="/demo/perps-v4">Perps v4</Link>
           <Link href="/demo/swap">Swap</Link>
           <Link href="/demo/earn">Earn</Link>
           <Link href="/demo/confidential-deposit">Confidential deposit</Link>

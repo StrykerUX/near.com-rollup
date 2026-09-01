@@ -130,6 +130,7 @@ beside it. `/demo` indexes them.
 | `/demo/perps` | 5m 41s | 24 | Fund with a passkey, build a ticket, hit both validation rules, open a position |
 | `/demo/perps-v2` | the same, cut | 16 | The trade alone: $5,000 of margin into a $100,000 position, and back to the card |
 | `/demo/perps-v3` | the same, quieter | 9 | Half the screen, no pointer: the control lights itself and the figures travel |
+| `/demo/perps-v4` | the marketing cut | 8 | One line of copy at a time, and a camera that pushes in on the moment |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
 | `/demo/earn` | 48s | 17 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
@@ -351,6 +352,42 @@ The chart gained a rule from this too. On a tall chart the gridlines are dense
 enough that one of them always lands under the live price or the entry chip, so
 a label at the same height as a chip is now skipped — a second price in the same
 place is not an axis.
+
+### v4, and the third thing built on one map
+
+A flow declares where each transition lands — `target` names a control's
+`data-tap`. That map has now driven three different things, and it is the same
+map every time:
+
+| | reads `target` as |
+|---|---|
+| `Hand` (v2) | a pointer that travels there before the beat presses it |
+| `Spotlight` (v3) | a ring that lights on it where it already is |
+| `Camera` (v4) | a frame that pushes in and centres on it |
+
+v4 is the cut you would put in front of a room. The phone is the only object on
+the page, the copy is one line at a time beside it, and the camera moves. Steps
+declare their own framing (`shot`) and, when a figure is the point, what to hang
+on it (`callout`). Every beat is longer than anywhere else: a push in, a hold
+and a pull back is three seconds of screen time on its own, and a cut that lands
+before the eye has arrived is a cut nobody saw.
+
+It borrows v3's device wholesale, because what v4 adds is not inside the phone.
+It is where the phone is looked at from.
+
+Two things the camera taught us, both of which read as bugs before they were
+understood:
+
+- **The frame and the camera have to be two elements.** `overflow: hidden`
+  clips a box's children against that box — but if the box is itself scaled, so
+  is the clip. Putting both on one element meant a 1.45x push-in GREW the phone
+  instead of looking into it: the vignette spilled a hundred pixels past the
+  bezel and took the rounded corners with it.
+- **Never crop the thing you are framing.** A declared zoom is a wish. The
+  leverage shot asked for 1.45 on a row that spans the whole device and cut off
+  the figure it existed to show, so the camera now clamps to the most it can
+  grant before the target's own ends leave the frame — and the shot was
+  retargeted from the row to the figure inside it.
 
 ### What the headless walk caught
 

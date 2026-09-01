@@ -19,6 +19,15 @@ import { applyBeat, type Beat, type Machine } from '@/components/stage/phone/flo
 
 export type Chapter = { id: string; name: string; blurb: string };
 
+/**
+ * WHERE THE CAMERA STANDS FOR A STEP.
+ *
+ * Only the marketing cut reads this. `on` is the `data-tap` of a control or any
+ * selector inside the device; `z` is how far in. Absent means the wide shot,
+ * which is also what a step gets when the thing it names is not on screen yet.
+ */
+export type Shot = { on?: string; z?: number };
+
 export type Step<S, A extends string> = {
   id: string;
   /** the chapter this step belongs to */
@@ -28,6 +37,10 @@ export type Step<S, A extends string> = {
   /** what the app is doing, and which number moved */
   note: string;
   beats: Beat<S, A>[];
+  /** the framing this step is played in; ignored by every flow but v4 */
+  shot?: Shot;
+  /** a figure worth annotating the moment it lands */
+  callout?: string;
 };
 
 /**

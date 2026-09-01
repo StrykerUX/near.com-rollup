@@ -1,0 +1,154 @@
+import { buildFlow, typing, type Chapter, type Step } from '@/components/demo/shell/flow';
+import { actions, initialFunded, type PD, type PDAction } from '@/components/demo/perps/state';
+
+/**
+ * PERPS v4 — the cut you would put in front of a room
+ * ==================================================================
+ * Same machine again. What changes is the camera and the copy.
+ *
+ * The other three versions explain. This one SHOWS: eight moments, each framed
+ * on the one thing it is about, with a line of copy beside the phone instead of
+ * a rail of notes under it. A step declares where the camera stands (`shot`)
+ * and, when a figure is the point, what to hang on it (`callout`).
+ *
+ * The beats are longer than anywhere else. A push in, a hold, a pull back is
+ * three seconds of screen time on its own, and a cut that lands before the eye
+ * has arrived is a cut nobody saw.
+ */
+
+const type_ = (act: PDAction, chars: string, lead?: number, gap?: number) =>
+  typing<PD, PDAction>(act, chars, lead, gap);
+
+/* the chapter is the eyebrow over the headline, so each one names the moment
+   its own steps are in rather than the section they were filed under */
+const CHAPTERS: Chapter[] = [
+  { id: 'market', name: 'The market', blurb: '' },
+  { id: 'size', name: 'Size and leverage', blurb: '' },
+  { id: 'protect', name: 'The exits', blurb: '' },
+  { id: 'sign', name: 'Signing', blurb: '' },
+  { id: 'live', name: 'Live', blurb: '' },
+];
+
+const STEPS: Step<PD, PDAction>[] = [
+  {
+    id: 'market', ch: 'market',
+    title: 'A price, and two decisions',
+    note: 'Perpetuals on the same account that holds everything else. No separate app, no bridge, no deposit to wait for.',
+    shot: { z: 1 },
+    beats: [{ ms: 3000 }],
+  },
+  {
+    id: 'long', ch: 'market',
+    title: 'Pick a side',
+    note: 'Long or short. The same ticket, with the sign reversed.',
+    shot: { on: 'side:long', z: 1.45 },
+    beats: [{ ms: 3200, do: 'openTicket', arg: 'long' }],
+  },
+
+  {
+    id: 'size', ch: 'size',
+    title: '$5,000 of margin',
+    note: 'The number you type is the number you can lose. Everything else on this screen is derived from it.',
+    shot: { on: 'field', z: 1.45 },
+    beats: [...type_('key', '5000', 2200, 380), { ms: 1800, do: 'done' }],
+  },
+  {
+    id: 'lev', ch: 'size',
+    title: 'Twenty times the position',
+    note: 'The same $5,000 at risk, controlling a hundred thousand dollars of Bitcoin. The figure travels so you can watch it happen.',
+    shot: { on: '.dlevfig', z: 1.5 },
+    callout: '$5,000 → $100,000',
+    beats: [
+      { ms: 2600, do: 'levSheet' },
+      { ms: 1600, do: 'levSet', arg: '14' },
+      { ms: 380, do: 'levSet', arg: '18' },
+      { ms: 380, do: 'levSet', arg: '20' },
+      { ms: 2400, do: 'levSave' },
+    ],
+  },
+
+  {
+    id: 'prot', ch: 'protect',
+    title: 'Both exits, before you are in',
+    note: 'One checkbox opens the pair. Where to leave when it works, and where to leave when it does not.',
+    shot: { on: 'prot', z: 1.4 },
+    beats: [{ ms: 3000, do: 'prot' }, { ms: 1600, do: 'unit', arg: 'tp' }],
+  },
+  {
+    id: 'rule', ch: 'protect',
+    title: 'The ticket refuses what the market would',
+    note: 'A take profit below the entry is an instruction to close at a loss. The button names the field instead of just going grey.',
+    shot: { on: 'field', z: 1.45 },
+    callout: 'Refused',
+    beats: [
+      { ms: 2200, do: 'key', arg: '2' },
+      { ms: 3400, do: 'key', arg: '⌫' },
+      ...type_('key', '82000', 1300, 380),
+      { ms: 2200, do: 'focus', arg: 'sl' },
+      ...type_('key', '78200', 1400, 380),
+      { ms: 1800, do: 'done' },
+    ],
+  },
+
+  {
+    id: 'sign', ch: 'sign',
+    title: 'One signature for all of it',
+    note: 'The leverage, the order and both exits go as a single signed intent. No password, no seed phrase.',
+    shot: { on: '.dface', z: 1.35 },
+    beats: [
+      { ms: 2800, do: 'submit' },
+      { ms: 2000, do: 'ostep' },
+      { ms: 1700, do: 'ostep' },
+      { ms: 1300, do: 'ostep' },
+      { ms: 1900, do: 'ostep' },
+      { ms: 1900, do: 'ostep' },
+      { ms: 2300, do: 'ostep' },
+    ],
+  },
+  {
+    id: 'open', ch: 'live',
+    title: 'In, and priced',
+    note: 'The entry draws itself on the chart. $100,000 of Bitcoin, $5,000 of margin, and the price at which it closes itself.',
+    shot: { z: 1 },
+    callout: 'Long 20x · $100,000',
+    beats: [{ ms: 3000 }, { ms: 3000, do: 'posOpen' }],
+  },
+];
+
+export const perpsV4Flow = buildFlow<PD, PDAction>({
+  initial: initialFunded,
+  actions,
+  chapters: CHAPTERS,
+  steps: STEPS,
+  restStep: 'open',
+  outro: 5200,
+  anchor: {
+    openTicket: 'size',
+    levSheet: 'lev',
+    levSave: 'prot',
+    prot: 'rule',
+    unit: 'rule',
+    submit: 'sign',
+    posOpen: 'open',
+  },
+  target: (a, arg, s) => {
+    switch (a) {
+      case 'openTicket': return `side:${arg}`;
+      case 'key': case 'done': case 'focus': return 'field';
+      case 'levSheet': return 'lev';
+      case 'levSet': return 'levslider';
+      case 'levSave': return 'save';
+      case 'prot': return 'prot';
+      case 'unit': return `unit:${arg ?? 'tp'}`;
+      case 'submit': return 'submit';
+      case 'ostep': return s.over === 'passkey' && s.auth === 'ask' ? 'passkey' : null;
+      case 'posOpen': return 'posbar';
+      default: return null;
+    }
+  },
+  auto: (s) => {
+    if (s.over === 'passkey') return { after: s.auth === 'done' ? 900 : 1300, do: 'ostep' };
+    if (s.submitting && s.over === 'none') return { after: 1900, do: 'ostep' };
+    return null;
+  },
+});

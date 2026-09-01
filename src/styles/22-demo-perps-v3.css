@@ -120,7 +120,7 @@
   padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, .07); font-size: 14px;
   color: rgba(255, 255, 255, .45);
 }
-.dlevnot span + span { font-size: 17px; font-weight: 500; color: #fff; font-variant-numeric: tabular-nums }
+.dlevnot .dlevfig { font-size: 17px; font-weight: 500; color: #fff; font-variant-numeric: tabular-nums }
 
 /* ---- slower, softer ----------------------------------------------------- */
 

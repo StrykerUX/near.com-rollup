@@ -276,7 +276,9 @@ function LevSheet({ d }: { d: Deck }) {
             before Save commits it */}
         <div className="dlevnot">
           <span>Position value</span>
-          <Count value={(Number(s.amount) || 0) * s.levDraft} prefix="$" ms={260} />
+          {/* named so v4's camera can frame the figure rather than the row —
+              a row that spans the device cannot be zoomed without cutting it */}
+          <Count className="dlevfig" value={(Number(s.amount) || 0) * s.levDraft} prefix="$" ms={260} />
         </div>
         <span className={'dcta light' + live(d.can('levSave'))} {...press(d.can('levSave'))}
               data-tap="save">Save</span>
