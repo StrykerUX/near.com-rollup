@@ -8,8 +8,8 @@ import {
  * PERPS v5 — THE SHORT CUT, AND THE BUDGET IS THE DESIGN
  * ==================================================================
  * v4 is the cut you put in front of a room: ninety seconds, eight moments, a
- * line of copy on each. This is the cut you put in a feed: twenty seconds,
- * and twenty is not a shorter ninety — it is a different problem, because the
+ * line of copy on each. This is the cut you put in a feed: twenty-five seconds,
+ * and that is not a shorter ninety — it is a different problem, because the
  * two things v4 spends most of its length on (a line of copy per step, and a
  * beat long enough for the eye to arrive) are the two that do not fit.
  *
@@ -21,9 +21,9 @@ import {
  *
  *   scene 1     2,400ms   the market, and a position already working
  *   scene 2    13,260ms   the second one, opened — and then left running
- *   outro         600ms   the hold before the loop
+ *   outro       4,000ms   the same frame again, for the loop
  *   ──────────────────
- *              16,260ms  ×1.25 = 20,325ms on screen
+ *              19,660ms  ×1.25 = 24,575ms on screen
  *
  * IT WAS TEN SECONDS AND IT COULD NOT BE READ. Scene 2 ran at 5,000ms, and the
  * table that killed it is the time each screen got to exist before the next
@@ -183,7 +183,24 @@ export const perpsV5Flow = buildFlow<BD, BDAction>({
   /* reduced motion gets the frame with two positions on it: the only one that
      shows both what the account had and what the cut did to it */
   restStep: 'open',
-  outro: 600,
+  /**
+   * FIVE SECONDS OF WALL CLOCK ON THE LAST FRAME, and it is the same hold the
+   * final beat is — `useDeck` keeps the script's last state for `ms`, and then
+   * for `outro` more, before it resets. Nothing distinguishes the two on
+   * screen; they are one dwell written in two places, and this is the half
+   * that belongs to the loop rather than to the beat.
+   *
+   * 4,000 authored × PACE = 5,000ms. With the final beat's 4,931 in front of
+   * it the ending runs 9.9 seconds — forty per cent of the cut spent on one
+   * frame, which is a deliberate ratio for something that loops: the trade is
+   * still working through all of it (the chart rolls, the quote prints, the
+   * P&L climbs), so the tail is where a viewer arriving mid-loop finds the
+   * answer rather than the setup.
+   *
+   * If that is too much, the beat is the lever and not this — shorten the
+   * 3,945 above and the outro keeps the loop's own breathing room.
+   */
+  outro: 4000,
   anchor: {
     openTicket: 'open',
     levSheet: 'open',

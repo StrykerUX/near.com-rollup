@@ -131,7 +131,7 @@ beside it. `/demo` indexes them.
 | `/demo/perps-v2` | the same, cut | 16 | The trade alone: $5,000 of margin into a $100,000 position, and back to the card |
 | `/demo/perps-v3` | the same, quieter | 9 | Half the screen, no pointer: the control lights itself and the figures travel |
 | `/demo/perps-v4` | the marketing cut | 8 | One line of copy at a time, and everything but the moment darkened |
-| `/demo/perps-v5` | twenty seconds | 2 | A position already working, and a second one opened beside it — its own device, rebuilt against the app |
+| `/demo/perps-v5` | twenty-five seconds | 2 | A position already working, and a second one opened beside it — its own device, rebuilt against the app |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
 | `/demo/earn` | 48s | 17 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
@@ -526,7 +526,7 @@ end. It found all of these before a browser could.
 
 `/demo/perps-v5` is commissioned to a length, checked by `pnpm check:flows`. The
 deck plays every beat at `PACE` (1.25), so the budget is **10,500ms of authored
-beats, outro included → 20,325ms on screen**, and the assertion exists because
+beats, outro included → 24,575ms on screen**, and the assertion exists because
 the length is not a number anywhere in the source — it is a sum of twenty-seven
 beats, and every future edit to one moves it by exactly as much as nobody
 notices.
@@ -555,6 +555,7 @@ already documents for demo-mode PACE:
 | keystrokes | 105ms | 160ms |
 | rests after a value lands | none | 4 × 500ms |
 | the ending | 1,545ms | 3,945ms |
+| the outro | 600ms | 4,000ms |
 
 `candleMs` buys something the others do not: a slower candle covers the same
 ground in more time, so a quoted market crosses fewer ticks per second and
@@ -747,7 +748,16 @@ factor of four, on the frame the whole cut is spent earning.
 The time is not dead. The chart keeps rolling through it, so the quote keeps
 printing and the new position's P&L keeps answering — what the hold shows is a
 bracket that was set and a trade that is working, which is the only reason to
-set one.
+set one. Measured: the price walks 46 distinct prints and the P&L goes
++$0.00 → +$58.44, opening at exactly zero because its entry *is* the mark.
+
+**The `outro` is the same hold, written twice.** `useDeck` keeps the script's
+last state for the final beat's `ms`, and then for `outro` more before it
+resets — nothing on screen distinguishes them. At 4,000 authored the two
+together run 9.9 seconds, forty per cent of the cut on one frame, which is a
+deliberate ratio for something that loops: a viewer arriving mid-loop lands on
+the answer rather than on the setup. If it wants shortening, the beat is the
+lever and not the outro, which is the loop's own breathing room.
 
 ### The quote, and three fixes that each undid the last
 

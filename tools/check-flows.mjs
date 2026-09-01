@@ -269,15 +269,16 @@ for (const [name, m] of Object.entries(machines)) {
    scene 2 now carries four silent beats, one after each value it sets, and its
    keystrokes are 160ms apart rather than 105. Another 800 is the third row of
    the order checklist finally being allowed to finish before the sheet closes,
-   and the last 3,000 is the ending: five things land in that frame at once and
-   two seconds was enough to see them, not to read them.
+   and 3,000 is the ending: five things land in that frame at once and two
+   seconds was enough to see them, not to read them. The last 4,250 is the
+   outro — the same dwell, on the loop's side of the seam.
 
    Enforced with a tolerance of one frame at 60Hz. Anything looser and the
    guard is decorative; anything tighter and rounding a beat to a round number
    would fail the build.
    ========================================================================== */
 {
-  const LIMIT = 20325;
+  const LIMIT = 24575;
   const TOL = 17;
   const PACE = Number(
     readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
