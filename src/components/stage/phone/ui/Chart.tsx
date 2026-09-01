@@ -20,14 +20,24 @@ import { useEffect, useRef, type RefObject } from 'react';
  */
 
 const CANDLES = 46;
-const CANDLE_MS = 2400;
+const CANDLE_MS = 1800;
 /**
  * How many candles the climb into a target takes. Counted in CANDLES and not
  * in milliseconds on purpose: the move belongs to the bars it happens in, so a
  * bar that has formed keeps the price it formed at no matter how long anyone
  * watches afterwards.
+ *
+ * Nine, not four. At four the thousand points arrived in bodies of ~370 and
+ * read as a spike — technically a rally, visually a gap with wicks on it. Nine
+ * puts the steepest bar at ~170 over the walk's own ~40, which is a market
+ * trending rather than jumping, and it is a fifth of the visible window, so
+ * there is a move to watch rather than a corner to notice.
+ *
+ * It costs sixteen seconds, which is why the candle rate came down with it and
+ * why the final step of every version holds longer. A climb that finishes
+ * after the loop has restarted is a climb nobody saw.
  */
-const RAMP_CANDLES = 4;
+const RAMP_CANDLES = 9;
 /** the price the flow's copy quotes, so the two cannot drift */
 export const BASE_PRICE = 79654;
 

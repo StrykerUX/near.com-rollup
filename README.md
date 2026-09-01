@@ -462,6 +462,15 @@ the market keeps its own shape around the new level instead of being pinned flat
 to a number. A take profit is met and then traded through, which is what meeting
 one looks like.
 
+The climb runs over **nine** candles. At four the thousand points arrived in
+bodies of ~370 and read as a spike — technically a rally, visually a gap with
+wicks on it. Nine puts the steepest bar at ~180 against the walk's own ~40, and
+the run has a shape: +48, +109, +151, +176, +183, +172, +143, +97, +34, then
+small red bars as it settles above the level. It crosses the take profit on the
+seventh. That costs sixteen seconds, which is why the candle rate came down to
+1.8s with it and why the last step of every version holds longer — a climb that
+finishes after the loop has restarted is a climb nobody saw.
+
 The figures moved with it. The recording's $82,000 and $78,200 were an arbitrary
 pair at 1.6:1; the brackets are now a thousand above the entry and five hundred
 below it — **two to one**, the ratio the shape exists for, and close enough
