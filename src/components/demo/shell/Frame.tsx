@@ -40,6 +40,7 @@ export function DemoPage<S, A extends string>({
           <Link href="/demo/perps-v2">Perps v2</Link>
           <Link href="/demo/perps-v3">Perps v3</Link>
           <Link href="/demo/perps-v4">Perps v4</Link>
+            <Link href="/demo/perps-v5">Perps v5</Link>
           <Link href="/demo/swap">Swap</Link>
           <Link href="/demo/swap-v4">Swap v4</Link>
           <Link href="/demo/earn">Earn</Link>
@@ -150,7 +151,12 @@ function Rail<S, A extends string>({ flow, deck }: { flow: DemoFlow<S, A>; deck:
 
 /** The status bar. Frozen at the time on the recordings, because a clock that
     disagreed with the one in the reference frames would be the only thing on
-    this page that is not from them. */
+    this page that is not from them.
+
+    `/demo/perps-v5` renders none of this — see the note where it would have
+    gone. It briefly took a `bare` prop that kept the notch and dropped the
+    three indicators; when the notch went too, the prop had no caller left, and
+    a shared component does not get to keep an option nobody passes. */
 export function StatusBar({ time = '12:03' }: { time?: string }) {
   return (
     <div className="dstat" aria-hidden="true">

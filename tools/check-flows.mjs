@@ -41,6 +41,11 @@ const MODULES = [
   [`${DEMO}/perpsv2/script.ts`, 'perpsv2-script'],
   [`${DEMO}/perpsv3/script.ts`, 'perpsv3-script'],
   [`${DEMO}/perpsv4/script.ts`, 'perpsv4-script'],
+  /* the ten-second cut, which is its OWN machine rather than a re-grouping
+     of the one above it — a different entry price, a book that starts with a
+     position on it, and no passkey. Walked for exactly that reason. */
+  [`${DEMO}/perpsv5/state.ts`, 'perpsv5-state'],
+  [`${DEMO}/perpsv5/script.ts`, 'perpsv5-script'],
   [`${DEMO}/swap/state.ts`, 'swap-state'],
   [`${DEMO}/swap/script.ts`, 'swap-script'],
   [`${DEMO}/earn/state.ts`, 'earn-state'],
@@ -94,6 +99,7 @@ const machines = {
   'demo/perps-v2': (await load('perpsv2-script')).perpsV2Flow.machine,
   'demo/perps-v3': (await load('perpsv3-script')).perpsV3Flow.machine,
   'demo/perps-v4': (await load('perpsv4-script')).perpsV4Flow.machine,
+  'demo/perps-v5': (await load('perpsv5-script')).perpsV5Flow.machine,
   'demo/swap': (await load('swap-script')).swapFlow.machine,
   'demo/earn': (await load('earn-script')).earnFlow.machine,
   'demo/confidential-deposit': (await load('condeposit-script')).conDepositFlow.machine,
@@ -243,6 +249,37 @@ for (const [name, m] of Object.entries(machines)) {
                        : 'the order closes before the market gets there'));
     else console.log(`   ${name}: opens at ${openedAt}ms, fills at ${filledAt}ms — on the frame`);
   }
+}
+
+/* ==========================================================================
+   6 · THE TEN-SECOND CUT IS TEN SECONDS
+   --------------------------------------------------------------------------
+   `/demo/perps-v5` was commissioned with a hard limit rather than a target: a
+   clip that runs eleven seconds is not a slightly long version of it, it is a
+   different deliverable. The length is not a number anywhere in the source —
+   it is the sum of twenty-seven beats plus an outro, multiplied by the deck's
+   PACE — so nothing about it is visible to a type checker and every future
+   edit to a beat changes it by exactly as much as nobody notices.
+
+   Enforced with a tolerance of one frame at 60Hz. Anything looser and the
+   guard is decorative; anything tighter and rounding a beat to a round number
+   would fail the build.
+   ========================================================================== */
+{
+  const LIMIT = 10000;
+  const TOL = 17;
+  const PACE = Number(
+    readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
+  );
+  const m = machines['demo/perps-v5'];
+  const authored = m.beats.reduce((t, b) => t + (b.ms ?? 0), 0) + (m.outro ?? 0);
+  const real = Math.round(authored * PACE);
+  console.log(`\n== the ten-second cut\n   demo/perps-v5: ${authored}ms authored `
+    + `x ${PACE} = ${real}ms on screen`);
+  if (Math.abs(real - LIMIT) > TOL)
+    bad('demo/perps-v5', `runs ${real}ms, and the brief is ${LIMIT}ms. `
+      + `The budget is ${Math.round(LIMIT / PACE)}ms of authored beats, outro included — `
+      + `this script authors ${authored}.`);
 }
 
 console.log(fail ? `\n${fail} problem(s)` : '\nall machines clean');

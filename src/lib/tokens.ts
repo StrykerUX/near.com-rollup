@@ -38,9 +38,24 @@ export const findToken = (sym: string) => TOKENS.find((t) => t.sym === sym)!;
  * token dot where available; every other token keeps its letter chip. Add more
  * by dropping a shape in here keyed by symbol.
  */
-export type TokenGlyph = { d: string } | { points: string };
+export type TokenGlyph = { d: string } | { points: string } | { img: string };
 
 export const TOK_ICONS: Record<string, TokenGlyph> = {
+  /**
+   * BITCOIN, AS THE MARK RATHER THAN AS A TRACING OF IT.
+   *
+   * The other two glyphs here are paths because they arrived as paths. This
+   * one arrived as the official artwork, and the ₿ inside it is a
+   * counter-in-a-counter — a shape that survives being redrawn by hand about
+   * as well as a signature does. A demo whose whole claim is that it is a
+   * pixel copy of the app cannot open on an approximation of the one logo
+   * every reader already knows by heart.
+   *
+   * The disc is baked into the file, so a token dot rendering this covers its
+   * own background rather than tinting one. `token.color` is still the right
+   * orange underneath, which is what shows for the frame before it decodes.
+   */
+  BTC: { img: '/img/btc.png' },
   NEAR: {
     d: 'M429.68,135.21c-12.21,0-23.54,6.33-29.93,16.73l-68.89,102.28c-2.24,3.37-1.33,7.92,2.04,10.16,2.73,1.82,6.35,1.6,8.84-.54l67.81-58.82c1.13-1.01,2.86-.91,3.88.22.46.52.7,1.18.7,1.87v184.15c0,1.52-1.23,2.74-2.75,2.74-.82,0-1.59-.36-2.1-.99l-204.99-245.37c-6.68-7.88-16.48-12.42-26.8-12.43h-7.16c-19.39,0-35.11,15.72-35.11,35.11v259.36c0,19.39,15.72,35.11,35.11,35.11,12.21,0,23.54-6.33,29.93-16.73l68.89-102.28c2.24-3.37,1.33-7.92-2.04-10.16-2.73-1.82-6.35-1.6-8.84.54l-67.81,58.82c-1.13,1.01-2.86.91-3.88-.22-.46-.52-.7-1.18-.7-1.87v-184.2c0-1.52,1.23-2.74,2.75-2.74.81,0,1.59.36,2.1.99l204.96,245.42c6.68,7.88,16.48,12.42,26.8,12.43h7.16c19.39,0,35.12-15.7,35.14-35.09V170.32c0-19.39-15.72-35.11-35.11-35.11h0Z',
   },

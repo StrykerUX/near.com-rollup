@@ -139,6 +139,14 @@ function walk(k: number) {
  * the one place it is broken is the one place no audit of the CSS can see.
  */
 const LABEL_PX = 14;
+/** the default axis face: what twelve of the thirteen devices are set in */
+const LABEL_FACE = 'ui-monospace, SFMono-Regular, Menlo, monospace';
+/** the default pair of market colours: what twelve of the thirteen use */
+const UP = '#26C281';
+const DOWN = '#E5484D';
+/** the ink a chip prints in, dark enough to sit on either side's fill */
+const UP_INK = '#04140E';
+const DOWN_INK = '#1E0507';
 /**
  * How much of the right edge belongs to the price axis. It was a bare 54,
  * tuned by eye against 9px labels; at 14px "$80,200" is wider than that and
@@ -214,20 +222,125 @@ export type ChartProps = {
    * off when nobody is looking at it.
    */
   live?: boolean;
+  /**
+   * WHAT THE HELD PICTURE READS.
+   *
+   * The walk is anchored so the last candle of the held picture closes exactly
+   * here — see WALK0. It defaults to the price every existing flow's copy
+   * quotes, and exists because a screen rebuilt against a different set of
+   * reference frames quotes a different one, and a chart that cannot be told
+   * which is the fastest possible way to end up with two prices for one
+   * market.
+   */
+  base?: number;
+  /**
+   * LET CANDLE TIME RUN WITH NOTHING TO REACH.
+   *
+   * Off by default, and that default is load-bearing: `9136204` stopped the
+   * candles until a trade opened precisely so that every loop of every flow
+   * draws the identical chart, and so the price a reader looks at in step 1 is
+   * the price the copy under it quotes in step 8.
+   *
+   * A cut whose FIRST scene is the market moving needs the opposite, and can
+   * have it for the same reason the hold was safe: the series is a pure
+   * function of a candle's number, so a rolling window is still deterministic —
+   * it just has to be re-mounted each pass (`key={deck.pass}`) for loop N to
+   * open on the same candle as loop 1.
+   */
+  roll?: boolean;
+  /**
+   * WHICH STRETCH OF THE WALK THE WINDOW SITS ON.
+   *
+   * A cut whose first line is "the market is climbing" needs a climbing market,
+   * and there are exactly two ways to get one. The first — add a slope, a few
+   * points per candle — was built and thrown away, and it failed the way the
+   * README already says every monotone lift fails: a slope large enough to see
+   * over ten seconds is 690 points across a 46-candle window, which swamps the
+   * walk's own ±100 of shape and closes every bar green. That is not a rally.
+   * It is a ramp with wicks drawn on it, and it is the same trap `RAMP` exists
+   * to avoid.
+   *
+   * This is the second way, and it invents nothing: the walk is 840 points of
+   * genuine market shape, bounded and never repeating, so somewhere in it is a
+   * stretch that rises gently while still closing a third of its bars red.
+   * `phase` is the candle number that stretch starts at. The picture is the
+   * real series, moved to a better hour of the day.
+   *
+   * `walk` has no period, so a phase is not a rotation and two phases are two
+   * different markets. Anchoring still holds: the held picture closes on
+   * `base` at whatever phase it is given.
+   */
+  phase?: number;
+  /**
+   * The face the canvas sets its axis labels and price chips in. Canvas has no
+   * stylesheet to inherit from, so a device whose UI is not in the default
+   * stack has to say so or its chart is the one panel still speaking in the
+   * old voice — and it is the panel with the most numbers on it.
+   */
+  face?: string;
+  /**
+   * THE SIZE OF A PRINT. Off by default; every existing flow quotes the raw
+   * price at one decimal, sixty times a second.
+   *
+   * That default was measured on the ten-second cut and it is an ODOMETER, not
+   * a quote. The header repainted 49 times a second, holding each value for
+   * 20ms, and — because the live candle's close travels LINEARLY from the
+   * previous close to its own — every one of those repaints was the same
+   * increment as the last:
+   *
+   *     $79,598.0 → .2 → .4 → .6 → .8 → 79,599.1 → .3 → .5 → .7
+   *
+   * Nothing about that is a fast market. It moved 35 points in six seconds,
+   * four hundredths of one per cent. It reads as aggressive because a digit is
+   * being repainted forty-nine times a second by a constant step, and no
+   * screen a person has ever traded on does that.
+   *
+   * So the quote is rounded to a tick and REPRINTED ONLY WHEN IT CROSSES ONE.
+   * The gate is the rounding itself: quantise the number and the writes stop
+   * on their own, because writing the same string twice is a write that does
+   * not happen. That makes the prints discrete in value and irregular in time,
+   * which is what a tape is — and it self-regulates, because a fast market
+   * crosses more ticks and prints more often, exactly as it should.
+   *
+   * IT IS THE QUOTE THAT TICKS, NOT THE MARKET. The candles, the scale and
+   * every price the geometry is built from stay continuous: quantising those
+   * would stair-step a body that is 4px wide, and the point is a calm number
+   * on a smooth chart rather than a coarse chart.
+   */
+  tick?: number;
+  /**
+   * THE TWO SIDES OF A MARKET, as one decision.
+   *
+   * These default to the greens and reds the chart has always drawn, so no
+   * existing flow moves. A device painted from a different palette passes its
+   * own — and it has to pass them HERE rather than restyle the canvas, because
+   * canvas has no cascade: `fillStyle` takes a literal and will not resolve a
+   * custom property.
+   *
+   * `up` is not only the candle. The live price line, the chip riding on it and
+   * the take-profit bracket are all the same green, because they are all the
+   * same claim about which way is good — a chart whose candles and whose price
+   * chip are two different greens six pixels apart reads as a mistake, and it
+   * is one. The dimmer variants are derived with `globalAlpha` rather than
+   * spelled out, so there is one hex per side and not four.
+   */
+  up?: string;
+  down?: string;
 };
 
 export function Chart({
   entry = null, side = null, live = true, paused = false, tp = null, sl = null,
-  toward = null, readout,
+  toward = null, readout, base = BASE_PRICE, roll = false, phase = 0, face = LABEL_FACE,
+  tick = 0, up = UP, down = DOWN,
 }: ChartProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   /* The draw loop reads these every frame but must not re-subscribe when they
      change — mirroring them into a ref from an effect keeps the rAF stable and
      the render pure. */
-  const props = useRef({ entry, side, readout, paused, tp, sl, toward });
+  const props = useRef({ entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down });
   useEffect(() => {
-    props.current = { entry, side, readout, paused, tp, sl, toward };
-  }, [entry, side, readout, paused, tp, sl, toward]);
+    props.current = { entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down };
+  }, [entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down]);
 
   useEffect(() => {
     const cv = ref.current;
@@ -304,13 +417,31 @@ export function Chart({
          edge as a flat dash — the picture would end on a bar that has not
          happened yet. */
       const HELD = CANDLE_MS - 1;
-      if (!aimNow) moved = 0;
+      /* `roll` buys out of the hold, and only out of the hold: with it on,
+         candle time is just the clock, which is what it was before the hold
+         existed. Everything downstream — the ramp's anchor included — reads
+         `shift`, so neither branch is a special case past this line. */
+      const rolling = props.current.roll;
+      if (!aimNow && !rolling) moved = 0;
       else moved += dt;
-      const adv = (aimNow ? HELD + moved : Math.min(HELD, clock)) / CANDLE_MS;
+      const adv = (aimNow || rolling ? HELD + moved : Math.min(HELD, clock)) / CANDLE_MS;
       /* The live candle: its close travels from the previous close toward its
          own, so the body grows out of the last one instead of appearing. */
       const shift = reduce ? 0 : Math.floor(adv);
       const phase = reduce ? 1 : adv - shift;
+      /**
+       * THE MARKET WITHOUT THE TRADE IN IT: where candle k sits before any
+       * scripted climb is added. Pulled out of `priceAt` because the ramp's
+       * anchor needs the same number and used to spell it out a second time —
+       * two copies of one formula, and the phase would have landed in exactly
+       * one of them.
+       */
+      const ph = props.current.phase;
+      /* the anchor travels with the phase: WALK0 is walk() at the candle the
+         held picture closes on, and moving the window moves that candle. At
+         phase 0 this is the module constant, to the bit. */
+      const w0 = ph === 0 ? WALK0 : walk(CANDLES + ph);
+      const level = (k: number) => props.current.base + walk(k + ph) - w0;
       /* THE CLIMB, AND WHY IT IS AN OFFSET PER CANDLE AND NOT A BLEND.
          The first version weighted the lift by a candle's position in the
          VISIBLE WINDOW, which had two faults and they were the same fault: the
@@ -329,10 +460,14 @@ export function Chart({
       const aim = aimNow;
       if (!aim) towardK = -1;
       else if (towardK < 0) {
-        /* always CANDLES - 1: candle time is at zero on the frame the position
-           opens, so the trade lands on the last candle of the held picture,
-           every loop, on every machine */
-        towardK = CANDLES - 1;
+        /* THE RIGHTMOST CANDLE ON SCREEN, which is where a trade is opened by
+           definition. Under the hold `shift` is always zero — candle time is
+           at zero on the frame the position opens — so this is the same
+           `CANDLES - 1` it has always been for every flow that holds. Written
+           against `shift` rather than assuming it, because a rolling chart
+           opens its trade several candles in and would otherwise anchor the
+           climb to a bar that scrolled off the left edge. */
+        towardK = shift + CANDLES - 1;
         /* THE LIFT IS MEASURED TO WHERE THE WALK WILL BE, NOT WHERE IT IS.
            Sized against the price at the open, the climb added exactly the
            right number of points and still missed: the walk kept drifting
@@ -343,7 +478,7 @@ export function Chart({
            candle the climb ends on, the last bar closes on the take profit to
            the point, every time, and the visible move is still exactly the
            distance from the open to the line. */
-        towardFrom = BASE_PRICE + walk(towardK + RAMP_CANDLES) - WALK0;
+        towardFrom = level(towardK + RAMP_CANDLES);
       }
       const offset = (k: number) => {
         if (!aim || towardK < 0 || k < towardK) return 0;
@@ -357,7 +492,7 @@ export function Chart({
          opens where the one before it closed, and that has to survive the lift,
          so the open takes this candle's offset and the close takes the next
          one's. It is the same rule the seamless walk is built on. */
-      const priceAt = (k: number) => BASE_PRICE + walk(k) - WALK0 + offset(k);
+      const priceAt = (k: number) => level(k) + offset(k);
       const bar = (k: number): Candle => {
         const r = rng(k * 2654435761);
         const o = priceAt(k);
@@ -374,6 +509,26 @@ export function Chart({
               h: src.o + (src.h - src.o) * phase, l: src.o + (src.l - src.o) * phase }
           : src);
       }
+
+      const last = view[view.length - 1].c;
+      /**
+       * THE PRINTED QUOTE, which is not the same number as the market.
+       *
+       * `last` is where the market is; `quote` is what a screen is willing to
+       * say it is. With no tick they are the same value and this is the
+       * behaviour every other flow has always had. With one, the quote holds
+       * still between crossings — and because every figure the READOUT shows is
+       * derived from `quote` rather than from `last`, the whole header holds
+       * with it. One walk, one price: the header, the change, the chip, the
+       * line the chip rides on and any P&L a screen hangs off `onTick` are all
+       * the same number, or the demo is quoting two markets.
+       *
+       * The GEOMETRY still uses `last`. Quantising the candles would stair-step
+       * a body 4px wide, and the point of this is a calm number on a smooth
+       * chart, not a coarse chart.
+       */
+      const tk = props.current.tick;
+      const quote = tk > 0 ? Math.round(last / tk) * tk : last;
 
       /* THE BRACKETS JOIN THE SCALE. A take profit a thousand points above the
          market is off the top of a chart framed on the candles alone, and a
@@ -392,7 +547,7 @@ export function Chart({
       ctx.clearRect(0, 0, w, h);
 
       /* gridlines on round hundreds, labelled at the right edge like the app */
-      ctx.font = `${LABEL_PX}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+      ctx.font = `${LABEL_PX}px ${props.current.face}`;
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
       const stepPx = 200;
@@ -400,7 +555,7 @@ export function Chart({
       /* the two chips own their rows. A gridline label at the same height is a
          second price in the same place, and on a tall chart — where the lines
          are dense — one of them is always landing under a chip. */
-      const chipRows = [y(view[view.length - 1].c)];
+      const chipRows = [y(quote)];
       for (const v of marks) chipRows.push(y(v));
       for (let v = first; v < top; v += stepPx) {
         const gy = Math.round(y(v)) + 0.5;
@@ -422,7 +577,7 @@ export function Chart({
       view.forEach((c, i) => {
         const cx = i * cw + cw / 2;
         const up = c.c >= c.o;
-        ctx.strokeStyle = ctx.fillStyle = up ? '#26C281' : '#E5484D';
+        ctx.strokeStyle = ctx.fillStyle = up ? props.current.up : props.current.down;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(Math.round(cx) + 0.5, y(c.h));
@@ -433,31 +588,44 @@ export function Chart({
         ctx.fillRect(cx - body / 2, Math.min(yo, yc), body, Math.max(1, Math.abs(yc - yo)));
       });
 
-      const last = view[view.length - 1].c;
-
       /* the header's quote, if this screen has one: same number, one source */
       const out = props.current.readout;
       if (out) {
         const open = view[0].o;
-        const d = last - open;
+        const d = quote - open;
         const pc = (d / open) * 100;
+        /* WRITE ONLY WHAT CHANGED. Assigning the same string to `textContent`
+           still tears the text node down and builds it again, so on a ticked
+           quote — which is the same string for eighty-odd milliseconds at a
+           time — the guard is the whole saving. It is the rule `domCache.ts`
+           exists to enforce one level up, and it is also what makes the print
+           self-healing: a React re-render that resets the markup is corrected
+           on the very next frame rather than held until the next crossing. */
         if (out.price?.current) {
-          out.price.current.textContent =
-            '$' + last.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+          const el = out.price.current;
+          const t = '$' + quote.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+          if (el.textContent !== t) el.textContent = t;
         }
-        out.onTick?.(last);
+        out.onTick?.(quote);
         if (out.change?.current) {
           const el = out.change.current;
-          el.textContent =
-            (d >= 0 ? '+' : '\u2212') + '$' + Math.abs(d).toFixed(2)
+          const t = (d >= 0 ? '+' : '\u2212') + '$' + Math.abs(d).toFixed(2)
             + '  ' + (d >= 0 ? '+' : '\u2212') + Math.abs(pc).toFixed(2) + '%';
+          if (el.textContent !== t) el.textContent = t;
           el.classList.toggle('up', d >= 0);
         }
       }
 
-      /* the live price line and its chip, pinned to the right axis */
-      const py = Math.round(y(last)) + 0.5;
-      ctx.strokeStyle = 'rgba(38,194,129,.55)';
+      /* the live price line and its chip, pinned to the right axis. Drawn at
+         the QUOTE, so the line is as still as the label riding on it — a line
+         that crept while its own number sat frozen would be the two of them
+         disagreeing about where the market is. */
+      const py = Math.round(y(quote)) + 0.5;
+      ctx.save();
+      /* the same green as the candles, dimmed — one hex per side, so a palette
+         change cannot leave the line behind the bars it belongs to */
+      ctx.globalAlpha = 0.55;
+      ctx.strokeStyle = props.current.up;
       ctx.setLineDash([3, 3]);
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -465,7 +633,8 @@ export function Chart({
       ctx.lineTo(w - AXIS_W + 2, py);
       ctx.stroke();
       ctx.setLineDash([]);
-      chip(ctx, w, py, '$' + last.toFixed(1), '#26C281', '#04140E');
+      ctx.restore();
+      chip(ctx, w, py, '$' + quote.toFixed(1), props.current.up, UP_INK, props.current.face);
 
       /* THE BRACKETS. Drawn before the entry so the entry sits on top where
          they crowd, and in their own colours because the two are not the same
@@ -479,7 +648,7 @@ export function Chart({
            quote is already printing this number — that is what touching means —
            so the bracket keeps its line and gives up its label rather than
            stacking a second copy of the same price on top of the first. */
-        const collides = Math.abs(by - y(view[view.length - 1].c)) < LABEL_PX + 6;
+        const collides = Math.abs(by - y(quote)) < LABEL_PX + 6;
         ctx.save();
         ctx.globalAlpha = a;
         ctx.strokeStyle = stroke;
@@ -490,7 +659,7 @@ export function Chart({
         ctx.lineTo(w - AXIS_W + 2, by);
         ctx.stroke();
         ctx.setLineDash([]);
-        if (!collides) chip(ctx, w, by, v.toLocaleString('en-US'), stroke, ink);
+        if (!collides) chip(ctx, w, by, v.toLocaleString('en-US'), stroke, ink, props.current.face);
         ctx.restore();
       };
 
@@ -501,8 +670,8 @@ export function Chart({
       if (!e) entryAt = 0;
       else if (!entryAt) entryAt = clock;
       const a = Math.min(1, Math.max(0, (clock - entryAt) / 520));
-      bracket(props.current.tp, '#26C281', '#04140E');
-      bracket(props.current.sl, '#E5484D', '#1E0507');
+      bracket(props.current.tp, props.current.up, UP_INK);
+      bracket(props.current.sl, props.current.down, DOWN_INK);
       if (e) {
         const ey = Math.round(y(e)) + 0.5;
         const right = w - AXIS_W + 2;
@@ -515,7 +684,7 @@ export function Chart({
         ctx.lineTo(right, ey);
         ctx.stroke();
         ctx.setLineDash([]);
-        chip(ctx, w, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F');
+        chip(ctx, w, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F', props.current.face);
         ctx.restore();
       }
 
@@ -543,9 +712,9 @@ export function Chart({
  */
 function chip(
   ctx: CanvasRenderingContext2D, right: number, y: number,
-  text: string, bg: string, fg: string,
+  text: string, bg: string, fg: string, face: string,
 ) {
-  ctx.font = `${LABEL_PX}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+  ctx.font = `${LABEL_PX}px ${face}`;
   const wdt = ctx.measureText(text).width + 8;
   const hgt = LABEL_PX + 5;
   ctx.fillStyle = bg;

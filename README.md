@@ -131,6 +131,7 @@ beside it. `/demo` indexes them.
 | `/demo/perps-v2` | the same, cut | 16 | The trade alone: $5,000 of margin into a $100,000 position, and back to the card |
 | `/demo/perps-v3` | the same, quieter | 9 | Half the screen, no pointer: the control lights itself and the figures travel |
 | `/demo/perps-v4` | the marketing cut | 8 | One line of copy at a time, and everything but the moment darkened |
+| `/demo/perps-v5` | ten seconds | 2 | A position already working, and a second one opened beside it — its own device, rebuilt against the app |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
 | `/demo/earn` | 48s | 17 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
@@ -520,6 +521,245 @@ end. It found all of these before a browser could.
 - **A rule's text was split into grid cells.** `.drules li` is a two-column grid;
   a bare text run beside an `<i>` becomes a grid item of its own, so "Only send
   USDT on the Tron network" laid out as two overlapping fragments.
+
+### v5, and what ten seconds is actually short of
+
+`/demo/perps-v5` is a hard limit rather than a target: ten seconds, checked by
+`pnpm check:flows`. The deck plays every beat at `PACE` (1.25), so the budget is
+**8,000ms of authored beats, outro included**, and the assertion exists because
+the length is not a number anywhere in the source — it is a sum of twenty-seven
+beats, and every future edit to one moves it by exactly as much as nobody
+notices.
+
+Ten seconds is not a shorter ninety. It is short of the two things v4 spends
+most of its length on, and each one had to be given up rather than compressed:
+
+**One line of copy per step becomes two lines total.** Eight steps in ten
+seconds is 1.2s a line, which is under the floor for reading one — the copy
+would be present, unreadable and moving, which is worse than absent. Two steps
+give each line about five seconds. The step is also what the dots and `Focus`
+are keyed to, so three things got quieter for one reason.
+
+**`shot` is absent from both steps.** The cut already spends its whole length on
+motion that carries meaning — a sheet arriving, digits landing, a figure
+travelling, a card joining a list. At this tempo a cutout travelling between
+controls does not direct the eye; it competes with what it is pointing at. The
+hand and the spotlight go for the same reason, which is why v5 declares no
+`target` at all: a map nothing reads is a map that will rot.
+
+**The take profit never fills.** The climb is fifteen candles — 22.5 real
+seconds — so it cannot even start. The ending is the order landing and a second
+card joining the first.
+
+### The one device that is a copy rather than an argument
+
+v5 is the only flow that does not borrow v3's device, and the reason is that
+v3's device is an *argument*: it removes half the screen on purpose, because
+what it is showing is a trade and the lists under the chart are where a trade
+lands. v5 claims the screen IS the app, so everything the other versions earned
+the right to drop is back — the chrome, the time axis, the 1H row,
+Positions/Orders/Trades with counts that move, Modify/Close, the position card,
+`Est. trade value`. It is under the opposite rule: **where a reference frame and
+a tidier idea disagree, the frame wins.**
+
+**It renders no status bar at all** — no clock, no signal, no battery, and no
+notch. It is the one block on the device that is not the product: 44px at the
+top of a 766px screen spent simulating an operating system, in a cut whose whole
+job is to show an app. The reference frames are crops and have none of it
+either, and a frozen 11:02 is the one detail in a ten-second loop that gives
+away that nothing on screen is live.
+
+The notch went last and is the interesting half. It is *device* chrome rather
+than status chrome, so it survived the first pass — but a Dynamic Island with
+nothing beside it is a phone bezel drawn inside a phone bezel, and `.pdev`
+already carries the radius, the border and the shadow that say "this is a
+device". It briefly took a `bare` prop on the shared `StatusBar` to keep the
+notch and drop the indicators; when the notch went too the prop had no caller
+left, and it was reverted — a shared component does not get to keep an option
+nobody passes.
+
+Sixteen of the 44 freed pixels went straight back as padding on the chrome row:
+with nothing above it, that row sat against a 42px corner radius and the back
+button tucked into the bezel's curve. A status bar buys that clearance for free
+and nobody notices until it is gone. The other 28 split between the chart and
+the list — and the list is the half that mattered. A card is 164px, so at the
+179 it had before, exactly one fitted and the counter was the only thing saying
+there were two positions. At 193 the second card's top edge shows below the
+first, and the frame the whole ten seconds is spent earning says it in the list
+as well as in the tab.
+
+Its wallet glyph is **Lucide's** (`wallet`, ISC), inlined rather than depended
+on — the repo already keeps its icons as 24-grid paths, and a package for one
+glyph is a tree to shake for two `d` attributes. The hand-drawn one it replaces
+did not read as a wallet; it read as a card, or a database.
+
+It is also the only surface in the repo set in **Figtree** — the face the real
+app uses, SIL OFL 1.1, self-hosted in two subsets. The other twelve devices stay
+in Montreal, which was an explicit decision (`b2c10ab`) about the site's voice;
+this screen is not speaking in the site's voice. Everything is scoped to
+`.pdev.btc` in `24-demo-btc.css`, and nothing in that file may leak.
+
+**Two rows share one slot.** Long/Short and Modify/Close are drawn in the same
+place, because the reference frames draw them in the same place and because both
+at once is 142px of buttons that push the list the whole ending lands in off the
+bottom of a 766px device. The switch is the book being full: while there is a
+trade left to open the row offers to open one, and on the last frame it offers
+the two things you can do with what you have.
+
+### The chart learned three things from this
+
+All three are opt-in props that default to what every other flow already does.
+
+**`roll`** lets candle time run with nothing to reach. The hold (`9136204`) is
+still the default and still load-bearing — it is what makes every loop of every
+flow draw the identical chart. A cut whose first scene is the market moving
+needs the opposite, and can have it safely for the same reason the hold was
+safe: the series is a pure function of a candle's number, so a rolling window is
+still deterministic. It just has to be re-mounted each pass — `key={deck.pass}`
+on the `<Chart>` — or loop two opens on a different candle.
+
+**`phase`** was the second attempt at "the market is climbing", and the first
+attempt is the more useful half of the story. A linear drift, a few points per
+candle, was built and thrown away: a slope big enough to see over ten seconds is
+690 points across a 46-candle window, which swamps the walk's own shape and
+closes **every** bar green. That is the exact failure `RAMP` has a long note
+about — a ramp with wicks drawn on it. `phase` invents nothing instead: the walk
+is 840 points of real market shape, so somewhere in it is a stretch that rises
+gently and still closes a third of its bars red. 1,628 was found by searching
+six thousand start points for a window whose low is a third of the way in and
+whose high is the right-hand edge — the shape in the reference frames — with the
+last third carrying 251 of its 306 points, still rising over the seven candles
+the cut advances, and **eighteen of forty-six bars red**. The first phase chosen
+scored well on everything except that shape and put its rally on the left, so
+the opening frame of a cut whose first line is "already working" was a market
+rolling over.
+
+**`tick`** is the size of a print, and it is the fix for the one thing that made
+this screen read as aggressive. Measured, before: the header repainted **49
+times a second**, held each value for 20ms, and moved by an *identical* step
+every time — because the live candle's close travels linearly across its
+1,500ms:
+
+```
+$79,598.0 → .2 → .4 → .6 → .8 → 79,599.1 → .3 → .5 → .7
+```
+
+Nothing about that is a fast market. It moved 35 points in six seconds, four
+hundredths of one per cent. It read as aggressive because a digit was being
+repainted forty-nine times a second by a constant increment, and no screen a
+person has ever traded on does that. **The instinct is to slow the market down,
+and it is wrong twice over**: the market is already calm, and a slower linear
+crawl repainted fifty times a second is more obviously a machine, not less.
+
+So the quote is rounded to a tick and reprinted only when it crosses one. The
+gate is the rounding itself — quantise the number and the writes stop on their
+own, because writing the same string twice is a write that does not happen.
+Measured, after:
+
+| | before | after |
+|---|---|---|
+| price | 49 prints/s, 20ms hold | **15 prints/s, 67ms hold** |
+| P&L | 52 prints/s, 19ms hold | **15 prints/s, 67ms hold** |
+| frames that touch the DOM | 68% | **19%** |
+| distance travelled | 35 pts / 6s | 35 pts / 6s — *unchanged* |
+
+$0.50 is read off the reference frames, not chosen: every quote in them lands on
+a half dollar — $79,567.5, $79,577.5, $79,585.5. The rate now follows the market
+rather than the frame rate, which is the property that matters: a fast market
+crosses more ticks and prints more often, exactly as it should.
+
+Two rules fall out of it. **It is the quote that ticks, not the market** — the
+candles, the scale and every price the geometry is built from stay continuous,
+because quantising those would stair-step a body 4px wide, and the point is a
+calm number on a smooth chart rather than a coarse chart. And **write-if-changed
+is the mechanism, not an optimisation**: assigning `textContent` a string it
+already holds still tears the text node down and rebuilds it, so without the
+guard the DOM would churn at 60Hz under a number that had not moved. It is the
+rule `stage/domCache.ts` enforces one level up. It also makes the print
+self-healing — a React re-render that resets the markup is corrected on the next
+frame rather than held until the next crossing.
+
+**`face`** tells the canvas which typeface to set its axis in. Canvas has no
+stylesheet to inherit from, so a device whose UI is not in the default stack has
+to say so, or its chart is the one panel still speaking in the old voice — and
+it is the panel with the most numbers on it.
+
+### One class naming two things, twice
+
+Both visual bugs this device has shipped were the same bug, and neither was
+visible in a diff:
+
+- `.btk` was the chart-type icon *and* the order ticket. The icon's
+  `width: 19px` collapsed the whole ticket to 27px.
+- `.blev` was the leverage chip in the ticket *and* the leverage sheet. The
+  chip — sized to its own text, with no width of its own — collapsed the entire
+  sheet to 67px, so the Save button inside it rendered 35px wide instead of 318.
+
+Neither typechecks as wrong, neither logs anything, and both look like a layout
+that was simply designed badly. The scan that catches them is not "does this
+class exist in another stylesheet" — that one passed both times, because this
+file is scoped to `.pdev.btc` and owns its whole namespace. It is **"is this
+class used at two JSX sites that are two different objects"**, which finds them
+in one pass over `Phone.tsx`. Worth running before adding a class here; a
+device this dense reuses names by accident.
+
+### The palette, and why it lives in TypeScript
+
+Four values — `#202020` the ground, `#262626` a container, `#0A0A0A` the market
+panel, `#03C076` a candle that closed up — and they are declared in
+`perpsv5/palette.ts` rather than in the stylesheet, which is backwards until you
+notice who the second reader is.
+
+**Canvas has no cascade.** `fillStyle` takes a literal and will not resolve
+`var(--btc-up)`, so a palette written in CSS has to be written again in JS for
+the candles, and the two copies drift the first time anyone adjusts one. So the
+values live in one module: `Phone.tsx` writes them onto the device as custom
+properties for `24-demo-btc.css` to read, and hands the same constants to
+`<Chart up down>`. It is the construction `@theme inline` already uses one level
+up in `globals.css`, for the same reason.
+
+**`up` is not only the candle.** The live price line, the chip riding on it and
+the take-profit bracket take the same green, dimmed with `globalAlpha` rather
+than spelled out as a second hex — a chart whose candles and whose price chip
+are two different greens six pixels apart reads as a mistake, and it is one.
+Both props default to the values the chart has always drawn, so no existing
+flow moves.
+
+**An opaque palette breaks a translucent stylesheet.** Every container in this
+file used to be `rgba(255,255,255,.0x)`, which is a fine way to build a grey
+until the ground stops being black: over `#202020` a 7% white lands on `#2E2E2E`
+and not on `#262626`. So every fill that is a *container* is now an opaque
+token, and translucency is kept for what is genuinely an overlay — borders, dim
+text, and a chip sitting inside a card that is already a token, where an opaque
+fill over an identical fill would just be an invisible box.
+
+**The tonal break replaced a divider.** `.bbook` used to be separated from the
+market by an 8px light rule. `#0A0A0A` against `#202020` does that job, so the
+rule is gone — the reference frames have no divider there either, they have
+exactly this change in ground.
+
+### Where v5 is deliberately not 1:1
+
+Three, and all three are the repo's own rules winning over a frame:
+
+- **The axis is less dense.** The reference labels every $100; at `LABEL_PX = 14`
+  — the floor `5fe1387` set, and an accessibility decision rather than a taste
+  one — labels that close would collide, so the step stays at $200.
+- **`Est. trade value` is not abbreviated.** The app writes `$100K`; the ticket
+  writes `$100,000`, because that figure travels from $50,000 as the leverage
+  lands and `Count` cannot ease through an abbreviation. The position card,
+  which does not travel, does write `$120K`.
+- **The balance chip in the chrome is an addition.** Nothing in the frames shows
+  what the account is worth on this screen. The cut opens on a position with
+  $6,000 of margin posted against it, and "what is left" is what makes the
+  second trade legible before the ticket is open.
+
+Two figures also had to move, and the reasoning is in `perpsv5/state.ts`: the
+reference ticket reads *Available to trade $1,087* and this cut types $5,000 of
+margin into it, which that balance cannot pay for. The trade was not the thing
+to change — $5,000 at 20x is the $100,000 position the cut is for. And the two
+exits hang off the mark at 2:1 rather than off the frames' arbitrary
+$82,000 / $78,200, for the same reason `demo/perps/state.ts` already gives.
 
 ## Three versions of the same app
 

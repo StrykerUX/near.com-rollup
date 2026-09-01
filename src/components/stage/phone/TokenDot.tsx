@@ -22,7 +22,14 @@ export function TokenDot({ token, size = 20 }: { token: Token; size?: number }) 
         fontSize: Math.max(12, Math.round(size * 0.42)) + 'px',
       }}
     >
-      {glyph ? (
+      {glyph && 'img' in glyph ? (
+        /* the artwork already contains its own disc, so it covers the dot
+           edge to edge rather than sitting inside it. Plain <img>: it is one
+           small square that never changes size between renders, which is the
+           one case next/image's layout machinery buys nothing for. */
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="tokimg" src={glyph.img} alt="" width={size} height={size} aria-hidden="true" />
+      ) : glyph ? (
         <svg viewBox="0 0 600 600" fill={token.ink} aria-hidden="true">
           {'d' in glyph ? <path d={glyph.d} /> : <polygon points={glyph.points} />}
         </svg>
