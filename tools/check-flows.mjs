@@ -49,6 +49,14 @@ const MODULES = [
   [`${DEMO}/condeposit/script.ts`, 'condeposit-script'],
   [`${DEMO}/consend/state.ts`, 'consend-state'],
   [`${DEMO}/consend/script.ts`, 'consend-script'],
+  /* the marketing cuts. Each one is the same machine as the flow above it,
+     re-grouped into eight or so moments — which is exactly why they are worth
+     walking: a re-cut that dropped or reordered a beat would still typecheck,
+     still build, and refuse silently on the third screen. */
+  [`${DEMO}/swapv4/script.ts`, 'swapv4-script'],
+  [`${DEMO}/earnv4/script.ts`, 'earnv4-script'],
+  [`${DEMO}/condepositv4/script.ts`, 'condepositv4-script'],
+  [`${DEMO}/consendv4/script.ts`, 'consendv4-script'],
 ];
 
 /* The flow files are types plus plain data — no JSX, no bundler features — so
@@ -66,8 +74,12 @@ for (const [src, f] of MODULES) {
     /* each demo's script imports `./state`; they are written out side by side,
        so the rewrite has to know which one it is looking at */
     .replace(/from ['"]\.\/state['"]/g, `from './${f.replace('-script', '')}-state.mjs'`)
-    /* v2 shares the long version's state module rather than copying it */
-    .replace(/from ['"]@\/components\/demo\/perps\/state['"]/g, "from './perps-state.mjs'");
+    /* A CUT DOES NOT GET ITS OWN STATE. v2, v3 and every v4 name their flow's
+       state module by its absolute path rather than importing a copy — that is
+       the whole claim those versions make, that they are the same machine seen
+       differently — so the rewrite has to resolve any feature's state, not
+       just the one this rule was written for. */
+    .replace(/from ['"]@\/components\/demo\/(\w+)\/state['"]/g, "from './$1-state.mjs'");
   writeFileSync(join(dir, `${f}.mjs`), js);
 }
 const load = (f) => import(pathToFileURL(join(dir, `${f}.mjs`)).href);
@@ -86,6 +98,10 @@ const machines = {
   'demo/earn': (await load('earn-script')).earnFlow.machine,
   'demo/confidential-deposit': (await load('condeposit-script')).conDepositFlow.machine,
   'demo/confidential-send': (await load('consend-script')).conSendFlow.machine,
+  'demo/swap-v4': (await load('swapv4-script')).swapV4Flow.machine,
+  'demo/earn-v4': (await load('earnv4-script')).earnV4Flow.machine,
+  'demo/confidential-deposit-v4': (await load('condepositv4-script')).conDepositV4Flow.machine,
+  'demo/confidential-send-v4': (await load('consendv4-script')).conSendV4Flow.machine,
 };
 
 let fail = 0;
@@ -146,7 +162,44 @@ for (const [name, m] of Object.entries(machines)) {
 }
 
 /* ==========================================================================
-   4 · THE TAKE PROFIT FILLS ON THE FRAME THE MARKET REACHES IT
+   4 · A MARKETING CUT IS THE SAME FLOW, RE-GROUPED
+   --------------------------------------------------------------------------
+   Each v4 is the same machine as the flow it was cut from, with the steps
+   merged into eight or so moments. That means its beats must be the SAME
+   beats, in the SAME order — a cut is where the step boundaries fall, not a
+   different set of gestures. A re-cut that quietly dropped a beat, or typed a
+   different figure, or pressed two things in the other order would still
+   typecheck and still build, and would refuse on some screen halfway through
+   where nobody is looking for the cause.
+   Only beats that DO something are compared: a cut is free to hold longer,
+   and free to add a silent beat at the end to hold on its last frame.
+   ========================================================================== */
+{
+  const PAIRS = [
+    ['demo/swap', 'demo/swap-v4'],
+    ['demo/earn', 'demo/earn-v4'],
+    ['demo/confidential-deposit', 'demo/confidential-deposit-v4'],
+    ['demo/confidential-send', 'demo/confidential-send-v4'],
+  ];
+  const gestures = (m) => m.beats.filter((b) => b.do).map((b) => b.do + (b.arg === undefined ? '' : `:${b.arg}`));
+  console.log('\n== marketing cuts play the same beats as the flows they are cut from');
+  for (const [base, cut] of PAIRS) {
+    const a = gestures(machines[base]);
+    const b = gestures(machines[cut]);
+    const i = a.findIndex((x, n) => x !== b[n]);
+    if (a.length !== b.length || i !== -1) {
+      const at = i === -1 ? Math.min(a.length, b.length) : i;
+      bad(cut, `beat ${at + 1} of ${base} is "${a[at] ?? '(end)'}" but the cut plays `
+        + `"${b[at] ?? '(end)'}" — a cut re-groups beats, it does not change them`);
+    } else {
+      console.log(`   ${cut}: ${a.length} gestures, ${machines[cut].beats.length} beats, `
+        + `${machines[base].beats.length} in ${base} — same gestures, ${machines[cut].beats.length - a.length} holds`);
+    }
+  }
+}
+
+/* ==========================================================================
+   5 · THE TAKE PROFIT FILLS ON THE FRAME THE MARKET REACHES IT
    --------------------------------------------------------------------------
    Three numbers in three files have to agree: the chart's climb length
    (RAMP_CANDLES x CANDLE_MS, in real milliseconds), the deck's PACE, and the

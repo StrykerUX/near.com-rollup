@@ -28,7 +28,7 @@ const DEMOS = [
     href: '/demo/perps-v3',
     name: 'Perps v3',
     len: 'the same trade, quieter',
-    steps: 9,
+    steps: 10,
     blurb:
       'Half as much on screen and nothing to follow. No pointer — the control about to change lights itself, and every derived figure travels to its new value, so the link between the slider and the number that answered is the thing you watch.',
   },
@@ -36,7 +36,7 @@ const DEMOS = [
     href: '/demo/perps-v4',
     name: 'Perps v4',
     len: 'the marketing cut',
-    steps: 8,
+    steps: 9,
     blurb:
       'The same trade as a film. One line of copy at a time, and a camera that pushes in on whatever the moment is about — the map that used to move a pointer now moves the frame.',
   },
@@ -49,12 +49,28 @@ const DEMOS = [
       'A whole USDT balance turned into NEAR across chains — and the yield chip that was sitting on the next row the entire time, used without leaving the list.',
   },
   {
+    href: '/demo/swap-v4',
+    name: 'Swap v4',
+    len: 'the marketing cut',
+    steps: 9,
+    blurb:
+      'The same eighteen steps as nine. One line of copy at a time, and the yield chip promoted from a detail on a row to the moment the cut ends on.',
+  },
+  {
     href: '/demo/earn',
     name: 'Earn',
     len: '48s',
-    steps: 16,
+    steps: 17,
     blurb:
       'Two vaults with every fee stated before the rate, a deposit signed with a passkey, and then paying someone straight out of a vault balance.',
+  },
+  {
+    href: '/demo/earn-v4',
+    name: 'Earn v4',
+    len: 'the marketing cut',
+    steps: 9,
+    blurb:
+      'The deposit and what it buys, in nine moments: every fee stated before the amount field, both numbers moving after it settles, and the vault turning up in the token picker as something you can spend.',
   },
   {
     href: '/demo/confidential-deposit',
@@ -65,12 +81,28 @@ const DEMOS = [
       'Three quarters warning, and that is the design: two rules in red, a box that gates the button, and an address that is single-use and expires.',
   },
   {
+    href: '/demo/confidential-deposit-v4',
+    name: 'Confidential deposit v4',
+    len: 'the marketing cut',
+    steps: 7,
+    blurb:
+      'Seven moments, and the refusal is still one of them — the picker naming the chains it will not take is the most interesting thing the screen does.',
+  },
+  {
     href: '/demo/confidential-send',
     name: 'Confidential send',
     len: '10s',
     steps: 8,
     blurb:
       'The shortest recording, and the finding is what it does not contain. There is no confidential mode — a shielded asset is picked from the same list as any other.',
+  },
+  {
+    href: '/demo/confidential-send-v4',
+    name: 'Confidential send v4',
+    len: 'the marketing cut',
+    steps: 6,
+    blurb:
+      'Six, because six is the honest length. A ten-second recording whose finding is that there is nothing extra to show does not get a seventh moment invented for it.',
   },
 ];
 
@@ -84,6 +116,11 @@ export default function Page() {
           Five screen recordings, rebuilt frame by frame as running screens rather than video.
           Each page plays its own timeline, lets you take the controls, and writes the argument for
           what the app is doing beside it. Every figure on them is the figure that was on screen.
+        </p>
+        <p>
+          Several are here more than once. A <b>v4</b> is the same machine and the same gestures
+          re-cut into eight or so moments, with the reasons taken off the page and one line of copy
+          left in their place — the argument made to a room rather than to a reader.
         </p>
       </header>
 

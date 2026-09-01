@@ -1,12 +1,17 @@
 /* =========================================================================
-   /demo/perps-v4 — the marketing cut
+   /demo/*-v4 — the marketing cut, for every flow
    -------------------------------------------------------------------------
    The other versions are arguments, so they put the phone beside their
    reasons. This one is a film: the phone is the only object on the page, the
    copy is one line at a time, and the camera moves.
 
    Everything below is the room the phone stands in and the way it is looked
-   at. Nothing here reaches inside the device — that is v3's, unchanged.
+   at. Nothing here reaches inside the device — each flow brings its own
+   device, unchanged, and none of them knows it is being filmed.
+
+   Written for perps and then found to name nothing about perps: every rule
+   here is about a phone, a headline and a row of dots. Shared rather than
+   copied five times, which is also the only way the five cuts stay one cut.
    ========================================================================= */
 
 .v4 {
