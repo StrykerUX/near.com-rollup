@@ -20,12 +20,14 @@ import { useEffect, useRef, type RefObject } from 'react';
  */
 
 const CANDLES = 46;
-/* slower. A candle every 2.4s made a market that never sat still long enough
-   to be read; the demos it sits behind hold a screen for six seconds or more,
-   and in that time the old rate turned over two and a half candles. */
-const CANDLE_MS = 3600;
-/** how long the series takes to reach a price it has been pointed at */
-const RAMP_MS = 9000;
+const CANDLE_MS = 2400;
+/**
+ * How many candles the climb into a target takes. Counted in CANDLES and not
+ * in milliseconds on purpose: the move belongs to the bars it happens in, so a
+ * bar that has formed keeps the price it formed at no matter how long anyone
+ * watches afterwards.
+ */
+const RAMP_CANDLES = 4;
 /** the price the flow's copy quotes, so the two cannot drift */
 export const BASE_PRICE = 79654;
 
@@ -78,33 +80,25 @@ function walk(k: number) {
   );
 }
 
-/** the wicks, keyed to the candle's own number so they never move once drawn */
-function candle(k: number): Candle {
-  const r = rng(k * 2654435761);
-  const o = BASE_PRICE + walk(k);
-  const c = BASE_PRICE + walk(k + 1);
-  const reach = 20 + r() * 40;
-  return {
-    o,
-    c,
-    h: Math.max(o, c) + r() * reach,
-    l: Math.min(o, c) - r() * reach,
-  };
-}
-
 /**
  * The axis labels and the price chips. Canvas draws text with no stylesheet to
- * inherit from, so the scale the rest of the UI keeps has to be stated here or the one place it is broken is the one place no
- * audit of the CSS can see.
+ * inherit from, so the scale the rest of the UI keeps has to be stated here or
+ * the one place it is broken is the one place no audit of the CSS can see.
  */
 const LABEL_PX = 14;
 /**
  * How much of the right edge belongs to the price axis. It was a bare 54,
- * tuned by eye against 9px labels; at 12px "$80,200" is wider than that and
+ * tuned by eye against 9px labels; at 14px "$80,200" is wider than that and
  * the candles ran under it. Derived now, so the next change to LABEL_PX moves
  * the gutter with it.
  */
 const AXIS_W = Math.round(LABEL_PX * 4.6) + 8;
+
+/* The bar itself is built inside the draw loop, in `bar()`. It has to be: a
+   candle's open is the previous candle's close, and once a trade is open that
+   chain runs through an offset the loop owns. Building it out here meant
+   applying the offset to a finished bar, which moved it as a block and broke
+   the chain — see the note beside `priceAt`. */
 
 export type ChartProps = {
   /** draws the dashed entry line and its chip */
@@ -198,9 +192,11 @@ export function Chart({
        rather than appear — a line that is simply there in the next frame reads
        as a rendering artefact, not as a position that was just opened */
     let entryAt = 0;
-    /* when the series was first pointed at a price, so the climb into it has a
-       start rather than being wherever the clock happens to be */
-    let towardAt = 0;
+    /* THE CANDLE THE TRADE OPENED ON, and the price the market was at when it
+       did. Everything before this index is history and is never touched again;
+       everything from it forward carries the move. */
+    let towardK = -1;
+    let towardFrom = 0;
     let w = 0;
     let h = 0;
 
@@ -236,29 +232,52 @@ export function Chart({
       /* no modulo: the window walks forward for as long as anyone watches, and
          `walk` is what keeps the price in range rather than the array's end */
       const shift = reduce ? 0 : Math.floor(clock / CANDLE_MS);
-      /* THE CLIMB. `toward` is a price the series is pointed at; the blend is
-         eased over RAMP_MS and weighted toward the newest candles, so the
-         history keeps its shape and the right-hand edge is what bends up into
-         the line it was aimed at. */
+      /* THE CLIMB, AND WHY IT IS AN OFFSET PER CANDLE AND NOT A BLEND.
+         The first version weighted the lift by a candle's position in the
+         VISIBLE WINDOW, which had two faults and they were the same fault: the
+         whole chart moved, and it moved differently every frame. A bar drawn
+         near the right edge was lifted almost fully; as the window scrolled,
+         that same bar found itself further left, got a smaller weight and sank
+         back down. History rewrote itself continuously.
+         The move belongs to the bars it happened in. `towardK` is the absolute
+         index of the candle the trade opened on — anything before it is
+         finished and is never touched again, and anything from it forward
+         carries an offset that eases in over RAMP_CANDLES.
+         It is an OFFSET rather than a blend toward the price, so once the climb
+         is done the market keeps its own shape around the new level instead of
+         being pinned flat to a number. A take profit is met and then traded
+         through, which is what meeting one looks like. */
       const aim = props.current.toward ?? null;
-      if (!aim) towardAt = 0;
-      else if (!towardAt) towardAt = clock;
-      const u = aim ? Math.min(1, Math.max(0, (clock - towardAt) / RAMP_MS)) : 0;
-      const ramp = u * u * (3 - 2 * u);
-      const lift = (v: number, i: number) => {
-        if (!aim || ramp <= 0) return v;
-        /* squared, so the left edge is untouched and the bend is recent */
-        const wgt = Math.pow(i / (CANDLES - 1), 2.4);
-        return v + (aim - v) * ramp * wgt;
+      if (!aim) towardK = -1;
+      else if (towardK < 0) {
+        towardK = shift + CANDLES - 1;
+        towardFrom = BASE_PRICE + walk(towardK);
+      }
+      const offset = (k: number) => {
+        if (!aim || towardK < 0 || k < towardK) return 0;
+        const u = Math.min(1, (k - towardK) / RAMP_CANDLES);
+        return (aim - towardFrom) * (u * u * (3 - 2 * u));
+      };
+
+      /* THE OFFSET GOES INTO THE PRICE, NOT ONTO THE CANDLE.
+         Adding it to a finished bar moved that bar as a block, so during the
+         climb each one sat a few hundred points above the last with nothing
+         joining them — a staircase of candles floating in clear air. A candle
+         opens where the one before it closed, and that has to survive the lift,
+         so the open takes this candle's offset and the close takes the next
+         one's. It is the same rule the seamless walk is built on. */
+      const priceAt = (k: number) => BASE_PRICE + walk(k) + offset(k);
+      const bar = (k: number): Candle => {
+        const r = rng(k * 2654435761);
+        const o = priceAt(k);
+        const c = priceAt(k + 1);
+        const reach = 20 + r() * 40;
+        return { o, c, h: Math.max(o, c) + r() * reach, l: Math.min(o, c) - r() * reach };
       };
 
       const view: Candle[] = [];
       for (let i = 0; i < CANDLES; i++) {
-        const raw = candle(i + shift);
-        const src = {
-          o: lift(raw.o, i), c: lift(raw.c, i),
-          h: lift(raw.h, i), l: lift(raw.l, i),
-        };
+        const src = bar(i + shift);
         view.push(i === CANDLES - 1
           ? { ...src, c: src.o + (src.c - src.o) * phase,
               h: src.o + (src.h - src.o) * phase, l: src.o + (src.l - src.o) * phase }

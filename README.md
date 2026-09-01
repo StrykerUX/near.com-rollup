@@ -437,9 +437,30 @@ empties when the order lands and that is what makes it ready for the next one.
 **The market is pointed at the take profit.** `toward` is the only scripted
 thing on this chart, and it earns its place: a market that has to be watched
 reaching a bracket inside one screen of a demo is not going to get there on its
-own, and waiting for a random walk to oblige is not a demo, it is a wait. The
-ramp is eased over nine seconds and weighted toward the newest candles, so the
-history keeps its shape and the right-hand edge is what bends up.
+own, and waiting for a random walk to oblige is not a demo, it is a wait.
+
+Getting that right took two goes, and the first was wrong in a way worth
+recording. It weighted the lift by a candle's position in the VISIBLE WINDOW,
+which had two faults that were the same fault: the whole chart moved, and it
+moved differently every frame — a bar lifted near the right edge sank back down
+as the window scrolled it leftward, so history rewrote itself continuously. The
+move belongs to the bars it happened in. `towardK` is now the absolute index of
+the candle the trade opened on; anything before it is finished and is never
+touched again.
+
+Then the second half of the same problem. Adding the offset to a finished bar
+moved that bar as a block, so during the climb each one sat a few hundred points
+above the last with nothing joining them — a staircase of candles floating in
+clear air. A candle opens where the one before it closed, and that has to
+survive the lift, so the open takes this candle's offset and the close takes the
+next one's. It is the same rule the seamless walk is built on, and checking it
+is the same check: `close(k) − open(k+1)` is exactly zero across the boundary,
+and the offset before the trade is exactly zero.
+
+It is an offset rather than a blend toward the price, so once the climb is done
+the market keeps its own shape around the new level instead of being pinned flat
+to a number. A take profit is met and then traded through, which is what meeting
+one looks like.
 
 The figures moved with it. The recording's $82,000 and $78,200 were an arbitrary
 pair at 1.6:1; the brackets are now a thousand above the entry and five hundred
