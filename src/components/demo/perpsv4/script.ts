@@ -6,10 +6,17 @@ import { actions, initialFunded, type PD, type PDAction } from '@/components/dem
  * ==================================================================
  * Same machine again. What changes is the camera and the copy.
  *
- * The other three versions explain. This one SHOWS: eight moments, each framed
- * on the one thing it is about, with a line of copy beside the phone instead of
- * a rail of notes under it. A step declares where the camera stands (`shot`)
- * and, when a figure is the point, what to hang on it (`callout`).
+ * The other three versions explain. This one SHOWS: eight moments, a line of
+ * copy beside the phone instead of a rail of notes under it, and — on three of
+ * them — everything but the subject darkened.
+ *
+ * THREE, NOT EIGHT. `shot` was on almost every step once, and an effect that
+ * arrives every time stops meaning anything: it becomes the house style rather
+ * than an instruction. It is kept for the moments where a reader would
+ * otherwise be looking at the wrong half of the screen — a number being typed,
+ * a figure travelling, a refusal appearing under a field. The rest are carried
+ * by what the UI does on its own: a sheet arriving, a box ticking, a signature
+ * rising.
  *
  * The beats are longer than anywhere else. A push in, a hold, a pull back is
  * three seconds of screen time on its own, and a cut that lands before the eye
@@ -40,7 +47,6 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'long', ch: 'market',
     title: 'Pick a side',
     note: 'Long or short. The same ticket, with the sign reversed.',
-    shot: { on: 'side:long' },
     beats: [{ ms: 3200, do: 'openTicket', arg: 'long' }],
   },
 
@@ -72,7 +78,6 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'prot', ch: 'protect',
     title: 'Both exits, before you are in',
     note: 'One checkbox opens the pair. Where to leave when it works, and where to leave when it does not.',
-    shot: { on: 'prot' },
     beats: [{ ms: 3000, do: 'prot' }, { ms: 1600, do: 'unit', arg: 'tp' }],
   },
   {
@@ -95,7 +100,6 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'sign', ch: 'sign',
     title: 'One signature for all of it',
     note: 'The leverage, the order and both exits go as a single signed intent. No password, no seed phrase.',
-    shot: { on: 'passkey' },
     beats: [
       { ms: 2800, do: 'submit' },
       { ms: 2000, do: 'ostep' },

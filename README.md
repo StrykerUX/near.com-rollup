@@ -394,6 +394,16 @@ emphasis and none of the disorientation. Nothing scales, nothing moves except
 the cutout travelling between controls, and that trip is the only motion left in
 the shot.
 
+It was then dialled most of the way back down. The first version ringed the
+cutout in green, dimmed everything else by seventy per cent, and ran on six of
+the eight steps — strong enough to become the subject itself, and arriving so
+often it stopped being an instruction and started being the house style. It is
+now a dim with no ring at all, in two steps of falloff so the boundary reads as
+a change in light rather than a cut, on **three** steps: a number being typed, a
+figure travelling, a refusal appearing under a field. The other five are carried
+by what the UI already does — a sheet arriving, a box ticking, a signature
+rising.
+
 Two things the camera taught us before it went, and both survive in the
 replacement:
 

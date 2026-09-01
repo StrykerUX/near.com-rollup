@@ -72,20 +72,22 @@
 }
 .v4frame .pdev { transform: none; width: 352px; height: 766px }
 
-/* THE FOCUS.
-   One box over the control the step is about, casting a shadow big enough to
-   cover everything else. The control is not lit — the rest is darkened, which
-   is the same contrast and none of the disorientation a zoom brings with it.
+/* THE FOCUS, AND HOW LITTLE OF IT THERE IS.
+   One box over the control a step is about, casting a shadow big enough to
+   cover the rest of the screen. Nothing is lit — the rest is darkened.
 
-   This replaced a camera that scaled the whole device. Scale is a poor way to
-   say "look here" when the thing being looked at is a phone: the screen grew,
-   the bezel stopped reading as a bezel, and half of every move was spent
-   re-finding where you were.
+   It went through two versions before this one. The first scaled the whole
+   device, which read as a magnifier rather than as attention. The second kept
+   the cutout but ringed it in green and dimmed everything else by seventy per
+   cent, on six of the eight steps: an effect strong enough to be the subject
+   itself, arriving so often it stopped meaning anything.
 
-   Only `opacity` and the four position properties transition. The box travels
-   between controls, and that trip is the only motion left in the shot — which
-   is the point: the eye follows one thing, and it is the frame of attention
-   rather than the screen. */
+   What is left is a dim and no ring at all. The cutout has a shape because of
+   the contrast across its edge, not because a line was drawn on it, and the
+   falloff is two steps rather than one so the boundary is a change in light
+   rather than a cut. Three steps use it — see `shot` in the script — and they
+   are the three where a reader would otherwise be looking at the wrong half of
+   the screen. */
 .v4focus {
   position: absolute; pointer-events: none; z-index: 30;
   left: var(--fx, 0); top: var(--fy, 0);
@@ -93,17 +95,15 @@
   border-radius: var(--fr, 14px);
   opacity: var(--fo, 0);
   box-shadow:
-    /* the edge, so the cutout has a shape rather than just an absence */
-    inset 0 0 0 1px rgba(0, 236, 151, .32),
-    0 0 26px -2px rgba(0, 236, 151, .22),
-    /* and the dark, wider than the screen it is clipped against */
-    0 0 0 9999px rgba(3, 6, 11, .70);
+    /* the near ring is lighter, so the edge is a falloff and not a cut */
+    0 0 0 26px rgba(3, 6, 11, .22),
+    0 0 0 9999px rgba(3, 6, 11, .5);
   transition:
     left 640ms cubic-bezier(.22, 1, .3, 1),
     top 640ms cubic-bezier(.22, 1, .3, 1),
     width 640ms cubic-bezier(.22, 1, .3, 1),
     height 640ms cubic-bezier(.22, 1, .3, 1),
-    opacity 520ms var(--ease-out);
+    opacity 620ms var(--ease-out);
 }
 
 /* The annotation hangs off the phone rather than sitting on it, because the
