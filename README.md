@@ -970,6 +970,55 @@ to change — $5,000 at 20x is the $100,000 position the cut is for. And the two
 exits hang off the mark at 2:1 rather than off the frames' arbitrary
 $82,000 / $78,200, for the same reason `demo/perps/state.ts` already gives.
 
+## `/home-v2` — the real device, on the real page
+
+The screen `/demo/perps-v5` runs, unchanged, standing in the home page's room:
+its gradient field, its lockup, its quote, its scroll, its light zone. Not a
+version of that screen — the same `<Phone>` file, the same `useDeck`, the same
+flow, the same 352 × 766. Anything fixed there is fixed here by construction.
+
+`flows/deck.tsx` carries the choice, a context beside `flows/mode.tsx` and for
+the same reason: it is made at the page and consumed four levels down, and
+threading it through Site → Stage → Lockup → PhoneShell would put a parameter on
+three components with no opinion about it.
+
+### The first attempt was a rebuild, and that was the mistake
+
+It compacted the screen into the tour's plate. `.cswap` gives 547px on a desktop
+and 309 where the lockup stacks; the device lays out 763. Fitting it meant
+dropping the chrome and the time axis, re-authoring the ticket as a composition
+instead of a sheet, and hiding the position list on a short plate. All of that
+is defensible work and none of it was the thing asked for. **The point of
+putting this screen on this page is to look at that screen**, and a version
+edited down to fit answers a question nobody had.
+
+So the plate stops being a plate. `.morph` keeps its id and every transform the
+engine writes to it — `--card-y` (the peek), `--card-s` (the plate shrink),
+`--card-pk`, `--card-o` — so the entry, the recede and the fade all still happen
+to it. What it gives up is being a *surface*: no glass, no blur, no border, no
+halo, and no clip, because the device carries its own bezel and is taller than
+the height the engine writes. The header, the tab bar and the three other faces
+are not rendered. **The tour is one screen long on this route**, which is the
+trade and was accepted as one.
+
+The engine tolerates that: `chromeTitleEl` is null-guarded, and nothing in it
+dereferences a particular face, so an empty deck is a deck that paints nothing.
+
+### The scale is the ladder 17-demo.css already has
+
+Keyed to viewport height, with the same numbers, for the reason that file's own
+note gives — the device is drawn at its own size and only shrinks when it cannot
+fit. Same ladder means the device on this page and the device on
+`/demo/perps-v5` are the same size at any window: 352 × 766 at 1440 × 900, and
+0.87 of that on a 800px-tall one.
+
+It is centred on the plate rather than pinned to its top. The engine writes
+`.morph` a height sized for a four-card deck — 696 — and the device is 766
+before scaling; anchored at the top it would hang 70px below the box the rest of
+the composition is laid out around. Centred, it overhangs evenly and the plate's
+height stops mattering, which is what it should do on a route with no cards in
+it.
+
 ## Three versions of the same app
 
 There are three routes. They are the same page, the same four screens and the

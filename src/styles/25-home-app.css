@@ -1,0 +1,79 @@
+/* =========================================================================
+   /home-v2 — THE PLATE GIVES UP AND HOLDS THE REAL DEVICE
+   -------------------------------------------------------------------------
+   `.morph` on this route is not a card. It keeps its id and every transform
+   the stage engine writes to it — `--card-y` (the peek), `--card-s` (the plate
+   shrink), `--card-pk`, `--card-o` — so the entry, the recede and the fade all
+   still happen to it. What it stops being is a SURFACE: no glass, no blur, no
+   border, no halo, no clipping. It is a carrier, and the object on the page is
+   `/demo/perps-v5`'s device at its own size.
+
+   WHY NOT COMPACT IT INTO THE PLATE. That was built first and thrown away.
+   `.cswap` gives 547px on a desktop and the device lays out 763, so fitting it
+   meant dropping the chrome, the time axis and the ticket's sheet, and
+   re-authoring the ticket as a composition — a different screen wearing the
+   same palette. The point of putting this screen on this page is to look at
+   THAT screen.
+
+   THE SCALE IS THE ONE 17-demo.css ALREADY USES, keyed to viewport height, for
+   the reason its own note gives: the device is drawn at its own size and only
+   shrinks when it cannot fit. Same ladder, same numbers, so the device on this
+   page and the device on `/demo/perps-v5` are the same size at any window.
+   ========================================================================= */
+
+.morph.appmorph {
+  --k: 1;
+  /* the surface goes, all of it. An opaque device inside a blurred plate is a
+     phone drawn inside a phone; the device carries its own bezel, border and
+     shadow, and 07-stage.css's halo was lighting a card that is no longer
+     there. */
+  background: none;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  /* AND THE CLIP GOES WITH IT. `.morph` is `overflow: hidden` so a card's
+     faces cannot escape it; here the thing inside is taller than the height
+     the engine writes, and clipping it would cut the device off at a line that
+     means nothing on this route. */
+  overflow: visible;
+  width: calc(352px * var(--k));
+  display: block;
+}
+/* the engine swaps the backdrop for a flat fill during a move (§3.48). There is
+   no backdrop here, so there is nothing to swap and nothing to match. */
+.morph.appmorph.moving { background: none }
+
+/**
+ * THE DEVICE IS CENTRED ON THE PLATE, not pinned to its top.
+ *
+ * The engine writes `.morph` a height sized for a four-card deck — 696 on a
+ * desktop — and the device is 766 before scaling. Anchored at the top it would
+ * hang 70px below the box the rest of the composition is laid out around;
+ * centred, it overhangs evenly and the plate's height stops mattering, which is
+ * what it should do on a route with no cards in it.
+ */
+.appmorph .appdev {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: calc(352px * var(--k));
+  height: calc(766px * var(--k));
+}
+
+/* THE SAME LADDER AS 17-demo.css, and it has to stay the same: a device that
+   is 0.95 on `/demo/perps-v5` and 0.87 here is two devices. Keyed to viewport
+   HEIGHT because that is what a 766px-tall object runs out of first. */
+@media (max-height: 899px) { .morph.appmorph { --k: .95 } }
+@media (max-height: 839px) { .morph.appmorph { --k: .87 } }
+@media (max-height: 779px) { .morph.appmorph { --k: .79 } }
+@media (max-height: 719px) { .morph.appmorph { --k: .71 } }
+@media (max-height: 659px) { .morph.appmorph { --k: .64 } }
+
+/* Below the width where the lockup stacks, the column is the constraint rather
+   than the height — the device has to fit beside nothing instead of beside the
+   copy, and 86vw is the same bound `.morph` itself uses. */
+@media (max-width: 1080px) {
+  .morph.appmorph { --k: min(.95, calc(86vw / 352px)) }
+}

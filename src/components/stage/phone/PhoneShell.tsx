@@ -4,11 +4,13 @@ import { CH_TITLES } from '@/lib/schedule';
 import { AccountFace } from './AccountFace';
 import { EarnFace } from './EarnFace';
 import { IconLock, IconScan } from './icons';
+import { AppDevice } from './AppDevice';
 import { PerpsFace } from './PerpsFace';
 import { SwapFace } from './SwapFace';
 import { TabBar } from './TabBar';
 import { SheetSlotProvider } from './ui/SheetSlot';
 import { useMode } from './flows/mode';
+import { useDeckVariant } from './flows/deck';
 
 /**
  * The phone shell: one chrome, four screens.
@@ -29,9 +31,30 @@ export function PhoneShell() {
      affordances and the demo's slower entrances are both CSS, and both keyed
      off this one attribute */
   const mode = useMode();
+  /* which perps screen this page shows — see flows/deck.tsx */
+  const deck = useDeckVariant();
+
+  /**
+   * `app` IS NOT A FOURTH FACE, IT IS THE PLATE GIVING UP.
+   *
+   * The shell below is a chrome plus a four-card viewport, and the device it
+   * would have to hold lays out 763px of screen into 547 of `.cswap`. There is
+   * no arrangement of those two numbers that leaves the device unchanged, so
+   * this route does not try: `.morph` keeps its id and its transforms — the
+   * engine still owns the peek, the shrink and the fade — and holds the real
+   * device instead of a viewport. The header, the tab bar and the three other
+   * faces are not rendered. The tour is one screen long here, on purpose.
+   */
+  if (deck === 'app') {
+    return (
+      <div className="morph appmorph" id="morph" data-mode={mode} data-deck={deck}>
+        <AppDevice />
+      </div>
+    );
+  }
 
   return (
-    <div className="morph" id="morph" data-mode={mode}>
+    <div className="morph" id="morph" data-mode={mode} data-deck={deck}>
       <SheetSlotProvider>
         <div className="hhead">
           <span className="avatar" aria-hidden="true"><NearGlyph /></span>
