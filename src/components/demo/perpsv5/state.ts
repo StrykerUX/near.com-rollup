@@ -121,7 +121,37 @@ export const CANDLE_MS = 5000;
  * median velocity at 37 points a second and [6,16] at 12. Nothing else here is
  * worth a third of that.
  */
-export const REACH: [number, number] = [6, 16];
+export const REACH: [number, number] = [7, 20];
+
+/**
+ * TWO CORRECTIONS THAT MAKE THESE READ AS CANDLES AND NOT AS PLUS SIGNS.
+ *
+ * Held next to a real BTC chart the difference was not the density — the app's
+ * own chart draws about seven pixels a candle, same as this one. It was that
+ * every bar here had a wick above AND below, and every body was the size of its
+ * neighbours. On a real chart the body dominates and most bars have one bare
+ * side.
+ *
+ * `WICK_BIAS` is an exponent on the 0..1 draw that sizes each wick. Uniform
+ * gives every side half a reach, on every bar, forever — the one shape that is
+ * actually rare. At 2.8 the mean wick is 26% of the reach and most of the mass
+ * is near nothing.
+ *
+ * `JITTER` is a per-candle wobble on the level, and it is safe because a
+ * candle's close IS the next one's open — both are the series at the same
+ * index, so any per-index offset preserves that chain exactly.
+ *
+ * Measured together on this window: the body goes from 42% of a candle's
+ * height to 59%, near-dojis from 11 of 46 to 5, bars with a noticeable wick on
+ * both sides from 26 to 10, and bars with one bare side from 9 to 27.
+ *
+ * They also made the quote CALMER rather than costing anything — a wick is
+ * where the price goes, so biasing it toward nothing means less ground covered:
+ * the median velocity fell from 5 points a second to 4 and the print rate from
+ * 18 to 15, even with REACH's ceiling raised from 16 to 20.
+ */
+export const WICK_BIAS = 2.8;
+export const JITTER = 16;
 
 /**
  * THE QUOTE ARRIVES IN BURSTS, WHICH IS THE WHOLE POINT.

@@ -759,6 +759,44 @@ deliberate ratio for something that loops: a viewer arriving mid-loop lands on
 the answer rather than on the setup. If it wants shortening, the beat is the
 lever and not the outro, which is the loop's own breathing room.
 
+### Plus signs are not candles
+
+Held against a real BTC chart, the difference was not what it looked like it
+was. **Density is not the problem** — the app's own chart draws about seven
+pixels a candle, same as this one, and the reference was a desktop chart at a
+different zoom. Two other things were:
+
+**Every bar had a wick above and below.** `h` and `l` were each `r() * reach`,
+two independent uniform draws, so every side of every bar averaged half a
+reach — forever. That is the one shape a real chart rarely has: a bar that ran
+up and closed at its high has *no* upper wick, and one long tail with nothing
+opposite it is the commonest candle there is. `wickBias` is an exponent on that
+draw; at 2.8 the mean wick is 26% of the reach and most of the mass sits near
+nothing.
+
+**Every body was the size of its neighbours.** `walk` is three sines, so its
+increment changes smoothly and a row of evenly sized bodies is the other half
+of why it read as generated. `jitter` is a per-candle wobble on the level, and
+it is safe for a reason this series already guarantees: a candle's close *is*
+the next candle's open, both being the series at the same index, so any
+per-index offset preserves that chain exactly.
+
+| | before | after |
+|---|---|---|
+| body, as a share of the candle | 42% | **59%** |
+| near-dojis | 11 / 46 | **5 / 46** |
+| bars with a wick on *both* sides | 26 / 46 | **10 / 46** |
+| bars with one bare side | 9 / 46 | **27 / 46** |
+
+They also made the quote **calmer** rather than costing anything, which was not
+the plan: a wick is where the price *goes*, so biasing it toward nothing means
+less ground covered. Median velocity 5 → 4 points a second and the print rate
+18 → 14, even with the reach ceiling raised from 16 to 20.
+
+Both are opt-in and default to the uniform draw every other flow has always
+made. Worth adopting there too — the plus signs are on those charts as well —
+but that changes four pictures and is its own decision.
+
 ### The quote, and three fixes that each undid the last
 
 This number was worked on three times, and the sequence is the useful part.

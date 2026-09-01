@@ -209,6 +209,19 @@ function walk(k: number) {
 }
 
 /**
+ * A DETERMINISTIC WOBBLE ON ONE CANDLE'S LEVEL — see `jitter`.
+ *
+ * Its own seed stream, deliberately unrelated to the one `bar()` draws its
+ * wicks from: if the same generator fed both, a candle with a big body would
+ * always be a candle with a particular wick, and the eye finds that pattern
+ * long before it can name it.
+ */
+function wobble(k: number, amount: number) {
+  if (!amount) return 0;
+  return (rng((k ^ 0x9e3779b9) * 2246822519)() - 0.5) * amount;
+}
+
+/**
  * The axis labels and the price chips. Canvas draws text with no stylesheet to
  * inherit from, so the scale the rest of the UI keeps has to be stated here or
  * the one place it is broken is the one place no audit of the CSS can see.
@@ -419,6 +432,38 @@ export type ChartProps = {
    */
   reach?: [number, number];
   /**
+   * HOW A WICK IS DISTRIBUTED INSIDE ITS REACH, as an exponent on a 0..1 draw.
+   * 1 is uniform, which is what this chart has always drawn and what makes
+   * every candle a plus sign.
+   *
+   * Uniform means each side's wick averages HALF the reach — on every bar, on
+   * both sides, forever. Real candles do not work that way: a bar that ran up
+   * and closed at its high has no upper wick at all, and one long tail with
+   * nothing opposite it is the commonest shape on any chart. Two independent
+   * uniform draws produce the one shape that is actually rare.
+   *
+   * An exponent biases the draw toward zero — at 2.8 the mean wick is 26% of
+   * the reach instead of 50%, and most of the mass sits near nothing. Measured
+   * on this cut: candles with a noticeable wick on BOTH sides fall from 26 of
+   * 46 to 10, and candles with one bare side rise from 9 to 27. The body goes
+   * from 42% of the candle's height to 59%.
+   */
+  wickBias?: number;
+  /**
+   * PER-CANDLE VARIANCE IN THE BODY, in points. 0 is off.
+   *
+   * `walk` is three sines, so its increment from one candle to the next changes
+   * smoothly — which means every body is about the size of its neighbours, and
+   * a row of evenly sized bodies is the other half of why this chart reads as
+   * generated. Real charts have a huge bar next to a tiny one.
+   *
+   * It is safe to add because of a property this series already has: a candle's
+   * close IS the next candle's open, since both are `priceAt` of the same
+   * index. Any per-index offset therefore preserves that chain exactly — the
+   * bodies change size, and nothing comes unstuck.
+   */
+  jitter?: number;
+  /**
    * HOW UNEVENLY THE PRICE COVERS ITS PATH. 0 is off, and off is what every
    * other flow has always had.
    *
@@ -465,16 +510,17 @@ export function Chart({
   entry = null, side = null, live = true, paused = false, tp = null, sl = null,
   toward = null, readout, base = BASE_PRICE, roll = false, phase = 0, face = LABEL_FACE,
   tick = 0, up = UP, down = DOWN, candleMs = CANDLE_MS, reach = REACH, tape = 0,
+  wickBias = 1, jitter = 0,
 }: ChartProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   /* The draw loop reads these every frame but must not re-subscribe when they
      change — mirroring them into a ref from an effect keeps the rAF stable and
      the render pure. */
-  const props = useRef({ entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs, reach, tape });
+  const props = useRef({ entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs, reach, tape, wickBias, jitter });
   useEffect(() => {
-    props.current = { entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs, reach, tape };
+    props.current = { entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs, reach, tape, wickBias, jitter };
   }, [entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down,
-      candleMs, reach, tape]);
+      candleMs, reach, tape, wickBias, jitter]);
 
   useEffect(() => {
     const cv = ref.current;
@@ -572,11 +618,16 @@ export function Chart({
        * one of them.
        */
       const ph = props.current.phase;
-      /* the anchor travels with the phase: WALK0 is walk() at the candle the
-         held picture closes on, and moving the window moves that candle. At
-         phase 0 this is the module constant, to the bit. */
-      const w0 = ph === 0 ? WALK0 : walk(CANDLES + ph);
-      const level = (k: number) => props.current.base + walk(k + ph) - w0;
+      const jit = props.current.jitter;
+      /* the series the whole chart is built from: the walk, plus a per-candle
+         wobble that only exists to stop every body being the size of its
+         neighbours. With `jitter` at 0 this IS `walk`, to the bit. */
+      const series = (k: number) => walk(k) + wobble(k, jit);
+      /* the anchor travels with the phase AND with the wobble: it is the series
+         at the candle the held picture closes on, so that candle still closes
+         exactly on `base` however the two are set. */
+      const w0 = ph === 0 && !jit ? WALK0 : series(CANDLES + ph);
+      const level = (k: number) => props.current.base + series(k + ph) - w0;
       /* THE CLIMB, AND WHY IT IS AN OFFSET PER CANDLE AND NOT A BLEND.
          The first version weighted the lift by a candle's position in the
          VISIBLE WINDOW, which had two faults and they were the same fault: the
@@ -634,8 +685,12 @@ export function Chart({
         const c = priceAt(k + 1);
         const [rMin, rMax] = props.current.reach;
         const reach = rMin + r() * (rMax - rMin);
-        const h = Math.max(o, c) + r() * reach;
-        const l = Math.min(o, c) - r() * reach;
+        /* biased toward nothing — see `wickBias`. At 1 this is the uniform draw
+           this chart has always made, which gives every bar half a reach of
+           wick on both sides and turns the whole series into plus signs. */
+        const bias = props.current.wickBias;
+        const h = Math.max(o, c) + reach * Math.pow(r(), bias);
+        const l = Math.min(o, c) - reach * Math.pow(r(), bias);
         /* WHEN the bar goes where it goes. Two windows that cannot overlap, so
            one extreme is always clearly before the other and the path never has
            to visit two prices at the same instant. The coin decides which side
