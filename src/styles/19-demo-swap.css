@@ -15,8 +15,8 @@
 }
 .dseg.wide .dsg { padding: 8px 6px; border-radius: 8px; text-align: center }
 .dseg.wide .dsg.on { background: rgba(255, 255, 255, .12) }
-.dseg.wide .dsg em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .5) }
-.dseg.wide .dsg b { display: block; font-size: 13px; font-weight: 500; margin-top: 2px }
+.dseg.wide .dsg em { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .5) }
+.dseg.wide .dsg b { display: block; font-size: 15px; font-weight: 500; margin-top: 2px }
 
 .dlist.tall { max-height: none; margin-top: 6px }
 .dli.plain { padding: 4px 0 12px }
@@ -24,7 +24,7 @@
 /* the sheet a token row opens: the token, then the four things it can do */
 .dsheet.acts .dacts { display: grid; gap: 6px; margin-top: 4px }
 .dact {
-  display: block; padding: 12px 13px; border-radius: 11px; font-size: 13px;
+  display: block; padding: 12px 13px; border-radius: 11px; font-size: 15px;
   background: rgba(255, 255, 255, .06);
 }
 
@@ -35,20 +35,20 @@
 .dlegv > b.off { font-size: .98rem; color: rgba(255, 255, 255, .35) }
 .dtokchip {
   flex: none; display: flex; align-items: center; gap: 5px; padding: 6px 9px;
-  border-radius: 999px; background: rgba(255, 255, 255, .1); font-size: 12px; white-space: nowrap;
+  border-radius: 999px; background: rgba(255, 255, 255, .1); font-size: 14px; white-space: nowrap;
 }
-.dlegm { display: flex; align-items: center; margin-top: 9px; font-size: 12px; color: rgba(255, 255, 255, .45) }
+.dlegm { display: flex; align-items: center; margin-top: 9px; font-size: 14px; color: rgba(255, 255, 255, .45) }
 .dlegm i { font-style: normal }
 .dlegm > span:last-child, .dbal { margin-left: auto; font-family: var(--font-mono) }
 
-.darrow { display: block; text-align: center; color: rgba(255, 255, 255, .45); font-size: 15px }
+.darrow { display: block; text-align: center; color: rgba(255, 255, 255, .45); font-size: 17px }
 .darrow.mid { margin: -6px 0 -8px; position: relative; z-index: 1 }
 
 /* the settling swap: both legs, then the checklist */
 .dlegs { flex: none; margin-top: 16px; background: rgba(255, 255, 255, .045); border-radius: 14px; padding: 12px 13px 4px }
 .dlegs.tight { margin-top: 8px; background: none; padding: 0 }
 .dest.wide { margin-top: 14px }
-.dest.wide div { font-size: 12px }
+.dest.wide div { font-size: 14px }
 .dest.wide dd { color: rgba(255, 255, 255, .86) }
 
 .dsheet.picker { max-height: 88% }

@@ -212,12 +212,12 @@
   border: 1px solid rgba(255, 255, 255, .1);
   box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .9), 0 0 0 8px #0b0d10;
   display: flex; flex-direction: column;
-  font-size: 13px; line-height: 1.3; color: #fff;
+  font-size: 15px; line-height: 1.3; color: #fff;
 }
 
 .dstat {
   flex: none; height: 44px; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 22px; font-size: 12px; font-weight: 500; position: relative;
+  padding: 0 22px; font-size: 14px; font-weight: 500; position: relative;
 }
 .dnotch {
   position: absolute; left: 50%; top: 9px; translate: -50% 0;
@@ -238,18 +238,18 @@
 
 .dlabel {
   display: flex; align-items: center; gap: 6px; margin-top: 10px;
-  font-size: 12px; color: rgba(255, 255, 255, .5);
+  font-size: 14px; color: rgba(255, 255, 255, .5);
 }
 .deye { width: 12px; height: 8px; border: 1px solid currentColor; border-radius: 0 0 8px 8px / 0 0 6px 6px; opacity: .8 }
 
 .dpair { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 13px }
 .dbtn {
   display: block; text-align: center; padding: 11px 0; border-radius: 12px;
-  background: rgba(255, 255, 255, .09); font-size: 13px; font-weight: 500;
+  background: rgba(255, 255, 255, .09); font-size: 15px; font-weight: 500;
 }
 
 .dcard { margin-top: 15px; background: rgba(255, 255, 255, .045); border-radius: 16px; padding: 4px 13px 6px }
-.dcardh { display: block; padding: 10px 0 4px; font-size: 12px; color: rgba(255, 255, 255, .45) }
+.dcardh { display: block; padding: 10px 0 4px; font-size: 14px; color: rgba(255, 255, 255, .45) }
 
 .dgain { color: #26C281 }
 .down { color: #E5484D }
@@ -268,7 +268,7 @@
 
 .dacc { display: contents }
 .dhead { display: flex; align-items: center; gap: 9px; padding: 6px 0 2px }
-.dhead b { font-size: 15px; font-weight: 500 }
+.dhead b { font-size: 17px; font-weight: 500 }
 .davatar { width: 25px; height: 25px; border-radius: 50%; background: var(--near-green) }
 .dhicons { margin-left: auto; display: flex; gap: 7px }
 .dhicons i { width: 22px; height: 22px; border-radius: 50%; background: rgba(255, 255, 255, .1) }
@@ -281,9 +281,9 @@
 }
 .dcardh + .drow { border-top: 0 }
 .drowl { flex: 1; display: block }
-.drowl em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .55) }
-.drowl > b { display: block; font-size: 17px; font-weight: 500; margin-top: 1px }
-.dpills { display: flex; align-items: center; gap: 5px; margin-top: 4px; font-size: 12px; color: rgba(255, 255, 255, .5) }
+.drowl em { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .55) }
+.drowl > b { display: block; font-size: 19px; font-weight: 500; margin-top: 1px }
+.dpills { display: flex; align-items: center; gap: 5px; margin-top: 4px; font-size: 14px; color: rgba(255, 255, 255, .5) }
 .dpills i { font-style: normal }
 .dpills i.dgain {
   background: rgba(38, 194, 129, .14); color: #26C281; border-radius: 5px; padding: 1px 5px;
@@ -295,7 +295,7 @@
    because the account screen without it is a card floating in half a phone of
    black, which is not what the app looks like. */
 .dexp { margin-top: 15px; flex: none; overflow: hidden }
-.dexph { display: block; font-size: 12px; color: rgba(255, 255, 255, .45); margin-bottom: 8px }
+.dexph { display: block; font-size: 14px; color: rgba(255, 255, 255, .45); margin-bottom: 8px }
 .dexpr { display: flex; gap: 9px }
 .dexpc {
   flex: none; width: 148px; padding: 10px; border-radius: 12px;
@@ -305,8 +305,8 @@
   display: block; height: 40px; border-radius: 8px; margin-bottom: 8px;
   background: linear-gradient(120deg, rgba(0, 236, 151, .22), rgba(0, 236, 151, .04));
 }
-.dexpc b { display: block; font-size: 12px; font-weight: 500; line-height: 1.25 }
-.dexpc em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45); margin-top: 3px; line-height: 1.3 }
+.dexpc b { display: block; font-size: 14px; font-weight: 500; line-height: 1.25 }
+.dexpc em { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .45); margin-top: 3px; line-height: 1.3 }
 
 /* ---- the tab bar -------------------------------------------------------- */
 
@@ -317,14 +317,14 @@
 }
 .dtab { display: grid; justify-items: center; gap: 3px; color: rgba(255, 255, 255, .42) }
 .dtab svg { width: 21px; height: 21px }
-.dtab em { font-style: normal; font-size: 12px }
+.dtab em { font-style: normal; font-size: 14px }
 .dtab[aria-current] { color: var(--near-green) }
 .dtab[aria-current] .fl { fill: rgba(0, 236, 151, .22) }
 
 /* ---- amount entry, settlement, and the buttons under them -------------------------------------------------------- */
 
 .dftitle { display: block; font-size: 1.15rem; font-weight: 500; margin-top: 6px }
-.dfsub { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .5); margin-top: 4px; line-height: 1.4 }
+.dfsub { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .5); margin-top: 4px; line-height: 1.4 }
 
 .damt {
   margin-top: 18px; background: rgba(255, 255, 255, .045); border-radius: 16px;
@@ -334,13 +334,13 @@
 .damt > b.off { color: rgba(255, 255, 255, .3) }
 .dpayrow {
   display: flex; align-items: center; gap: 7px; margin-top: 16px; padding-top: 11px;
-  border-top: 1px solid rgba(255, 255, 255, .07); font-size: 12px;
+  border-top: 1px solid rgba(255, 255, 255, .07); font-size: 14px;
 }
 .dpayrow i { margin-left: auto; font-style: normal; color: rgba(255, 255, 255, .45) }
 
 .dcta {
   display: block; text-align: center; margin-top: 13px; padding: 12px 0; border-radius: 999px;
-  font-size: 13px; font-weight: 500; background: rgba(255, 255, 255, .92); color: #0B0F0D;
+  font-size: 15px; font-weight: 500; background: rgba(255, 255, 255, .92); color: #0B0F0D;
   transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
 }
 .dcta.off { background: rgba(255, 255, 255, .11); color: rgba(255, 255, 255, .42) }
@@ -348,7 +348,7 @@
 .dcta.light { background: #fff; color: #0B0F0D }
 .dghost {
   display: block; text-align: center; margin-top: 9px; padding: 11px 0; border-radius: 999px;
-  font-size: 12px; background: rgba(255, 255, 255, .07); color: rgba(255, 255, 255, .8);
+  font-size: 14px; background: rgba(255, 255, 255, .07); color: rgba(255, 255, 255, .8);
 }
 
 .dsettle { margin-top: 34px; display: grid; justify-items: center }
@@ -400,11 +400,11 @@
   width: 34px; height: 4px; border-radius: 3px; background: rgba(255, 255, 255, .22);
   margin: 2px auto 10px; flex: none;
 }
-.dsh { display: block; font-size: 14px; font-weight: 500; margin-bottom: 12px }
-.dx { position: absolute; right: 16px; top: 14px; color: rgba(255, 255, 255, .5); font-size: 17px }
+.dsh { display: block; font-size: 16px; font-weight: 500; margin-bottom: 12px }
+.dx { position: absolute; right: 16px; top: 14px; color: rgba(255, 255, 255, .5); font-size: 19px }
 
 /* Review send */
-.drevh { display: flex; align-items: center; padding: 4px 0 14px; font-size: 12px; color: rgba(255, 255, 255, .55) }
+.drevh { display: flex; align-items: center; padding: 4px 0 14px; font-size: 14px; color: rgba(255, 255, 255, .55) }
 .dshield {
   width: 30px; height: 30px; margin: 0 auto; border-radius: 9px; background: rgba(38, 194, 129, .16);
   position: relative;
@@ -414,10 +414,10 @@
 }
 .drevt { display: block; text-align: center; font-size: 1.05rem; font-weight: 500; margin: 11px 0 18px; line-height: 1.3 }
 .drevl { margin: 0; display: grid; gap: 9px; border-top: 1px solid rgba(255, 255, 255, .07); padding-top: 13px }
-.drevl div { display: flex; justify-content: space-between; align-items: center; font-size: 12px }
+.drevl div { display: flex; justify-content: space-between; align-items: center; font-size: 14px }
 .drevl dt { color: rgba(255, 255, 255, .5) }
 .drevl dd { margin: 0; display: flex; align-items: center; gap: 5px; font-family: var(--font-mono) }
-.drevn { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .38); margin-top: 14px; line-height: 1.4 }
+.drevn { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .38); margin-top: 14px; line-height: 1.4 }
 
 /* the passkey */
 .dsheet.pass { border-radius: 22px; margin: auto 10px 90px; padding: 22px 20px 20px; text-align: center }
@@ -429,13 +429,13 @@
   content: ''; position: absolute; inset: 7px 6px; border-bottom: 2px solid #2F80ED;
   border-radius: 0 0 6px 6px;
 }
-.dsheet.pass .dsh { margin: 10px 0 6px; font-size: 17px }
-.dpsub { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .6); line-height: 1.45; margin-bottom: 16px }
+.dsheet.pass .dsh { margin: 10px 0 6px; font-size: 19px }
+.dpsub { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .6); line-height: 1.45; margin-bottom: 16px }
 .dauth { display: grid; justify-items: center; gap: 9px; padding: 8px 0 4px }
-.dauth em { font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .6) }
+.dauth em { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .6) }
 .ddone {
   width: 30px; height: 30px; border-radius: 50%; border: 2px solid #2F80ED; color: #2F80ED;
-  display: grid; place-items: center; font-size: 15px;
+  display: grid; place-items: center; font-size: 17px;
 }
 
 /* ---- affordances --------------------------------------------------------- */
@@ -476,13 +476,13 @@
 
 /* the yield chip that rides on a token row */
 .dchip {
-  flex: none; align-self: center; font-size: 12px; padding: 3px 7px; border-radius: 6px;
+  flex: none; align-self: center; font-size: 14px; padding: 3px 7px; border-radius: 6px;
   background: rgba(90, 150, 255, .14); color: #9CC0FF; white-space: nowrap;
 }
 
 /* a group heading inside a picker: Your tokens, More tokens, Your vaults */
 .dgroup {
-  display: block; font-size: 12px; color: rgba(255, 255, 255, .42);
+  display: block; font-size: 14px; color: rgba(255, 255, 255, .42);
   margin: 12px 0 2px; flex: none;
 }
 
@@ -490,7 +490,7 @@
 .dsearch {
   display: flex; align-items: center; gap: 8px; flex: none;
   min-height: 36px; padding: 0 11px; border-radius: 10px;
-  background: rgba(255, 255, 255, .06); font-size: 13px;
+  background: rgba(255, 255, 255, .06); font-size: 15px;
 }
 .dsearch i { font-style: normal; color: rgba(255, 255, 255, .4) }
 .dsearch b { font-weight: 400 }
@@ -500,18 +500,18 @@
 .dvico { display: block; margin-bottom: 9px }
 .dsh.big { font-size: 1.05rem; margin-bottom: 6px }
 .dvdesc {
-  display: block; font-style: normal; font-size: 12px; line-height: 1.45;
+  display: block; font-style: normal; font-size: 14px; line-height: 1.45;
   color: rgba(255, 255, 255, .5); margin-bottom: 14px;
 }
 .dvstat { margin: 0 0 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px }
-.dvstat dt { font-size: 12px; color: rgba(255, 255, 255, .45) }
+.dvstat dt { font-size: 14px; color: rgba(255, 255, 255, .45) }
 .dvstat dd { margin: 0; font-size: 1.15rem; font-weight: 500 }
 .dvfees { margin: 0; display: grid; gap: 8px; border-top: 1px solid rgba(255, 255, 255, .07); padding-top: 11px }
-.dvfees div { display: grid; grid-template-columns: 108px 1fr; gap: 10px; font-size: 12px }
+.dvfees div { display: grid; grid-template-columns: 108px 1fr; gap: 10px; font-size: 14px }
 .dvfees dt { color: rgba(255, 255, 255, .45); display: flex; flex-direction: column; align-items: flex-start; gap: 3px }
 .dvfees dd { margin: 0; color: rgba(255, 255, 255, .82); line-height: 1.35 }
 .dpromo {
-  font-style: normal; font-size: 12px; letter-spacing: .04em; padding: 1px 5px; border-radius: 4px;
+  font-style: normal; font-size: 14px; letter-spacing: .04em; padding: 1px 5px; border-radius: 4px;
   background: rgba(90, 150, 255, .18); color: #9CC0FF;
 }
 
@@ -519,16 +519,16 @@
 .damt.tight { margin-top: 14px; padding: 16px 14px 12px }
 .damt.tight > b { font-size: 1.5rem }
 .damt.tight > b i { font-style: normal; color: rgba(255, 255, 255, .4); font-size: 1rem }
-.damt.tight > em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45); margin-top: 3px }
-.davailrow { display: flex; align-items: center; gap: 8px; margin-top: 11px; font-size: 12px }
+.damt.tight > em { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .45); margin-top: 3px }
+.davailrow { display: flex; align-items: center; gap: 8px; margin-top: 11px; font-size: 14px }
 .davailrow > span { display: flex; flex-direction: column; color: rgba(255, 255, 255, .45) }
 .davailrow > span i { font-style: normal; color: rgba(255, 255, 255, .82) }
 .dmax {
-  margin-left: auto; padding: 5px 10px; border-radius: 7px; font-size: 12px;
+  margin-left: auto; padding: 5px 10px; border-radius: 7px; font-size: 14px;
   background: rgba(255, 255, 255, .1);
 }
 .dvsettings {
-  display: block; font-style: normal; text-align: center; font-size: 12px;
+  display: block; font-style: normal; text-align: center; font-size: 14px;
   color: rgba(255, 255, 255, .4); margin-top: 11px;
 }
 
@@ -536,7 +536,7 @@
 .dref {
   display: flex; justify-content: space-between; align-items: center;
   border-top: 1px solid rgba(255, 255, 255, .07); margin-top: 12px; padding-top: 10px;
-  font-size: 12px; color: rgba(255, 255, 255, .45);
+  font-size: 14px; color: rgba(255, 255, 255, .45);
 }
 .dref b { font-weight: 400; font-family: var(--font-mono); color: rgba(255, 255, 255, .8) }
 

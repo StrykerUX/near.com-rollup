@@ -11,22 +11,22 @@
 .dmkt, .dfund { display: contents }
 .dmhead { display: flex; align-items: center; padding: 6px 0 4px; min-height: 30px }
 .dback { font-size: 22px; line-height: 1; color: rgba(255, 255, 255, .8) }
-.dbrief { margin-left: auto; font-size: 15px; color: rgba(255, 255, 255, .65) }
+.dbrief { margin-left: auto; font-size: 17px; color: rgba(255, 255, 255, .65) }
 
 .dpair2 { display: flex; align-items: center; gap: 8px; margin-top: 4px }
-.dpairt b { display: block; font-size: 14px; font-weight: 500; line-height: 1.15 }
-.dpairt em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45) }
+.dpairt b { display: block; font-size: 16px; font-weight: 500; line-height: 1.15 }
+.dpairt em { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .45) }
 .dchev2 { margin-left: auto; color: rgba(255, 255, 255, .4) }
 
 .dpx { display: flex; align-items: baseline; gap: 8px; margin-top: 8px }
 .dpxv { font-size: 1.55rem; font-weight: 500; letter-spacing: -.01em }
-.dpxd { font-size: 12px; color: #E5484D }
+.dpxd { font-size: 14px; color: #E5484D }
 .dpxd.up { color: #26C281 }
 
 .dchart { flex: 1; min-height: 132px; position: relative; margin-top: 6px }
 .dtf {
   flex: none; display: flex; align-items: center; margin-top: 5px;
-  font-family: var(--font-mono); font-size: 12px; color: rgba(255, 255, 255, .5);
+  font-family: var(--font-mono); font-size: 14px; color: rgba(255, 255, 255, .5);
 }
 .dtfi {
   margin-left: auto; width: 12px; height: 10px; border-left: 1px solid currentColor;
@@ -36,18 +36,18 @@
 .dsides { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 10px }
 .dside {
   display: block; text-align: center; padding: 10px 0; border-radius: 10px;
-  font-size: 13px; font-weight: 500;
+  font-size: 15px; font-weight: 500;
 }
 .dside.long { background: rgba(20, 96, 66, .55); color: #6BE3AE }
 .dside.short { background: rgba(107, 27, 34, .55); color: #FF8A8F }
 
 /* the position bar that replaces Long/Short once there is one */
 .dposbar { margin-top: 9px; background: rgba(255, 255, 255, .045); border-radius: 12px; padding: 9px 11px }
-.dposh { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255, 255, 255, .6) }
+.dposh { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255, 255, 255, .6) }
 .dposh b { font-weight: 500 }
 .dposh b.long { color: #26C281 }
 .dposh b.short { color: #E5484D }
-.dposp { margin-left: auto; font-size: 12px; display: flex; gap: 5px; align-items: baseline }
+.dposp { margin-left: auto; font-size: 14px; display: flex; gap: 5px; align-items: baseline }
 .dposp b { font-weight: 500 }
 .dposp i { font-style: normal; opacity: .75 }
 .dposp:has(.dgain) i, .dliv:has(.dgain) i { color: #26C281 }
@@ -55,13 +55,13 @@
 .dposc { transition: rotate var(--dur) var(--ease-out); color: rgba(255, 255, 255, .5) }
 .dposc.on { rotate: 180deg }
 .dposd { margin: 9px 0 0; display: grid; gap: 5px }
-.dposd div { display: flex; justify-content: space-between; font-size: 12px }
+.dposd div { display: flex; justify-content: space-between; font-size: 14px }
 .dposd dt { color: rgba(255, 255, 255, .45) }
 .dposd dd { margin: 0; font-family: var(--font-mono) }
 .dposd dd i { font-style: normal; color: rgba(255, 255, 255, .45); margin-left: 5px }
 .dposact { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 9px }
 .dpb {
-  display: block; text-align: center; padding: 8px 0; border-radius: 9px; font-size: 12px;
+  display: block; text-align: center; padding: 8px 0; border-radius: 9px; font-size: 14px;
   background: rgba(255, 255, 255, .1);
 }
 .dpb.close { background: rgba(107, 27, 34, .6); color: #FF8A8F }
@@ -70,7 +70,7 @@
 .dlists { flex: none; margin-top: 10px; display: flex; flex-direction: column; min-height: 0 }
 .dtabsr { display: flex; gap: 16px; border-bottom: 1px solid rgba(255, 255, 255, .08) }
 .dlt {
-  padding: 7px 0 8px; font-size: 12px; color: rgba(255, 255, 255, .45); position: relative;
+  padding: 7px 0 8px; font-size: 14px; color: rgba(255, 255, 255, .45); position: relative;
 }
 .dlt.on { color: #fff }
 .dlt.on::after {
@@ -86,18 +86,18 @@
 .pdev[data-pos] .dchart { min-height: 104px }
 .pdev[data-pos] .dlist { max-height: 76px }
 .dempty { padding: 18px 0 22px; text-align: center }
-.dempty b { display: block; font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, .75) }
-.dempty em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .4); margin-top: 2px }
+.dempty b { display: block; font-size: 14px; font-weight: 400; color: rgba(255, 255, 255, .75) }
+.dempty em { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .4); margin-top: 2px }
 
 .dli { display: flex; align-items: center; gap: 9px; padding: 9px 0 }
 .dlit { flex: 1 }
-.dlit b { display: block; font-size: 12px; font-weight: 500 }
-.dlit em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45) }
-.dliv { text-align: right; font-size: 12px }
+.dlit b { display: block; font-size: 14px; font-weight: 500 }
+.dlit em { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .45) }
+.dliv { text-align: right; font-size: 14px }
 .dliv b { display: block; font-weight: 500; min-height: 14px }
-.dliv i { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45); font-family: var(--font-mono) }
+.dliv i { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .45); font-family: var(--font-mono) }
 .dlid { margin: 0 0 8px; display: grid; gap: 4px; padding: 8px 10px; background: rgba(255, 255, 255, .04); border-radius: 10px }
-.dlid div { display: flex; justify-content: space-between; font-size: 12px }
+.dlid div { display: flex; justify-content: space-between; font-size: 14px }
 .dlid dt { color: rgba(255, 255, 255, .45) }
 .dlid dd { margin: 0; font-family: var(--font-mono) }
 .dlid dd i { font-style: normal; color: rgba(255, 255, 255, .45); margin-left: 5px }
@@ -107,14 +107,14 @@
 .drange { flex: 1; accent-color: #fff; height: 3px }
 .dlevbox {
   min-width: 56px; text-align: center; padding: 8px 6px; border-radius: 9px;
-  background: rgba(255, 255, 255, .07); font-family: var(--font-mono); font-size: 13px;
+  background: rgba(255, 255, 255, .07); font-family: var(--font-mono); font-size: 15px;
 }
 .dlevbox i { font-style: normal; color: rgba(255, 255, 255, .4) }
 .dsheet.lev .dcta { margin-top: 18px }
 
 /* My account */
 .dmine { margin: 0; display: grid; gap: 7px }
-.dmine div { display: flex; justify-content: space-between; font-size: 12px }
+.dmine div { display: flex; justify-content: space-between; font-size: 14px }
 .dmine dt { color: rgba(255, 255, 255, .5) }
 .dmine dd { margin: 0; font-family: var(--font-mono) }
 .dmine dd i { font-style: normal; color: rgba(255, 255, 255, .45); margin-left: 6px }
@@ -129,30 +129,30 @@
 .dsheet.tk { padding-bottom: 12px }
 .dtkrow { display: flex; align-items: center; gap: 8px; flex: none }
 .dseg { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: rgba(255, 255, 255, .06); border-radius: 9px; padding: 3px }
-.dsg { text-align: center; padding: 6px 0; border-radius: 7px; font-size: 12.5px; color: rgba(255, 255, 255, .55) }
+.dsg { text-align: center; padding: 6px 0; border-radius: 7px; font-size: 14px; color: rgba(255, 255, 255, .55) }
 .dsg.long.on { background: rgba(20, 96, 66, .75); color: #6BE3AE }
 .dsg.short.on { background: rgba(107, 27, 34, .75); color: #FF8A8F }
 .dot {
   display: flex; align-items: center; gap: 5px; padding: 7px 10px; border-radius: 9px;
-  background: rgba(255, 255, 255, .06); font-size: 12.5px;
+  background: rgba(255, 255, 255, .06); font-size: 14px;
 }
 .dot i { font-style: normal; color: rgba(255, 255, 255, .5) }
 .dot.on { background: rgba(255, 255, 255, .14) }
 
-.davail { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; flex: none }
+.davail { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 14px; flex: none }
 .davail span { color: rgba(255, 255, 255, .5) }
 .davail b { margin-left: auto; font-weight: 500; font-family: var(--font-mono) }
-.davail i { font-style: normal; font-size: 12px; color: var(--near-green) }
+.davail i { font-style: normal; font-size: 14px; color: var(--near-green) }
 
 .dfield { margin-top: 10px; flex: none }
-.dflab { display: block; font-size: 12px; color: rgba(255, 255, 255, .5); margin-bottom: 4px }
+.dflab { display: block; font-size: 14px; color: rgba(255, 255, 255, .5); margin-bottom: 4px }
 .dfield:has(.dlev) { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end }
 .dfield:has(.dlev) .dflab { grid-column: 1 / -1 }
 
 .dfin {
   display: flex; align-items: center; gap: 3px; min-height: 40px; padding: 0 11px;
   border-radius: 10px; background: rgba(255, 255, 255, .05);
-  border: 1px solid transparent; font-size: 14px;
+  border: 1px solid transparent; font-size: 16px;
   transition: border-color var(--dur) var(--ease-out);
 }
 .dfin.on { border-color: rgba(90, 150, 255, .8) }
@@ -168,20 +168,20 @@
 .dunit { margin-left: auto; display: flex; align-items: center; gap: 9px; color: rgba(255, 255, 255, .45) }
 .dunit i { font-style: normal }
 .dswap { color: rgba(255, 255, 255, .6) }
-.derr { display: block; font-style: normal; font-size: 12px; color: #E5484D; margin-top: 5px }
+.derr { display: block; font-style: normal; font-size: 14px; color: #E5484D; margin-top: 5px }
 
 .dlev {
   display: flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 11px;
-  border-radius: 10px; background: rgba(255, 255, 255, .05); font-size: 13px; font-family: var(--font-mono);
+  border-radius: 10px; background: rgba(255, 255, 255, .05); font-size: 15px; font-family: var(--font-mono);
 }
 .dlev i { font-style: normal; color: rgba(255, 255, 255, .45) }
 
-.dchk { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; flex: none }
+.dchk { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 14px; flex: none }
 .dbox { width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid rgba(255, 255, 255, .3); position: relative }
 .dchk.on .dbox { background: #26C281; border-color: #26C281 }
 .dchk.on .dbox::after {
   content: '✓'; position: absolute; inset: 0; display: grid; place-items: center;
-  font-size: 12px; color: #04140E;
+  font-size: 14px; color: #04140E;
 }
 
 .dochk { display: grid; justify-content: start; margin-top: 12px }
@@ -189,11 +189,11 @@
 .dsheet.tk .dcta .dspin { vertical-align: -3px }
 
 .dest { margin: 12px 0 0; display: grid; gap: 6px; flex: none }
-.dest div { display: flex; justify-content: space-between; font-size: 12px }
+.dest div { display: flex; justify-content: space-between; font-size: 14px }
 .dest dt { color: rgba(255, 255, 255, .45) }
 .dest dd { margin: 0; font-family: var(--font-mono); display: flex; align-items: center; gap: 6px }
 .dest dd i {
-  font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .6);
+  font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .6);
   background: rgba(255, 255, 255, .08); border-radius: 4px; padding: 1px 5px;
 }
 
@@ -204,8 +204,8 @@
   box-shadow: 0 20px 40px -12px rgba(0, 0, 0, .8);
 }
 .dmi { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 9px }
-.dmi b { display: block; font-size: 12.5px; font-weight: 500 }
-.dmi em { display: block; font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .5); margin-top: 1px }
+.dmi b { display: block; font-size: 14px; font-weight: 500 }
+.dmi em { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .5); margin-top: 1px }
 .dtick { margin-left: auto; font-style: normal; color: var(--near-green) }
 
 /* SHARED, AND FILED HERE FOR HISTORICAL REASONS.

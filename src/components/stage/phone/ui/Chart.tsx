@@ -82,11 +82,10 @@ function candle(k: number): Candle {
 
 /**
  * The axis labels and the price chips. Canvas draws text with no stylesheet to
- * inherit from, so the floor the rest of the UI keeps — nothing under 12px —
- * has to be stated here or the one place it is broken is the one place no
+ * inherit from, so the scale the rest of the UI keeps has to be stated here or the one place it is broken is the one place no
  * audit of the CSS can see.
  */
-const LABEL_PX = 12;
+const LABEL_PX = 14;
 /**
  * How much of the right edge belongs to the price axis. It was a bare 54,
  * tuned by eye against 9px labels; at 12px "$80,200" is wider than that and
