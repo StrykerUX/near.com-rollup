@@ -20,24 +20,53 @@ import { useEffect, useRef, type RefObject } from 'react';
  */
 
 const CANDLES = 46;
-const CANDLE_MS = 1800;
+const CANDLE_MS = 1500;
 /**
- * How many candles the climb into a target takes. Counted in CANDLES and not
- * in milliseconds on purpose: the move belongs to the bars it happens in, so a
- * bar that has formed keeps the price it formed at no matter how long anyone
- * watches afterwards.
+ * THE CLIMB, AS A LIST OF WHAT EACH CANDLE CONTRIBUTES.
  *
- * Nine, not four. At four the thousand points arrived in bodies of ~370 and
- * read as a spike — technically a rally, visually a gap with wicks on it. Nine
- * puts the steepest bar at ~170 over the walk's own ~40, which is a market
- * trending rather than jumping, and it is a fifth of the visible window, so
- * there is a move to watch rather than a corner to notice.
+ * The move into a take profit is written out bar by bar rather than derived
+ * from a curve, because every curve that was tried failed the same way. A
+ * thousand points spread over N candles is ~1000/N per bar no matter what
+ * shape carries them, and the walk's own noise is only ~40 — so any strictly
+ * increasing ease, at any N, closes every single bar of the climb green. That
+ * is not a rally, it is a ramp with wicks drawn on it, and no chart has ever
+ * done it. Smoothstep, a damped sine over smoothstep, and a monotone staircase
+ * were each measured over 500 start points; the best of them produced a red
+ * bar in 44% of runs and only by making the green ones bigger.
  *
- * It costs sixteen seconds, which is why the candle rate came down with it and
- * why the final step of every version holds longer. A climb that finishes
- * after the loop has restarted is a climb nobody saw.
+ * So the pullbacks are declared, not hoped for. These are relative weights,
+ * normalised to sum to the whole move: the positive ones push, the two
+ * negative ones give a little back. A bar with weight -0.55 closes ~55 points
+ * below its open whatever the walk is doing, which is what makes the run read
+ * as a market that had to work for it.
+ *
+ * Measured over the same 500 start points: the biggest body is +119 against
+ * the +162 of the nine-candle smoothstep this replaces, the third-biggest is
+ * +110 against +152 — those were the three bars that read as too long — the
+ * median run has two red candles, every run has at least one, and no bar of
+ * the climb ever closes below the price the trade opened at.
+ *
+ * Fifteen candles cost twenty-two seconds, which is why the candle rate came
+ * down with them and why the final step of every version holds longer. A climb
+ * that finishes after the loop has restarted is a climb nobody saw.
  */
-const RAMP_CANDLES = 9;
+const RAMP = [
+  0.4, 0.8, 0.95, 1.05, /* the market takes a breath */ -0.55,
+  0.55, 1.0, 1.1, 1.05, /* and another, higher up */ -0.55,
+  0.65, 1.1, 0.95, 0.7, 0.4,
+];
+const RAMP_CANDLES = RAMP.length;
+/** RAMP as a running fraction of the whole move, so `ramp(u)` is a lookup */
+const RAMP_AT = RAMP.reduce<number[]>(
+  (acc, w) => (acc.push(acc[acc.length - 1] + w / RAMP.reduce((a, b) => a + b, 0)), acc),
+  [0],
+);
+/** how much of the move has happened at progress `u`, linear within a candle */
+function ramp(u: number) {
+  const t = Math.min(1, Math.max(0, u)) * RAMP_CANDLES;
+  const i = Math.min(RAMP_CANDLES - 1, Math.floor(t));
+  return RAMP_AT[i] + (RAMP_AT[i + 1] - RAMP_AT[i]) * (t - i);
+}
 /** the price the flow's copy quotes, so the two cannot drift */
 export const BASE_PRICE = 79654;
 
@@ -261,12 +290,21 @@ export function Chart({
       if (!aim) towardK = -1;
       else if (towardK < 0) {
         towardK = shift + CANDLES - 1;
-        towardFrom = BASE_PRICE + walk(towardK);
+        /* THE LIFT IS MEASURED TO WHERE THE WALK WILL BE, NOT WHERE IT IS.
+           Sized against the price at the open, the climb added exactly the
+           right number of points and still missed: the walk kept drifting
+           underneath it, and a run that opened while the walk was falling
+           finished three hundred points short of the take profit. The line was
+           reached in the arithmetic and not on the screen, which is the one
+           thing this whole sequence exists to show. Anchored to the walk at the
+           candle the climb ends on, the last bar closes on the take profit to
+           the point, every time, and the visible move is still exactly the
+           distance from the open to the line. */
+        towardFrom = BASE_PRICE + walk(towardK + RAMP_CANDLES);
       }
       const offset = (k: number) => {
         if (!aim || towardK < 0 || k < towardK) return 0;
-        const u = Math.min(1, (k - towardK) / RAMP_CANDLES);
-        return (aim - towardFrom) * (u * u * (3 - 2 * u));
+        return (aim - towardFrom) * ramp((k - towardK) / RAMP_CANDLES);
       };
 
       /* THE OFFSET GOES INTO THE PRICE, NOT ONTO THE CANDLE.

@@ -113,7 +113,7 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'position', ch: 'open',
     title: 'Both brackets, and the market walking into one',
     note: 'Three lines now: the entry at $79,654, the stop below it and the take profit above. The market climbs into the green one, which is the whole of what a bracket is for.',
-    beats: [{ ms: 2800 }, { ms: 2600, do: 'posOpen' }, { ms: 9500 }],
+    beats: [{ ms: 2800 }, { ms: 2600, do: 'posOpen' }, { ms: 23500 }],
   },
 ];
 

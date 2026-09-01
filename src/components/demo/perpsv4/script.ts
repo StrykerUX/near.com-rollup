@@ -115,7 +115,7 @@ const STEPS: Step<PD, PDAction>[] = [
     title: 'Both exits on the chart, and one of them met',
     note: 'The entry, the stop five hundred below it and the take profit a thousand above — two to one. The market walks up into the green line, which is the only proof a bracket was ever worth setting.',
         callout: 'Long 20x · $100,000',
-    beats: [{ ms: 3000 }, { ms: 3000, do: 'posOpen' }, { ms: 10000 }],
+    beats: [{ ms: 3000 }, { ms: 3000, do: 'posOpen' }, { ms: 24000 }],
   },
 ];
 
