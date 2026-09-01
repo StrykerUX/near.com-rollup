@@ -7,7 +7,7 @@ import { Count } from '@/components/demo/shell/Count';
 import { Layer } from '@/components/demo/shell/Frame';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
-import { TOK_ICONS } from '@/lib/tokens';
+import { Dot } from '@/components/demo/app/Dot';
 import { CATALOGUE, type Asset } from './catalogue';
 import {
   FROM_BAL, SWAP_STEPS, cta, least, out, rate, usd, type SV, type SVAction,
@@ -31,37 +31,6 @@ type Deck = GenericDeck<SV, SVAction>;
  */
 
 const ROW = 56;
-
-/**
- * The token chip. Brand colour behind an initial — which is what the app does
- * for every asset it has no mark for, and the honest thing for twenty-seven
- * rows nobody has drawn icons for.
- *
- * BITCOIN IS THE EXCEPTION because the repo has its artwork already: it is the
- * one asset a reader knows by heart, and a `B` on orange where the real mark
- * exists is a worse lie than a `D` on gold where none does.
- */
-function Dot({ a, size = 30 }: { a: Asset; size?: number }) {
-  const art = TOK_ICONS[a.sym];
-  return (
-    <span
-      className="swdot"
-      style={{
-        background: a.color,
-        color: a.ink,
-        width: size + 'px',
-        height: size + 'px',
-        fontSize: Math.max(12, Math.round(size * 0.4)) + 'px',
-      }}
-    >
-      {art && 'img' in art
-        // eslint-disable-next-line @next/next/no-img-element
-        ? <img className="swimg" src={art.img} alt="" width={size} height={size} aria-hidden="true" />
-        : a.sym.charAt(0)}
-    </span>
-  );
-}
-
 export function Phone({ d }: { d: Deck }) {
   return (
     <div className="pdev app swp" data-motion="rich" data-tempo="fast" style={PALETTE_VARS}>

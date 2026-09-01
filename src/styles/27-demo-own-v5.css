@@ -1,0 +1,131 @@
+/* =========================================================================
+   /demo/own-v5 — THE ACCOUNT, AND WHAT IS IN IT
+   -------------------------------------------------------------------------
+   Two screens and a sheet, all three read off
+   `rec-Everything you own + Swap screen.MP4`. `.pdev.app` carries the face,
+   the palette, the tempo and the sheet mechanics, so what is here is the
+   account home, the assets list and the row's menu.
+
+   SCOPED TO `.pdev.own`, all of it.
+   ========================================================================= */
+
+.pdev.own .pdview { padding: 0 16px }
+.pdev.own .ownhome, .pdev.own .ownassets {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+}
+
+/* ---- the account ------------------------------------------------------- */
+
+.pdev.own .ownhead { flex: none; display: flex; align-items: center; gap: 10px; height: 52px }
+.pdev.own .ownhead b { font-size: 17px; font-weight: 600 }
+.pdev.own .ownav {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--btc-up), #0B7A55);
+}
+.pdev.own .ownh { flex: none; display: block; font-size: 22px; font-weight: 600; padding: 14px 0 10px }
+
+.pdev.own .ownlab {
+  flex: none; display: block; font-size: 13px; color: rgba(255, 255, 255, .5); margin-top: 6px;
+}
+.pdev.own .owntotal {
+  flex: none; display: block; font-size: 32px; font-weight: 600; letter-spacing: -.03em;
+  margin-top: 2px; font-variant-numeric: tabular-nums;
+}
+
+.pdev.own .ownpair {
+  flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 18px;
+}
+.pdev.own .ownbtn {
+  display: flex; align-items: center; justify-content: center; gap: 7px; height: 42px;
+  border-radius: 999px; background: #fff; color: #0B0F0D; font-size: 15px; font-weight: 600;
+}
+.pdev.own .ownbtn svg { width: 16px; height: 16px }
+
+/* ---- the balances card ------------------------------------------------- */
+
+.pdev.own .owncard {
+  flex: none; border-radius: 18px; background: var(--btc-card); overflow: hidden;
+}
+.pdev.own .owncardh {
+  display: block; padding: 13px 15px 4px; font-size: 13px; color: rgba(255, 255, 255, .5);
+}
+.pdev.own .ownrow {
+  display: flex; align-items: center; gap: 10px; padding: 12px 15px;
+  border-top: 1px solid rgba(255, 255, 255, .07);
+}
+.pdev.own .ownrow:first-of-type { border-top: 0 }
+.pdev.own .ownrowl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px }
+.pdev.own .ownrowl em { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .62) }
+.pdev.own .ownrowl > b { font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums }
+.pdev.own .ownpills {
+  display: flex; align-items: center; gap: 6px; margin-top: 3px;
+  font-size: 12px; color: rgba(255, 255, 255, .45);
+}
+.pdev.own .ownpills i { font-style: normal }
+.pdev.own .ownpills i b { font-weight: 600; color: rgba(255, 255, 255, .72) }
+.pdev.own .ownchev { width: 18px; height: 18px; flex: none; color: rgba(255, 255, 255, .38) }
+
+.pdev.own .ownup { color: #2FD48A }
+.pdev.own .owndown { color: #F0616B }
+
+/* ---- the assets screen ------------------------------------------------- */
+
+/* THE TWO HALVES, and they are in every frame of this screen. Most of this
+   wallet is confidential and the header is where the app says so. */
+.pdev.own .ownsplit {
+  flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 16px 0 6px;
+  border-radius: 14px; background: var(--btc-card); overflow: hidden;
+}
+.pdev.own .ownhalf {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 0;
+  transition: background-color var(--dur) var(--ease-out);
+}
+.pdev.own .ownhalf.on { background: rgba(255, 255, 255, .07) }
+.pdev.own .ownhalf i { font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .5) }
+.pdev.own .ownhalf b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums }
+
+.pdev.own .ownlist {
+  flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column;
+  padding-top: 4px;
+}
+.pdev.own .ownitem {
+  flex: none; display: flex; align-items: center; gap: 12px; padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+/* the rows arrive one after another rather than as a block. Five is more
+   reading than any other screen in this family asks for, and a staggered list
+   is read top to bottom where a block arrives as one shape. */
+.pdev.own[data-motion] .ownitem { animation: drise 340ms var(--ease-out) both }
+
+.pdev.own .ownitemt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px }
+.pdev.own .ownitemt b { font-size: 15px; font-weight: 600 }
+.pdev.own .ownitemt em {
+  font-style: normal; font-size: 13px; color: rgba(255, 255, 255, .45);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pdev.own .ownitemv {
+  flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+}
+.pdev.own .ownitemv b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums }
+.pdev.own .ownitemv i { font-style: normal; font-size: 12px; font-variant-numeric: tabular-nums }
+
+/* ---- what a row opens -------------------------------------------------- */
+
+.pdev.own .ownact { padding-bottom: 20px }
+.pdev.own .ownacth {
+  display: flex; align-items: center; gap: 12px; padding: 4px 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+.pdev.own .ownaction {
+  display: flex; align-items: center; height: 46px; margin-top: 8px; padding: 0 15px;
+  border-radius: 12px; background: rgba(255, 255, 255, .05);
+  font-size: 15px; font-weight: 500;
+  transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+}
+/* the row that was pressed, and the last frame of the chapter. It stays lit
+   rather than navigating: the swap screen is the next chapter's to tell. */
+.pdev.own .ownaction.taken { background: var(--btc-up); color: #04140E; font-weight: 600 }
+
+@media (prefers-reduced-motion: reduce) {
+  .pdev.own[data-motion] .ownitem { animation: none }
+}

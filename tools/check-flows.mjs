@@ -52,6 +52,9 @@ const MODULES = [
   [`${DEMO}/swapv5/catalogue.ts`, 'swapv5-catalogue'],
   [`${DEMO}/swapv5/state.ts`, 'swapv5-state'],
   [`${DEMO}/swapv5/script.ts`, 'swapv5-script'],
+  /* the account chapter — the tour's "Everything you own, one screen" */
+  [`${DEMO}/ownv5/state.ts`, 'ownv5-state'],
+  [`${DEMO}/ownv5/script.ts`, 'ownv5-script'],
   [`${DEMO}/swap/state.ts`, 'swap-state'],
   [`${DEMO}/swap/script.ts`, 'swap-script'],
   [`${DEMO}/earn/state.ts`, 'earn-state'],
@@ -92,7 +95,9 @@ for (const [src, f] of MODULES) {
        just the one this rule was written for. */
     .replace(/from ['"]@\/components\/demo\/(\w+)\/state['"]/g, "from './$1-state.mjs'")
     /* the swap's catalogue is data beside its state, and its state imports it */
-    .replace(/from ['"]\.\/catalogue['"]/g, "from './swapv5-catalogue.mjs'");
+    .replace(/from ['"]\.\/catalogue['"]/g, "from './swapv5-catalogue.mjs'")
+    /* the account chapter imports the swap's catalogue for NEAR's price */
+    .replace(/from ['"]@\/components\/demo\/swapv5\/catalogue['"]/g, "from './swapv5-catalogue.mjs'");
   writeFileSync(join(dir, `${f}.mjs`), js);
 }
 const load = (f) => import(pathToFileURL(join(dir, `${f}.mjs`)).href);
@@ -109,6 +114,7 @@ const machines = {
   'demo/perps-v4': (await load('perpsv4-script')).perpsV4Flow.machine,
   'demo/perps-v5': (await load('perpsv5-script')).perpsV5Flow.machine,
   'demo/swap-v5': (await load('swapv5-script')).swapV5Flow.machine,
+  'demo/own-v5': (await load('ownv5-script')).ownV5Flow.machine,
   'demo/swap': (await load('swap-script')).swapFlow.machine,
   'demo/earn': (await load('earn-script')).earnFlow.machine,
   'demo/confidential-deposit': (await load('condeposit-script')).conDepositFlow.machine,
@@ -293,7 +299,7 @@ for (const [name, m] of Object.entries(machines)) {
     readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
   );
   console.log('\n== the short cuts run the length they say they do');
-  for (const [name, limit] of [['demo/perps-v5', LIMIT], ['demo/swap-v5', 25250]]) {
+  for (const [name, limit] of [['demo/perps-v5', LIMIT], ['demo/swap-v5', 25250], ['demo/own-v5', 20025]]) {
     const m = machines[name];
     const authored = m.beats.reduce((t, b) => t + (b.ms ?? 0), 0) + (m.outro ?? 0);
     const real = Math.round(authored * PACE);

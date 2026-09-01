@@ -89,6 +89,22 @@
    two animations rather than one. */
 .pdev.app .enter > * { animation-duration: 560ms }
 
+/* ---- the token chip, shared ---------------------------------------------
+   `demo/app/Dot.tsx` is used by every screen in this family, so its style
+   belongs here rather than beside whichever one drew it first. It lived in
+   26-demo-swap-v5.css for one commit and the account screen rendered five
+   SQUARE chips — the component had been promoted and its stylesheet had not.
+   ------------------------------------------------------------------------- */
+
+.pdev.app .swdot {
+  border-radius: 50%; flex: none; display: grid; place-items: center;
+  font-weight: 700; letter-spacing: -.02em; overflow: hidden;
+}
+/* artwork brings its own disc, so it covers the chip rather than sitting
+   inside it — the same rule `.tok .tokimg` keeps one level up */
+.pdev.app .swimg { width: 100%; height: 100%; display: block }
+.pdev.app .swsvg { width: 58%; height: 58%; display: block }
+
 /* ---- the chrome --------------------------------------------------------- */
 
 /* THE TOP OF THE SCREEN, NOW THAT NOTHING SIMULATES AN OS ABOVE IT.

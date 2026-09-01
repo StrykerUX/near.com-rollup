@@ -36,7 +36,8 @@ export function DemoPage<S, A extends string>({
         <h1>{title}</h1>
         <p>{intro}</p>
         <nav className="pdlinks">
-          <Link href="/demo/perps">Perps</Link>
+          <Link href="/demo/own-v5">Everything you own</Link>
+            <Link href="/demo/perps">Perps</Link>
           <Link href="/demo/perps-v2">Perps v2</Link>
           <Link href="/demo/perps-v3">Perps v3</Link>
           <Link href="/demo/perps-v4">Perps v4</Link>

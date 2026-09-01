@@ -9,6 +9,14 @@ export const metadata: Metadata = {
 
 const DEMOS = [
   {
+    href: '/demo/own-v5',
+    name: 'Everything you own',
+    len: 'twenty seconds',
+    steps: 4,
+    blurb:
+      'One account and three balances, and behind the first of them the screen the tour’s own headline is about: five holdings sorted by value, a tokenised share among them, and a row that opens into a swap. Rebuilt off `rec-Everything you own + Swap screen.MP4` — the recording that finally put the assets screen on film.',
+  },
+  {
     href: '/demo/perps',
     name: 'Perps',
     len: '5m 41s',
