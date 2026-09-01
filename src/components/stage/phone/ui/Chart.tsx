@@ -216,6 +216,12 @@ function walk(k: number) {
  * always be a candle with a particular wick, and the eye finds that pattern
  * long before it can name it.
  */
+/** the entry prop, in the one shape the draw loop wants */
+function entryList(e: number | number[] | null | undefined): number[] {
+  if (e == null) return [];
+  return (Array.isArray(e) ? e : [e]).filter((v) => typeof v === 'number' && Number.isFinite(v));
+}
+
 function wobble(k: number, amount: number) {
   if (!amount) return 0;
   return (rng((k ^ 0x9e3779b9) * 2246822519)() - 0.5) * amount;
@@ -254,8 +260,20 @@ const AXIS_W = Math.round(LABEL_PX * 4.6) + 8;
    the chain — see the note beside `priceAt`. */
 
 export type ChartProps = {
-  /** draws the dashed entry line and its chip */
-  entry?: number | null;
+  /**
+   * WHERE POSITIONS WERE OPENED — one price, or a book of them.
+   *
+   * It was a single number, and that was a design mistake rather than a
+   * simplification: a screen with two positions on it has two entries, and
+   * handing the chart only the newest meant the older one's line vanished the
+   * moment a second trade landed. What a viewer saw was one blue line MOVING,
+   * which says the position changed price — the opposite of what happened.
+   *
+   * A list draws one line each, newest first, so that when only one label fits
+   * it belongs to the trade that was just opened. A bare number still works and
+   * is what every other flow passes.
+   */
+  entry?: number | number[] | null;
   /**
    * Where to WRITE the live quote, if the screen shows it in its own header.
    * The alternative — a second walk driving that figure — is how a header ends
@@ -551,9 +569,16 @@ export function Chart({
     /* when the entry line first had a price to draw at, so it can arrive
        rather than appear — a line that is simply there in the next frame reads
        as a rendering artefact, not as a position that was just opened */
-    let entryAt = 0;
-    /* WHICH price that arrival belongs to, so a change of entry is noticed */
-    let entryOf = 0;
+    /**
+     * WHEN EACH ENTRY PRICE BEGAN DRAWING ITSELF IN, keyed by the price.
+     *
+     * A pair of scalars could only ever describe one line, so a second position
+     * landing either stole the first one's arrival or got none of its own. A
+     * map gives every price its own 520ms, and dropping the keys that are no
+     * longer on the book means a position that closes and reopens arrives again
+     * rather than snapping back at full opacity.
+     */
+    const entryAt = new Map<number, number>();
     /* THE CANDLE THE TRADE OPENED ON, and the price the market was at when it
        did. Everything before this index is history and is never touched again;
        everything from it forward carries the move. */
@@ -736,8 +761,10 @@ export function Chart({
       /* THE BRACKETS JOIN THE SCALE. A take profit a thousand points above the
          market is off the top of a chart framed on the candles alone, and a
          line nobody can see is not a line that says a position is protected. */
-      const marks = [props.current.tp, props.current.sl, props.current.entry]
-        .filter((v): v is number => typeof v === 'number');
+      const opens = entryList(props.current.entry);
+      const marks = [props.current.tp, props.current.sl]
+        .filter((v): v is number => typeof v === 'number')
+        .concat(opens);
       const lo = Math.min(...view.map((c) => c.l), ...marks);
       const hi = Math.max(...view.map((c) => c.h), ...marks);
       /* More headroom above than below: the series ends at its high, and a
@@ -839,6 +866,19 @@ export function Chart({
       ctx.restore();
       chip(ctx, w, py, '$' + quote.toFixed(1), props.current.up, UP_INK, props.current.face);
 
+      /**
+       * ROWS A LABEL ALREADY OWNS THIS FRAME.
+       *
+       * Every line on this chart wants to print its price against the same
+       * narrow axis, and two of them on one row is two prices in the same
+       * place. The live quote is seeded first because it is the market and
+       * outranks everything; each label that fits afterwards claims its own
+       * row. A line NEVER gives way — only its label does, and the price it
+       * was going to print is on the position card either way.
+       */
+      const taken = [py];
+      const freeRow = (row: number) => !taken.some((r) => Math.abs(r - row) < LABEL_PX + 6);
+
       /* THE BRACKETS. Drawn before the entry so the entry sits on top where
          they crowd, and in their own colours because the two are not the same
          instruction: one is where the trade is taken off at a profit, the
@@ -851,9 +891,13 @@ export function Chart({
            quote is already printing this number — that is what touching means —
            so the bracket keeps its line and gives up its label rather than
            stacking a second copy of the same price on top of the first. */
-        const collides = Math.abs(by - y(quote)) < LABEL_PX + 6;
+        const fits = freeRow(by);
         ctx.save();
-        ctx.globalAlpha = a;
+        /* the brackets belong to the newest position and arrive with its line —
+           they were drawn at that alpha before the entries became a list, and
+           snapping them in while the line they hang off draws itself would be
+           two halves of one event on two different clocks */
+        ctx.globalAlpha = newest;
         ctx.strokeStyle = stroke;
         ctx.setLineDash([5, 4]);
         ctx.lineWidth = 1;
@@ -862,56 +906,55 @@ export function Chart({
         ctx.lineTo(w - AXIS_W + 2, by);
         ctx.stroke();
         ctx.setLineDash([]);
-        if (!collides) chip(ctx, w, by, v.toLocaleString('en-US'), stroke, ink, props.current.face);
+        if (fits) {
+          chip(ctx, w, by, v.toLocaleString('en-US'), stroke, ink, props.current.face);
+          taken.push(by);
+        }
         ctx.restore();
       };
 
-      /* the entry line, when a position is open. It draws OUT FROM ITS CHIP:
-         the price is what the position is anchored to, so the line grows from
-         the label leftward across the chart rather than switching on. */
       /**
-       * THE LINE ARRIVES WHENEVER THE ENTRY IS A DIFFERENT PRICE, not only when
-       * there was no line before.
+       * ONE LINE PER OPEN POSITION, NEWEST FIRST.
        *
-       * This used to latch: `entryAt` was set the first time `entry` went
-       * non-null and never touched again unless it went back to null. On a
-       * screen that opens with a position already on the book, that is the
-       * first frame — so when a SECOND position landed and the entry moved from
-       * $79,520 to $79,567.5, the fade was long since finished and the line
-       * simply teleported. A new trade's entry appearing and an old one's line
-       * sliding to a new price look nothing alike, and the demo was drawing the
-       * second while claiming the first.
+       * Each draws OUT FROM ITS CHIP — the price is what a position is anchored
+       * to, so the line grows from the axis leftward across the chart rather
+       * than switching on — and each has its own 520ms, kept in `entryAt` under
+       * its own price. A trade opening is a line appearing; before this the
+       * chart had one line that moved instead, which says the position changed
+       * price rather than that a second one exists.
+       *
+       * Newest first so that where only one label fits, it is the trade that
+       * was just opened.
        */
-      const e = props.current.entry;
-      if (!e) { entryAt = 0; entryOf = 0; }
-      else if (e !== entryOf) { entryAt = clock; entryOf = e; }
-      const a = Math.min(1, Math.max(0, (clock - entryAt) / 520));
+      for (const price of entryAt.keys()) if (!opens.includes(price)) entryAt.delete(price);
+      for (const price of opens) if (!entryAt.has(price)) entryAt.set(price, clock);
+
+      const newest = opens.length
+        ? Math.min(1, Math.max(0, (clock - (entryAt.get(opens[0]) ?? clock)) / 520))
+        : 1;
       bracket(props.current.tp, props.current.up, UP_INK);
       bracket(props.current.sl, props.current.down, DOWN_INK);
-      if (e) {
-        const ey = Math.round(y(e)) + 0.5;
-        const right = w - AXIS_W + 2;
+
+      const right = w - AXIS_W + 2;
+      for (const price of opens) {
+        const a = Math.min(1, Math.max(0, (clock - (entryAt.get(price) ?? clock)) / 520));
+        const ey = Math.round(y(price)) + 0.5;
         ctx.save();
         ctx.globalAlpha = a;
         ctx.strokeStyle = 'rgba(120,170,255,.6)';
         ctx.setLineDash([2, 4]);
+        ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(right * (1 - a), ey);
         ctx.lineTo(right, ey);
         ctx.stroke();
         ctx.setLineDash([]);
-        /* THE LAST CHIP DRAWN WAS COVERING THE ONE THAT MATTERS MOST. An entry
-           forty points off the market is ten pixels off it on this scale, and a
-           chip is nineteen tall — so the entry label was painting over the live
-           quote and cutting it in half. It gives up its label on that row, the
-           way the brackets already do: the line stays, and the entry price is
-           spelled out in full on the position card directly below the chart. */
-        if (Math.abs(ey - y(quote)) >= LABEL_PX + 6) {
-          chip(ctx, w, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F', props.current.face);
+        if (freeRow(ey)) {
+          chip(ctx, w, ey, price.toLocaleString('en-US'), '#7AA7FF', '#04101F', props.current.face);
+          taken.push(ey);
         }
         ctx.restore();
       }
-
     };
 
     raf = requestAnimationFrame(draw);

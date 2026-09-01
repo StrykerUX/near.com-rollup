@@ -265,7 +265,12 @@ function Market({ d }: { d: Deck }) {
           up={PALETTE.up}
           down={PALETTE.down}
           face={AXIS_FACE}
-          entry={head ? head.entry : null}
+          /* ONE LINE PER POSITION, newest first — the whole book, not its head.
+             Handing the chart only `book[0]` meant the first position's line
+             vanished the instant a second trade landed, so what a viewer saw
+             was one blue line MOVING: the position changed price, which is the
+             opposite of what happened. */
+          entry={s.book.map((p) => p.entry)}
           side={head?.side ?? null}
           /**
            * THE BRACKET GOES ON THE CHART, because a trade that was set and

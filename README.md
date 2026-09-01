@@ -761,6 +761,20 @@ lever and not the outro, which is the loop's own breathing room.
 
 ### Two bugs where the second position lands
 
+**A book of positions had one entry line between them.** `entry` was a single
+number, and that was a design mistake rather than a simplification: a screen
+with two positions on it has two entries, and handing the chart only `book[0]`
+meant the older one's line vanished the instant a second trade landed. What
+reached the viewer was one blue line *moving* — which says the position changed
+price, the opposite of what happened. It takes a list now, one line each,
+newest first, and a bare number still works for every other flow.
+
+Three lines and a quote cannot all print a label: at the end the two entries
+and the live price sit within 16px of each other and a chip is 19px tall. So
+labels are claimed in priority order — the market first, then whatever fits —
+and a **line never gives way, only its label does**. Both entry prices are
+spelled out on the position cards directly below either way.
+
 **The entry line teleported instead of arriving.** `entryAt` — the clock the
 line's 520ms draw-in is measured from — was latched the first time `entry` went
 non-null and never touched again unless it went back to null. On a screen that
