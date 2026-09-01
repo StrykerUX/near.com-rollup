@@ -226,6 +226,12 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
       ctx.textBaseline = 'middle';
       const stepPx = 200;
       const first = Math.ceil(bot / stepPx) * stepPx;
+      /* the two chips own their rows. A gridline label at the same height is a
+         second price in the same place, and on a tall chart — where the lines
+         are dense — one of them is always landing under a chip. */
+      const chipRows = [y(view[view.length - 1].c)];
+      const ent = props.current.entry;
+      if (ent) chipRows.push(y(ent));
       for (let v = first; v < top; v += stepPx) {
         const gy = Math.round(y(v)) + 0.5;
         ctx.strokeStyle = 'rgba(255,255,255,.055)';
@@ -234,6 +240,7 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
         ctx.moveTo(0, gy);
         ctx.lineTo(w, gy);
         ctx.stroke();
+        if (chipRows.some((cy) => Math.abs(cy - gy) < LABEL_PX + 6)) continue;
         ctx.fillStyle = 'rgba(255,255,255,.32)';
         ctx.fillText('$' + v.toLocaleString('en-US'), w - 4, gy - 6);
       }

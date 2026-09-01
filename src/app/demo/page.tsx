@@ -25,6 +25,14 @@ const DEMOS = [
       'The trade on its own — no account, no funding. $5,000 of margin into a $100,000 position, with the market held still while the stop loss and take profit are typed, because both rules are enforced against a fixed entry price.',
   },
   {
+    href: '/demo/perps-v3',
+    name: 'Perps v3',
+    len: 'the same trade, quieter',
+    steps: 9,
+    blurb:
+      'Half as much on screen and nothing to follow. No pointer — the control about to change lights itself, and every derived figure travels to its new value, so the link between the slider and the number that answered is the thing you watch.',
+  },
+  {
     href: '/demo/swap',
     name: 'Swap',
     len: '1m 14s',

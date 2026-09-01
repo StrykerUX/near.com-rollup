@@ -129,6 +129,7 @@ beside it. `/demo` indexes them.
 |---|---|---|---|
 | `/demo/perps` | 5m 41s | 24 | Fund with a passkey, build a ticket, hit both validation rules, open a position |
 | `/demo/perps-v2` | the same, cut | 16 | The trade alone: $5,000 of margin into a $100,000 position, and back to the card |
+| `/demo/perps-v3` | the same, quieter | 9 | Half the screen, no pointer: the control lights itself and the figures travel |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
 | `/demo/earn` | 48s | 17 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
@@ -314,6 +315,42 @@ surfaced three places where a script did something no reader could:
   100 ZEC appeared to fill itself in.
 - The shared passkey sheet reached the DOM with nothing to aim at, which had a
   flow stamping a tap id onto another component's markup after render.
+
+### v3, and taking the pointer away
+
+`/demo/perps-v3` is the same machine again, and it is defined by two
+subtractions.
+
+**Nothing travels.** A pointer is honest — it says a person is doing this — but
+it is also a second thing to watch, and it arrives from wherever it was last.
+When what you want is the reader's eye already ON the control at the moment it
+changes, the control itself is the better instrument. `Spotlight` reads the same
+`hand` the pointer does and writes two classes instead of drawing anything:
+`.spot` on the control the next beat will press, `.hit` on the one it just
+pressed. A field in error borrows the refusal's colour rather than wearing a
+green ring over a red border, because stacking them says two things at once
+about the same box.
+
+**Half the screen.** Gone: the three lists under the chart, the Market/Limit
+control, the keypad, and the liquidation row in the ticket. Each was carrying
+something and each was carrying it somewhere else too — the lists are where a
+trade LANDS and this page is about making one; the order type is a second story;
+the pad spends two hundred pixels saying "this is being typed", which the caret
+and the digits landing say for nothing; and liquidation matters most once you
+are in, which is where it still appears. What is left is the price, the two
+sides, the size, what leverage turns it into, the two rules, and the position.
+
+The one thing v3 adds is `Count`. Every figure on these screens is derived, so
+when leverage goes 10x to 20x four of them change in the same frame — correct,
+and unreadable, because the eye gets no chance to see which moved. Easing them
+there is what makes the causal link between the control that was touched and the
+numbers that answered visible at all. It is why the ticket's two estimate rows
+collapse into one line that travels: that trip is the leverage feature.
+
+The chart gained a rule from this too. On a tall chart the gridlines are dense
+enough that one of them always lands under the live price or the entry chip, so
+a label at the same height as a chip is now skipped — a second price in the same
+place is not an axis.
 
 ### What the headless walk caught
 
