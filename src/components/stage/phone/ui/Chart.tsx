@@ -552,6 +552,8 @@ export function Chart({
        rather than appear — a line that is simply there in the next frame reads
        as a rendering artefact, not as a position that was just opened */
     let entryAt = 0;
+    /* WHICH price that arrival belongs to, so a change of entry is noticed */
+    let entryOf = 0;
     /* THE CANDLE THE TRADE OPENED ON, and the price the market was at when it
        did. Everything before this index is history and is never touched again;
        everything from it forward carries the move. */
@@ -867,9 +869,22 @@ export function Chart({
       /* the entry line, when a position is open. It draws OUT FROM ITS CHIP:
          the price is what the position is anchored to, so the line grows from
          the label leftward across the chart rather than switching on. */
+      /**
+       * THE LINE ARRIVES WHENEVER THE ENTRY IS A DIFFERENT PRICE, not only when
+       * there was no line before.
+       *
+       * This used to latch: `entryAt` was set the first time `entry` went
+       * non-null and never touched again unless it went back to null. On a
+       * screen that opens with a position already on the book, that is the
+       * first frame — so when a SECOND position landed and the entry moved from
+       * $79,520 to $79,567.5, the fade was long since finished and the line
+       * simply teleported. A new trade's entry appearing and an old one's line
+       * sliding to a new price look nothing alike, and the demo was drawing the
+       * second while claiming the first.
+       */
       const e = props.current.entry;
-      if (!e) entryAt = 0;
-      else if (!entryAt) entryAt = clock;
+      if (!e) { entryAt = 0; entryOf = 0; }
+      else if (e !== entryOf) { entryAt = clock; entryOf = e; }
       const a = Math.min(1, Math.max(0, (clock - entryAt) / 520));
       bracket(props.current.tp, props.current.up, UP_INK);
       bracket(props.current.sl, props.current.down, DOWN_INK);
@@ -885,7 +900,15 @@ export function Chart({
         ctx.lineTo(right, ey);
         ctx.stroke();
         ctx.setLineDash([]);
-        chip(ctx, w, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F', props.current.face);
+        /* THE LAST CHIP DRAWN WAS COVERING THE ONE THAT MATTERS MOST. An entry
+           forty points off the market is ten pixels off it on this scale, and a
+           chip is nineteen tall — so the entry label was painting over the live
+           quote and cutting it in half. It gives up its label on that row, the
+           way the brackets already do: the line stays, and the entry price is
+           spelled out in full on the position card directly below the chart. */
+        if (Math.abs(ey - y(quote)) >= LABEL_PX + 6) {
+          chip(ctx, w, ey, e.toLocaleString('en-US'), '#7AA7FF', '#04101F', props.current.face);
+        }
         ctx.restore();
       }
 

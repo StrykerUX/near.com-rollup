@@ -759,6 +759,35 @@ deliberate ratio for something that loops: a viewer arriving mid-loop lands on
 the answer rather than on the setup. If it wants shortening, the beat is the
 lever and not the outro, which is the loop's own breathing room.
 
+### Two bugs where the second position lands
+
+**The entry line teleported instead of arriving.** `entryAt` — the clock the
+line's 520ms draw-in is measured from — was latched the first time `entry` went
+non-null and never touched again unless it went back to null. On a screen that
+*opens* with a position on the book that is frame one, so when the second
+position landed and the entry moved from $79,520 to $79,567.5 the fade was long
+finished and the line simply jumped. A new trade's entry appearing and an old
+one's line sliding to a new price look nothing alike, and the cut was drawing
+the second while claiming the first. It now re-arrives whenever the entry is a
+*different price*: measured, the line grows 0 → 73px over ~530ms.
+
+**The entry chip was painting over the live quote.** It was the last label
+drawn and the only one with no collision rule. An entry forty points off the
+market is ten pixels off it on this scale and a chip is nineteen tall, so the
+blue label was cutting the live price in half. It now gives up its label on
+that row the way the brackets already do — the line stays, and the entry price
+is spelled out in full on the position card directly below.
+
+### Two cards, and the second one visible
+
+The new position has always been unshifted onto the front of the book, so it
+was already drawn above the old one — but the list had 193px for a 164px card,
+so what reached the screen was one card and nine pixels of the next. Capping
+the chart at 200px gives the list 226 and puts the second position's header row
+— its dot, its side, its P&L — on screen underneath the first. That row is the
+point of the frame: the cut spends twenty seconds opening a second position and
+the list should say there are two.
+
 ### Plus signs are not candles
 
 Held against a real BTC chart, the difference was not what it looked like it

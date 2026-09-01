@@ -160,7 +160,17 @@
 
 /* ---- the chart ---------------------------------------------------------- */
 
-.pdev.btc .bchart { flex: 1; min-height: 150px; position: relative; margin-top: 2px }
+/* THE CHART IS CAPPED SO THE LIST CAN HOLD TWO CARDS.
+   Both boxes are `flex: 1`, so they split what is left and the chart was taking
+   233 of it — which left the list 193 for a 164px card, and the whole ending
+   was one card with nine pixels of the next one showing. Capped at 200 the list
+   gets 226, and the second position's header row — its dot, its side, its P&L —
+   is on screen under the first. That row IS the point of the frame: the cut
+   spends twenty seconds opening a second position and the list should show
+   that there are two of them. */
+.pdev.btc .bchart {
+  flex: 1; min-height: 150px; max-height: 200px; position: relative; margin-top: 2px;
+}
 /* the watermark. It is in every reference frame, bottom left, under the
    candles — a chart drawn without it is the one detail that says "this panel
    was made for a slide". Low enough that it never competes with a wick. */
