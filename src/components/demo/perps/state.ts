@@ -163,6 +163,22 @@ export type PD = {
    * the moment it pays off leaves an empty screen where the answer should be.
    */
   filled: boolean;
+  /**
+   * THE SETTLEMENT CARD, IN ITS THREE STATES.
+   *
+   * The flow used to end on a filled position and cut straight back to the
+   * start, which threw away the only thing it had spent a minute earning. The
+   * gain was realised into `perps` — a figure the market screen stops drawing
+   * the moment a position exists, so the money landed somewhere nobody could
+   * see, and the next frame was an account with none of it.
+   *
+   * Three states rather than a boolean because the card has to arrive BEFORE
+   * the money does. `Count` travels when its value changes and mounts on
+   * whatever it is first given; opened and credited in the same frame, the
+   * balance would simply be the new number, and the one moment worth watching
+   * in the whole card is that number moving.
+   */
+  receipt: 'none' | 'open' | 'settled';
   /** the position bar on the market screen, expanded */
   posOpen: boolean;
   /** the row in the Positions list, expanded */
@@ -199,6 +215,7 @@ export const initial: PD = {
   submitting: false,
   pos: null,
   filled: false,
+  receipt: 'none',
   posOpen: false,
   rowOpen: false,
   tap: null,
@@ -274,7 +291,7 @@ export type PDAction =
   | 'focus' | 'key' | 'done'
   | 'levSheet' | 'levSet' | 'levSave'
   | 'prot' | 'unit'
-  | 'submit' | 'ostep' | 'tab' | 'posOpen' | 'rowOpen' | 'closePos' | 'tpFill';
+  | 'submit' | 'ostep' | 'tab' | 'posOpen' | 'rowOpen' | 'closePos' | 'tpFill' | 'receipt' | 'settle';
 
 const digits = (cur: string, d: string) => {
   if (d === '⌫') return cur.slice(0, -1);
@@ -420,12 +437,17 @@ export const actions: Record<PDAction, Act<PD>> = {
   posOpen: (s) => (s.pos ? { posOpen: !s.posOpen, tap: 'posOpen' } : null),
   /* refuses without a position and without a take profit to fill, and refuses
      twice: an order fills once */
-  tpFill: (s) =>
-    s.pos && s.pos.tp && !s.filled
+  tpFill: (s) => (s.pos && s.pos.tp && !s.filled ? { filled: true, tap: 'tpFill' } : null),
+  /* the card comes up on a filled order and only on a filled order */
+  receipt: (s) => (s.filled && s.receipt === 'none' ? { receipt: 'open', tap: 'receipt' } : null),
+  /* and the money lands a beat later, so the balance is seen to move rather
+     than seen to be different */
+  settle: (s) =>
+    s.receipt === 'open' && s.pos && s.pos.tp
       ? {
-          filled: true,
+          receipt: 'settled',
           perps: s.perps + realised(s.pos.entry, s.pos.tp, s.pos.size, s.pos.side),
-          tap: 'tpFill',
+          tap: null,
         }
       : null,
   rowOpen: (s) => (s.pos ? { rowOpen: !s.rowOpen, tap: 'rowOpen' } : null),

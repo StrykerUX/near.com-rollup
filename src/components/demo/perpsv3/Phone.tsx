@@ -50,6 +50,7 @@ export function Phone({ d }: { d: Deck }) {
 
       <Ticket d={d} />
       <LevSheet d={d} />
+      <Receipt d={d} />
       <PasskeySheet open={s.over === 'passkey'} auth={s.auth} onUse={d.can('ostep')} />
 
       {/* No pointer. The control that is about to change lights instead — see
@@ -183,6 +184,72 @@ function PositionCard({ d }: { d: Deck }) {
         </dl>
       ) : null}
     </div>
+  );
+}
+
+/* ---- the settlement --------------------------------------------------- */
+
+/**
+ * THE LAST THING THE DEMO SAYS, AND THE ONLY PLACE IT SAYS IT.
+ *
+ * Everything on this card is already true somewhere else on the screen — the
+ * size in the position bar, the exits on the chart, the P&L in the header —
+ * and that is exactly the problem it solves. Spread across three places and a
+ * minute of screen time, the trade never adds up anywhere; a reader who
+ * watched the whole thing could not tell you what it made without doing the
+ * arithmetic themselves.
+ *
+ * Reward against risk is the row the entire protection chapter was for. Both
+ * numbers are the same quantity of BTC against the two lines that were typed,
+ * so the two to one that was set as a pair of prices is still two to one as a
+ * pair of dollars — which is the claim, and it should be checkable on screen
+ * rather than asserted.
+ */
+function Receipt({ d }: { d: Deck }) {
+  const { s } = d;
+  const p = s.pos;
+  if (!p || !p.tp) return null;
+  const qty = p.size / p.entry;
+  const made = realised(p.entry, p.tp, p.size, p.side);
+  const risked = p.sl ? Math.abs(realised(p.entry, p.sl, p.size, p.side)) : 0;
+  const margin = p.size / p.lev;
+  return (
+    /* modal: there is nothing left to tap, and a scrim that dismissed it would
+       be offering a way out of the one screen that is the answer */
+    <Layer open={s.receipt !== 'none'} onScrim={null}>
+      {/* `dsheet` for the slide, the visibility flip and the clip; the rest of
+          the class lifts it off the bottom edge into a card, the way the
+          passkey dialog does */}
+      <div className="dsheet drcpt">
+        <span className="drcpth">Take profit filled</span>
+        <b className="drcptv">+{usd(made, 2)}</b>
+        <i className="drcptp">+{((made / margin) * 100).toFixed(2)}% on {usd(margin, 0)} of margin</i>
+
+        <dl className="drcptd">
+          <div><dt>Entry</dt><dd>{usd(p.entry, 0)}</dd></div>
+          <div><dt>Exit</dt><dd className="dgain">{usd(p.tp, 0)}</dd></div>
+          <div><dt>Size</dt><dd>{usd(p.size, 0)} <i>{qty.toFixed(5)} BTC</i></dd></div>
+        </dl>
+
+        <div className="drcptr">
+          <dl className="drcptrg">
+            <div><dt>Risked</dt><dd>{usd(risked, 2)}</dd></div>
+            <div><dt>Made</dt><dd className="dgain">+{usd(made, 2)}</dd></div>
+          </dl>
+          <span className="drcptx">
+            <b>{(made / (risked || 1)).toFixed(0)} : 1</b>
+            <i>the ratio the two exits were set at</i>
+          </span>
+        </div>
+
+        {/* the balance is the whole point of the card: it mounts on the figure
+            the account had before any of this and travels once `settle` fires */}
+        <div className="drcptb">
+          <span>Perps balance</span>
+          <Count className="drcptbv" value={s.perps} dp={2} prefix="$" ms={900} />
+        </div>
+      </div>
+    </Layer>
   );
 }
 

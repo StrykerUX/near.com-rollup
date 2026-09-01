@@ -270,3 +270,67 @@
 .pdev[data-motion] .dsheet.tk:not(.pad) .kpwrap {
   max-height: 0; translate: 0 100%; opacity: 0;
 }
+
+/* =========================================================================
+   THE SETTLEMENT CARD
+   -------------------------------------------------------------------------
+   The last screen of the flow and the seam back to the first. It is built on
+   `.dsheet` — the slide, the visibility flip and the clip are all solved
+   there, and a second implementation of a sheet that appears and leaves is a
+   second set of the same bugs — and then lifted off the bottom edge into a
+   card, because this one is not asking for an action. Nothing on it is
+   tappable; it is a statement, and it leaves on its own.
+
+   It also does the work of the loop. A flow that cut from a filled position
+   straight back to an empty market threw away the minute it had just spent;
+   a card that states the outcome and then slides off is an ending, and
+   starting over after an ending reads as intended rather than as a jump.
+   ========================================================================= */
+
+.drcpt {
+  margin: auto 12px 14px; border-radius: 22px; padding: 20px 18px 16px;
+  background: #0E1113; border: 1px solid rgba(38, 194, 129, .22);
+  text-align: center; gap: 0;
+}
+.drcpth { display: block; font-size: 14px; color: rgba(255, 255, 255, .55) }
+/* the figure the whole flow is for: the only thing on the card set larger
+   than the copy around it, so there is no question what it is answering */
+.drcptv { display: block; font-size: 32px; font-weight: 500; color: #26C281; margin-top: 6px; letter-spacing: -.01em }
+.drcptp { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .5); margin-top: 3px }
+
+.drcptd { margin: 18px 0 0; display: grid; gap: 7px; text-align: left }
+.drcptd div, .drcptrg div { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px }
+.drcptd dt, .drcptrg dt { color: rgba(255, 255, 255, .5) }
+.drcptd dd, .drcptrg dd { margin: 0; font-variant-numeric: tabular-nums }
+.drcptd dd i { font-style: normal; color: rgba(255, 255, 255, .42); margin-left: 7px }
+
+/* REWARD AGAINST RISK, BOXED. Two figures and the number they make is the
+   claim the protection chapter spent three steps setting up, and left as two
+   more rows in the list above it, it is filed rather than said. */
+.drcptr {
+  margin-top: 14px; padding: 12px 13px 11px; border-radius: 13px;
+  background: rgba(255, 255, 255, .04);
+}
+.drcptrg { margin: 0; display: grid; gap: 6px; text-align: left }
+.drcptx {
+  display: block; margin-top: 10px; padding-top: 9px;
+  border-top: 1px solid rgba(255, 255, 255, .07);
+}
+.drcptx b { display: block; font-size: 19px; font-weight: 500; letter-spacing: .04em }
+.drcptx i { display: block; font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .45); margin-top: 2px }
+
+.drcptb {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-top: 16px; padding-top: 13px; font-size: 14px;
+  border-top: 1px solid rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .5);
+}
+.drcptbv { color: #fff; font-size: 16px; font-variant-numeric: tabular-nums }
+
+/* it arrives in the order it is read, and only the once — the stagger is on
+   the card, so the balance is still travelling under a list that has settled */
+.pdev[data-motion] .drcpt > * { animation: drise 320ms var(--ease-out) both }
+.pdev[data-motion] .drcpt > :nth-child(2) { animation-delay: 60ms }
+.pdev[data-motion] .drcpt > :nth-child(3) { animation-delay: 100ms }
+.pdev[data-motion] .drcpt > :nth-child(4) { animation-delay: 150ms }
+.pdev[data-motion] .drcpt > :nth-child(5) { animation-delay: 210ms }
+.pdev[data-motion] .drcpt > :nth-child(6) { animation-delay: 270ms }

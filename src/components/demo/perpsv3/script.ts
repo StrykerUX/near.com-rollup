@@ -123,7 +123,18 @@ const STEPS: Step<PD, PDAction>[] = [
        already spent above. `pnpm check:flows` asserts this still lands. */
     beats: [
       { ms: 2800 }, { ms: 2600, do: 'posOpen' },
-      { ms: 12600, do: 'tpFill' }, { ms: 5600 },
+      { ms: 12600, do: 'tpFill' }, { ms: 3000 },
+    ],
+  },
+  {
+    id: 'settled', ch: 'open',
+    title: 'What the trade actually made',
+    note: 'The size, both exits and the P&L have each been on screen already, in three different places. This is the only one that adds them up: $627.71 was at risk, $1,255.43 came back, and the balance moves.',
+    beats: [
+      { ms: 900, do: 'receipt' },
+      /* the card first, the money a beat later — see `receipt` in state.ts */
+      { ms: 800, do: 'settle' },
+      { ms: 3300 },
     ],
   },
 ];
@@ -144,6 +155,8 @@ export const perpsV3Flow = buildFlow<PD, PDAction>({
     submit: 'sign',
     posOpen: 'position',
     tpFill: 'position',
+    receipt: 'settled',
+    settle: 'settled',
   },
   /**
    * WHICH CONTROL EACH TRANSITION LIGHTS.
@@ -169,6 +182,8 @@ export const perpsV3Flow = buildFlow<PD, PDAction>({
       case 'ostep': return s.over === 'passkey' && s.auth === 'ask' ? 'passkey' : null;
       case 'posOpen': return 'posbar';
       case 'tpFill': return 'posbar';
+      /* nothing to light: the card IS the subject */
+      case 'receipt': case 'settle': return null;
       default: return null;
     }
   },

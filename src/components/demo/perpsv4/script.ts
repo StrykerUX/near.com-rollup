@@ -120,7 +120,19 @@ const STEPS: Step<PD, PDAction>[] = [
       /* the climb is 22,500 REAL ms; beats run at PACE, so the fill sits at
          22,500 / 1.25 = 18,000 of script time from the open, less the 6,000
          already spent above. Checked by `pnpm check:flows`. */
-      { ms: 12000, do: 'tpFill' }, { ms: 6000 },
+      { ms: 12000, do: 'tpFill' }, { ms: 3000 },
+    ],
+  },
+  {
+    id: 'settled', ch: 'live',
+    title: 'Two to one, paid',
+    note: 'Six hundred at risk, twelve hundred back, and the balance that was $5,428.61 a minute ago.',
+    callout: 'Settled · +$1,255.43',
+    beats: [
+      { ms: 900, do: 'receipt' },
+      /* the card first, the money a beat later — see `receipt` in state.ts */
+      { ms: 800, do: 'settle' },
+      { ms: 3300 },
     ],
   },
 ];
@@ -141,6 +153,8 @@ export const perpsV4Flow = buildFlow<PD, PDAction>({
     submit: 'sign',
     posOpen: 'open',
     tpFill: 'open',
+    receipt: 'settled',
+    settle: 'settled',
   },
   target: (a, arg, s) => {
     switch (a) {
@@ -155,6 +169,7 @@ export const perpsV4Flow = buildFlow<PD, PDAction>({
       case 'ostep': return s.over === 'passkey' && s.auth === 'ask' ? 'passkey' : null;
       case 'posOpen': return 'posbar';
       case 'tpFill': return 'posbar';
+      case 'receipt': case 'settle': return null;
       default: return null;
     }
   },
