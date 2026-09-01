@@ -74,7 +74,7 @@
 
 /* ---- the page's own head ---------------------------------------------- */
 
-.pdtop { max-width: 1180px; margin: 0 auto; padding: 30px 24px 4px }
+.pdtop { max-width: 1180px; margin: 0 auto; padding: 22px 24px 2px }
 .pdback {
   display: inline-block; font-family: var(--font-mono); font-size: var(--fs-micro);
   letter-spacing: .1em; text-transform: uppercase; color: rgba(255, 255, 255, .48);
@@ -101,7 +101,7 @@
 /* ---- the two columns --------------------------------------------------- */
 
 .pdgrid {
-  max-width: 1180px; margin: 0 auto; padding: 20px 24px 0;
+  max-width: 1180px; margin: 0 auto; padding: 14px 24px 0;
   display: grid; grid-template-columns: auto minmax(340px, 1fr); gap: 46px; align-items: start;
 }
 
@@ -111,13 +111,19 @@
   --k: 1; position: relative;
   width: calc(352px * var(--k)); height: calc(766px * var(--k));
 }
-/* The device does not reflow, it SCALES — so these steps are about how much
-   room the page's own head leaves, not about a layout breaking. */
-@media (max-height: 1180px) { .pdphone { --k: .92 } }
-@media (max-height: 1080px) { .pdphone { --k: .84 } }
-@media (max-height:  980px) { .pdphone { --k: .76 } }
-@media (max-height:  880px) { .pdphone { --k: .68 } }
-@media (max-height:  800px) { .pdphone { --k: .62 } }
+/* THE DEVICE IS DRAWN AT ITS OWN SIZE, 352 x 766, AND ONLY SHRINKS WHEN IT
+   CANNOT FIT.
+   The ladder used to start shrinking at 1180px of viewport and reach .62 by
+   800, which meant it was scaled down on every laptop anyone actually owns —
+   12px type rendered at 10, and the reason the UI read as small was never the
+   type scale. It needs 766 for itself plus 94 for the sticky offset, the gap
+   and the transport, so 1 holds down to a 860px viewport; each step below is
+   the largest scale that still clears that sum. */
+@media (max-height: 899px) { .pdphone { --k: .95 } }
+@media (max-height: 839px) { .pdphone { --k: .87 } }
+@media (max-height: 779px) { .pdphone { --k: .79 } }
+@media (max-height: 719px) { .pdphone { --k: .71 } }
+@media (max-height: 659px) { .pdphone { --k: .64 } }
 
 .pdheld {
   /* above the device, not below it: below is where the transport lives, and a
