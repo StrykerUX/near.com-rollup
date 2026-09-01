@@ -334,7 +334,7 @@ export type ChartProps = {
    * and there are exactly two ways to get one. The first — add a slope, a few
    * points per candle — was built and thrown away, and it failed the way the
    * README already says every monotone lift fails: a slope large enough to see
-   * over ten seconds is 690 points across a 46-candle window, which swamps the
+   * across a short cut is 690 points over a 46-candle window, which swamps the
    * walk's own ±100 of shape and closes every bar green. That is not a rally.
    * It is a ramp with wicks drawn on it, and it is the same trap `RAMP` exists
    * to avoid.

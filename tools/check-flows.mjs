@@ -267,15 +267,17 @@ for (const [name, m] of Object.entries(machines)) {
    screen ever came to rest; 13,125 fixed the sheets and left the FIELDS with
    the same problem — a value landing and being built on in the same breath. So
    scene 2 now carries four silent beats, one after each value it sets, and its
-   keystrokes are 160ms apart rather than 105. The other 800 is the third row of
-   the order checklist finally being allowed to finish before the sheet closes.
+   keystrokes are 160ms apart rather than 105. Another 800 is the third row of
+   the order checklist finally being allowed to finish before the sheet closes,
+   and the last 3,000 is the ending: five things land in that frame at once and
+   two seconds was enough to see them, not to read them.
 
    Enforced with a tolerance of one frame at 60Hz. Anything looser and the
    guard is decorative; anything tighter and rounding a beat to a round number
    would fail the build.
    ========================================================================== */
 {
-  const LIMIT = 17325;
+  const LIMIT = 20325;
   const TOL = 17;
   const PACE = Number(
     readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],

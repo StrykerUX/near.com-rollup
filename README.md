@@ -131,7 +131,7 @@ beside it. `/demo` indexes them.
 | `/demo/perps-v2` | the same, cut | 16 | The trade alone: $5,000 of margin into a $100,000 position, and back to the card |
 | `/demo/perps-v3` | the same, quieter | 9 | Half the screen, no pointer: the control lights itself and the figures travel |
 | `/demo/perps-v4` | the marketing cut | 8 | One line of copy at a time, and everything but the moment darkened |
-| `/demo/perps-v5` | seventeen seconds | 2 | A position already working, and a second one opened beside it — its own device, rebuilt against the app |
+| `/demo/perps-v5` | twenty seconds | 2 | A position already working, and a second one opened beside it — its own device, rebuilt against the app |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
 | `/demo/earn` | 48s | 17 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
@@ -526,7 +526,7 @@ end. It found all of these before a browser could.
 
 `/demo/perps-v5` is commissioned to a length, checked by `pnpm check:flows`. The
 deck plays every beat at `PACE` (1.25), so the budget is **10,500ms of authored
-beats, outro included → 17,325ms on screen**, and the assertion exists because
+beats, outro included → 20,325ms on screen**, and the assertion exists because
 the length is not a number anywhere in the source — it is a sum of twenty-seven
 beats, and every future edit to one moves it by exactly as much as nobody
 notices.
@@ -548,12 +548,13 @@ already documents for demo-mode PACE:
 
 | dial | was | is |
 |---|---|---|
-| scene 2's beats | 5,000ms | 10,860ms |
+| scene 2's beats | 5,000ms | 13,260ms |
 | `--dur` / `--dur-slow` | 150 / 260 | 225 / 390 |
 | the chart's `candleMs` | 1,500 | 5,000 |
 | every `Count` that travels | 200–640 | 300–960 |
 | keystrokes | 105ms | 160ms |
 | rests after a value lands | none | 4 × 500ms |
+| the ending | 1,545ms | 3,945ms |
 
 `candleMs` buys something the others do not: a slower candle covers the same
 ground in more time, so a quoted market crosses fewer ticks per second and
@@ -733,6 +734,20 @@ file is scoped to `.pdev.btc` and owns its whole namespace. It is **"is this
 class used at two JSX sites that are two different objects"**, which finds them
 in one pass over `Phone.tsx`. Worth running before adding a class here; a
 device this dense reuses names by accident.
+
+### The ending gets a third of the cut
+
+Five things land in one frame when `land` fires: the sheet slides out, the tab
+row counts up to (2)/(4)/(28), a second card arrives above the first, the entry
+and its two exits draw themselves onto the chart, and Modify/Close takes the
+slot Long/Short had. Two seconds was enough to *see* that and not enough to
+*read* it, so the hold is now 3,945ms — the longest beat in the script by a
+factor of four, on the frame the whole cut is spent earning.
+
+The time is not dead. The chart keeps rolling through it, so the quote keeps
+printing and the new position's P&L keeps answering — what the hold shows is a
+bracket that was set and a trade that is working, which is the only reason to
+set one.
 
 ### The quote, and three fixes that each undid the last
 

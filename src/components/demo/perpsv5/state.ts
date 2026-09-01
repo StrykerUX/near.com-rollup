@@ -152,7 +152,7 @@ export const TAPE = 0.9;
 /**
  * IT OPENS ON A TRADE ALREADY WORKING, which is the whole reason this cut
  * exists. Every other version starts on an empty book and spends its first
- * third earning the right to have one; thirteen seconds does not have a third
+ * third earning the right to have one; a cut this short does not have a third
  * to spend, and "here is an account with a live position in it" is a stronger
  * first frame than "here is an account".
  *

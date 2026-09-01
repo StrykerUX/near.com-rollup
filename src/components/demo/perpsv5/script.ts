@@ -8,8 +8,8 @@ import {
  * PERPS v5 — THE SHORT CUT, AND THE BUDGET IS THE DESIGN
  * ==================================================================
  * v4 is the cut you put in front of a room: ninety seconds, eight moments, a
- * line of copy on each. This is the cut you put in a feed: thirteen seconds,
- * and thirteen is not a shorter ninety — it is a different problem, because the
+ * line of copy on each. This is the cut you put in a feed: twenty seconds,
+ * and twenty is not a shorter ninety — it is a different problem, because the
  * two things v4 spends most of its length on (a line of copy per step, and a
  * beat long enough for the eye to arrive) are the two that do not fit.
  *
@@ -19,11 +19,11 @@ import {
  * the beats times 1.25. `pnpm check:flows` asserts that product, so a beat that
  * grows by two hundred milliseconds cannot quietly move the clip's length.
  *
- *   scene 1    2,400ms   the market, and a position already working
- *   scene 2    7,500ms   the second one, opened
- *   outro        600ms   the hold before the loop
- *   ─────────────────
- *             10,500ms  ×1.25 = 13,125ms on screen
+ *   scene 1     2,400ms   the market, and a position already working
+ *   scene 2    13,260ms   the second one, opened — and then left running
+ *   outro         600ms   the hold before the loop
+ *   ──────────────────
+ *              16,260ms  ×1.25 = 20,325ms on screen
  *
  * IT WAS TEN SECONDS AND IT COULD NOT BE READ. Scene 2 ran at 5,000ms, and the
  * table that killed it is the time each screen got to exist before the next
@@ -100,7 +100,7 @@ const STEPS: Step<BD, BDAction>[] = [
     beats: [{ ms: 2400 }],
   },
 
-  /* ---- scene 2 · 7,500ms ------------------------------------------------
+  /* ---- scene 2 · 13,260ms ------------------------------------------------
      The whole ticket in seven and a half seconds of script time. Every gap is
      under one rule: a press and the screen it opens are two beats, and the
      first of the two has to outlast the entrance it is waiting for AND leave
@@ -159,11 +159,18 @@ const STEPS: Step<BD, BDAction>[] = [
       { ms: 800, do: 'land' },
 
       /* THE HOLD, AND IT IS THE POINT OF THE CUT.
-         The ticket closes, the tab row counts up and a second card arrives
-         above the first. Nearly two seconds on screen, and it is the longest
-         single beat in the script for exactly that reason: everything before it was
-         setting up a frame nobody would remember if it flashed. */
-      { ms: 1545 },
+         Five things land here at once: the sheet slides out, the tab row counts
+         up to (2)/(4)/(28), a second card arrives above the first, the entry and
+         its two exits draw themselves onto the chart, and Modify/Close takes the
+         slot Long/Short had. Nearly two seconds was enough to SEE that, and not
+         enough to read it — and this is the frame the whole cut is spent
+         earning, so it now gets almost five.
+
+         The extra time is not dead. The chart keeps rolling, so the quote keeps
+         printing and the new position's P&L keeps answering it: what the hold
+         actually shows is a bracket that was set and a trade that is working,
+         which is the only reason to set one. */
+      { ms: 3945 },
     ],
   },
 ];
