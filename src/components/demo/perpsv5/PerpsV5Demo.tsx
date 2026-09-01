@@ -1,28 +1,24 @@
 'use client';
 import { useDeck } from '@/components/demo/shell/deck';
-import { V4Stage } from '@/components/demo/shell/V4Stage';
+import { Stage } from './Stage';
 import { Phone } from './Phone';
 import { perpsV5Flow } from './script';
 
 /**
  * PERPS v5 — the short cut
  * ==================================================================
- * The room is `shell/V4Stage`, unchanged and shared with the four other
- * marketing cuts. That is the point of it having been written against a phone,
- * a headline and a row of dots rather than against perps: a cut that is a
- * sixth of the length of the others still stands in the same room.
+ * Two files, and between them they are everything this cut does not share with
+ * the other five: its own device (`Phone.tsx` — v3's is an argument about the
+ * app, this one is a copy of it) and its own room (`Stage.tsx` — the shared
+ * `V4Stage` is a phone plus a headline plus a row of dots, and this page is a
+ * phone).
  *
- * What is different here is inside the device rather than around it — this is
- * the only flow that brings its OWN screens rather than borrowing v3's, and
- * the reason is in Phone.tsx: v3's device is an argument about the app and
- * this one is a copy of it.
- *
- * No `links`. The other cuts point at their siblings because a reader who
- * wants the reasoning should be able to get to it; this one is meant to be
- * recorded, and a row of route names is the first thing that would have to be
- * cropped out of the frame.
+ * The deck is still a full deck: the clock runs, the machine's guards are
+ * live, `seek` and `toggle` exist. Nothing on screen calls them, which is what
+ * "leave only the demo" means — this page is a surface to point a screen
+ * recorder at, and every control on it would be a control to crop out.
  */
 export function PerpsV5Demo() {
   const deck = useDeck(perpsV5Flow);
-  return <V4Stage flow={perpsV5Flow} deck={deck} phone={<Phone d={deck} />} />;
+  return <Stage phone={<Phone d={deck} />} />;
 }

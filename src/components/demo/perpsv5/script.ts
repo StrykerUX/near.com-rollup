@@ -77,6 +77,14 @@ const CHAPTERS: Chapter[] = [
   { id: 'more', name: 'Again', blurb: '' },
 ];
 
+/**
+ * `title` and `note` survive as documentation and nothing else. The stage this
+ * cut runs in draws no copy, so nothing on screen reads them — but they are
+ * what a step IS, they are required by `Step`, and they are the only place the
+ * argument for each scene is written down. `callout` is gone: it existed only
+ * to render the bubble beside the phone, and a field whose sole consumer has
+ * been deleted is a field that will be wrong within a month.
+ */
 const STEPS: Step<BD, BDAction>[] = [
   /* ---- scene 1 · 2,400ms ------------------------------------------------
      One beat, and nothing in the machine changes during it. Everything that
@@ -88,7 +96,6 @@ const STEPS: Step<BD, BDAction>[] = [
     id: 'live', ch: 'live',
     title: 'A position, already working',
     note: 'Long BTC at 20x, opened at $79,520 and $47.50 in front. The margin is posted, the liquidation is priced, and the balance in the corner is what is left to trade with.',
-    callout: 'Long 20x · $120,000',
     beats: [{ ms: 2400 }],
   },
 
@@ -105,7 +112,6 @@ const STEPS: Step<BD, BDAction>[] = [
     id: 'open', ch: 'more',
     title: 'A second one, in five taps',
     note: '$5,000 of margin at twenty times, both exits set before you are in, and one press that carries the leverage, the order and the bracket together.',
-    callout: '$5,000 → $100,000',
     beats: [
       /* the sheet */
       { ms: 630, do: 'openTicket', arg: 'long' },

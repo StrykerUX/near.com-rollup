@@ -47,6 +47,46 @@ const BTC = findToken('BTC');
    face the rest of the device is set in — see `face` on <Chart>. Tabular
    figures: the live chip is rewritten every frame and a proportional 1 makes
    the label twitch sideways under a price that has not moved. */
+/**
+ * LUCIDE, INLINED (ISC) — `lucide-static@1.38.0`.
+ *
+ * EVERY MARK ON THIS DEVICE THAT IS AN ICON IS ONE OF THESE. They were four
+ * different kinds of not-an-icon, and each failed the same way:
+ *
+ *   `⌄`  MODIFIER LETTER DOWN ARROWHEAD — not a chevron, a phonetic letter.
+ *        Every family draws it at its own weight, size and baseline, so the
+ *        five disclosure arrows on this screen were five slightly different
+ *        marks, none of them aligned to the text beside them.
+ *   `⇄`  a text glyph again, and one Figtree has no strong opinion about.
+ *   `~`  a hand-drawn polyline that had to be read twice before it said chart.
+ *   `✓`  drawn in CSS out of two rotated borders — precise, and impossible to
+ *        restyle, recolour or resize without redoing the trigonometry.
+ *
+ * One 24-grid path set each, inlined the way the repo already keeps its icons
+ * (`phone/icons.tsx`, `TAB_ICONS` in the shell). A package for five glyphs is
+ * a tree to shake for a handful of `d` attributes.
+ *
+ * The spinner stays CSS. It is a rotating stroke rather than a glyph, and a
+ * border with an `animation` is both smaller and smoother than a path being
+ * transformed.
+ */
+function Icon({ d, className }: { d: string; className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {d.split('|').map((p) => <path key={p} d={p} />)}
+    </svg>
+  );
+}
+/** lucide `chevron-down` */
+const CHEV = 'm6 9 6 6 6-6';
+/** lucide `chart-line` — the control switches the chart's type */
+const CHART_KIND = 'M3 3v16a2 2 0 0 0 2 2h16|m19 9-5 5-4-4-3 3';
+/** lucide `arrow-right-left` — the unit swap on a protection field */
+const SWAP = 'm16 3 4 4-4 4|M20 7H4|m8 21-4-4 4-4|M4 17h16';
+/** lucide `check` — the "add profit taker/stop loss" box, once it is ticked */
+const CHECK = 'M20 6 9 17l-5-5';
+
 const AXIS_FACE = '\'Figtree\', "Helvetica Neue", Arial, sans-serif';
 const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
 /** a signed figure, in the app's own spelling: a true minus, never a hyphen */
@@ -196,7 +236,7 @@ function Market({ d }: { d: Deck }) {
       <div className="bpair">
         <TokenDot token={BTC} size={34} />
         <span className="bpairt"><b>BTC</b><em>Bitcoin</em></span>
-        <span className="bchev" aria-hidden="true">⌄</span>
+        <Icon d={CHEV} className="bcv bchev" />
       </div>
 
       <div className="bpx">
@@ -246,11 +286,8 @@ function Market({ d }: { d: Deck }) {
       <div className="btime" aria-hidden="true"><i>:00</i><i>10:30</i><b>11:00</b></div>
 
       <div className="btools">
-        <span className="btf">1H <i>⌄</i></span>
-        <span className="bkind" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-               strokeLinecap="round" strokeLinejoin="round"><path d="M4 16.5l5-6 4 3.2 6.5-8" /></svg>
-        </span>
+        <span className="btf">1H <Icon d={CHEV} className="bcv" /></span>
+        <Icon d={CHART_KIND} className="bkind" />
       </div>
 
       {s.book.length ? <PositionBar d={d} /> : null}
@@ -306,7 +343,7 @@ function PositionBar({ d }: { d: Deck }) {
           <b data-pnl="0">{signed(pnl(p, MARK))}</b>
           <i data-pnlp="0" className="bpct">{signedPct(pnlPct(p, MARK))}</i>
         </span>
-        <span className={'bposc' + (s.posOpen ? ' on' : '')} aria-hidden="true">⌄</span>
+        <Icon d={CHEV} className={'bcv bposc' + (s.posOpen ? ' on' : '')} />
       </div>
     </div>
   );
@@ -419,7 +456,7 @@ function Ticket({ d }: { d: Deck }) {
               second story and there is no room for it; a control that opened
               nothing would be worse than one that is plainly just a label, so
               it carries no `can` and gets no pointer. */}
-          <span className="botype">Market <i>⌄</i></span>
+          <span className="botype">Market <Icon d={CHEV} className="bcv" /></span>
         </div>
 
         <div className="bavail">
@@ -439,13 +476,13 @@ function Ticket({ d }: { d: Deck }) {
               {s.focus === 'amount' ? <i className="bcaret" /> : null}
             </span>
             <span className={'blev' + live(d.can('levSheet'))} {...press(d.can('levSheet'))}
-                  data-tap="lev">{s.lev}x <i>⌄</i></span>
+                  data-tap="lev">{s.lev}x <Icon d={CHEV} className="bcv" /></span>
           </div>
         </div>
 
         <span className={'bchk' + (s.prot ? ' on' : '') + live(d.can('prot'))} {...press(d.can('prot'))}
               data-tap="prot">
-          <i className="bbox" />Add profit taker/stop loss
+          <i className="bbox"><Icon d={CHECK} className="btick" /></i>Add profit taker/stop loss
         </span>
 
         {s.prot ? (
@@ -497,7 +534,7 @@ function Protect({ d, which, label, bad, err, delay = 0 }: {
             it is inert because this cut never swaps units — see `prot` in
             state.ts. Inert and undrawn are different lies; this is the smaller
             one, and `press(null)` keeps it out of the tab order either way. */}
-        <span className="bunit" aria-hidden="true"><i>$</i><em>⇄</em></span>
+        <span className="bunit" aria-hidden="true"><i>$</i><Icon d={SWAP} className="bswap" /></span>
       </span>
       {bad ? <em className="berr">{err}</em> : null}
     </div>

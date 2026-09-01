@@ -139,7 +139,11 @@
 .pdev.btc .bpairt { display: flex; flex-direction: column; line-height: 1.15 }
 .pdev.btc .bpairt b { font-size: 17px; font-weight: 600 }
 .pdev.btc .bpairt em { font-style: normal; font-size: 13px; color: rgba(255, 255, 255, .45) }
-.pdev.btc .bchev { margin-left: auto; color: rgba(255, 255, 255, .5); font-size: 19px; font-style: normal }
+/* every disclosure arrow on this device is the same Lucide path at the same
+   size — see `Icon` in Phone.tsx. `flex: none` because each one sits in a flex
+   row next to text that would otherwise squeeze it. */
+.pdev.btc .bcv { width: 16px; height: 16px; flex: none; color: rgba(255, 255, 255, .45) }
+.pdev.btc .bchev { margin-left: auto; width: 20px; height: 20px; color: rgba(255, 255, 255, .5) }
 
 .pdev.btc .bpx {
   flex: none; height: 44px; display: flex; align-items: baseline; gap: 10px; padding: 6px 16px 0;
@@ -180,7 +184,7 @@
   padding: 0 16px;
 }
 .pdev.btc .btf { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, .82) }
-.pdev.btc .btf i { font-style: normal; color: rgba(255, 255, 255, .45); margin-left: 2px }
+.pdev.btc .btf { display: flex; align-items: center; gap: 3px }
 .pdev.btc .bkind { width: 19px; color: rgba(255, 255, 255, .72) }
 .pdev.btc .bkind svg { width: 100%; display: block }
 
@@ -207,7 +211,7 @@
 .pdev.btc .bpct.bup { background: rgba(47, 212, 138, .14) }
 .pdev.btc .bpct.bdown { background: rgba(240, 97, 107, .14) }
 .pdev.btc .bposc {
-  font-style: normal; color: rgba(255, 255, 255, .5); font-size: 19px;
+  width: 20px; height: 20px; color: rgba(255, 255, 255, .5);
   transition: rotate var(--dur) var(--ease-out);
 }
 .pdev.btc .bposc.on { rotate: 180deg }
@@ -239,8 +243,14 @@
   flex: 1; min-height: 0; display: flex; flex-direction: column;
   background: var(--btc-bg);
 }
+/* CENTRED, as a group rather than spread. `space-between` would pin Positions
+   to the left edge and Trades to the right, and the underline — which is as
+   wide as its own label — would then travel the entire width of the device
+   between two tabs that are only three words apart. Centred, the row reads as
+   one control and the underline moves the distance the eye expects. */
 .pdev.btc .btabs {
-  flex: none; height: 40px; display: flex; align-items: center; gap: 18px; padding: 0 16px;
+  flex: none; height: 40px; display: flex; align-items: center; justify-content: center;
+  gap: 18px; padding: 0 16px;
   border-bottom: 1px solid rgba(255, 255, 255, .07);
 }
 .pdev.btc .btab {
@@ -321,7 +331,7 @@
   padding: 11px 13px; border-radius: 13px; border: 1px solid rgba(255, 255, 255, .12);
   font-size: 15px; font-weight: 500; color: rgba(255, 255, 255, .78); white-space: nowrap;
 }
-.pdev.btc .botype i { font-style: normal; color: rgba(255, 255, 255, .45); margin-left: 3px }
+.pdev.btc .botype { display: flex; align-items: center; gap: 4px }
 
 .pdev.btc .bavail {
   display: flex; align-items: center; gap: 10px; padding: 13px 0;
@@ -372,7 +382,7 @@
   border-radius: 13px; border: 1px solid rgba(255, 255, 255, .12);
   font-size: 16px; font-weight: 500; white-space: nowrap;
 }
-.pdev.btc .blev i { font-style: normal; color: rgba(255, 255, 255, .45) }
+
 
 .pdev.btc .bchk {
   display: flex; align-items: center; gap: 11px; padding: 13px 0;
@@ -384,19 +394,24 @@
   transition: background-color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
 }
 .pdev.btc .bchk.on .bbox { background: #3BE39A; border-color: #3BE39A }
-/* the tick is drawn rather than typed: a ✓ glyph is a different weight in
-   every family, and this one has to sit dead centre in 22 pixels */
-.pdev.btc .bchk.on .bbox::after {
-  content: ''; position: absolute; left: 7px; top: 3px; width: 6px; height: 11px;
-  border: solid #06120C; border-width: 0 2.2px 2.2px 0; rotate: 45deg;
+/* THE TICK IS A LUCIDE PATH, not two rotated borders. The old one was drawn in
+   CSS because a `✓` glyph is a different weight in every family — true, and it
+   traded that problem for a worse one: a mark whose size, colour and centring
+   were three magic numbers that had to be re-derived together every time the
+   box changed. `place-items: center` on the box does that job now. */
+.pdev.btc .bbox { display: grid; place-items: center }
+.pdev.btc .btick {
+  width: 15px; height: 15px; color: #06120C; stroke-width: 3;
+  opacity: 0; transition: opacity var(--dur) var(--ease-out);
 }
+.pdev.btc .bchk.on .btick { opacity: 1 }
 
 .pdev.btc .bprot { padding-bottom: 13px }
 .pdev.btc[data-motion] .bprot { animation: drise 390ms var(--ease-out) both }
 .pdev.btc .bfin.wide { width: 100% }
 .pdev.btc .bunit { margin-left: auto; display: flex; align-items: center; gap: 10px }
 .pdev.btc .bunit i { font-style: normal; color: rgba(255, 255, 255, .55) }
-.pdev.btc .bunit em { font-style: normal; color: rgba(255, 255, 255, .55); font-size: 17px }
+.pdev.btc .bswap { width: 17px; height: 17px; color: rgba(255, 255, 255, .55) }
 .pdev.btc .berr { display: block; margin-top: 7px; font-size: 13px; font-style: normal; color: #FF7079 }
 
 .pdev.btc .bcta {
@@ -472,3 +487,18 @@
   .pdev.btc[data-motion] .bochk,
   .pdev.btc[data-motion] .bposact { animation: none }
 }
+
+/* =========================================================================
+   THE ROOM WITH NOTHING IN IT BUT THE PHONE
+   -------------------------------------------------------------------------
+   `perpsv5/Stage.tsx` reuses `.v4`, `.v4bg`, `.v4glow`, `.v4phone` and
+   `.v4frame` — the dark ground, the two drifting lights and the clipping bezel
+   are about a room and not about a headline, and duplicating them is how two
+   rooms end up lit differently.
+
+   These two rules are the whole difference. `.v4` is a three-row page (back
+   link / stage / transport bar) whose stage is two columns (phone / copy).
+   With none of that rendered, both collapse to one centred cell.
+   ========================================================================= */
+.v4.v5bare { grid-template-rows: 1fr; place-items: center }
+.v4.v5bare .v4stage { grid-template-columns: auto; gap: 0 }
