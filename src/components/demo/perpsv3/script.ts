@@ -81,16 +81,16 @@ const STEPS: Step<PD, PDAction>[] = [
     beats: [
       { ms: 1800, do: 'key', arg: '2' },
       { ms: 3000, do: 'key', arg: '⌫' },
-      ...type_('key', '82000', 1100, 340),
+      ...type_('key', '80654', 1100, 340),
     ],
   },
   {
     id: 'sl', ch: 'protect',
     title: 'And below it for the other one',
-    note: '$78,200 is 1.8% under the $79,654 entry. The same rule, mirrored, and the ticket takes it without comment.',
+    note: 'Five hundred under the $79,654 entry, against a thousand above it. Two to one — the trade has to be right half as often as it is wrong to be worth taking.',
     beats: [
       { ms: 2400, do: 'focus', arg: 'sl' },
-      ...type_('key', '78200', 1400, 340),
+      ...type_('key', '79154', 1400, 340),
       { ms: 1800, do: 'done' },
     ],
   },
@@ -111,9 +111,9 @@ const STEPS: Step<PD, PDAction>[] = [
   },
   {
     id: 'position', ch: 'open',
-    title: 'On the chart, and priced',
-    note: 'The entry draws itself at $79,654 and the position sits under it: $100,000, $5,000 of margin, and the price at which it closes itself.',
-    beats: [{ ms: 2800 }, { ms: 2600, do: 'posOpen' }],
+    title: 'Both brackets, and the market walking into one',
+    note: 'Three lines now: the entry at $79,654, the stop below it and the take profit above. The market climbs into the green one, which is the whole of what a bracket is for.',
+    beats: [{ ms: 2800 }, { ms: 2600, do: 'posOpen' }, { ms: 6000 }],
   },
 ];
 

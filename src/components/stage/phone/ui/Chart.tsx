@@ -20,7 +20,12 @@ import { useEffect, useRef, type RefObject } from 'react';
  */
 
 const CANDLES = 46;
-const CANDLE_MS = 2400;
+/* slower. A candle every 2.4s made a market that never sat still long enough
+   to be read; the demos it sits behind hold a screen for six seconds or more,
+   and in that time the old rate turned over two and a half candles. */
+const CANDLE_MS = 3600;
+/** how long the series takes to reach a price it has been pointed at */
+const RAMP_MS = 9000;
 /** the price the flow's copy quotes, so the two cannot drift */
 export const BASE_PRICE = 79654;
 
@@ -57,12 +62,19 @@ function rng(seed: number) {
  * chart was chosen so a long would read as being in profit; a market that only
  * goes up is a worse lie than a position that is sometimes down, and the
  * recordings show the P&L crossing zero repeatedly.
+ *
+ * CALMER THAN IT WAS. The first version ran ±840 with a fast third term, which
+ * on a tall chart read as noise: a line busy enough that a reader could not see
+ * a rise happening inside it. The amplitudes are roughly halved and every
+ * period is longer, so the shape is still a market and the movement is still
+ * two-sided, but a five-hundred-point climb is something you can watch rather
+ * than something you have to find.
  */
 function walk(k: number) {
   return (
-    Math.sin(k * 0.083 + 1.7) * 420 +
-    Math.sin(k * 0.21) * 300 +
-    Math.sin(k * 0.53 + 0.4) * 120
+    Math.sin(k * 0.045 + 1.7) * 250 +
+    Math.sin(k * 0.109) * 140 +
+    Math.sin(k * 0.263 + 0.4) * 48
   );
 }
 
@@ -71,7 +83,7 @@ function candle(k: number): Candle {
   const r = rng(k * 2654435761);
   const o = BASE_PRICE + walk(k);
   const c = BASE_PRICE + walk(k + 1);
-  const reach = 34 + r() * 74;
+  const reach = 20 + r() * 40;
   return {
     o,
     c,
@@ -117,6 +129,24 @@ export type ChartProps = {
   /** 'long' tints the entry chip; null hides the position marker */
   side?: 'long' | 'short' | null;
   /**
+   * The two brackets, drawn as their own lines. A demo whose point is that a
+   * position has a take profit and a stop loss on it has to SHOW them: an
+   * entry line on its own says where you got in and nothing about where you
+   * get out. They also join the price scale, so the chart frames all three
+   * instead of putting two of them off the top and bottom.
+   */
+  tp?: number | null;
+  sl?: number | null;
+  /**
+   * A price the series eases toward, and the only scripted thing on this
+   * chart. A market that has to be watched reaching a take profit inside one
+   * screen of a demo is not going to get there on its own, and waiting for a
+   * random walk to oblige is not a demo, it is a wait. The ramp is weighted
+   * toward the newest candles so the history is left alone and the right-hand
+   * edge is what bends.
+   */
+  toward?: number | null;
+  /**
    * HOLD THE MARKET STILL.
    *
    * Not the same as `live`. `live` switches the loop off for a card nobody is
@@ -139,15 +169,18 @@ export type ChartProps = {
   live?: boolean;
 };
 
-export function Chart({ entry = null, side = null, live = true, paused = false, readout }: ChartProps) {
+export function Chart({
+  entry = null, side = null, live = true, paused = false, tp = null, sl = null,
+  toward = null, readout,
+}: ChartProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   /* The draw loop reads these every frame but must not re-subscribe when they
      change — mirroring them into a ref from an effect keeps the rAF stable and
      the render pure. */
-  const props = useRef({ entry, side, readout, paused });
+  const props = useRef({ entry, side, readout, paused, tp, sl, toward });
   useEffect(() => {
-    props.current = { entry, side, readout, paused };
-  }, [entry, side, readout, paused]);
+    props.current = { entry, side, readout, paused, tp, sl, toward };
+  }, [entry, side, readout, paused, tp, sl, toward]);
 
   useEffect(() => {
     const cv = ref.current;
@@ -165,6 +198,9 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
        rather than appear — a line that is simply there in the next frame reads
        as a rendering artefact, not as a position that was just opened */
     let entryAt = 0;
+    /* when the series was first pointed at a price, so the climb into it has a
+       start rather than being wherever the clock happens to be */
+    let towardAt = 0;
     let w = 0;
     let h = 0;
 
@@ -200,21 +236,46 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
       /* no modulo: the window walks forward for as long as anyone watches, and
          `walk` is what keeps the price in range rather than the array's end */
       const shift = reduce ? 0 : Math.floor(clock / CANDLE_MS);
+      /* THE CLIMB. `toward` is a price the series is pointed at; the blend is
+         eased over RAMP_MS and weighted toward the newest candles, so the
+         history keeps its shape and the right-hand edge is what bends up into
+         the line it was aimed at. */
+      const aim = props.current.toward ?? null;
+      if (!aim) towardAt = 0;
+      else if (!towardAt) towardAt = clock;
+      const u = aim ? Math.min(1, Math.max(0, (clock - towardAt) / RAMP_MS)) : 0;
+      const ramp = u * u * (3 - 2 * u);
+      const lift = (v: number, i: number) => {
+        if (!aim || ramp <= 0) return v;
+        /* squared, so the left edge is untouched and the bend is recent */
+        const wgt = Math.pow(i / (CANDLES - 1), 2.4);
+        return v + (aim - v) * ramp * wgt;
+      };
+
       const view: Candle[] = [];
       for (let i = 0; i < CANDLES; i++) {
-        const src = candle(i + shift);
+        const raw = candle(i + shift);
+        const src = {
+          o: lift(raw.o, i), c: lift(raw.c, i),
+          h: lift(raw.h, i), l: lift(raw.l, i),
+        };
         view.push(i === CANDLES - 1
           ? { ...src, c: src.o + (src.c - src.o) * phase,
               h: src.o + (src.h - src.o) * phase, l: src.o + (src.l - src.o) * phase }
           : src);
       }
 
-      const lo = Math.min(...view.map((c) => c.l));
-      const hi = Math.max(...view.map((c) => c.h));
+      /* THE BRACKETS JOIN THE SCALE. A take profit a thousand points above the
+         market is off the top of a chart framed on the candles alone, and a
+         line nobody can see is not a line that says a position is protected. */
+      const marks = [props.current.tp, props.current.sl, props.current.entry]
+        .filter((v): v is number => typeof v === 'number');
+      const lo = Math.min(...view.map((c) => c.l), ...marks);
+      const hi = Math.max(...view.map((c) => c.h), ...marks);
       /* More headroom above than below: the series ends at its high, and a
          price chip pinned to the top edge reads as clipped. */
       const pad = (hi - lo) * 0.12 || 1;
-      const top = hi + pad * 1.9;
+      const top = hi + pad * 1.5;
       const bot = lo - pad;
       const y = (v: number) => ((top - v) / (top - bot)) * h;
 
@@ -230,8 +291,7 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
          second price in the same place, and on a tall chart — where the lines
          are dense — one of them is always landing under a chip. */
       const chipRows = [y(view[view.length - 1].c)];
-      const ent = props.current.entry;
-      if (ent) chipRows.push(y(ent));
+      for (const v of marks) chipRows.push(y(v));
       for (let v = first; v < top; v += stepPx) {
         const gy = Math.round(y(v)) + 0.5;
         ctx.strokeStyle = 'rgba(255,255,255,.055)';
@@ -297,14 +357,43 @@ export function Chart({ entry = null, side = null, live = true, paused = false, 
       ctx.setLineDash([]);
       chip(ctx, w, py, '$' + last.toFixed(1), '#26C281', '#04140E');
 
+      /* THE BRACKETS. Drawn before the entry so the entry sits on top where
+         they crowd, and in their own colours because the two are not the same
+         instruction: one is where the trade is taken off at a profit, the
+         other is where it is taken off at a loss. Solid-ish and thin, so they
+         read as levels rather than as more market. */
+      const bracket = (v: number | null | undefined, stroke: string, ink: string) => {
+        if (typeof v !== 'number') return;
+        const by = Math.round(y(v)) + 0.5;
+        /* AT THE MOMENT OF TOUCHING, TWO CHIPS WANT THE SAME ROW. The live
+           quote is already printing this number — that is what touching means —
+           so the bracket keeps its line and gives up its label rather than
+           stacking a second copy of the same price on top of the first. */
+        const collides = Math.abs(by - y(view[view.length - 1].c)) < LABEL_PX + 6;
+        ctx.save();
+        ctx.globalAlpha = a;
+        ctx.strokeStyle = stroke;
+        ctx.setLineDash([5, 4]);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, by);
+        ctx.lineTo(w - AXIS_W + 2, by);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        if (!collides) chip(ctx, w, by, v.toLocaleString('en-US'), stroke, ink);
+        ctx.restore();
+      };
+
       /* the entry line, when a position is open. It draws OUT FROM ITS CHIP:
          the price is what the position is anchored to, so the line grows from
          the label leftward across the chart rather than switching on. */
       const e = props.current.entry;
       if (!e) entryAt = 0;
       else if (!entryAt) entryAt = clock;
+      const a = Math.min(1, Math.max(0, (clock - entryAt) / 520));
+      bracket(props.current.tp, '#26C281', '#04140E');
+      bracket(props.current.sl, '#E5484D', '#1E0507');
       if (e) {
-        const a = Math.min(1, Math.max(0, (clock - entryAt) / 520));
         const ey = Math.round(y(e)) + 0.5;
         const right = w - AXIS_W + 2;
         ctx.save();

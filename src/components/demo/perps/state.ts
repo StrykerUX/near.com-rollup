@@ -37,6 +37,23 @@ export const FUND_STEPS = ['Processing send', 'Sending', 'Complete'];
 
 /** the price the position opens at, frame 4:32 */
 export const ENTRY = 79654;
+
+/**
+ * THE TWO BRACKETS, AT TWO TO ONE.
+ *
+ * The recording's own figures were $82,000 and $78,200 — an arbitrary pair that
+ * happened to be on screen, and a 1.6:1 reward against risk. These are a
+ * thousand above the entry and five hundred below it: the same shape a trader
+ * would actually set, at the ratio the shape is for, and both typeable as
+ * whole numbers that echo the entry they hang off.
+ *
+ * They are also close enough to the entry that a chart can hold all three and
+ * still show the candles moving between them. At $82,000 the take profit sat
+ * so far above the price that the two lines could only be drawn by flattening
+ * the market into a ribbon.
+ */
+export const TAKE_PROFIT = 80654;
+export const STOP_LOSS = 79154;
 /** the market's quote before any of this happens, frame 0:14 */
 export const MARK_0 = 79525.5;
 
@@ -111,7 +128,16 @@ export type PD = {
   /** the order checklist under the button */
   ostep: number;
   submitting: boolean;
-  pos: null | { side: Side; lev: number; size: number; entry: number };
+  /**
+   * The brackets live on the POSITION, not on the ticket that set them. The
+   * ticket empties when the order lands — that is what makes it ready for the
+   * next one — and carrying them here is the difference between a chart that
+   * can draw where you get out and one that forgets the moment you are in.
+   */
+  pos: null | {
+    side: Side; lev: number; size: number; entry: number;
+    tp: number | null; sl: number | null;
+  };
   /** the position bar on the market screen, expanded */
   posOpen: boolean;
   /** the row in the Positions list, expanded */
@@ -351,7 +377,13 @@ export const actions: Record<PDAction, Act<PD>> = {
       sl: '',
       prot: false,
       punit: '%',
-      pos: { side: s.side, lev: s.lev, size: notional(s), entry: ENTRY },
+      pos: {
+        side: s.side, lev: s.lev, size: notional(s), entry: ENTRY,
+        /* only a price is a bracket; a percentage is a distance nobody has
+           resolved yet, and the ticket is about to be emptied of both */
+        tp: s.punit === '$' && Number(s.tp) > 0 ? Number(s.tp) : null,
+        sl: s.punit === '$' && Number(s.sl) > 0 ? Number(s.sl) : null,
+      },
       tab: 'pos',
       tap: null,
     };

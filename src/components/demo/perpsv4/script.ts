@@ -89,9 +89,9 @@ const STEPS: Step<PD, PDAction>[] = [
     beats: [
       { ms: 2200, do: 'key', arg: '2' },
       { ms: 3400, do: 'key', arg: '⌫' },
-      ...type_('key', '82000', 1300, 380),
+      ...type_('key', '80654', 1300, 380),
       { ms: 2200, do: 'focus', arg: 'sl' },
-      ...type_('key', '78200', 1400, 380),
+      ...type_('key', '79154', 1400, 380),
       { ms: 1800, do: 'done' },
     ],
   },
@@ -112,10 +112,10 @@ const STEPS: Step<PD, PDAction>[] = [
   },
   {
     id: 'open', ch: 'live',
-    title: 'In, and priced',
-    note: 'The entry draws itself on the chart. $100,000 of Bitcoin, $5,000 of margin, and the price at which it closes itself.',
+    title: 'Both exits on the chart, and one of them met',
+    note: 'The entry, the stop five hundred below it and the take profit a thousand above — two to one. The market walks up into the green line, which is the only proof a bracket was ever worth setting.',
         callout: 'Long 20x · $100,000',
-    beats: [{ ms: 3000 }, { ms: 3000, do: 'posOpen' }],
+    beats: [{ ms: 3000 }, { ms: 3000, do: 'posOpen' }, { ms: 6500 }],
   },
 ];
 

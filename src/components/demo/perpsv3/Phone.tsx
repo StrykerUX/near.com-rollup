@@ -109,8 +109,19 @@ function Market({ d }: { d: Deck }) {
       </div>
 
       <div className="dchart3">
-        <Chart entry={s.pos ? s.pos.entry : null} side={s.pos?.side ?? null} live
-               paused={paused} readout={{ price, change, onTick }} />
+        <Chart
+          entry={s.pos ? s.pos.entry : null}
+          side={s.pos?.side ?? null}
+          tp={s.pos?.tp ?? null}
+          sl={s.pos?.sl ?? null}
+          /* the market is pointed at the take profit once there is one to
+             reach: a demo of a bracket that is never touched has shown you
+             where the exit is and nothing about it working */
+          toward={s.pos?.tp ?? null}
+          live
+          paused={paused}
+          readout={{ price, change, onTick }}
+        />
       </div>
 
       {s.pos ? <PositionCard d={d} /> : (

@@ -97,27 +97,27 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'unit', ch: 'protect',
     title: 'The ⇄ swaps the unit',
     note: 'And empties both fields, which is right: 82000 means one thing as a price and nothing at all as a percentage.',
-    beats: [...type_('key', '82000', 1300, 300), { ms: 1700, do: 'unit', arg: 'tp' }],
+    beats: [...type_('key', '80654', 1300, 300), { ms: 1700, do: 'unit', arg: 'tp' }],
   },
   {
     id: 'tperr', ch: 'protect',
     title: 'A take profit sits above the entry',
-    note: 'At $2 the ticket refuses — “Take profit must be above entry price” — and the button stops saying Open long and starts saying Review take profit. Corrected to $82,000, it comes back.',
+    note: 'At $2 the ticket refuses — “Take profit must be above entry price” — and the button stops saying Open long and starts saying Review take profit. Corrected to $80,654, it comes back.',
     beats: [
       { ms: 1400, do: 'key', arg: '2' },
       /* the long pause is a person reading the refusal, which is the only
          reason the refusal is on the screen at all */
       { ms: 2600, do: 'key', arg: '⌫' },
-      ...type_('key', '82000', 850, 300),
+      ...type_('key', '80654', 850, 300),
     ],
   },
   {
     id: 'slerr', ch: 'protect',
     title: 'A stop loss sits below it',
-    note: 'The same rule mirrored: below the entry on a long, above it on a short. $78,200 is 1.8% under $79,654 and the ticket takes it without argument — one refusal on this screen is a lesson, two in a row is a queue.',
+    note: 'The same rule mirrored: below the entry on a long, above it on a short. Five hundred under $79,654, against a thousand above — two to one, and the ticket takes it without argument.',
     beats: [
       { ms: 1800, do: 'focus', arg: 'sl' },
-      ...type_('key', '78200', 1100, 300),
+      ...type_('key', '79154', 1100, 300),
       { ms: 1300, do: 'done' },
     ],
   },
@@ -172,7 +172,7 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'home', ch: 'back',
     title: 'The balance, from the account',
     note: 'Out of the market and back to the card the whole app hangs off. Perps reads $5,428.61 with its unrealized P&L underneath — the same money, seen from the other end.',
-    beats: [{ ms: 1600, do: 'home' }],
+    beats: [{ ms: 4200, do: 'home' }],
   },
 ];
 

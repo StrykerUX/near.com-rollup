@@ -417,6 +417,41 @@ replacement:
   phone entirely, so the focus refuses any rect that is not on screen and keeps
   the last good one until the sheet lands.
 
+### The chart, and the one scripted thing on it
+
+Three changes turned the perps chart from a market into a demonstration.
+
+**Calmer.** The walk ran ±840 with a fast third term and a candle every 2.4
+seconds, which on a tall chart read as noise — a line busy enough that a rise
+could happen inside it without being seen. The amplitudes are roughly halved,
+every period is longer and a candle now takes 3.6 seconds.
+
+**The brackets are drawn.** A demo whose point is that a position has a take
+profit and a stop loss on it has to show them; an entry line on its own says
+where you got in and nothing about where you get out. `Chart` takes `tp` and
+`sl`, draws them in their own colours, and — importantly — joins them to the
+price scale, so the chart frames all three instead of putting two off the top
+and bottom. They live on the POSITION rather than the ticket, because the ticket
+empties when the order lands and that is what makes it ready for the next one.
+
+**The market is pointed at the take profit.** `toward` is the only scripted
+thing on this chart, and it earns its place: a market that has to be watched
+reaching a bracket inside one screen of a demo is not going to get there on its
+own, and waiting for a random walk to oblige is not a demo, it is a wait. The
+ramp is eased over nine seconds and weighted toward the newest candles, so the
+history keeps its shape and the right-hand edge is what bends up.
+
+The figures moved with it. The recording's $82,000 and $78,200 were an arbitrary
+pair at 1.6:1; the brackets are now a thousand above the entry and five hundred
+below it — **two to one**, the ratio the shape exists for, and close enough
+together that a chart can hold all three and still show the candles moving
+between them. At 20x that is +25% of margin against −12.5%, and the P&L reads
++$1,255.43 the moment the green line is met.
+
+One detail from that moment: when the price meets a bracket, two chips want the
+same row. The live quote is already printing that number — that is what touching
+means — so the bracket keeps its line and gives up its label.
+
 ### What the headless walk caught
 
 `pnpm check:flows` drives every machine with no browser: each scripted beat must
