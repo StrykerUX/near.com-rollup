@@ -85,6 +85,71 @@ export const BASE_PRICE = 79654;
 const WALK0 = walk(CANDLES);
 
 type Candle = { o: number; h: number; l: number; c: number };
+/**
+ * A finished bar plus the two things a finished bar does not record: WHEN in
+ * its own hour the high and the low were touched. Nothing reads them once the
+ * bar has closed — they exist only so the live one can be drawn forming.
+ */
+type Bar = Candle & { tHi: number; tLo: number };
+
+/**
+ * A BAR AS IT IS BEING MADE, WHICH IS NOT A BAR SCALED DOWN
+ * ------------------------------------------------------------------
+ * The live candle used to be the finished candle with every one of its four
+ * prices eased out of the open together:
+ *
+ *     c = o + (c - o) * u,  h = o + (h - o) * u,  l = o + (l - o) * u
+ *
+ * which grows the upper wick and the lower wick AT THE SAME TIME, in both
+ * directions, for the whole hour. No bar has ever done that, and it is the tell
+ * that gives the whole chart away: a high is not a property a bar eases into,
+ * it is the highest the price has BEEN.
+ *
+ * So the bar is drawn from its price path instead. A candle opens, the price
+ * wanders, and at any moment:
+ *
+ *   · the BODY runs from the open to wherever the price is now
+ *   · the HIGH is the running maximum of everywhere it has been
+ *   · the LOW is the running minimum
+ *
+ * which means a wick only ever appears on the side the price actually went,
+ * only ever grows, and never comes back. Early in the bar there is no wick at
+ * all, because nothing has been visited yet — the bar opens as a doji, which is
+ * what every bar on every chart does.
+ *
+ * The path is four waypoints joined by straight lines: open, the two extremes
+ * in whichever order this bar visits them, close. It is deterministic, drawn
+ * from the same seeded generator as the bar itself, so the chart is still
+ * identical on every machine and every loop.
+ */
+function forming(b: Bar, u: number): Candle {
+  if (u >= 1) return { o: b.o, h: b.h, l: b.l, c: b.c };
+  const pts: [number, number][] = [[0, b.o], [b.tHi, b.h], [b.tLo, b.l], [1, b.c]];
+  pts.sort((x, y) => x[0] - y[0]);
+
+  /* where the price is now */
+  let px = b.o;
+  for (let i = 1; i < pts.length; i++) {
+    const [t0, p0] = pts[i - 1];
+    const [t1, p1] = pts[i];
+    if (u <= t1) {
+      px = p0 + (p1 - p0) * ((u - t0) / (t1 - t0));
+      break;
+    }
+  }
+
+  /* and the furthest it has been either way. The path is piecewise linear, so
+     its extremes over [0, u] can only be at a waypoint already passed or at
+     the point it has reached — there is nowhere else for a maximum to hide. */
+  let h = Math.max(b.o, px);
+  let l = Math.min(b.o, px);
+  for (const [t, p] of pts) {
+    if (t > u) break;
+    h = Math.max(h, p);
+    l = Math.min(l, p);
+  }
+  return { o: b.o, h, l, c: px };
+}
 
 /** mulberry32 — small, fast, and the same everywhere */
 function rng(seed: number) {
@@ -510,21 +575,31 @@ export function Chart({
          so the open takes this candle's offset and the close takes the next
          one's. It is the same rule the seamless walk is built on. */
       const priceAt = (k: number) => level(k) + offset(k);
-      const bar = (k: number): Candle => {
+      const bar = (k: number): Bar => {
         const r = rng(k * 2654435761);
         const o = priceAt(k);
         const c = priceAt(k + 1);
         const reach = 20 + r() * 40;
-        return { o, c, h: Math.max(o, c) + r() * reach, l: Math.min(o, c) - r() * reach };
+        const h = Math.max(o, c) + r() * reach;
+        const l = Math.min(o, c) - r() * reach;
+        /* WHEN the bar goes where it goes. Two windows that cannot overlap, so
+           one extreme is always clearly before the other and the path never has
+           to visit two prices at the same instant. The coin decides which side
+           the bar runs to first, which is the difference between a candle that
+           spiked and recovered and one that dipped and rallied.
+           These draws come AFTER h and l on purpose: the generator is seeded per
+           candle and consumed in order, so appending to the end leaves every
+           price this chart has ever drawn exactly where it was. */
+        const early = 0.15 + r() * 0.3;
+        const late = 0.55 + r() * 0.3;
+        const hiFirst = r() < 0.5;
+        return { o, c, h, l, tHi: hiFirst ? early : late, tLo: hiFirst ? late : early };
       };
 
       const view: Candle[] = [];
       for (let i = 0; i < CANDLES; i++) {
         const src = bar(i + shift);
-        view.push(i === CANDLES - 1
-          ? { ...src, c: src.o + (src.c - src.o) * phase,
-              h: src.o + (src.h - src.o) * phase, l: src.o + (src.l - src.o) * phase }
-          : src);
+        view.push(i === CANDLES - 1 ? forming(src, phase) : src);
       }
 
       const last = view[view.length - 1].c;

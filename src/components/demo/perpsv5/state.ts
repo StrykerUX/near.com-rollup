@@ -137,17 +137,33 @@ export const NEW_MARGIN = '5000';
 export const NEW_LEV = 20;
 
 /**
- * THE TWO EXITS, HUNG OFF THE MARK AND NOT OFF THE RECORDING.
+ * THE TWO EXITS, SIZED TO THE MARKET THEY ARE SET IN.
  *
- * The reference frames show $82,000 and $78,200 — an arbitrary pair that
- * happened to be on screen, at 1.6:1. These are a thousand above the entry and
- * five hundred below it: the shape a trader actually sets, at the ratio the
- * shape is for, and both close enough to the mark that the chart can hold all
- * three and still show candles moving between them. `demo/perps/state.ts`
- * made the same call for the same reason and its note is worth reading.
+ * Three hundred above the entry and a hundred and fifty below it — two to one,
+ * which is the whole point of setting a pair — and at 20x that is +7.5% and
+ * −3.8% on the margin. A scalper's bracket, on a scalper's leverage.
+ *
+ * THEY WERE +1,000 / −500 AND THE CHART COULD NOT SHOW THEM. That pair was
+ * chosen for its shape and never checked against the series it would be drawn
+ * on: these candles cover 420 points across the whole visible hour, so a take
+ * profit a thousand points away is not "the shape a trader would set", it is a
+ * bracket that would never fill. Measured, drawing it forced the price scale to
+ * 1,950 points and squeezed every candle into 22% of the chart's height.
+ *
+ * That is what the brackets were being left off the chart to avoid — and
+ * leaving them off meant the one frame that is supposed to show a trade was
+ * set showed a line moving 47 points and nothing else. The bracket was not the
+ * problem. Its size was. At ±300/150 the scale is 839 points, the candles keep
+ * half the height, and all three lines are on screen where a reader can see
+ * that the exits sit either side of the entry.
+ *
+ * (The reference frames show $82,000 and $78,200 — an arbitrary pair that
+ * happened to be on screen, at 1.6:1, and 2,400 points from a market that moves
+ * 420 in an hour. `demo/perps/state.ts` walked away from them for a version of
+ * the same reason.)
  */
-export const TAKE_PROFIT = '80567';
-export const STOP_LOSS = '79067';
+export const TAKE_PROFIT = '79867';
+export const STOP_LOSS = '79417';
 
 /* ---- the account ------------------------------------------------------ */
 

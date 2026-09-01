@@ -263,13 +263,20 @@ function Market({ d }: { d: Deck }) {
           face={AXIS_FACE}
           entry={head ? head.entry : null}
           side={head?.side ?? null}
-          /* NO BRACKETS ON THE CHART, and it is a timing decision rather than a
-             taste one. The brackets join the price scale so they can be seen —
-             which is right over ninety seconds and wrong over one: the take
-             profit is a thousand points above the mark, so drawing it in the
-             final second would rescale the whole chart on the last frame of
-             the cut. The bracket is shown where there is room to read it, on
-             the ticket that set it. */
+          /**
+           * THE BRACKET GOES ON THE CHART, because a trade that was set and
+           * cannot be seen is the ending failing to happen. Before the order
+           * lands there is nothing to draw; after it, the entry moves to the
+           * new position and its two exits appear either side — which is the
+           * only thing on screen that says a SECOND trade exists rather than
+           * the first one having shifted.
+           *
+           * These lines join the price scale so they can be seen, and that is
+           * exactly why the exits had to be resized rather than hidden: see
+           * TAKE_PROFIT in state.ts.
+           */
+          tp={head?.tp ?? null}
+          sl={head?.sl ?? null}
           live
           paused={paused}
           readout={{ price, change, onTick }}
