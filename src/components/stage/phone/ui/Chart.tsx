@@ -69,6 +69,20 @@ function ramp(u: number) {
 }
 /** the price the flow's copy quotes, so the two cannot drift */
 export const BASE_PRICE = 79654;
+/**
+ * WHAT THE HELD CHART IS WORTH.
+ *
+ * `walk` is a sum of sines about zero, so without this the price the demo sits
+ * on for its first eight steps was BASE_PRICE plus whatever the walk happened
+ * to be at the last candle — a few hundred points off the entry the copy
+ * quotes, the entry line, and the rule the stop loss is checked against. Four
+ * places naming the same price and one of them disagreeing.
+ *
+ * Subtracting the walk at the candle the held picture closes on puts that
+ * quote exactly on BASE_PRICE. The chart the reader looks at through the whole
+ * setup reads $79,654, which is the number under it in the copy.
+ */
+const WALK0 = walk(CANDLES);
 
 type Candle = { o: number; h: number; l: number; c: number };
 
@@ -224,8 +238,22 @@ export function Chart({
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let raf = 0;
     /* the market's own clock, in milliseconds, which only advances on the
-       frames it is allowed to */
+       frames it is allowed to. It runs for as long as the card is on stage and
+       is what the entry line's arrival is timed against. */
     let clock = 0;
+    /* CANDLE TIME, WHICH IS NOT THE SAME THING.
+       The chart used to derive its window straight from `clock`, so the candles
+       marched forward for as long as anyone watched. Nothing about that was
+       random — every price here is a pure function of a candle's number — but
+       the flow loops and the clock does not, so each pass through the demo
+       opened its trade on a different candle and drew a different chart: a
+       1,069-point rally on the first loop, 828 on the second, 1,336 on the
+       fourth. Same script, same second, different market.
+       So candle time only runs while there is a position on. Before that the
+       picture is held, which makes the chart the reader sees in step 1 the
+       chart they are still looking at in step 8, and makes every loop identical
+       to the first. */
+    let moved = 0;
     let prev = 0;
     /* when the entry line first had a price to draw at, so it can arrive
        rather than appear — a line that is simply there in the next frame reads
@@ -261,16 +289,28 @@ export function Chart({
          quoted a price from the server render. */
       if (live) raf = requestAnimationFrame(draw);
       if (!prev) prev = now;
-      if (!props.current.paused) clock += now - prev;
+      /* one delta, read once: `prev` is consumed by both clocks and the second
+         reader used to get zero because the first had already moved it on */
+      const dt = props.current.paused ? 0 : now - prev;
       prev = now;
+      clock += dt;
       if (!fit()) return;
 
+      const aimNow = props.current.toward ?? null;
+      /* HELD, AND WHERE IT IS HELD.
+         One tick short of a full candle, so the last bar of the held picture is
+         drawn complete. Landing exactly on the boundary rolls the window over
+         and starts the next candle at phase zero, which draws the right-hand
+         edge as a flat dash — the picture would end on a bar that has not
+         happened yet. */
+      const HELD = CANDLE_MS - 1;
+      if (!aimNow) moved = 0;
+      else moved += dt;
+      const adv = (aimNow ? HELD + moved : Math.min(HELD, clock)) / CANDLE_MS;
       /* The live candle: its close travels from the previous close toward its
          own, so the body grows out of the last one instead of appearing. */
-      const phase = reduce ? 1 : (clock % CANDLE_MS) / CANDLE_MS;
-      /* no modulo: the window walks forward for as long as anyone watches, and
-         `walk` is what keeps the price in range rather than the array's end */
-      const shift = reduce ? 0 : Math.floor(clock / CANDLE_MS);
+      const shift = reduce ? 0 : Math.floor(adv);
+      const phase = reduce ? 1 : adv - shift;
       /* THE CLIMB, AND WHY IT IS AN OFFSET PER CANDLE AND NOT A BLEND.
          The first version weighted the lift by a candle's position in the
          VISIBLE WINDOW, which had two faults and they were the same fault: the
@@ -286,10 +326,13 @@ export function Chart({
          is done the market keeps its own shape around the new level instead of
          being pinned flat to a number. A take profit is met and then traded
          through, which is what meeting one looks like. */
-      const aim = props.current.toward ?? null;
+      const aim = aimNow;
       if (!aim) towardK = -1;
       else if (towardK < 0) {
-        towardK = shift + CANDLES - 1;
+        /* always CANDLES - 1: candle time is at zero on the frame the position
+           opens, so the trade lands on the last candle of the held picture,
+           every loop, on every machine */
+        towardK = CANDLES - 1;
         /* THE LIFT IS MEASURED TO WHERE THE WALK WILL BE, NOT WHERE IT IS.
            Sized against the price at the open, the climb added exactly the
            right number of points and still missed: the walk kept drifting
@@ -300,7 +343,7 @@ export function Chart({
            candle the climb ends on, the last bar closes on the take profit to
            the point, every time, and the visible move is still exactly the
            distance from the open to the line. */
-        towardFrom = BASE_PRICE + walk(towardK + RAMP_CANDLES);
+        towardFrom = BASE_PRICE + walk(towardK + RAMP_CANDLES) - WALK0;
       }
       const offset = (k: number) => {
         if (!aim || towardK < 0 || k < towardK) return 0;
@@ -314,7 +357,7 @@ export function Chart({
          opens where the one before it closed, and that has to survive the lift,
          so the open takes this candle's offset and the close takes the next
          one's. It is the same rule the seamless walk is built on. */
-      const priceAt = (k: number) => BASE_PRICE + walk(k) + offset(k);
+      const priceAt = (k: number) => BASE_PRICE + walk(k) - WALK0 + offset(k);
       const bar = (k: number): Candle => {
         const r = rng(k * 2654435761);
         const o = priceAt(k);
