@@ -93,7 +93,7 @@
 
    It is NOT the site's face and it is NOT the face of the other twelve demo
    devices: `b2c10ab` put those in Montreal on purpose. It is scoped to
-   `.pdev.btc` in 24-demo-btc.css, which is the one screen that claims to be a
+   `.pdev.app` in 24-demo-app.css, which is the one screen that claims to be a
    pixel copy of the app rather than a rendering of it. */
 @font-face{
   font-family:"Figtree";src:url("/fonts/Figtree-Variable.woff2") format("woff2");

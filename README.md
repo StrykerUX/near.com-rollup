@@ -630,7 +630,7 @@ It is also the only surface in the repo set in **Figtree** — the face the real
 app uses, SIL OFL 1.1, self-hosted in two subsets. The other twelve devices stay
 in Montreal, which was an explicit decision (`b2c10ab`) about the site's voice;
 this screen is not speaking in the site's voice. Everything is scoped to
-`.pdev.btc` in `24-demo-btc.css`, and nothing in that file may leak.
+`.pdev.app` in `24-demo-app.css`, and nothing in that file may leak.
 
 **Two rows share one slot.** Long/Short and Modify/Close are drawn in the same
 place, because the reference frames draw them in the same place and because both
@@ -731,7 +731,7 @@ visible in a diff:
 Neither typechecks as wrong, neither logs anything, and both look like a layout
 that was simply designed badly. The scan that catches them is not "does this
 class exist in another stylesheet" — that one passed both times, because this
-file is scoped to `.pdev.btc` and owns its whole namespace. It is **"is this
+file is scoped to `.pdev.app` and owns its whole namespace. It is **"is this
 class used at two JSX sites that are two different objects"**, which finds them
 in one pass over `Phone.tsx`. Worth running before adding a class here; a
 device this dense reuses names by accident.
@@ -923,7 +923,7 @@ notice who the second reader is.
 `var(--btc-up)`, so a palette written in CSS has to be written again in JS for
 the candles, and the two copies drift the first time anyone adjusts one. So the
 values live in one module: `Phone.tsx` writes them onto the device as custom
-properties for `24-demo-btc.css` to read, and hands the same constants to
+properties for `24-demo-app.css` to read, and hands the same constants to
 `<Chart up down>`. It is the construction `@theme inline` already uses one level
 up in `globals.css`, for the same reason.
 
@@ -969,6 +969,72 @@ margin into it, which that balance cannot pay for. The trade was not the thing
 to change — $5,000 at 20x is the $100,000 position the cut is for. And the two
 exits hang off the mark at 2:1 rather than off the frames' arbitrary
 $82,000 / $78,200, for the same reason `demo/perps/state.ts` already gives.
+
+## `/demo/swap-v5` — the same device, doing something else
+
+The second screen in the app's own language, and the first proof that the
+language is one. `.pdev.app` carries the face, the palette, the tempo, the
+chrome, the caret, the primary button, the checklist and the sheet mechanics,
+so `swapv5/Phone.tsx` draws only what is actually a swap and its stylesheet is
+a third the length of perps'.
+
+**That class was `.pdev.btc`.** It was fine while perps was the only screen
+wearing it and a lie on the first screen with no BTC chart in it, so it was
+renamed with the file — 142 selectors, mechanically, verified by re-measuring
+perps-v5 afterwards. The palette moved with it, from `perpsv5/palette.ts` to
+`demo/app/palette.ts`, because it was never perps'.
+
+### The catalogue is the one thing not read off a frame, and it says so
+
+`rec-Swap.MP4` shows the picker at 0:45 holding **five** tokens — ZEC, NEAR,
+SOL, BTC, ETH — which is what `demo/swap/state.ts` carries, with the frame
+number beside it. The brief asks for a long list, scrolled, showing at least
+the top twenty-five. There is no frame of that.
+
+What went in is not invention either: the largest assets by market
+capitalisation, in that order, with the symbols, names and brand colours they
+actually trade under. Every row is checkable against any exchange. What was
+*chosen* rather than observed is only which assets near.com's picker offers and
+in what order — and if the real list differs, `catalogue.ts` is the only file
+that changes.
+
+**Prices are only where they are needed.** A picker row shows a symbol and a
+name; nothing on it is priced. The only pair this cut quotes is the one it
+swaps, so BTC and NEAR carry a price and the other twenty-five do not — a table
+of twenty-seven prices nobody reads is twenty-seven numbers that can go stale
+and be wrong on screen.
+
+**BTC's price is imported rather than repeated.** `tokens.ts` says $68,420.10
+and perps-v5 marks $79,567.50, which is two prices for one coin in one product
+— not tolerable on a page that can show both screens seconds apart. This screen
+quotes the mark, from the file that owns it. The older flows keep their own
+figures, which were read off their own recordings.
+
+### Making a list feel long is not the same as it being long
+
+Twenty-seven rows and six fit. `s.at` is a row index, the track is translated by
+it, and a 620ms transition — slower than the device's own `--dur-slow`, because
+a list is heavy — does the travelling. The rail is drawn rather than native: a
+native scrollbar is the browser disagreeing with the phone about what a
+scrollbar looks like, on a screen whose whole claim is that it is a copy.
+
+**Three stops, not one glide.** A single continuous move reads as one fact. Down,
+further, and back up to the row it had already passed and wanted — which is what
+looking down a list and finding nothing better actually looks like.
+
+### `.fixed` is a Tailwind utility
+
+The source token's chip was `className="swtok fixed"`, and `.fixed` is
+`position: fixed`. The chip left the flow and landed on top of the amount it was
+meant to sit beside. The ported stylesheets outrank Tailwind — they are imported
+unlayered — but only where they *set* the property, and nothing here set
+`position`.
+
+A modifier named after a utility is a rule you did not write and cannot see in
+your own file. The scan that catches it is class names against Tailwind's bare
+utilities (`fixed`, `absolute`, `static`, `block`, `flex`, `grid`, `hidden`,
+`visible`, `border`, `container`, `transform`, …); run over every `className` in
+`src/components`, it found exactly one.
 
 ## `/home-v2` — the real device, on the real page
 

@@ -9,7 +9,7 @@ import { findToken } from '@/lib/tokens';
 import { fmt } from '@/lib/format';
 import { Count } from '@/components/demo/shell/Count';
 import { Layer } from '@/components/demo/shell/Frame';
-import { PALETTE, PALETTE_VARS } from './palette';
+import { PALETTE, PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
   CANDLE_MS, JITTER, MARK, PHASE, REACH, TAPE, TICK, WICK_BIAS, ORDERS_0, ORDER_STEPS, TRADES_0, avail, btcSize, cta, liqPct, liqPrice, money,
@@ -39,7 +39,7 @@ type Deck = GenericDeck<BD, BDAction>;
  * IT IS SET IN FIGTREE, and it is the only surface in the repo that is. The
  * other twelve devices are in Montreal by an explicit decision (`b2c10ab`);
  * that decision was about the site's voice, and this screen is not speaking in
- * the site's voice. See `.pdev.btc` in 24-demo-btc.css.
+ * the site's voice. See `.pdev.app` in 24-demo-app.css.
  */
 
 const BTC = findToken('BTC');
@@ -97,7 +97,7 @@ const signedPct = (v: number, dp = 2) =>
 
 export function Phone({ d }: { d: Deck }) {
   return (
-    <div className="pdev btc" data-motion="rich" data-tempo="fast" style={PALETTE_VARS}>
+    <div className="pdev app" data-motion="rich" data-tempo="fast" style={PALETTE_VARS}>
       {/* NO STATUS BAR AT ALL — no clock, no signal, no battery, and no notch.
           It is the one block on this device that is not the product: forty-four
           pixels at the top of a 766px screen spent simulating an operating

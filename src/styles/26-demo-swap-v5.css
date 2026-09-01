@@ -1,0 +1,179 @@
+/* =========================================================================
+   /demo/swap-v5 — WHAT IS ACTUALLY A SWAP
+   -------------------------------------------------------------------------
+   Everything this screen shares with `/demo/perps-v5` it inherits: the face,
+   the palette, the tempo, the chrome row, the caret, the primary button, the
+   order checklist, the sheet mechanics. `.pdev.app` in 24-demo-app.css owns
+   all of it, which is why this file is short.
+
+   What is here is the form, the quote, the success state, and the picker —
+   and the picker is the only genuinely new idea, because nothing else in this
+   repo has had to make a list FEEL long.
+
+   SCOPED TO `.pdev.swp`, all of it.
+   ========================================================================= */
+
+.pdev.swp .pdview { padding: 0 16px }
+.pdev.swp .swtitle { font-size: 17px; font-weight: 600; margin-left: 2px }
+
+/* ---- the form ----------------------------------------------------------- */
+
+.pdev.swp .swform { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 6px }
+
+.pdev.swp .swfield {
+  flex: none; padding: 14px; border-radius: 16px; background: var(--btc-card);
+}
+.pdev.swp .swlab { display: block; font-size: 13px; color: rgba(255, 255, 255, .5) }
+.pdev.swp .swrow { display: flex; align-items: center; gap: 10px; margin-top: 8px }
+
+.pdev.swp .swfin {
+  flex: 1; min-width: 0; display: flex; align-items: center;
+  font-size: 28px; font-weight: 600; letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+.pdev.swp .swfin b { font-weight: 600 }
+.pdev.swp .swfin b.off, .pdev.swp .swfin.quiet { color: rgba(255, 255, 255, .3) }
+.pdev.swp .swfin.quiet span { color: #fff }
+
+/* the token chip. `given` is the source — chosen a screen ago and not offered
+   back, because offering it back is offering to undo the tap that got here.
+   NOT `fixed`: that is a Tailwind utility, and naming a modifier after one is
+   a `position: fixed` nobody wrote and nobody can see in this file. */
+.pdev.swp .swtok {
+  flex: none; display: flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px;
+  border-radius: 999px; background: rgba(255, 255, 255, .08);
+  font-size: 15px; font-weight: 600; white-space: nowrap;
+}
+.pdev.swp .swtok.given { background: rgba(255, 255, 255, .06) }
+.pdev.swp .swtok.empty { background: var(--btc-up); color: #04140E }
+.pdev.swp .swtok.empty .bcv { color: #04140E }
+
+.pdev.swp .swdot {
+  border-radius: 50%; flex: none; display: grid; place-items: center;
+  font-weight: 700; letter-spacing: -.02em; overflow: hidden;
+}
+/* the artwork brings its own disc, so it covers the chip rather than sitting
+   inside it — the same rule `.tok .tokimg` keeps one level up */
+.pdev.swp .swimg { width: 100%; height: 100%; display: block }
+
+.pdev.swp .swsub {
+  display: flex; align-items: baseline; gap: 8px; margin-top: 8px;
+  font-size: 13px; color: rgba(255, 255, 255, .45); font-variant-numeric: tabular-nums;
+}
+.pdev.swp .swsub em { margin-left: auto; font-style: normal }
+
+/* the arrow between the two fields. It overlaps both by design — that is what
+   says they are one control and not two forms stacked. */
+.pdev.swp .swarrow {
+  align-self: center; width: 34px; height: 34px; margin: -10px 0; z-index: 1;
+  display: grid; place-items: center; border-radius: 50%;
+  background: var(--btc-bg); border: 3px solid var(--btc-chart);
+  color: rgba(255, 255, 255, .6);
+}
+.pdev.swp .swarrow svg { width: 16px; height: 16px }
+
+/* ---- the quote ---------------------------------------------------------- */
+
+.pdev.swp .swquote {
+  flex: none; margin-top: 14px; padding: 12px 14px; border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .09);
+  display: grid; gap: 7px;
+}
+.pdev.swp .swquote > div { display: flex; align-items: center; gap: 8px }
+.pdev.swp .swquote dt { font-size: 13px; color: rgba(255, 255, 255, .45) }
+.pdev.swp .swquote dd {
+  margin-left: auto; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums;
+}
+
+/* the primary button sits at the floor whatever is above it */
+.pdev.swp .bcta { margin-top: auto }
+.pdev.swp .bochk { margin-bottom: 4px }
+
+/* ---- the success state -------------------------------------------------- */
+
+.pdev.swp .swdone {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding-bottom: 24px;
+}
+.pdev.swp .swtick {
+  width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(3, 192, 118, .16); color: var(--btc-up); margin-bottom: 16px;
+}
+.pdev.swp .swtick svg { width: 28px; height: 28px }
+.pdev.swp .swdoneh { font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, .6) }
+.pdev.swp .swdonev {
+  font-size: 30px; font-weight: 600; letter-spacing: -.025em; margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.pdev.swp .swdonep { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .45); margin-top: 4px }
+.pdev.swp .swdoned {
+  width: 100%; margin-top: 26px; padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, .09); display: grid; gap: 8px;
+}
+.pdev.swp .swdoned > div { display: flex; align-items: center; gap: 8px }
+.pdev.swp .swdoned dt { font-size: 13px; color: rgba(255, 255, 255, .45) }
+.pdev.swp .swdoned dd {
+  margin-left: auto; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================================
+   THE PICKER — the only new idea on this screen
+   -------------------------------------------------------------------------
+   Twenty-seven rows and six fit. Being long is not the same as FEELING long,
+   so the list travels: `s.at` is a row index, the track is translated by it,
+   and the transition below does the moving. The script stops three times
+   rather than gliding once — one continuous move reads as one fact, and what
+   a reader should come away with is that there was more every time they
+   looked.
+   ========================================================================= */
+
+.pdev.swp .swpick { height: 78%; padding-bottom: 0 }
+.pdev.swp .swpickh { flex: none; display: block; font-size: 18px; font-weight: 600; margin: 4px 0 12px }
+
+.pdev.swp .swlistwrap { flex: 1; min-height: 0; overflow: hidden; position: relative }
+.pdev.swp .swlist {
+  display: flex; flex-direction: column;
+  /* slower than the device's own `--dur-slow`: a list is heavy, and a
+     twenty-seven-row track that snaps between stops reads as a cut rather
+     than as someone scrolling */
+  transition: transform 620ms var(--ease-out);
+}
+.pdev.swp .switem {
+  flex: none; height: 56px; display: flex; align-items: center; gap: 12px;
+}
+.pdev.swp .switemt { display: flex; flex-direction: column; line-height: 1.15 }
+.pdev.swp .switemt b { font-size: 15px; font-weight: 600 }
+.pdev.swp .switemt em { font-style: normal; font-size: 13px; color: rgba(255, 255, 255, .45) }
+/* the token being spent is on the list and cannot be chosen — a swap from a
+   thing into itself is not a trade. It says so rather than going quiet. */
+.pdev.swp .switem.self { opacity: .42 }
+.pdev.swp .swself {
+  margin-left: auto; font-style: normal; font-size: 12px; padding: 3px 8px; border-radius: 7px;
+  background: rgba(255, 255, 255, .07); color: rgba(255, 255, 255, .6);
+}
+
+/* THE RAIL IS DRAWN, NOT NATIVE. A native scrollbar is the browser disagreeing
+   with the phone about what a scrollbar looks like, on a screen whose whole
+   claim is that it is a copy of an app. */
+.pdev.swp .swrail {
+  position: absolute; right: 0; top: 4px; bottom: 4px; width: 3px;
+  border-radius: 2px; background: rgba(255, 255, 255, .07);
+}
+.pdev.swp .swrail i {
+  position: absolute; left: 0; width: 3px; height: 34%; border-radius: 2px;
+  background: rgba(255, 255, 255, .28);
+  transition: top 620ms var(--ease-out);
+}
+
+/* the list fades at both edges so a row leaving the frame reads as travelling
+   rather than as being clipped by a box */
+.pdev.swp .swlistwrap::before,
+.pdev.swp .swlistwrap::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 26px; pointer-events: none; z-index: 1;
+}
+.pdev.swp .swlistwrap::before { top: 0; background: linear-gradient(var(--btc-card), transparent) }
+.pdev.swp .swlistwrap::after { bottom: 0; background: linear-gradient(transparent, var(--btc-card)) }
+
+@media (prefers-reduced-motion: reduce) {
+  .pdev.swp .swlist, .pdev.swp .swrail i { transition: none }
+}

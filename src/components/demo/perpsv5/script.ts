@@ -40,7 +40,7 @@ import {
  * scripted in it, and a rest does not become more restful by lasting longer.
  *
  * THREE OTHER DIALS MOVED WITH IT, or this would only be a slower slideshow:
- * the CSS tempo (`--dur` / `--dur-slow` in 24-demo-btc.css), the chart's
+ * the CSS tempo (`--dur` / `--dur-slow` in 24-demo-app.css), the chart's
  * `candleMs`, and the `Count` durations on every figure that travels. A script
  * stretched on its own just makes a fast animation wait longer between jumps,
  * which is worse than either — the same trap `16-modes.css` documents for the

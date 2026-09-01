@@ -65,6 +65,14 @@ const DEMOS = [
       'The same eighteen steps as nine. One line of copy at a time, and the yield chip promoted from a detail on a row to the moment the cut ends on.',
   },
   {
+    href: '/demo/swap-v5',
+    name: 'Swap v5',
+    len: 'twenty-five seconds',
+    steps: 4,
+    blurb:
+      'A form that already knows half of what it needs — BTC is in the top field because the reader tapped it on the home screen, and what is left is how much and into what. A destination picker of twenty-seven, scrolled three times rather than glided once, and one press. Same device as Perps v5.',
+  },
+  {
     href: '/demo/earn',
     name: 'Earn',
     len: '48s',

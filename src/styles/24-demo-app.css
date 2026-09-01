@@ -1,15 +1,22 @@
 /* =========================================================================
-   /demo/perps-v5 — THE DEVICE, AS A COPY
+   THE APP DEVICE — a copy of near.com, not a rendering of it
+   -------------------------------------------------------------------------
+   `.pdev.app` is the shared language of the v5 family: the face, the palette,
+   the tempo, the chrome, the fields, the sheets. It was `.pdev.btc` while
+   perps was the only screen wearing it — a name that would have been a lie on
+   the first screen with no BTC chart in it, which is the swap.
+
+   What is specific to one screen lives beside that screen. /demo/perps-v5
    -------------------------------------------------------------------------
    Every other demo stylesheet in this repo dresses an ARGUMENT about the app.
    This one dresses a claim that the screen IS the app, which changes what the
    rules are allowed to be: where a reference frame and a tidier value
    disagree, the frame wins.
 
-   SCOPED TO `.pdev.btc`, all of it. The twelve other devices are Montreal on a
+   SCOPED TO `.pdev.app`, all of it. The twelve other devices are Montreal on a
    deliberate decision (`b2c10ab`) and none of them wants Figtree, a 34px token
    dot or a price axis. Nothing below may leak: every selector in this file
-   starts inside `.pdev.btc`, and that is the one rule to keep when editing it.
+   starts inside `.pdev.app`, and that is the one rule to keep when editing it.
 
    THE PALETTE IS NOT DECLARED HERE. `--btc-bg` / `--btc-card` / `--btc-chart`
    / `--btc-up` are written onto the device as an inline style from
@@ -44,7 +51,7 @@
    two. Dropping the simulated OS is what bought the next card's top edge.
    ========================================================================= */
 
-.pdev.btc {
+.pdev.app {
   /* THE APP'S OWN FACE. See 01-fonts.css: SIL OFL, self-hosted, and declared
      once as `--font-app` so this line cannot drift from that one. */
   font-family: var(--font-app);
@@ -53,14 +60,14 @@
   background: var(--btc-bg);
   -webkit-font-smoothing: antialiased;
 }
-.pdev.btc .pdview { padding: 0; overflow: hidden }
+.pdev.app .pdview { padding: 0; overflow: hidden }
 /* THE ITALICS ARE NOT ITALICS HERE.
    The site sets every `em` in Kepler — that is the whole voice of the page —
    and this device uses `em` as the app does, for a secondary line under a
    primary one: "Bitcoin" under BTC, "Long 20x" under the pair. Inherited, they
    came out in a condensed serif on a screen claiming to be a copy of an app
    set entirely in Figtree. One rule, stated once, at the top. */
-.pdev.btc em, .pdev.btc i, .pdev.btc b {
+.pdev.app em, .pdev.app i, .pdev.app b {
   font-family: inherit; font-style: normal;
 }
 
@@ -74,13 +81,13 @@
    PACE and solves it the same way.
    Still under the site's own 240 / 480: this is an app being used, not a page
    being read, and the ratio between the two durations is untouched. */
-.pdev.btc[data-tempo="fast"] { --dur: 225ms; --dur-slow: 390ms }
+.pdev.app[data-tempo="fast"] { --dur: 225ms; --dur-slow: 390ms }
 
 /* the shared entrance is 380ms (15-demo.css). Everything else on this device
    slowed by half again, and a stagger that did not would be the one motion
    still moving at the old tempo — which is exactly what makes a screen read as
    two animations rather than one. */
-.pdev.btc .enter > * { animation-duration: 560ms }
+.pdev.app .enter > * { animation-duration: 560ms }
 
 /* ---- the chrome --------------------------------------------------------- */
 
@@ -91,35 +98,35 @@
    than as a layout. The padding is what the status bar used to buy for free:
    somewhere for the corner to happen before the content starts. It costs 16 of
    the 44 that were freed; the other 28 still go to the chart and the list. */
-.pdev.btc .bchrome {
+.pdev.app .bchrome {
   flex: none; height: 62px; display: flex; align-items: center; gap: 8px;
   padding: 16px 14px 0;
 }
-.pdev.btc .bback {
+.pdev.app .bback {
   width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center;
   background: var(--btc-card); color: rgba(255, 255, 255, .82);
 }
-.pdev.btc .bback svg { width: 19px; height: 19px }
-.pdev.btc .bspace { flex: 1 }
+.pdev.app .bback svg { width: 19px; height: 19px }
+.pdev.app .bspace { flex: 1 }
 
 /* the one thing on this row that is not in the reference frame — see Chrome()
    in Phone.tsx. It is a chip and not a headline because it is context for the
    ticket, not the subject of the screen. */
-.pdev.btc .bbal {
+.pdev.app .bbal {
   display: flex; flex-direction: column; align-items: flex-end; line-height: 1.12;
   padding: 4px 9px; border-radius: 10px; background: var(--btc-card);
 }
-.pdev.btc .bbal i {
+.pdev.app .bbal i {
   font-style: normal; font-size: 10px; font-weight: 500; letter-spacing: .04em;
   text-transform: uppercase; color: rgba(255, 255, 255, .42);
 }
-.pdev.btc .bbalv { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums }
+.pdev.app .bbalv { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums }
 
-.pdev.btc .bwallet {
+.pdev.app .bwallet {
   width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center;
   background: var(--btc-card); color: rgba(255, 255, 255, .8);
 }
-.pdev.btc .bwallet svg { width: 20px; height: 20px }
+.pdev.app .bwallet svg { width: 20px; height: 20px }
 
 /* ---- the pair and the price -------------------------------------------- */
 
@@ -127,36 +134,36 @@
    through the two sides, because in the reference frames that whole block is
    one near-black plate and the tonal break falls at "Positions" — the chart is
    the section, not just the canvas. `.bbook` below takes the ground back. */
-.pdev.btc .bmkt {
+.pdev.app .bmkt {
   flex: 1; min-height: 0; display: flex; flex-direction: column;
   background: var(--btc-chart);
 }
 
-.pdev.btc .bpair {
+.pdev.app .bpair {
   flex: none; height: 50px; display: flex; align-items: center; gap: 10px;
   padding: 0 16px; border-bottom: 1px solid rgba(255, 255, 255, .07);
 }
-.pdev.btc .bpairt { display: flex; flex-direction: column; line-height: 1.15 }
-.pdev.btc .bpairt b { font-size: 17px; font-weight: 600 }
-.pdev.btc .bpairt em { font-style: normal; font-size: 13px; color: rgba(255, 255, 255, .45) }
+.pdev.app .bpairt { display: flex; flex-direction: column; line-height: 1.15 }
+.pdev.app .bpairt b { font-size: 17px; font-weight: 600 }
+.pdev.app .bpairt em { font-style: normal; font-size: 13px; color: rgba(255, 255, 255, .45) }
 /* every disclosure arrow on this device is the same Lucide path at the same
    size — see `Icon` in Phone.tsx. `flex: none` because each one sits in a flex
    row next to text that would otherwise squeeze it. */
-.pdev.btc .bcv { width: 16px; height: 16px; flex: none; color: rgba(255, 255, 255, .45) }
-.pdev.btc .bchev { margin-left: auto; width: 20px; height: 20px; color: rgba(255, 255, 255, .5) }
+.pdev.app .bcv { width: 16px; height: 16px; flex: none; color: rgba(255, 255, 255, .45) }
+.pdev.app .bchev { margin-left: auto; width: 20px; height: 20px; color: rgba(255, 255, 255, .5) }
 
-.pdev.btc .bpx {
+.pdev.app .bpx {
   flex: none; height: 44px; display: flex; align-items: baseline; gap: 10px; padding: 6px 16px 0;
 }
 /* the quote is the largest thing on the screen, because it is the thing the
    screen is about. Tabular figures: it is rewritten every frame off the chart,
    and a proportional 1 makes the whole number twitch sideways as it ticks. */
-.pdev.btc .bpxv { font-size: 27px; font-weight: 600; letter-spacing: -.025em; font-variant-numeric: tabular-nums }
-.pdev.btc .bpxd {
+.pdev.app .bpxv { font-size: 27px; font-weight: 600; letter-spacing: -.025em; font-variant-numeric: tabular-nums }
+.pdev.app .bpxd {
   font-size: 14px; font-weight: 500; color: #F0616B; white-space: pre;
   font-variant-numeric: tabular-nums;
 }
-.pdev.btc .bpxd.up { color: #2FD48A }
+.pdev.app .bpxd.up { color: #2FD48A }
 
 /* ---- the chart ---------------------------------------------------------- */
 
@@ -168,88 +175,88 @@
    is on screen under the first. That row IS the point of the frame: the cut
    spends twenty seconds opening a second position and the list should show
    that there are two of them. */
-.pdev.btc .bchart {
+.pdev.app .bchart {
   flex: 1; min-height: 150px; max-height: 200px; position: relative; margin-top: 2px;
 }
 /* the watermark. It is in every reference frame, bottom left, under the
    candles — a chart drawn without it is the one detail that says "this panel
    was made for a slide". Low enough that it never competes with a wick. */
-.pdev.btc .btv {
+.pdev.app .btv {
   position: absolute; left: 8px; bottom: 6px; width: 30px; color: rgba(255, 255, 255, .17);
 }
-.pdev.btc .btv svg { width: 100%; display: block }
+.pdev.app .btv svg { width: 100%; display: block }
 
-.pdev.btc .btime {
+.pdev.app .btime {
   flex: none; height: 18px; display: flex; align-items: center; justify-content: space-between;
   /* the right inset is the chart's own price gutter: the axis owns that strip
      and a time label under it would sit beneath a price */
   padding: 0 74px 0 12px;
   font-size: 11px; color: rgba(255, 255, 255, .38); font-variant-numeric: tabular-nums;
 }
-.pdev.btc .btime i { font-style: normal }
-.pdev.btc .btime b { font-weight: 600; color: rgba(255, 255, 255, .62) }
+.pdev.app .btime i { font-style: normal }
+.pdev.app .btime b { font-weight: 600; color: rgba(255, 255, 255, .62) }
 
-.pdev.btc .btools {
+.pdev.app .btools {
   flex: none; height: 30px; display: flex; align-items: center; justify-content: space-between;
   padding: 0 16px;
 }
-.pdev.btc .btf { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, .82) }
-.pdev.btc .btf { display: flex; align-items: center; gap: 3px }
-.pdev.btc .bkind { width: 19px; color: rgba(255, 255, 255, .72) }
-.pdev.btc .bkind svg { width: 100%; display: block }
+.pdev.app .btf { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, .82) }
+.pdev.app .btf { display: flex; align-items: center; gap: 3px }
+.pdev.app .bkind { width: 19px; color: rgba(255, 255, 255, .72) }
+.pdev.app .bkind svg { width: 100%; display: block }
 
 /* ---- the position bar --------------------------------------------------- */
 
-.pdev.btc .bposbar {
+.pdev.app .bposbar {
   flex: none; border-top: 1px solid rgba(255, 255, 255, .07); padding: 0 16px;
 }
-.pdev.btc .bposh { height: 40px; display: flex; align-items: center; gap: 8px }
-.pdev.btc .bposl { font-size: 15px; color: rgba(255, 255, 255, .72) }
-.pdev.btc .bposl b { font-weight: 600 }
-.pdev.btc .bposl b.long { color: #2FD48A }
-.pdev.btc .bposl b.short { color: #F0616B }
-.pdev.btc .bposp { margin-left: auto; display: flex; align-items: center; gap: 8px }
-.pdev.btc .bposp b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums }
+.pdev.app .bposh { height: 40px; display: flex; align-items: center; gap: 8px }
+.pdev.app .bposl { font-size: 15px; color: rgba(255, 255, 255, .72) }
+.pdev.app .bposl b { font-weight: 600 }
+.pdev.app .bposl b.long { color: #2FD48A }
+.pdev.app .bposl b.short { color: #F0616B }
+.pdev.app .bposp { margin-left: auto; display: flex; align-items: center; gap: 8px }
+.pdev.app .bposp b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums }
 /* the percentage wears the tinted pill from the reference frame; the dollar
    figure beside it does not, because two chips on one row is a row of chips */
-.pdev.btc .bpct {
+.pdev.app .bpct {
   font-style: normal; font-size: 13px; font-weight: 600; padding: 3px 7px; border-radius: 7px;
   font-variant-numeric: tabular-nums;
 }
-.pdev.btc .bup { color: #2FD48A }
-.pdev.btc .bdown { color: #F0616B }
-.pdev.btc .bpct.bup { background: rgba(47, 212, 138, .14) }
-.pdev.btc .bpct.bdown { background: rgba(240, 97, 107, .14) }
-.pdev.btc .bposc {
+.pdev.app .bup { color: #2FD48A }
+.pdev.app .bdown { color: #F0616B }
+.pdev.app .bpct.bup { background: rgba(47, 212, 138, .14) }
+.pdev.app .bpct.bdown { background: rgba(240, 97, 107, .14) }
+.pdev.app .bposc {
   width: 20px; height: 20px; color: rgba(255, 255, 255, .5);
   transition: rotate var(--dur) var(--ease-out);
 }
-.pdev.btc .bposc.on { rotate: 180deg }
+.pdev.app .bposc.on { rotate: 180deg }
 
 /* ---- the slot: two sides, or the two things you do with a position ------ */
 
-.pdev.btc .bsides,
-.pdev.btc .bposact {
+.pdev.app .bsides,
+.pdev.app .bposact {
   flex: none; height: 52px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
   padding: 0 16px 8px;
 }
-.pdev.btc .bside,
-.pdev.btc .bact {
+.pdev.app .bside,
+.pdev.app .bact {
   display: grid; place-items: center; border-radius: 13px;
   font-size: 15px; font-weight: 600;
 }
-.pdev.btc .bside.long { background: rgba(20, 74, 52, .55); color: #3BE39A }
-.pdev.btc .bside.short { background: rgba(84, 24, 33, .55); color: #FF7079 }
-.pdev.btc .bact.modify { background: var(--btc-card); color: #fff }
-.pdev.btc .bact.close { background: rgba(84, 24, 33, .55); color: #FF7079 }
+.pdev.app .bside.long { background: rgba(20, 74, 52, .55); color: #3BE39A }
+.pdev.app .bside.short { background: rgba(84, 24, 33, .55); color: #FF7079 }
+.pdev.app .bact.modify { background: var(--btc-card); color: #fff }
+.pdev.app .bact.close { background: rgba(84, 24, 33, .55); color: #FF7079 }
 /* the switch is a cut, not a cross-fade: the row that arrives is the one that
    replaces the row that had the slot, and two of them dissolving through each
    other would read as neither */
-.pdev.btc[data-motion] .bposact { animation: drise 390ms var(--ease-out) both }
+.pdev.app[data-motion] .bposact { animation: drise 390ms var(--ease-out) both }
 
 /* ---- the three lists ---------------------------------------------------- */
 
-.pdev.btc .bbook {
+.pdev.app .bbook {
   flex: 1; min-height: 0; display: flex; flex-direction: column;
   background: var(--btc-bg);
 }
@@ -258,26 +265,26 @@
    wide as its own label — would then travel the entire width of the device
    between two tabs that are only three words apart. Centred, the row reads as
    one control and the underline moves the distance the eye expects. */
-.pdev.btc .btabs {
+.pdev.app .btabs {
   flex: none; height: 40px; display: flex; align-items: center; justify-content: center;
   gap: 18px; padding: 0 16px;
   border-bottom: 1px solid rgba(255, 255, 255, .07);
 }
-.pdev.btc .btab {
+.pdev.app .btab {
   position: relative; height: 40px; display: flex; align-items: center; gap: 4px;
   font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, .42);
   transition: color var(--dur) var(--ease-out);
 }
-.pdev.btc .btab i { font-style: normal; font-weight: 500 }
-.pdev.btc .btab.on { color: #fff }
+.pdev.app .btab i { font-style: normal; font-weight: 500 }
+.pdev.app .btab.on { color: #fff }
 /* the underline travels the width of its own label, which is the only part of
    this row that says which tab you are on once the colours are read */
-.pdev.btc .btab.on::after {
+.pdev.app .btab.on::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
   background: #fff; border-radius: 2px;
 }
 
-.pdev.btc .blist {
+.pdev.app .blist {
   flex: 1; min-height: 0; overflow: hidden; padding: 10px 16px 0;
   display: flex; flex-direction: column; gap: 10px;
 }
@@ -285,96 +292,96 @@
    the row rises as a block. That is right: a card is one object arriving, and
    `02-cd8a` is the commit that says a list rises by its rows or as a block and
    never both. */
-.pdev.btc .brow { flex: none }
+.pdev.app .brow { flex: none }
 
-.pdev.btc .bcard {
+.pdev.app .bcard {
   border: 1px solid rgba(255, 255, 255, .09); border-radius: 16px; padding: 12px 14px;
   background: var(--btc-card);
 }
-.pdev.btc .bcardh { display: flex; align-items: center; gap: 10px }
-.pdev.btc .bcardt { display: flex; flex-direction: column; line-height: 1.15 }
-.pdev.btc .bcardt b { font-size: 16px; font-weight: 600 }
-.pdev.btc .bcardt em { font-style: normal; font-size: 13px; color: rgba(255, 255, 255, .45) }
-.pdev.btc .bcardp {
+.pdev.app .bcardh { display: flex; align-items: center; gap: 10px }
+.pdev.app .bcardt { display: flex; flex-direction: column; line-height: 1.15 }
+.pdev.app .bcardt b { font-size: 16px; font-weight: 600 }
+.pdev.app .bcardt em { font-style: normal; font-size: 13px; color: rgba(255, 255, 255, .45) }
+.pdev.app .bcardp {
   margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
 }
-.pdev.btc .bcardp b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums }
-.pdev.btc .bcardp .bpct { padding: 0; background: none }
+.pdev.app .bcardp b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums }
+.pdev.app .bcardp .bpct { padding: 0; background: none }
 
-.pdev.btc .bcardd {
+.pdev.app .bcardd {
   margin-top: 11px; padding-top: 11px; border-top: 1px solid rgba(255, 255, 255, .08);
   display: grid; gap: 7px;
 }
-.pdev.btc .bcardd > div { display: flex; align-items: center; gap: 8px }
-.pdev.btc .bcardd dt { font-size: 14px; color: rgba(255, 255, 255, .45) }
-.pdev.btc .bcardd dd {
+.pdev.app .bcardd > div { display: flex; align-items: center; gap: 8px }
+.pdev.app .bcardd dt { font-size: 14px; color: rgba(255, 255, 255, .45) }
+.pdev.app .bcardd dd {
   margin-left: auto; display: flex; align-items: center; gap: 7px;
   font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums;
 }
 /* the qualifying figure — the BTC quantity, the distance to liquidation — is
    the app's own chip: the same value in the same row, said the other way */
-.pdev.btc .bcardd dd i {
+.pdev.app .bcardd dd i {
   font-style: normal; font-size: 13px; font-weight: 500; padding: 3px 7px; border-radius: 7px;
   background: rgba(255, 255, 255, .07); color: rgba(255, 255, 255, .72);
 }
 
 /* ---- the ticket --------------------------------------------------------- */
 
-.pdev.btc .dsheet { background: var(--btc-card); padding: 8px 16px 18px; font-family: var(--font-app) }
-.pdev.btc .btk { gap: 0 }
+.pdev.app .dsheet { background: var(--btc-card); padding: 8px 16px 18px; font-family: var(--font-app) }
+.pdev.app .btk { gap: 0 }
 
-.pdev.btc .btkhead { display: flex; align-items: center; gap: 10px; padding-bottom: 14px }
-.pdev.btc .bseg {
+.pdev.app .btkhead { display: flex; align-items: center; gap: 10px; padding-bottom: 14px }
+.pdev.app .bseg {
   flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px;
   border-radius: 14px; background: rgba(255, 255, 255, .05);
 }
 /* the segmented track sits ON a sheet that is already `--btc-card`, so it stays
    translucent: an opaque token over an identical token is an invisible box */
-.pdev.btc .bsg {
+.pdev.app .bsg {
   display: grid; place-items: center; padding: 9px 0; border-radius: 11px;
   font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, .55);
   transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
 }
-.pdev.btc .bsg.long.on { background: rgba(20, 74, 52, .75); color: #3BE39A }
-.pdev.btc .bsg.short.on { background: rgba(84, 24, 33, .75); color: #FF7079 }
-.pdev.btc .botype {
+.pdev.app .bsg.long.on { background: rgba(20, 74, 52, .75); color: #3BE39A }
+.pdev.app .bsg.short.on { background: rgba(84, 24, 33, .75); color: #FF7079 }
+.pdev.app .botype {
   padding: 11px 13px; border-radius: 13px; border: 1px solid rgba(255, 255, 255, .12);
   font-size: 15px; font-weight: 500; color: rgba(255, 255, 255, .78); white-space: nowrap;
 }
-.pdev.btc .botype { display: flex; align-items: center; gap: 4px }
+.pdev.app .botype { display: flex; align-items: center; gap: 4px }
 
-.pdev.btc .bavail {
+.pdev.app .bavail {
   display: flex; align-items: center; gap: 10px; padding: 13px 0;
   border-top: 1px solid rgba(255, 255, 255, .07);
   font-size: 15px; color: rgba(255, 255, 255, .55);
 }
-.pdev.btc .bavail b {
+.pdev.app .bavail b {
   margin-left: auto; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums;
 }
-.pdev.btc .bmax {
+.pdev.app .bmax {
   font-style: normal; font-size: 14px; font-weight: 500; padding: 5px 10px; border-radius: 9px;
   background: rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .82);
 }
 /* also on a sheet, also left translucent, for the reason above */
 
-.pdev.btc .bamt { padding: 13px 0; border-top: 1px solid rgba(255, 255, 255, .07) }
-.pdev.btc .bflab { display: block; font-size: 15px; font-weight: 600; margin-bottom: 8px }
-.pdev.btc .bamtr { display: flex; align-items: center; gap: 10px }
+.pdev.app .bamt { padding: 13px 0; border-top: 1px solid rgba(255, 255, 255, .07) }
+.pdev.app .bflab { display: block; font-size: 15px; font-weight: 600; margin-bottom: 8px }
+.pdev.app .bamtr { display: flex; align-items: center; gap: 10px }
 
-.pdev.btc .bfin {
+.pdev.app .bfin {
   flex: 1; display: flex; align-items: center; gap: 7px; min-height: 46px; padding: 0 14px;
   border-radius: 13px; border: 1px solid rgba(255, 255, 255, .12);
   font-size: 16px; font-weight: 500; font-variant-numeric: tabular-nums;
   transition: border-color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out);
 }
-.pdev.btc .bfin.on { border-color: rgba(255, 255, 255, .32); background: rgba(255, 255, 255, .03) }
+.pdev.app .bfin.on { border-color: rgba(255, 255, 255, .32); background: rgba(255, 255, 255, .03) }
 /* A FIELD IN ERROR BORROWS THE REFUSAL'S COLOUR rather than wearing a focus
    ring over a red border: stacking them says two things at once about one box.
    Same rule v3 arrived at, and the same reason. */
-.pdev.btc .bfin.bad, .pdev.btc .bfin.bad.on { border-color: #E5484D; background: rgba(229, 72, 77, .07) }
-.pdev.btc .bcur { font-style: normal; color: rgba(255, 255, 255, .45) }
-.pdev.btc .bfin b { font-weight: 500 }
-.pdev.btc .bcaret {
+.pdev.app .bfin.bad, .pdev.app .bfin.bad.on { border-color: #E5484D; background: rgba(229, 72, 77, .07) }
+.pdev.app .bcur { font-style: normal; color: rgba(255, 255, 255, .45) }
+.pdev.app .bfin b { font-weight: 500 }
+.pdev.app .bcaret {
   width: 1.5px; height: 19px; background: #fff; border-radius: 1px; margin-left: -3px;
   animation: bblink 1s steps(1, end) infinite;
 }
@@ -387,74 +394,74 @@
    that had no business being narrow. Second time this file has been bitten by
    one class naming two things (`.btk` was the first); a class used at two JSX
    sites for two different objects is the shape of the bug both times. */
-.pdev.btc .blev {
+.pdev.app .blev {
   display: flex; align-items: center; gap: 3px; min-height: 46px; padding: 0 14px;
   border-radius: 13px; border: 1px solid rgba(255, 255, 255, .12);
   font-size: 16px; font-weight: 500; white-space: nowrap;
 }
 
 
-.pdev.btc .bchk {
+.pdev.app .bchk {
   display: flex; align-items: center; gap: 11px; padding: 13px 0;
   border-top: 1px solid rgba(255, 255, 255, .07); font-size: 15px; font-weight: 600;
 }
-.pdev.btc .bbox {
+.pdev.app .bbox {
   width: 22px; height: 22px; border-radius: 6px; flex: none;
   border: 1.5px solid rgba(255, 255, 255, .3); position: relative;
   transition: background-color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
 }
-.pdev.btc .bchk.on .bbox { background: #3BE39A; border-color: #3BE39A }
+.pdev.app .bchk.on .bbox { background: #3BE39A; border-color: #3BE39A }
 /* THE TICK IS A LUCIDE PATH, not two rotated borders. The old one was drawn in
    CSS because a `✓` glyph is a different weight in every family — true, and it
    traded that problem for a worse one: a mark whose size, colour and centring
    were three magic numbers that had to be re-derived together every time the
    box changed. `place-items: center` on the box does that job now. */
-.pdev.btc .bbox { display: grid; place-items: center }
-.pdev.btc .btick {
+.pdev.app .bbox { display: grid; place-items: center }
+.pdev.app .btick {
   width: 15px; height: 15px; color: #06120C; stroke-width: 3;
   opacity: 0; transition: opacity var(--dur) var(--ease-out);
 }
-.pdev.btc .bchk.on .btick { opacity: 1 }
+.pdev.app .bchk.on .btick { opacity: 1 }
 
-.pdev.btc .bprot { padding-bottom: 13px }
-.pdev.btc[data-motion] .bprot { animation: drise 390ms var(--ease-out) both }
-.pdev.btc .bfin.wide { width: 100% }
-.pdev.btc .bunit { margin-left: auto; display: flex; align-items: center; gap: 10px }
-.pdev.btc .bunit i { font-style: normal; color: rgba(255, 255, 255, .55) }
-.pdev.btc .bswap { width: 17px; height: 17px; color: rgba(255, 255, 255, .55) }
-.pdev.btc .berr { display: block; margin-top: 7px; font-size: 13px; font-style: normal; color: #FF7079 }
+.pdev.app .bprot { padding-bottom: 13px }
+.pdev.app[data-motion] .bprot { animation: drise 390ms var(--ease-out) both }
+.pdev.app .bfin.wide { width: 100% }
+.pdev.app .bunit { margin-left: auto; display: flex; align-items: center; gap: 10px }
+.pdev.app .bunit i { font-style: normal; color: rgba(255, 255, 255, .55) }
+.pdev.app .bswap { width: 17px; height: 17px; color: rgba(255, 255, 255, .55) }
+.pdev.app .berr { display: block; margin-top: 7px; font-size: 13px; font-style: normal; color: #FF7079 }
 
-.pdev.btc .bcta {
+.pdev.app .bcta {
   display: grid; place-items: center; margin-top: 4px; min-height: 50px; border-radius: 999px;
   font-size: 16px; font-weight: 600; background: #fff; color: #0B0F0D;
   transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
 }
-.pdev.btc .bcta.off { background: rgba(255, 255, 255, .13); color: rgba(255, 255, 255, .42) }
-.pdev.btc .bcta.light { background: #fff; color: #0B0F0D }
-.pdev.btc .bspin {
+.pdev.app .bcta.off { background: rgba(255, 255, 255, .13); color: rgba(255, 255, 255, .42) }
+.pdev.app .bcta.light { background: #fff; color: #0B0F0D }
+.pdev.app .bspin {
   width: 19px; height: 19px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .25);
   border-top-color: rgba(255, 255, 255, .8); animation: bspin 700ms linear infinite;
 }
 @keyframes bspin { to { rotate: 360deg } }
 
-.pdev.btc .bochk {
+.pdev.app .bochk {
   margin-top: 12px; padding: 12px 14px; border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, .09); background: rgba(255, 255, 255, .04);
 }
-.pdev.btc[data-motion] .bochk { animation: drise 360ms var(--ease-out) both }
+.pdev.app[data-motion] .bochk { animation: drise 360ms var(--ease-out) both }
 
 /* the app's own footer on this sheet: what the leverage turned the margin
    into, said twice — in dollars and in the coin */
-.pdev.btc .best {
+.pdev.app .best {
   display: flex; align-items: center; gap: 9px; margin-top: 13px; padding-top: 13px;
   border-top: 1px solid rgba(255, 255, 255, .07);
   font-size: 14px; color: rgba(255, 255, 255, .5);
 }
-.pdev.btc .bestv {
+.pdev.app .bestv {
   margin-left: auto; font-size: 15px; font-weight: 600; color: #fff;
   font-variant-numeric: tabular-nums;
 }
-.pdev.btc .bestb {
+.pdev.app .bestb {
   font-size: 13px; font-weight: 500; padding: 3px 7px; border-radius: 7px;
   background: rgba(255, 255, 255, .07); color: rgba(255, 255, 255, .72);
   font-variant-numeric: tabular-nums;
@@ -462,24 +469,24 @@
 
 /* ---- the leverage sheet ------------------------------------------------- */
 
-.pdev.btc .bsh { display: block; font-size: 18px; font-weight: 600; margin: 4px 0 16px }
-.pdev.btc .bslide {
+.pdev.app .bsh { display: block; font-size: 18px; font-weight: 600; margin: 4px 0 16px }
+.pdev.app .bslide {
   display: flex; align-items: center; gap: 14px; padding: 14px;
   border-radius: 16px; background: rgba(255, 255, 255, .045);
 }
-.pdev.btc .brange { flex: 1; accent-color: #fff; height: 4px }
-.pdev.btc .blevbox {
+.pdev.app .brange { flex: 1; accent-color: #fff; height: 4px }
+.pdev.app .blevbox {
   display: flex; align-items: baseline; gap: 5px; padding: 10px 16px; border-radius: 13px;
   background: rgba(255, 255, 255, .07); font-size: 24px; font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.pdev.btc .blevbox i { font-style: normal; font-size: 15px; color: rgba(255, 255, 255, .45) }
+.pdev.app .blevbox i { font-style: normal; font-size: 15px; color: rgba(255, 255, 255, .45) }
 
-.pdev.btc .blevnot {
+.pdev.app .blevnot {
   display: flex; align-items: center; gap: 10px; margin: 13px 0 4px;
   font-size: 14px; color: rgba(255, 255, 255, .5);
 }
-.pdev.btc .blevfig {
+.pdev.app .blevfig {
   margin-left: auto; font-size: 16px; font-weight: 600; color: #fff;
   font-variant-numeric: tabular-nums;
 }
@@ -492,10 +499,10 @@
    query itself.
    ------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  .pdev.btc .bcaret, .pdev.btc .bspin { animation: none }
-  .pdev.btc[data-motion] .bprot,
-  .pdev.btc[data-motion] .bochk,
-  .pdev.btc[data-motion] .bposact { animation: none }
+  .pdev.app .bcaret, .pdev.app .bspin { animation: none }
+  .pdev.app[data-motion] .bprot,
+  .pdev.app[data-motion] .bochk,
+  .pdev.app[data-motion] .bposact { animation: none }
 }
 
 /* =========================================================================

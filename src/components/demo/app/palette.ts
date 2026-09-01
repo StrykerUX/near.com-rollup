@@ -10,7 +10,7 @@
  * So the values live HERE, in the one file both consumers can import:
  *
  *   · `Phone.tsx` writes them onto the device as custom properties, which is
- *     what `24-demo-btc.css` reads through `var(--btc-*)`
+ *     what `24-demo-app.css` reads through `var(--btc-*)`
  *   · the same constants are handed to `<Chart>` as `up` / `down`
  *
  * It is the same construction the site already uses one level up — `@theme
@@ -44,7 +44,7 @@ export const PALETTE = {
 } as const;
 
 /**
- * The custom properties `24-demo-btc.css` reads. Written as an inline style on
+ * The custom properties `24-demo-app.css` reads. Written as an inline style on
  * the device rather than declared in the stylesheet, because the stylesheet is
  * the consumer here and not the source — see the note above.
  */

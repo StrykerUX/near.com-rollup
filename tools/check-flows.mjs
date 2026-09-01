@@ -46,6 +46,12 @@ const MODULES = [
      position on it, and no passkey. Walked for exactly that reason. */
   [`${DEMO}/perpsv5/state.ts`, 'perpsv5-state'],
   [`${DEMO}/perpsv5/script.ts`, 'perpsv5-script'],
+  /* the swap short cut — its own machine again, and for the same reason: the
+     long swap bakes in three screens, a confidential/main split and a vault
+     deposit running beside it. This one is a single form. */
+  [`${DEMO}/swapv5/catalogue.ts`, 'swapv5-catalogue'],
+  [`${DEMO}/swapv5/state.ts`, 'swapv5-state'],
+  [`${DEMO}/swapv5/script.ts`, 'swapv5-script'],
   [`${DEMO}/swap/state.ts`, 'swap-state'],
   [`${DEMO}/swap/script.ts`, 'swap-script'],
   [`${DEMO}/earn/state.ts`, 'earn-state'],
@@ -84,7 +90,9 @@ for (const [src, f] of MODULES) {
        the whole claim those versions make, that they are the same machine seen
        differently — so the rewrite has to resolve any feature's state, not
        just the one this rule was written for. */
-    .replace(/from ['"]@\/components\/demo\/(\w+)\/state['"]/g, "from './$1-state.mjs'");
+    .replace(/from ['"]@\/components\/demo\/(\w+)\/state['"]/g, "from './$1-state.mjs'")
+    /* the swap's catalogue is data beside its state, and its state imports it */
+    .replace(/from ['"]\.\/catalogue['"]/g, "from './swapv5-catalogue.mjs'");
   writeFileSync(join(dir, `${f}.mjs`), js);
 }
 const load = (f) => import(pathToFileURL(join(dir, `${f}.mjs`)).href);
@@ -100,6 +108,7 @@ const machines = {
   'demo/perps-v3': (await load('perpsv3-script')).perpsV3Flow.machine,
   'demo/perps-v4': (await load('perpsv4-script')).perpsV4Flow.machine,
   'demo/perps-v5': (await load('perpsv5-script')).perpsV5Flow.machine,
+  'demo/swap-v5': (await load('swapv5-script')).swapV5Flow.machine,
   'demo/swap': (await load('swap-script')).swapFlow.machine,
   'demo/earn': (await load('earn-script')).earnFlow.machine,
   'demo/confidential-deposit': (await load('condeposit-script')).conDepositFlow.machine,
@@ -283,15 +292,17 @@ for (const [name, m] of Object.entries(machines)) {
   const PACE = Number(
     readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
   );
-  const m = machines['demo/perps-v5'];
-  const authored = m.beats.reduce((t, b) => t + (b.ms ?? 0), 0) + (m.outro ?? 0);
-  const real = Math.round(authored * PACE);
-  console.log(`\n== the short cut runs the length it says it does\n`
-    + `   demo/perps-v5: ${authored}ms authored x ${PACE} = ${real}ms on screen`);
-  if (Math.abs(real - LIMIT) > TOL)
-    bad('demo/perps-v5', `runs ${real}ms, and the brief is ${LIMIT}ms. `
-      + `The budget is ${Math.round(LIMIT / PACE)}ms of authored beats, outro included — `
-      + `this script authors ${authored}.`);
+  console.log('\n== the short cuts run the length they say they do');
+  for (const [name, limit] of [['demo/perps-v5', LIMIT], ['demo/swap-v5', 25250]]) {
+    const m = machines[name];
+    const authored = m.beats.reduce((t, b) => t + (b.ms ?? 0), 0) + (m.outro ?? 0);
+    const real = Math.round(authored * PACE);
+    console.log(`   ${name}: ${authored}ms authored x ${PACE} = ${real}ms on screen`);
+    if (Math.abs(real - limit) > TOL)
+      bad(name, `runs ${real}ms, and the brief is ${limit}ms. `
+        + `The budget is ${Math.round(limit / PACE)}ms of authored beats, outro included — `
+        + `this script authors ${authored}.`);
+  }
 }
 
 console.log(fail ? `\n${fail} problem(s)` : '\nall machines clean');
