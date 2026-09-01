@@ -113,7 +113,18 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'position', ch: 'open',
     title: 'Both brackets, and the market walking into one',
     note: 'Three lines now: the entry at $79,654, the stop below it and the take profit above. The market climbs into the green one, which is the whole of what a bracket is for.',
-    beats: [{ ms: 2800 }, { ms: 2600, do: 'posOpen' }, { ms: 23500 }],
+    /* THE FILL IS PLACED, NOT WATCHED FOR — AND PLACED IN THE DECK'S TIME.
+       The climb takes RAMP_CANDLES x CANDLE_MS = 22,500 REAL milliseconds. Beat
+       lengths are not real milliseconds: the deck plays them at PACE, so
+       22,500 written here would run 28,125ms long and the order would fill five
+       seconds after the market had already traded through the line it closed
+       at — which is the bug this fill was added to fix, arriving late instead
+       of not at all. 22,500 / 1.25 = 18,000, and 2,800 + 2,600 of that is
+       already spent above. `pnpm check:flows` asserts this still lands. */
+    beats: [
+      { ms: 2800 }, { ms: 2600, do: 'posOpen' },
+      { ms: 12600, do: 'tpFill' }, { ms: 5600 },
+    ],
   },
 ];
 
@@ -132,6 +143,7 @@ export const perpsV3Flow = buildFlow<PD, PDAction>({
     unit: 'tp',
     submit: 'sign',
     posOpen: 'position',
+    tpFill: 'position',
   },
   /**
    * WHICH CONTROL EACH TRANSITION LIGHTS.
@@ -156,6 +168,7 @@ export const perpsV3Flow = buildFlow<PD, PDAction>({
       case 'submit': return 'submit';
       case 'ostep': return s.over === 'passkey' && s.auth === 'ask' ? 'passkey' : null;
       case 'posOpen': return 'posbar';
+      case 'tpFill': return 'posbar';
       default: return null;
     }
   },

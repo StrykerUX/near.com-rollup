@@ -35,6 +35,15 @@ export const FUND_SLIPPAGE = '0.50%';
 export const FUND_ETA = '~22 sec';
 export const FUND_STEPS = ['Processing send', 'Sending', 'Complete'];
 
+/**
+ * What a bracket pays when it fills: the move, times the quantity the size
+ * bought at the entry. Not the margin — the position is the notional, and the
+ * leverage is already inside the size.
+ */
+export function realised(entry: number, exit: number, size: number, side: Side) {
+  return (exit - entry) * (size / entry) * (side === 'long' ? 1 : -1);
+}
+
 /** the price the position opens at, frame 4:32 */
 export const ENTRY = 79654;
 
@@ -138,6 +147,22 @@ export type PD = {
     side: Side; lev: number; size: number; entry: number;
     tp: number | null; sl: number | null;
   };
+  /**
+   * THE TAKE PROFIT, ONCE IT HAS ACTUALLY FILLED.
+   *
+   * The demo used to walk the market into the green line and then keep going,
+   * which showed the one thing a bracket is for and then quietly disproved it:
+   * a take profit that is touched and not filled is a line on a chart, not an
+   * order. This is what turns the climb into an outcome — the position is
+   * closed at `pos.tp`, the gain is realised into the balance, and the stop
+   * loss on the other side is cancelled, because two brackets are one decision
+   * and the first to fill ends it.
+   *
+   * The position itself is kept rather than cleared. The reader has spent the
+   * whole flow being shown three lines and a size, and deleting all of it at
+   * the moment it pays off leaves an empty screen where the answer should be.
+   */
+  filled: boolean;
   /** the position bar on the market screen, expanded */
   posOpen: boolean;
   /** the row in the Positions list, expanded */
@@ -173,6 +198,7 @@ export const initial: PD = {
   ostep: -1,
   submitting: false,
   pos: null,
+  filled: false,
   posOpen: false,
   rowOpen: false,
   tap: null,
@@ -248,7 +274,7 @@ export type PDAction =
   | 'focus' | 'key' | 'done'
   | 'levSheet' | 'levSet' | 'levSave'
   | 'prot' | 'unit'
-  | 'submit' | 'ostep' | 'tab' | 'posOpen' | 'rowOpen' | 'closePos';
+  | 'submit' | 'ostep' | 'tab' | 'posOpen' | 'rowOpen' | 'closePos' | 'tpFill';
 
 const digits = (cur: string, d: string) => {
   if (d === '⌫') return cur.slice(0, -1);
@@ -392,6 +418,16 @@ export const actions: Record<PDAction, Act<PD>> = {
   /* ---- living with a position ---- */
   tab: (s, v) => (s.tab === v ? null : { tab: v as PD['tab'], tap: 'tab' }),
   posOpen: (s) => (s.pos ? { posOpen: !s.posOpen, tap: 'posOpen' } : null),
+  /* refuses without a position and without a take profit to fill, and refuses
+     twice: an order fills once */
+  tpFill: (s) =>
+    s.pos && s.pos.tp && !s.filled
+      ? {
+          filled: true,
+          perps: s.perps + realised(s.pos.entry, s.pos.tp, s.pos.size, s.pos.side),
+          tap: 'tpFill',
+        }
+      : null,
   rowOpen: (s) => (s.pos ? { rowOpen: !s.rowOpen, tap: 'rowOpen' } : null),
   closePos: (s) =>
     s.pos ? { pos: null, posOpen: false, rowOpen: false, perps: PERPS_BAL_1, tap: 'closePos' } : null,

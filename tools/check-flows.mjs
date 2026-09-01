@@ -145,5 +145,52 @@ for (const [name, m] of Object.entries(machines)) {
   console.log('   free-mode reachable states:', seen.size);
 }
 
+/* ==========================================================================
+   4 · THE TAKE PROFIT FILLS ON THE FRAME THE MARKET REACHES IT
+   --------------------------------------------------------------------------
+   Three numbers in three files have to agree: the chart's climb length
+   (RAMP_CANDLES x CANDLE_MS, in real milliseconds), the deck's PACE, and the
+   beat that closes the position. They drifted once already — the beat was
+   written in real milliseconds, the deck played it at PACE, and the order
+   filled 5.6 seconds after the market had traded through the line it was
+   supposed to have closed at. Nothing about that is visible to a type checker
+   and it looks almost right on screen, which is the worst way for it to fail.
+   ========================================================================== */
+{
+  const chart = readFileSync('src/components/stage/phone/ui/Chart.tsx', 'utf8');
+  const CANDLE_MS = Number(chart.match(/const CANDLE_MS = (\d+);/)[1]);
+  const RAMP_N = chart.match(/const RAMP = \[([\s\S]*?)\];/)[1]
+    .split(',').filter((x) => /-?\d/.test(x)).length;
+  const PACE = Number(
+    readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
+  );
+  /* the climb, in the units a beat is written in */
+  const climb = (RAMP_N * CANDLE_MS) / PACE;
+  console.log(`\n== take profit timing — climb is ${RAMP_N} x ${CANDLE_MS}ms, ${climb}ms of script time`);
+
+  for (const name of ['demo/perps-v3', 'demo/perps-v4']) {
+    const m = machines[name];
+    let st = { ...m.initial };
+    let t = 0, openedAt = null, filledAt = null;
+    for (const b of m.beats) {
+      t += b.ms ?? 0;
+      if (b.do) {
+        const patch = m.actions[b.do]?.(st, b.arg);
+        if (patch) st = { ...st, ...patch };
+      }
+      if (openedAt === null && st.pos) openedAt = t;
+      if (filledAt === null && st.filled) filledAt = t;
+    }
+    if (openedAt === null) { bad(name, 'no position is ever opened'); continue; }
+    if (filledAt === null) { bad(name, 'the take profit never fills'); continue; }
+    const gap = filledAt - openedAt;
+    if (gap !== climb)
+      bad(name, `fills ${gap}ms after the open, but the climb is ${climb}ms — `
+        + (gap > climb ? 'the market trades past the line before the order closes'
+                       : 'the order closes before the market gets there'));
+    else console.log(`   ${name}: opens at ${openedAt}ms, fills at ${filledAt}ms — on the frame`);
+  }
+}
+
 console.log(fail ? `\n${fail} problem(s)` : '\nall machines clean');
 process.exit(fail ? 1 : 0);

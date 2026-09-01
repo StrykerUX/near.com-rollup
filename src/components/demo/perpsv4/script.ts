@@ -115,7 +115,13 @@ const STEPS: Step<PD, PDAction>[] = [
     title: 'Both exits on the chart, and one of them met',
     note: 'The entry, the stop five hundred below it and the take profit a thousand above — two to one. The market walks up into the green line, which is the only proof a bracket was ever worth setting.',
         callout: 'Long 20x · $100,000',
-    beats: [{ ms: 3000 }, { ms: 3000, do: 'posOpen' }, { ms: 24000 }],
+    beats: [
+      { ms: 3000 }, { ms: 3000, do: 'posOpen' },
+      /* the climb is 22,500 REAL ms; beats run at PACE, so the fill sits at
+         22,500 / 1.25 = 18,000 of script time from the open, less the 6,000
+         already spent above. Checked by `pnpm check:flows`. */
+      { ms: 12000, do: 'tpFill' }, { ms: 6000 },
+    ],
   },
 ];
 
@@ -134,6 +140,7 @@ export const perpsV4Flow = buildFlow<PD, PDAction>({
     unit: 'rule',
     submit: 'sign',
     posOpen: 'open',
+    tpFill: 'open',
   },
   target: (a, arg, s) => {
     switch (a) {
@@ -147,6 +154,7 @@ export const perpsV4Flow = buildFlow<PD, PDAction>({
       case 'submit': return 'submit';
       case 'ostep': return s.over === 'passkey' && s.auth === 'ask' ? 'passkey' : null;
       case 'posOpen': return 'posbar';
+      case 'tpFill': return 'posbar';
       default: return null;
     }
   },

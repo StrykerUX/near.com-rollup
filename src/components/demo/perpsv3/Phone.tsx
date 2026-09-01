@@ -12,7 +12,7 @@ import { PasskeySheet } from '@/components/demo/shell/Screens';
 import { Spotlight } from '@/components/demo/shell/Spotlight';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
-  ENTRY, ORDER_STEPS, avail, btcSize, cta, liqPrice, notional, slBad, tpBad,
+  ENTRY, ORDER_STEPS, avail, btcSize, cta, liqPrice, notional, realised, slBad, tpBad,
   type PD, type PDAction,
 } from '@/components/demo/perps/state';
 
@@ -73,10 +73,15 @@ function Market({ d }: { d: Deck }) {
   const change = useRef<HTMLSpanElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const pos = s.pos;
+  const filled = s.filled;
 
   const onTick = useCallback((last: number) => {
     const el = wrap.current;
     if (!el || !pos) return;
+    /* once the take profit has filled the figure is settled, and a live P&L
+       still ticking under the word "filled" is the same lie the fill was
+       added to remove */
+    if (filled) return;
     const qty = pos.size / pos.entry;
     const dv = (last - pos.entry) * qty * (pos.side === 'long' ? 1 : -1);
     const pc = (dv / (pos.size / pos.lev)) * 100;
@@ -89,12 +94,16 @@ function Market({ d }: { d: Deck }) {
     el.querySelectorAll<HTMLElement>('[data-pnlp]').forEach((n) => {
       n.textContent = `${sign}${Math.abs(pc).toFixed(2)}%`;
     });
-  }, [pos]);
+  }, [pos, filled]);
 
   /* the market holds still while a protection field is being typed into: both
      rules are enforced against a fixed entry, and a quote walking under them
      makes a refusal look arbitrary instead of legible */
-  const paused = s.focus === 'tp' || s.focus === 'sl';
+  const paused = s.focus === 'tp' || s.focus === 'sl'
+    /* and once the order has filled: the position closed at that price, so the
+       chart stops where it closed rather than wandering on past a line the
+       reader has just been told ended the trade */
+    || s.filled;
 
   return (
     <div className="dmkt3" ref={wrap}>
@@ -113,7 +122,10 @@ function Market({ d }: { d: Deck }) {
           entry={s.pos ? s.pos.entry : null}
           side={s.pos?.side ?? null}
           tp={s.pos?.tp ?? null}
-          sl={s.pos?.sl ?? null}
+          /* the stop loss goes when the take profit fills. They were one
+             decision made twice, and leaving the losing side drawn under a
+             closed position says an order is still working that is not. */
+          sl={s.filled ? null : (s.pos?.sl ?? null)}
           /* the market is pointed at the take profit once there is one to
              reach: a demo of a bracket that is never touched has shown you
              where the exit is and nothing about it working */
@@ -146,11 +158,20 @@ function PositionCard({ d }: { d: Deck }) {
   if (!s.pos) return null;
   const open = d.can('posOpen');
   const btc = s.pos.size / s.pos.entry;
+  const gain = realised(s.pos.entry, s.pos.tp ?? s.pos.entry, s.pos.size, s.pos.side);
+  const pct = (gain / (s.pos.size / s.pos.lev)) * 100;
   return (
     <div className="dposbar">
       <div className={'dposh' + live(open)} {...press(open)} data-tap="posbar">
-        <span>Position: <b className={s.pos.side}>{s.pos.side === 'long' ? 'Long' : 'Short'} {s.pos.lev}x</b></span>
-        <span className="dposp"><b data-pnl className="down">&minus;$1.58</b> <i data-pnlp>&minus;0.23%</i></span>
+        <span>{s.filled
+          ? <>Take profit <b className="dfill">filled</b> at {usd(s.pos.tp ?? 0, 0)}</>
+          : <>Position: <b className={s.pos.side}>{s.pos.side === 'long' ? 'Long' : 'Short'} {s.pos.lev}x</b></>}</span>
+        {/* the realised figure is written into the markup, not by the chart:
+            no `data-pnl` here means nothing can tick over it */}
+        <span className="dposp">{s.filled
+          ? <b className="dgain">+{usd(gain, 2)}</b>
+          : <b data-pnl className="down">&minus;$1.58</b>}
+          {s.filled ? <i>+{pct.toFixed(2)}%</i> : <i data-pnlp>&minus;0.23%</i>}</span>
         <span className={'dposc' + (s.posOpen ? ' on' : '')}>⌄</span>
       </div>
       {s.posOpen ? (

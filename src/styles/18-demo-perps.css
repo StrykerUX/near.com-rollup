@@ -52,6 +52,14 @@
 .dposp i { font-style: normal; opacity: .75 }
 .dposp:has(.dgain) i, .dliv:has(.dgain) i { color: #26C281 }
 .dposp:has(.down) i, .dliv:has(.down) i { color: #E5484D }
+/* FILLED. The bar keeps its place and its shape — the position did not
+   disappear, it resolved — and the only things that change are the word and
+   the colour of the ground behind it. A bar that moved or grew at this moment
+   would read as a new element arriving rather than as the one already on
+   screen having been answered. */
+.dposh b.dfill { color: #26C281 }
+.dposbar:has(.dfill) { background: rgba(38, 194, 129, .1) }
+
 .dposc { transition: rotate var(--dur) var(--ease-out); color: rgba(255, 255, 255, .5) }
 .dposc.on { rotate: 180deg }
 .dposd { margin: 9px 0 0; display: grid; gap: 5px }
