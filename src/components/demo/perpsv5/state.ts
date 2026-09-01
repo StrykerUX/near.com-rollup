@@ -98,18 +98,54 @@ export const TICK = 0.5;
  * the frame the market reaches it, so it is not a number this cut gets to move
  * for everybody.
  *
- * 2,000 for the same reason everything else on this screen slowed by half
- * again — but it buys something the other dials do not. A slower candle means
- * the price covers the same ground in more time, so a QUOTED market crosses
- * fewer ticks per second and prints less often: the candle rate is the upstream
- * dial on how busy the whole readout is, and this takes it from about fifteen
- * prints a second to eleven without touching `TICK`.
+ * Five seconds a bar, which is slow for an hour and right for a cut: the price
+ * covers the same ground in more time, so it moves at a lower velocity and a
+ * QUOTED market crosses fewer ticks per second. It is the WEAKEST of the three
+ * dials on its own — 37 points a second to 26 — and it earns its place only in
+ * combination with REACH and TAPE.
  *
- * The clip now advances 6.56 candles instead of 8.75. Re-checked against
- * `PHASE`: the window still rises (+55 points over the clip, against +53
- * before) and still closes eighteen of forty-six bars red.
+ * The clip advances 3.46 candles. Re-checked against `PHASE`: the window still
+ * rises over it (+53.6 points), still puts its low a third of the way in and
+ * its high at the right edge, and still closes eighteen of forty-six bars red.
  */
-export const CANDLE_MS = 2000;
+export const CANDLE_MS = 5000;
+
+/**
+ * HOW FAR A WICK REACHES, and it is the strongest dial on the quote.
+ *
+ * The chart's default is [20, 60] and this cut runs a quarter of it. The reason
+ * only became visible after the candles were fixed to form properly: a bar's
+ * reach is not decoration, it is where the price GOES — open → high → low →
+ * close walks that distance two or three times per bar, and every point of it
+ * is a point the header has to print. Measured on this cut, [20,60] puts the
+ * median velocity at 37 points a second and [6,16] at 12. Nothing else here is
+ * worth a third of that.
+ */
+export const REACH: [number, number] = [6, 16];
+
+/**
+ * THE QUOTE ARRIVES IN BURSTS, WHICH IS THE WHOLE POINT.
+ *
+ * Rounding the price to a tick fixed the odometer, and then correct candle
+ * formation undid most of it: a bar that really visits its high and its low
+ * covers two to three times the ground, and at 60fps a $0.50 tick only starts
+ * filtering below 30 points a second. Above that the price crosses several
+ * ticks between frames and the number changes on every one of them — measured
+ * at 27 prints a second with 17ms between them, which is not a market, it is a
+ * constant crawl.
+ *
+ * And CONSTANT is the word that matters. Real quotes sit still and then jump;
+ * they do not move quickly at an even rate. Slowing everything down uniformly
+ * gives a slower even rate, which is the same problem quieter.
+ *
+ * So the time inside each leg of a bar's path is warped — see `tape` on
+ * <Chart>. At 0.9 the price runs between a tenth and nearly twice its average
+ * speed, three times per leg. Measured with CANDLE_MS and REACH together: the
+ * median velocity falls from 37 points a second to 8, and the quiet between
+ * prints goes from 33ms to 100 at the ninetieth percentile. Clusters and
+ * pauses, rather than an even churn.
+ */
+export const TAPE = 0.9;
 
 /* ---- the position that is already on ---------------------------------- */
 
@@ -307,17 +343,48 @@ export const money = (v: number) =>
  * button's label mean something and because a reader driving the screen by
  * hand can still walk into them.
  */
-export const tpBad = (s: BD) =>
+const tpWrong = (s: BD) =>
   s.prot && s.tp !== '' && (s.side === 'long' ? Number(s.tp) <= MARK : Number(s.tp) >= MARK);
-export const slBad = (s: BD) =>
+const slWrong = (s: BD) =>
   s.prot && s.sl !== '' && (s.side === 'long' ? Number(s.sl) >= MARK : Number(s.sl) <= MARK);
+
+/**
+ * WHAT THE FIELD IS ALLOWED TO SAY ABOUT ITSELF — which is nothing, while the
+ * caret is still in it.
+ *
+ * Typing 79867 goes 7 → 79 → 798 → 7986 → 79867, and the first four of those
+ * are below the entry price. So the field turned red on the first keystroke and
+ * stayed red for four of the five, with the button reading "Review take profit"
+ * throughout: 525ms of the screen accusing a reader of a mistake they were
+ * halfway through not making. The stop loss never showed it, because it is
+ * below the entry from its first digit — the coincidence that kept this hidden.
+ *
+ * `7` is not a take profit below the entry. It is an unfinished number, and a
+ * form that judges one is wrong in the real app too. Same rule, checked once
+ * the reader has finished saying what they mean.
+ */
+export const tpBad = (s: BD) => tpWrong(s) && s.focus !== 'tp';
+export const slBad = (s: BD) => slWrong(s) && s.focus !== 'sl';
 
 /** what the primary button says, which is how the ticket reports itself */
 export function cta(s: BD): { label: string; ok: boolean } {
   if (tpBad(s)) return { label: 'Review take profit', ok: false };
   if (slBad(s)) return { label: 'Review stop loss', ok: false };
   if (!(Number(s.amount) > 0)) return { label: 'Enter amount', ok: false };
-  return { label: s.side === 'long' ? 'Open long' : 'Open short', ok: true };
+  /**
+   * WRONG BUT STILL BEING TYPED: grey, and silent.
+   *
+   * Gating the field's red on focus opens a hole unless the button closes it —
+   * a reader could type `7` and press Open long, and the machine would hand
+   * them a position whose take profit is below its own entry. So the CTA reads
+   * the UNGATED rule for whether it FIRES and the gated one for whether it
+   * ACCUSES. Mid-keystroke a reader sees an ordinary disabled button, which is
+   * what an unfinished form should look like.
+   */
+  return {
+    label: s.side === 'long' ? 'Open long' : 'Open short',
+    ok: !tpWrong(s) && !slWrong(s),
+  };
 }
 
 /* ---- the transitions -------------------------------------------------- */
@@ -327,7 +394,7 @@ export type BDAction =
   | 'focus' | 'key' | 'done'
   | 'levSheet' | 'levSet' | 'levSave'
   | 'prot'
-  | 'submit' | 'ostep'
+  | 'submit' | 'ostep' | 'land'
   | 'tab' | 'posOpen';
 
 const digits = (cur: string, d: string) => {
@@ -391,10 +458,27 @@ export const actions: Record<BDAction, Act<BD>> = {
     s.ticket && cta(s).ok
       ? { submitting: true, ostep: 0, over: 'none', focus: null, tap: 'submit' }
       : null,
+  /**
+   * THE CHECKLIST TICKS, AND STOPS WHEN THERE IS NOTHING LEFT TO TICK.
+   *
+   * It used to run to `length - 1` and then land the order in the same call —
+   * so at ostep 2 the third row was ACTIVE, spinning, and the very next
+   * transition closed the sheet out from under it. The third row never once
+   * showed its check. A viewer watched two settle and the third vanish.
+   *
+   * It now runs one further. At `ORDER_STEPS.length` every row is `i < at`,
+   * which is the done state, and the sheet is still up. Landing the order is
+   * `land` — a separate transition, because "the order is confirmed" and "the
+   * ticket is gone" are two moments and the whole point is to see the first.
+   * `demo/perps/state.ts` splits `receipt` from `settle` for the same reason.
+   */
   ostep: (s) => {
     if (!s.submitting) return null;
-    if (s.ostep < ORDER_STEPS.length - 1) return { ostep: s.ostep + 1 };
-    /* the order lands: the ticket empties, the position joins the book */
+    return s.ostep < ORDER_STEPS.length ? { ostep: s.ostep + 1 } : null;
+  },
+  /** the order lands: the ticket empties, the position joins the book */
+  land: (s) => {
+    if (!s.submitting || s.ostep < ORDER_STEPS.length) return null;
     return {
       submitting: false,
       ostep: -1,

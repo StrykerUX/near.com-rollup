@@ -262,19 +262,20 @@ for (const [name, m] of Object.entries(machines)) {
    visible to a type checker, and every future edit to a beat changes it by
    exactly as much as nobody notices.
 
-   It was 10,000 and could not be read: at that tempo a sheet was being pressed
-   115ms after it finished arriving, so nothing on screen ever came to rest.
-   Scene 2 is the same sequence at 1.5x — the shape kept, the tempo changed —
-   and three other dials moved with it, or the script would only have been
-   waiting longer between the same fast animations: the CSS tempo, the chart's
-   `candleMs`, and every `Count` that travels.
+   It has grown twice, and both times because it could not be read. 10,000 put
+   a press 115ms after the sheet it opened had finished arriving, so nothing on
+   screen ever came to rest; 13,125 fixed the sheets and left the FIELDS with
+   the same problem — a value landing and being built on in the same breath. So
+   scene 2 now carries four silent beats, one after each value it sets, and its
+   keystrokes are 160ms apart rather than 105. The other 800 is the third row of
+   the order checklist finally being allowed to finish before the sheet closes.
 
    Enforced with a tolerance of one frame at 60Hz. Anything looser and the
    guard is decorative; anything tighter and rounding a beat to a round number
    would fail the build.
    ========================================================================== */
 {
-  const LIMIT = 13125;
+  const LIMIT = 17325;
   const TOL = 17;
   const PACE = Number(
     readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],

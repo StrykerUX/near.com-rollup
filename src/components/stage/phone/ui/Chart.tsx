@@ -122,18 +122,28 @@ type Bar = Candle & { tHi: number; tLo: number };
  * from the same seeded generator as the bar itself, so the chart is still
  * identical on every machine and every loop.
  */
-function forming(b: Bar, u: number): Candle {
+function surge(x: number, a: number) {
+  /* monotone by construction while a < 1: the derivative is 1 − a·cos(2πkx),
+     which stays positive. Both ends are fixed — sin(2πk) is zero for whole k —
+     so warping the time inside a leg cannot move the prices at either end of
+     it, and cannot move the bar's high or its low. */
+  if (a <= 0) return x;
+  const w = 2 * Math.PI * TAPE_SURGES;
+  return x - (a / w) * Math.sin(w * x);
+}
+
+function forming(b: Bar, u: number, tape: number): Candle {
   if (u >= 1) return { o: b.o, h: b.h, l: b.l, c: b.c };
   const pts: [number, number][] = [[0, b.o], [b.tHi, b.h], [b.tLo, b.l], [1, b.c]];
   pts.sort((x, y) => x[0] - y[0]);
 
-  /* where the price is now */
+  /* where the price is now, along a leg it does not cover evenly — see `tape` */
   let px = b.o;
   for (let i = 1; i < pts.length; i++) {
     const [t0, p0] = pts[i - 1];
     const [t1, p1] = pts[i];
     if (u <= t1) {
-      px = p0 + (p1 - p0) * ((u - t0) / (t1 - t0));
+      px = p0 + (p1 - p0) * surge((u - t0) / (t1 - t0), tape);
       break;
     }
   }
@@ -212,6 +222,10 @@ const DOWN = '#E5484D';
 /** the ink a chip prints in, dark enough to sit on either side's fill */
 const UP_INK = '#04140E';
 const DOWN_INK = '#1E0507';
+/** the default wick reach, in points past the body: what twelve of the thirteen use */
+const REACH: [number, number] = [20, 60];
+/** how many times the price surges and rests inside one leg of a bar's path */
+const TAPE_SURGES = 3;
 /**
  * How much of the right edge belongs to the price axis. It was a bare 54,
  * tuned by eye against 9px labels; at 14px "$80,200" is wider than that and
@@ -392,6 +406,44 @@ export type ChartProps = {
   up?: string;
   down?: string;
   /**
+   * HOW FAR A WICK CAN REACH past the body, as [min, max] in points.
+   *
+   * The dominant dial on how fast the quote moves, and it took a measurement to
+   * see why: a bar's wicks do not only make it taller, they are where the price
+   * GOES. Correct candle formation walks open → high → low → close, so the
+   * reach is travelled two or three times per bar, and every point of it is
+   * points the header has to print.
+   *
+   * Measured on this cut: [20,60] puts the median velocity at 37 points a
+   * second, [6,16] at 12. Nothing else here comes close to a 3x.
+   */
+  reach?: [number, number];
+  /**
+   * HOW UNEVENLY THE PRICE COVERS ITS PATH. 0 is off, and off is what every
+   * other flow has always had.
+   *
+   * A quote at a constant velocity is the thing that reads as a machine, and
+   * quantising it does not help: at 60fps a $0.50 tick only starts filtering
+   * below 30 points a second, and a straight line between two turning points
+   * sits above that for hundreds of milliseconds at a time. Slowing it down
+   * uniformly just gives a slower constant crawl.
+   *
+   * So the time inside each leg is warped: `w(x) = x − (a/2πk)·sin(2πkx)`,
+   * whose derivative `1 − a·cos(2πkx)` swings between 1−a and 1+a. The price
+   * accelerates and very nearly stops, k times per leg, which is what a tape
+   * does — clusters of prints separated by quiet, rather than an even churn.
+   *
+   * IT IS MONOTONE, and that is the property that makes it safe: `forming()`
+   * derives the high and the low from the waypoints already passed, so any
+   * strictly increasing reparametrisation of time leaves them untouched. The
+   * wicks still only grow. `a` must stay below 1 or the price would run
+   * backwards and a high would have to be un-drawn.
+   *
+   * `w(0) = 0` and `w(1) = 1` for whole k, so every leg still starts and ends
+   * exactly where the bar says it does.
+   */
+  tape?: number;
+  /**
    * HOW LONG A CANDLE TAKES TO FORM, in milliseconds.
    *
    * The module constant is 1,500 and it is load-bearing for every flow that
@@ -412,16 +464,17 @@ export type ChartProps = {
 export function Chart({
   entry = null, side = null, live = true, paused = false, tp = null, sl = null,
   toward = null, readout, base = BASE_PRICE, roll = false, phase = 0, face = LABEL_FACE,
-  tick = 0, up = UP, down = DOWN, candleMs = CANDLE_MS,
+  tick = 0, up = UP, down = DOWN, candleMs = CANDLE_MS, reach = REACH, tape = 0,
 }: ChartProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   /* The draw loop reads these every frame but must not re-subscribe when they
      change — mirroring them into a ref from an effect keeps the rAF stable and
      the render pure. */
-  const props = useRef({ entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs });
+  const props = useRef({ entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs, reach, tape });
   useEffect(() => {
-    props.current = { entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs };
-  }, [entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs]);
+    props.current = { entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs, reach, tape };
+  }, [entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down,
+      candleMs, reach, tape]);
 
   useEffect(() => {
     const cv = ref.current;
@@ -579,7 +632,8 @@ export function Chart({
         const r = rng(k * 2654435761);
         const o = priceAt(k);
         const c = priceAt(k + 1);
-        const reach = 20 + r() * 40;
+        const [rMin, rMax] = props.current.reach;
+        const reach = rMin + r() * (rMax - rMin);
         const h = Math.max(o, c) + r() * reach;
         const l = Math.min(o, c) - r() * reach;
         /* WHEN the bar goes where it goes. Two windows that cannot overlap, so
@@ -599,7 +653,7 @@ export function Chart({
       const view: Candle[] = [];
       for (let i = 0; i < CANDLES; i++) {
         const src = bar(i + shift);
-        view.push(i === CANDLES - 1 ? forming(src, phase) : src);
+        view.push(i === CANDLES - 1 ? forming(src, phase, props.current.tape) : src);
       }
 
       const last = view[view.length - 1].c;

@@ -131,7 +131,7 @@ beside it. `/demo` indexes them.
 | `/demo/perps-v2` | the same, cut | 16 | The trade alone: $5,000 of margin into a $100,000 position, and back to the card |
 | `/demo/perps-v3` | the same, quieter | 9 | Half the screen, no pointer: the control lights itself and the figures travel |
 | `/demo/perps-v4` | the marketing cut | 8 | One line of copy at a time, and everything but the moment darkened |
-| `/demo/perps-v5` | thirteen seconds | 2 | A position already working, and a second one opened beside it — its own device, rebuilt against the app |
+| `/demo/perps-v5` | seventeen seconds | 2 | A position already working, and a second one opened beside it — its own device, rebuilt against the app |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
 | `/demo/earn` | 48s | 17 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
@@ -526,7 +526,7 @@ end. It found all of these before a browser could.
 
 `/demo/perps-v5` is commissioned to a length, checked by `pnpm check:flows`. The
 deck plays every beat at `PACE` (1.25), so the budget is **10,500ms of authored
-beats, outro included → 13,125ms on screen**, and the assertion exists because
+beats, outro included → 17,325ms on screen**, and the assertion exists because
 the length is not a number anywhere in the source — it is a sum of twenty-seven
 beats, and every future edit to one moves it by exactly as much as nobody
 notices.
@@ -548,10 +548,12 @@ already documents for demo-mode PACE:
 
 | dial | was | is |
 |---|---|---|
-| scene 2's beats | 5,000ms | 7,500ms |
+| scene 2's beats | 5,000ms | 10,860ms |
 | `--dur` / `--dur-slow` | 150 / 260 | 225 / 390 |
-| the chart's `candleMs` | 1,500 | 2,000 |
+| the chart's `candleMs` | 1,500 | 5,000 |
 | every `Count` that travels | 200–640 | 300–960 |
+| keystrokes | 105ms | 160ms |
+| rests after a value lands | none | 4 × 500ms |
 
 `candleMs` buys something the others do not: a slower candle covers the same
 ground in more time, so a quoted market crosses fewer ticks per second and
@@ -731,6 +733,78 @@ file is scoped to `.pdev.btc` and owns its whole namespace. It is **"is this
 class used at two JSX sites that are two different objects"**, which finds them
 in one pass over `Phone.tsx`. Worth running before adding a class here; a
 device this dense reuses names by accident.
+
+### The quote, and three fixes that each undid the last
+
+This number was worked on three times, and the sequence is the useful part.
+
+**One · it was an odometer.** 49 prints a second, 20ms apart, every one the same
+increment — because the live candle's close travelled linearly from open to
+close. Rounding the quote to the app's own $0.50 tick and reprinting only on a
+crossing took it to 15 prints/s at 67ms.
+
+**Two · fixing the candles undid it.** Once bars formed properly they *visit*
+their high and their low instead of lerping to the close, which is two to three
+times the ground covered per bar. Back to 27 prints/s at 17ms — and worse than
+the raw number suggests, because the price was now crossing 2–3 ticks *between
+frames*. **At 60fps a $0.50 tick only filters below 30 points a second**, and
+the median velocity was 37. Above that ceiling the quantisation does nothing at
+all. The correct candle shape had been bought with a worse quote.
+
+**Three · the missing word was *constant*.** Real quotes sit still and then
+jump; they do not move quickly at an even rate. Slowing everything uniformly
+gives a slower even rate — the same problem, quieter. Three dials, measured
+separately, on a median velocity of 37 points/s:
+
+| | median velocity | quiet at p90 |
+|---|---|---|
+| `reach` [20,60] → [6,16] | **12** | 67ms |
+| `candleMs` 2,000 → 5,000 | 26 | 33ms |
+| `tape` 0 → 0.9 | 26 *(p90 velocity 105)* | 33ms |
+| all three | **8** | **100ms** |
+
+`reach` is the strongest and it is not obvious why: a wick is not decoration,
+it is where the price *goes*, and a bar walks that distance two or three times.
+`tape` is the one that answers the actual complaint — it warps time inside each
+leg of a bar's path, `w(x) = x − (a/2πk)·sin(2πkx)`, whose derivative swings
+between 1−a and 1+a, so the price surges and very nearly stops three times per
+leg. It is **monotone**, which is what makes it safe: `forming()` derives the
+high and low from waypoints already passed, so any strictly increasing
+reparametrisation of time leaves them untouched and the wicks still only grow.
+
+Measured after: **18 prints/s, 43ms mean hold, quiet reaching 317ms** — and the
+price moves half a dollar at a time again rather than a point and a half,
+because it is back under the ceiling where the tick can do its job.
+
+### `7` is not a take profit below the entry price
+
+Typing 79867 goes `7 → 79 → 798 → 7986 → 79867`, and the first four are below
+the entry. So the field turned red on the first keystroke and stayed red for
+four of the five, with the button reading "Review take profit" — **525ms of the
+screen accusing a reader of a mistake they were halfway through not making.**
+The stop loss never showed it, because it is below the entry from its first
+digit, and that coincidence is what kept it hidden.
+
+The rule is no longer evaluated on the field that has the caret in it. Same
+rule, checked once the reader has finished saying what they mean — which is
+right in the real app too, not a demo concession. The button closes the hole
+that opens: it reads the *ungated* rule for whether it fires and the gated one
+for whether it accuses, so a half-typed value gets an ordinary disabled button
+and never a red one. Measured across a full loop: **zero frames in error**, and
+the only labels the button shows are "Enter amount" and "Open long".
+
+### The third row of the checklist never finished
+
+`ostep` ran to `ORDER_STEPS.length - 1` and landed the order in the same call,
+so at ostep 2 the third row was *active* — spinning — and the next transition
+closed the sheet out from under it. Two rows settled and the third vanished.
+
+It now runs one step further, to `length`, where every row is done and the
+sheet is still up; `land` is a separate transition that closes it 800ms later.
+"The order is confirmed" and "the ticket is gone" are two moments and the point
+was always to see the first. `demo/perps/state.ts` splits `receipt` from
+`settle` for exactly this reason. Measured: **all three rows read as done for
+about a second** before the sheet goes.
 
 ### The palette, and why it lives in TypeScript
 

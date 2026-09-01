@@ -1,6 +1,7 @@
 import { buildFlow, typing, type Chapter, type Step } from '@/components/demo/shell/flow';
 import {
-  NEW_LEV, NEW_MARGIN, STOP_LOSS, TAKE_PROFIT, actions, initial, type BD, type BDAction,
+  NEW_LEV, NEW_MARGIN, ORDER_STEPS, STOP_LOSS, TAKE_PROFIT, actions, initial,
+  type BD, type BDAction,
 } from './state';
 
 /**
@@ -116,10 +117,16 @@ const STEPS: Step<BD, BDAction>[] = [
       /* the sheet */
       { ms: 630, do: 'openTicket', arg: 'long' },
 
-      /* the size. Four digits at 120ms reads as typed rather than pasted; at
-         the 80 this ran at first they arrived closer together than a thumb
-         can move, which reads as pasted no matter how many of them there are. */
-      ...type_('key', NEW_MARGIN, 420, 120),
+      /* THE SIZE. 160ms a digit, which is a thumb. It ran at 80 and then at
+         120, and both were quicker than a hand can actually move — a run of
+         digits that arrives faster than anyone could type it reads as pasted
+         however many of them there are. */
+      ...type_('key', NEW_MARGIN, 420, 160),
+      /* AND THEN NOTHING, ON PURPOSE. Half a second of a finished field before
+         anything touches the screen again. Every rest in this scene is here for
+         the same reason: a value that lands and is immediately built on has not
+         been seen to land — the eye uses the pause to decide something ended. */
+      { ms: 500 },
 
       /* the leverage. Two stops rather than a sweep: the slider is not the
          feature, the figure answering it is, and `Count` needs a value change
@@ -127,20 +134,29 @@ const STEPS: Step<BD, BDAction>[] = [
       { ms: 450, do: 'levSheet' },
       { ms: 150, do: 'levSet', arg: '14' },
       { ms: 210, do: 'levSet', arg: String(NEW_LEV) },
+      /* the rest lands on 20x and on the position value that travelled to meet
+         it — the one figure the whole leverage sheet exists to show */
+      { ms: 500 },
       { ms: 510, do: 'levSave' },
 
       /* both exits. One checkbox opens the pair already in dollars — see
          `prot` in state.ts for why the ⇄ is not in this cut. */
       { ms: 450, do: 'prot' },
-      ...type_('key', TAKE_PROFIT, 330, 105),
+      ...type_('key', TAKE_PROFIT, 330, 160),
+      { ms: 500 },
       { ms: 195, do: 'focus', arg: 'sl' },
-      ...type_('key', STOP_LOSS, 255, 105),
+      ...type_('key', STOP_LOSS, 255, 160),
+      { ms: 500 },
 
-      /* signing, as a checklist and nothing else */
+      /* SIGNING, AS A CHECKLIST — and the third row now gets to finish.
+         `ostep` runs one step past the last row so all three read as done, and
+         `land` is what closes the sheet, 800ms later. Before this the third row
+         was still spinning when the ticket vanished. */
       { ms: 420, do: 'submit' },
       { ms: 225, do: 'ostep' },
       { ms: 225, do: 'ostep' },
       { ms: 285, do: 'ostep' },
+      { ms: 800, do: 'land' },
 
       /* THE HOLD, AND IT IS THE POINT OF THE CUT.
          The ticket closes, the tab row counts up and a second card arrives
@@ -167,9 +183,19 @@ export const perpsV5Flow = buildFlow<BD, BDAction>({
     levSave: 'open',
     prot: 'open',
     submit: 'open',
+    land: 'open',
   },
   /* No `target`. Nothing in this cut travels to a control or lights one — see
      the note about the camera above; the same argument retires the hand and
      the spotlight, and a map nothing reads is a map that will rot. */
-  auto: (s) => (s.submitting ? { after: 320, do: 'ostep' } : null),
+  /* a checklist is not waiting for anyone: while a reader holds the wheel it
+     ticks on its own, through the same transitions the beats fire — and it has
+     to know to stop ticking and land, or `check:flows` catches an `auto` firing
+     into a refusal */
+  auto: (s) => {
+    if (!s.submitting) return null;
+    return s.ostep < ORDER_STEPS.length
+      ? { after: 320, do: 'ostep' }
+      : { after: 800, do: 'land' };
+  },
 });

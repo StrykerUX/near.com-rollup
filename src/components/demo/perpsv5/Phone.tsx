@@ -12,7 +12,7 @@ import { Layer } from '@/components/demo/shell/Frame';
 import { PALETTE, PALETTE_VARS } from './palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
-  CANDLE_MS, MARK, PHASE, TICK, ORDERS_0, ORDER_STEPS, TRADES_0, avail, btcSize, cta, liqPct, liqPrice, money,
+  CANDLE_MS, MARK, PHASE, REACH, TAPE, TICK, ORDERS_0, ORDER_STEPS, TRADES_0, avail, btcSize, cta, liqPct, liqPrice, money,
   notional, pnl, pnlPct, slBad, tpBad, type BD, type BDAction, type Position,
 } from './state';
 
@@ -258,6 +258,8 @@ function Market({ d }: { d: Deck }) {
           phase={PHASE}
           tick={TICK}
           candleMs={CANDLE_MS}
+          reach={REACH}
+          tape={TAPE}
           up={PALETTE.up}
           down={PALETTE.down}
           face={AXIS_FACE}
