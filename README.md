@@ -130,7 +130,7 @@ beside it. `/demo` indexes them.
 | `/demo/perps` | 5m 41s | 24 | Fund with a passkey, build a ticket, hit both validation rules, open a position |
 | `/demo/perps-v2` | the same, cut | 16 | The trade alone: $5,000 of margin into a $100,000 position, and back to the card |
 | `/demo/perps-v3` | the same, quieter | 9 | Half the screen, no pointer: the control lights itself and the figures travel |
-| `/demo/perps-v4` | the marketing cut | 8 | One line of copy at a time, and a camera that pushes in on the moment |
+| `/demo/perps-v4` | the marketing cut | 8 | One line of copy at a time, and everything but the moment darkened |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
 | `/demo/earn` | 48s | 17 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
@@ -363,31 +363,49 @@ map every time:
 |---|---|
 | `Hand` (v2) | a pointer that travels there before the beat presses it |
 | `Spotlight` (v3) | a ring that lights on it where it already is |
-| `Camera` (v4) | a frame that pushes in and centres on it |
+| `Focus` (v4) | a cutout that darkens everything except it |
 
 v4 is the cut you would put in front of a room. The phone is the only object on
-the page, the copy is one line at a time beside it, and the camera moves. Steps
-declare their own framing (`shot`) and, when a figure is the point, what to hang
-on it (`callout`). Every beat is longer than anywhere else: a push in, a hold
-and a pull back is three seconds of screen time on its own, and a cut that lands
-before the eye has arrived is a cut nobody saw.
+the page, the copy is one line at a time beside it, and everything on screen
+except the thing being talked about is darkened. Steps declare what they are
+about (`shot`) and, when a figure is the point, what to hang on it (`callout`).
+Every beat is longer than anywhere else: a move, a hold and a release is three
+seconds of screen time on its own, and a cut that lands before the eye has
+arrived is a cut nobody saw.
 
 It borrows v3's device wholesale, because what v4 adds is not inside the phone.
-It is where the phone is looked at from.
+It is how the phone is looked at.
 
-Two things the camera taught us, both of which read as bugs before they were
-understood:
+### The camera that did not survive
 
-- **The frame and the camera have to be two elements.** `overflow: hidden`
-  clips a box's children against that box — but if the box is itself scaled, so
-  is the clip. Putting both on one element meant a 1.45x push-in GREW the phone
-  instead of looking into it: the vignette spilled a hundred pixels past the
-  bezel and took the rounded corners with it.
-- **Never crop the thing you are framing.** A declared zoom is a wish. The
-  leverage shot asked for 1.45 on a row that spans the whole device and cut off
-  the figure it existed to show, so the camera now clamps to the most it can
-  grant before the target's own ends leave the frame — and the shot was
-  retargeted from the row to the figure inside it.
+v4's first build scaled the device: `Camera` transformed the whole phone so it
+pushed in on whatever the step was about, up to 1.5x. It was rejected, and the
+reason is worth keeping.
+
+**Scale is a poor way to say "look here" when the thing being looked at is a
+phone.** The screen grew, the bezel stopped reading as a bezel, and half of
+every move was spent re-finding where you were. It read as a magnifier, not as
+attention.
+
+`Focus` does the same job with contrast instead. One box sits over the control,
+casting a shadow deliberately larger than the screen; the frame clips it at the
+bezel. The control is not lit — everything else is darkened, which is the same
+emphasis and none of the disorientation. Nothing scales, nothing moves except
+the cutout travelling between controls, and that trip is the only motion left in
+the shot.
+
+Two things the camera taught us before it went, and both survive in the
+replacement:
+
+- **The frame has to be a separate element from anything transformed.**
+  `overflow: hidden` clips a box's children against that box — but if the box
+  is itself scaled, so is the clip. With both on one element, a 1.45x push-in
+  GREW the phone instead of looking into it: the dim spilled a hundred pixels
+  past the bezel and took the rounded corners with it.
+- **A rect measured mid-slide is a rect of somewhere the control was leaving.**
+  A sheet takes half a second to arrive and a closed one is laid out below the
+  phone entirely, so the focus refuses any rect that is not on screen and keeps
+  the last good one until the sheet lands.
 
 ### What the headless walk caught
 

@@ -61,13 +61,8 @@
 
 .v4phone { position: relative; width: 352px; height: 766px }
 
-/* THE FRAME AND THE CAMERA ARE TWO ELEMENTS, AND THEY HAVE TO BE.
-   `overflow: hidden` clips a box's children against that box — but if the box
-   is itself scaled, so is the clip. Putting both on one element meant a 1.45x
-   push-in grew the phone instead of looking into it: the dark of the vignette
-   spilled a hundred pixels past the bezel and took the rounded corners with
-   it. The frame holds the shape and does the clipping; the camera moves
-   underneath it. */
+/* THE FRAME. It clips, because the cutout below casts a shadow deliberately
+   larger than the screen and that shadow has to stop at the bezel. */
 .v4frame {
   position: absolute; inset: 0; border-radius: 42px; overflow: hidden;
   box-shadow:
@@ -75,28 +70,41 @@
     0 0 0 1px rgba(255, 255, 255, .07),
     0 0 90px -30px rgba(0, 236, 151, .25);
 }
-.pdcam {
-  position: absolute; inset: 0;
-  transform: translate(var(--camx, 0), var(--camy, 0)) scale(var(--camz, 1));
-  transform-origin: 0 0;
-  /* a long, heavily damped move: a camera that snaps is a cut */
-  transition: transform 1100ms cubic-bezier(.22, 1, .28, 1);
-}
-.dcamroot { display: none }
-/* the device fills its frame; the camera moves the frame's contents, not it */
-.pdcam .pdev { transform: none; width: 352px; height: 766px }
+.v4frame .pdev { transform: none; width: 352px; height: 766px }
 
-/* THE VIGNETTE ONLY EXISTS WHEN THE CAMERA IS IN. Wide, everything is the
-   subject; close, everything but one control is context, and dimming it is
-   what makes the push-in read as attention rather than as magnification. */
-.v4vig {
-  position: absolute; inset: 0; pointer-events: none; z-index: 30; opacity: 0;
-  transition: opacity 700ms var(--ease-out);
-  background: radial-gradient(
-    circle at var(--focusx, 50%) var(--focusy, 50%),
-    rgba(2, 4, 8, 0) 0, rgba(2, 4, 8, 0) 110px, rgba(2, 4, 8, .62) 280px);
+/* THE FOCUS.
+   One box over the control the step is about, casting a shadow big enough to
+   cover everything else. The control is not lit — the rest is darkened, which
+   is the same contrast and none of the disorientation a zoom brings with it.
+
+   This replaced a camera that scaled the whole device. Scale is a poor way to
+   say "look here" when the thing being looked at is a phone: the screen grew,
+   the bezel stopped reading as a bezel, and half of every move was spent
+   re-finding where you were.
+
+   Only `opacity` and the four position properties transition. The box travels
+   between controls, and that trip is the only motion left in the shot — which
+   is the point: the eye follows one thing, and it is the frame of attention
+   rather than the screen. */
+.v4focus {
+  position: absolute; pointer-events: none; z-index: 30;
+  left: var(--fx, 0); top: var(--fy, 0);
+  width: var(--fw, 0); height: var(--fh, 0);
+  border-radius: var(--fr, 14px);
+  opacity: var(--fo, 0);
+  box-shadow:
+    /* the edge, so the cutout has a shape rather than just an absence */
+    inset 0 0 0 1px rgba(0, 236, 151, .32),
+    0 0 26px -2px rgba(0, 236, 151, .22),
+    /* and the dark, wider than the screen it is clipped against */
+    0 0 0 9999px rgba(3, 6, 11, .70);
+  transition:
+    left 640ms cubic-bezier(.22, 1, .3, 1),
+    top 640ms cubic-bezier(.22, 1, .3, 1),
+    width 640ms cubic-bezier(.22, 1, .3, 1),
+    height 640ms cubic-bezier(.22, 1, .3, 1),
+    opacity 520ms var(--ease-out);
 }
-.pdcam.near .v4vig { opacity: 1 }
 
 /* The annotation hangs off the phone rather than sitting on it, because the
    thing it names is inside and the label is the page talking. It goes on the
@@ -185,7 +193,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pdcam { transition: none }
+  .v4focus { transition: none }
   .v4glow { animation: none }
   .v4copy h1, .v4copy p, .v4callout { animation: none }
 }

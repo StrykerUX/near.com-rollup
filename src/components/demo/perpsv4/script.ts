@@ -34,14 +34,13 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'market', ch: 'market',
     title: 'A price, and two decisions',
     note: 'Perpetuals on the same account that holds everything else. No separate app, no bridge, no deposit to wait for.',
-    shot: { z: 1 },
-    beats: [{ ms: 3000 }],
+        beats: [{ ms: 3000 }],
   },
   {
     id: 'long', ch: 'market',
     title: 'Pick a side',
     note: 'Long or short. The same ticket, with the sign reversed.',
-    shot: { on: 'side:long', z: 1.45 },
+    shot: { on: 'side:long' },
     beats: [{ ms: 3200, do: 'openTicket', arg: 'long' }],
   },
 
@@ -49,14 +48,16 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'size', ch: 'size',
     title: '$5,000 of margin',
     note: 'The number you type is the number you can lose. Everything else on this screen is derived from it.',
-    shot: { on: 'field', z: 1.45 },
+    shot: { on: 'field' },
     beats: [...type_('key', '5000', 2200, 380), { ms: 1800, do: 'done' }],
   },
   {
     id: 'lev', ch: 'size',
     title: 'Twenty times the position',
     note: 'The same $5,000 at risk, controlling a hundred thousand dollars of Bitcoin. The figure travels so you can watch it happen.',
-    shot: { on: '.dlevfig', z: 1.5 },
+    /* the row, not the figure inside it: with nothing scaling, a cutout can
+       hold the label and its number together and still be the only lit thing */
+    shot: { on: '.dlevnot' },
     callout: '$5,000 → $100,000',
     beats: [
       { ms: 2600, do: 'levSheet' },
@@ -71,14 +72,14 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'prot', ch: 'protect',
     title: 'Both exits, before you are in',
     note: 'One checkbox opens the pair. Where to leave when it works, and where to leave when it does not.',
-    shot: { on: 'prot', z: 1.4 },
+    shot: { on: 'prot' },
     beats: [{ ms: 3000, do: 'prot' }, { ms: 1600, do: 'unit', arg: 'tp' }],
   },
   {
     id: 'rule', ch: 'protect',
     title: 'The ticket refuses what the market would',
     note: 'A take profit below the entry is an instruction to close at a loss. The button names the field instead of just going grey.',
-    shot: { on: 'field', z: 1.45 },
+    shot: { on: 'field' },
     callout: 'Refused',
     beats: [
       { ms: 2200, do: 'key', arg: '2' },
@@ -94,7 +95,7 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'sign', ch: 'sign',
     title: 'One signature for all of it',
     note: 'The leverage, the order and both exits go as a single signed intent. No password, no seed phrase.',
-    shot: { on: '.dface', z: 1.35 },
+    shot: { on: 'passkey' },
     beats: [
       { ms: 2800, do: 'submit' },
       { ms: 2000, do: 'ostep' },
@@ -109,8 +110,7 @@ const STEPS: Step<PD, PDAction>[] = [
     id: 'open', ch: 'live',
     title: 'In, and priced',
     note: 'The entry draws itself on the chart. $100,000 of Bitcoin, $5,000 of margin, and the price at which it closes itself.',
-    shot: { z: 1 },
-    callout: 'Long 20x · $100,000',
+        callout: 'Long 20x · $100,000',
     beats: [{ ms: 3000 }, { ms: 3000, do: 'posOpen' }],
   },
 ];

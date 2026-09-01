@@ -20,13 +20,17 @@ import { applyBeat, type Beat, type Machine } from '@/components/stage/phone/flo
 export type Chapter = { id: string; name: string; blurb: string };
 
 /**
- * WHERE THE CAMERA STANDS FOR A STEP.
+ * WHAT A STEP IS ABOUT, ON SCREEN.
  *
  * Only the marketing cut reads this. `on` is the `data-tap` of a control or any
- * selector inside the device; `z` is how far in. Absent means the wide shot,
- * which is also what a step gets when the thing it names is not on screen yet.
+ * selector inside the device; everything else is darkened around it. Absent
+ * means the whole screen is the subject, which is also what a step gets when
+ * the thing it names is not on screen yet.
+ *
+ * It used to carry a `z` as well, and the device was scaled to it. Scale is a
+ * poor way to say "look here" when the thing being looked at is a phone.
  */
-export type Shot = { on?: string; z?: number };
+export type Shot = { on?: string };
 
 export type Step<S, A extends string> = {
   id: string;

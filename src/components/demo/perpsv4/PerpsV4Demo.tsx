@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useDeck } from '@/components/demo/shell/deck';
-import { Camera } from '@/components/demo/shell/Camera';
+import { Focus } from '@/components/demo/shell/Focus';
 import { Phone } from '@/components/demo/perpsv3/Phone';
 import { perpsV4Flow } from './script';
 
@@ -33,16 +33,11 @@ export function PerpsV4Demo() {
 
       <div className="v4stage">
         <div className="v4phone">
-          {/* THE FRAME CLIPS, THE CAMERA MOVES. They have to be two elements:
-              `overflow: hidden` on the transformed one would scale the clip
-              along with the content, and a 1.45x push-in would grow the phone
-              rather than look into it. */}
+          {/* The frame clips, so the cutout's shadow — which is bigger than
+              the screen on purpose — stops at the bezel. */}
           <div className="v4frame">
-            <div className="pdcam">
-              <Phone d={deck} />
-              <Camera shot={step.shot} on={!deck.held} />
-              <span className="v4vig" aria-hidden="true" />
-            </div>
+            <Phone d={deck} />
+            <Focus shot={step.shot} on={!deck.held} />
           </div>
           {/* outside the frame, or the frame would clip the annotation too */}
           {step.callout ? (
