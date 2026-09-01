@@ -282,7 +282,7 @@ export type ChartProps = {
    * THE SIZE OF A PRINT. Off by default; every existing flow quotes the raw
    * price at one decimal, sixty times a second.
    *
-   * That default was measured on the ten-second cut and it is an ODOMETER, not
+   * That default was measured on `/demo/perps-v5` and it is an ODOMETER, not
    * a quote. The header repainted 49 times a second, holding each value for
    * 20ms, and — because the live candle's close travels LINEARLY from the
    * previous close to its own — every one of those repaints was the same
@@ -326,21 +326,37 @@ export type ChartProps = {
    */
   up?: string;
   down?: string;
+  /**
+   * HOW LONG A CANDLE TAKES TO FORM, in milliseconds.
+   *
+   * The module constant is 1,500 and it is load-bearing for every flow that
+   * runs a scripted climb: `check:flows` multiplies it by `RAMP.length` to
+   * assert that the take profit fills on the frame the market reaches it, and
+   * it reads that number out of this file. Changing the constant would move
+   * two other routes' timing; passing a different one moves only the caller.
+   *
+   * Slower is calmer for two reasons and the second is not obvious. The live
+   * candle forms over a longer window, so its body grows more gently — and
+   * because the price crosses the same ground in more time, a QUOTED market
+   * (see `tick`) crosses fewer ticks per second and prints less often. The
+   * candle rate is the upstream dial on how busy the whole readout is.
+   */
+  candleMs?: number;
 };
 
 export function Chart({
   entry = null, side = null, live = true, paused = false, tp = null, sl = null,
   toward = null, readout, base = BASE_PRICE, roll = false, phase = 0, face = LABEL_FACE,
-  tick = 0, up = UP, down = DOWN,
+  tick = 0, up = UP, down = DOWN, candleMs = CANDLE_MS,
 }: ChartProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   /* The draw loop reads these every frame but must not re-subscribe when they
      change — mirroring them into a ref from an effect keeps the rAF stable and
      the render pure. */
-  const props = useRef({ entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down });
+  const props = useRef({ entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs });
   useEffect(() => {
-    props.current = { entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down };
-  }, [entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down]);
+    props.current = { entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs };
+  }, [entry, side, readout, paused, tp, sl, toward, base, roll, phase, face, tick, up, down, candleMs]);
 
   useEffect(() => {
     const cv = ref.current;
@@ -416,7 +432,8 @@ export function Chart({
          and starts the next candle at phase zero, which draws the right-hand
          edge as a flat dash — the picture would end on a bar that has not
          happened yet. */
-      const HELD = CANDLE_MS - 1;
+      const cms = props.current.candleMs;
+      const HELD = cms - 1;
       /* `roll` buys out of the hold, and only out of the hold: with it on,
          candle time is just the clock, which is what it was before the hold
          existed. Everything downstream — the ramp's anchor included — reads
@@ -424,7 +441,7 @@ export function Chart({
       const rolling = props.current.roll;
       if (!aimNow && !rolling) moved = 0;
       else moved += dt;
-      const adv = (aimNow || rolling ? HELD + moved : Math.min(HELD, clock)) / CANDLE_MS;
+      const adv = (aimNow || rolling ? HELD + moved : Math.min(HELD, clock)) / cms;
       /* The live candle: its close travels from the previous close toward its
          own, so the body grows out of the last one instead of appearing. */
       const shift = reduce ? 0 : Math.floor(adv);

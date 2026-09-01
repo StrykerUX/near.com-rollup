@@ -4,37 +4,54 @@ import {
 } from './state';
 
 /**
- * PERPS v5 — TEN SECONDS, AND THE BUDGET IS THE DESIGN
+ * PERPS v5 — THE SHORT CUT, AND THE BUDGET IS THE DESIGN
  * ==================================================================
  * v4 is the cut you put in front of a room: ninety seconds, eight moments, a
- * line of copy on each. This is the cut you put in a feed. It has ten seconds,
- * and ten seconds is not a shorter version of ninety — it is a different
- * problem, because the two things v4 spends most of its length on (a line of
- * copy per step, and a beat long enough for the eye to arrive) are the two
- * things that do not fit.
+ * line of copy on each. This is the cut you put in a feed: thirteen seconds,
+ * and thirteen is not a shorter ninety — it is a different problem, because the
+ * two things v4 spends most of its length on (a line of copy per step, and a
+ * beat long enough for the eye to arrive) are the two that do not fit.
  *
  * THE ARITHMETIC, WHICH IS THE WHOLE CONSTRAINT
  * ---------------------------------------------
- * The deck plays every beat at `PACE` (1.25), so ten seconds of wall clock is
- * 8,000ms of AUTHORED beat time, outro included. That is the budget, it is
- * hard, and everything below is what it bought:
+ * The deck plays every beat at `PACE` (1.25), so the wall clock is the sum of
+ * the beats times 1.25. `pnpm check:flows` asserts that product, so a beat that
+ * grows by two hundred milliseconds cannot quietly move the clip's length.
  *
- *   scene 1   2,400ms   the market, and a position already working
- *   scene 2   5,000ms   the second one, opened
- *   outro       600ms   the hold before the loop
- *   ────────────────
- *             8,000ms  ×1.25 = 10,000ms on screen
+ *   scene 1    2,400ms   the market, and a position already working
+ *   scene 2    7,500ms   the second one, opened
+ *   outro        600ms   the hold before the loop
+ *   ─────────────────
+ *             10,500ms  ×1.25 = 13,125ms on screen
  *
- * `pnpm check:flows` asserts that sum, so a beat that grows by two hundred
- * milliseconds cannot quietly turn this into an eleven-second clip.
+ * IT WAS TEN SECONDS AND IT COULD NOT BE READ. Scene 2 ran at 5,000ms, and the
+ * table that killed it is the time each screen got to exist before the next
+ * control was pressed: a sheet takes ~260ms to arrive, and it was being pressed
+ * over 115ms later. Nothing rested. Every state was landed on by the next one
+ * while it was still arriving, which does not read as fast — it reads as
+ * unresolved, because the eye never gets the beat of stillness it uses to
+ * decide something finished happening.
+ *
+ * So scene 2 is that same sequence at 1.5x, and the multiplier is on the SHAPE
+ * rather than on the gaps: every beat, every keystroke and every hold grew by
+ * the same factor, so the rhythm the cut was authored with survives and only
+ * its tempo changed. Scene 1 did not grow — it is one hold with nothing
+ * scripted in it, and a rest does not become more restful by lasting longer.
+ *
+ * THREE OTHER DIALS MOVED WITH IT, or this would only be a slower slideshow:
+ * the CSS tempo (`--dur` / `--dur-slow` in 24-demo-btc.css), the chart's
+ * `candleMs`, and the `Count` durations on every figure that travels. A script
+ * stretched on its own just makes a fast animation wait longer between jumps,
+ * which is worse than either — the same trap `16-modes.css` documents for the
+ * demo-mode PACE.
  *
  * TWO STEPS, NOT EIGHT
  * --------------------
- * v4's copy is one line per step. At eight steps in ten seconds each line gets
- * 1.2 seconds, which is under the floor for reading one — so the copy would be
- * present, unreadable, and moving, which is worse than absent. Two steps give
- * each line about five seconds, and the step is also what `Focus` and the dot
- * row are keyed to: three things that all get quieter for the same reason.
+ * v4's copy is one line per step. Eight steps across a cut this short gives
+ * each line a second or so, which is under the floor for reading one — the copy
+ * would be present, unreadable and moving, which is worse than absent. Two
+ * steps give each line five seconds or more, and the step is also what `Focus`
+ * and the dot row are keyed to: three things that get quieter for one reason.
  *
  * NO CAMERA
  * ---------
@@ -75,13 +92,15 @@ const STEPS: Step<BD, BDAction>[] = [
     beats: [{ ms: 2400 }],
   },
 
-  /* ---- scene 2 · 5,000ms ------------------------------------------------
-     The whole ticket in five seconds of script time. Every gap below was cut
-     against one rule: a press and the screen it opens are two beats, and the
-     first of the two never goes under the entrance it is waiting for. That is
-     why the sheet openings (420 / 300 / 340) are the largest numbers here and
-     the keystrokes (70–80) are the smallest — a digit landing is instant and
-     a sheet arriving is not. */
+  /* ---- scene 2 · 7,500ms ------------------------------------------------
+     The whole ticket in seven and a half seconds of script time. Every gap is
+     under one rule: a press and the screen it opens are two beats, and the
+     first of the two has to outlast the entrance it is waiting for AND leave
+     something over. That is why the sheet openings (630 / 450 / 510) are the
+     largest numbers here and the keystrokes (105–120) are the smallest — a
+     digit landing is instant and a sheet arriving is not, and what the 1.5x
+     bought is the remainder: ~370ms of a sheet simply sitting there finished
+     before anything touches it, where there used to be 115. */
   {
     id: 'open', ch: 'more',
     title: 'A second one, in five taps',
@@ -89,40 +108,40 @@ const STEPS: Step<BD, BDAction>[] = [
     callout: '$5,000 → $100,000',
     beats: [
       /* the sheet */
-      { ms: 420, do: 'openTicket', arg: 'long' },
+      { ms: 630, do: 'openTicket', arg: 'long' },
 
-      /* the size. Four digits at 80ms reads as typed rather than pasted, and
-         it is the shortest run that still does — three would read as a
-         glitch, and the first keystroke carries the field's own entrance. */
-      ...type_('key', NEW_MARGIN, 280, 80),
+      /* the size. Four digits at 120ms reads as typed rather than pasted; at
+         the 80 this ran at first they arrived closer together than a thumb
+         can move, which reads as pasted no matter how many of them there are. */
+      ...type_('key', NEW_MARGIN, 420, 120),
 
       /* the leverage. Two stops rather than a sweep: the slider is not the
          feature, the figure answering it is, and `Count` needs a value change
          to travel to. 14 exists so that 20 is arrived at and not set. */
-      { ms: 300, do: 'levSheet' },
-      { ms: 100, do: 'levSet', arg: '14' },
-      { ms: 140, do: 'levSet', arg: String(NEW_LEV) },
-      { ms: 340, do: 'levSave' },
+      { ms: 450, do: 'levSheet' },
+      { ms: 150, do: 'levSet', arg: '14' },
+      { ms: 210, do: 'levSet', arg: String(NEW_LEV) },
+      { ms: 510, do: 'levSave' },
 
       /* both exits. One checkbox opens the pair already in dollars — see
          `prot` in state.ts for why the ⇄ is not in this cut. */
-      { ms: 300, do: 'prot' },
-      ...type_('key', TAKE_PROFIT, 220, 70),
-      { ms: 130, do: 'focus', arg: 'sl' },
-      ...type_('key', STOP_LOSS, 170, 70),
+      { ms: 450, do: 'prot' },
+      ...type_('key', TAKE_PROFIT, 330, 105),
+      { ms: 195, do: 'focus', arg: 'sl' },
+      ...type_('key', STOP_LOSS, 255, 105),
 
       /* signing, as a checklist and nothing else */
-      { ms: 280, do: 'submit' },
-      { ms: 150, do: 'ostep' },
-      { ms: 150, do: 'ostep' },
-      { ms: 190, do: 'ostep' },
+      { ms: 420, do: 'submit' },
+      { ms: 225, do: 'ostep' },
+      { ms: 225, do: 'ostep' },
+      { ms: 285, do: 'ostep' },
 
       /* THE HOLD, AND IT IS THE POINT OF THE CUT.
          The ticket closes, the tab row counts up and a second card arrives
-         above the first. One second is not long, and it is the longest single
-         beat in the script for exactly that reason: everything before it was
+         above the first. Nearly two seconds on screen, and it is the longest
+         single beat in the script for exactly that reason: everything before it was
          setting up a frame nobody would remember if it flashed. */
-      { ms: 1030 },
+      { ms: 1545 },
     ],
   },
 ];

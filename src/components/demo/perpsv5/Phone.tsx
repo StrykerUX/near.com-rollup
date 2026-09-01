@@ -12,7 +12,7 @@ import { Layer } from '@/components/demo/shell/Frame';
 import { PALETTE, PALETTE_VARS } from './palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
-  MARK, PHASE, TICK, ORDERS_0, ORDER_STEPS, TRADES_0, avail, btcSize, cta, liqPct, liqPrice, money,
+  CANDLE_MS, MARK, PHASE, TICK, ORDERS_0, ORDER_STEPS, TRADES_0, avail, btcSize, cta, liqPct, liqPrice, money,
   notional, pnl, pnlPct, slBad, tpBad, type BD, type BDAction, type Position,
 } from './state';
 
@@ -73,7 +73,7 @@ export function Phone({ d }: { d: Deck }) {
           The forty-four pixels go where the cut needed them: `.bchart` and
           `.blist` are both `flex: 1`, so the chart gets some air and the list
           finally has room to show that a SECOND position arrived, which is the
-          frame the whole ten seconds is spent earning. */}
+          frame the whole clip is spent earning. */}
       <Chrome d={d} />
       <div className="pdview">
         <Market d={d} />
@@ -109,7 +109,7 @@ function Chrome({ d }: { d: Deck }) {
       {/* the figure travels, because it is about to be spent */}
       <span className="bbal">
         <i>Available</i>
-        <Count className="bbalv" value={avail(d.s)} dp={2} prefix="$" ms={640} />
+        <Count className="bbalv" value={avail(d.s)} dp={2} prefix="$" ms={960} />
       </span>
       {/* THE WALLET, FROM LUCIDE (ISC) — `lucide-static@1.38.0`, icon `wallet`,
           inlined rather than depended on. It is one 24-grid path pair and the
@@ -217,6 +217,7 @@ function Market({ d }: { d: Deck }) {
           roll
           phase={PHASE}
           tick={TICK}
+          candleMs={CANDLE_MS}
           up={PALETTE.up}
           down={PALETTE.down}
           face={AXIS_FACE}
@@ -423,7 +424,7 @@ function Ticket({ d }: { d: Deck }) {
 
         <div className="bavail">
           <span>Available to trade</span>
-          <b><Count value={avail(s)} dp={2} prefix="$" ms={640} /></b>
+          <b><Count value={avail(s)} dp={2} prefix="$" ms={960} /></b>
           <i className="bmax">Max</i>
         </div>
 
@@ -470,8 +471,8 @@ function Ticket({ d }: { d: Deck }) {
             the leverage did. Both figures travel — that trip IS the feature. */}
         <div className="best">
           <span>Est. trade value</span>
-          <Count className="bestv" value={notional(s)} prefix="$" />
-          <Count className="bestb" value={btcSize(s)} dp={5} suffix=" BTC" />
+          <Count className="bestv" value={notional(s)} prefix="$" ms={780} />
+          <Count className="bestb" value={btcSize(s)} dp={5} suffix=" BTC" ms={780} />
         </div>
       </div>
     </Layer>
@@ -521,13 +522,13 @@ function LevSheet({ d }: { d: Deck }) {
             }}
             disabled={!set}
           />
-          <span className="blevbox"><Count value={s.levDraft} ms={200} /> <i>x</i></span>
+          <span className="blevbox"><Count value={s.levDraft} ms={300} /> <i>x</i></span>
         </div>
         {/* the same figure the ticket's footer shows, so the slider's effect is
             legible BEFORE Save commits it */}
         <div className="blevnot">
           <span>Position value</span>
-          <Count className="blevfig" value={(Number(s.amount) || 0) * s.levDraft} prefix="$" ms={240} />
+          <Count className="blevfig" value={(Number(s.amount) || 0) * s.levDraft} prefix="$" ms={360} />
         </div>
         <span className={'bcta light' + live(d.can('levSave'))} {...press(d.can('levSave'))}
               data-tap="save">Save</span>

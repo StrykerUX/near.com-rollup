@@ -43,10 +43,10 @@ const DEMOS = [
   {
     href: '/demo/perps-v5',
     name: 'Perps v5',
-    len: 'ten seconds',
+    len: 'thirteen seconds',
     steps: 2,
     blurb:
-      'The cut for a feed rather than a room. It opens on a Long already working — $120,000 at 20x, in front — and spends the other seven seconds opening a second one beside it: $5,000 of margin, twenty times, both exits set. Its own device, rebuilt against the app rather than argued down from it, and the only screen here set in the face the app actually uses.',
+      'The cut for a feed rather than a room. It opens on a Long already working — $120,000 at 20x, in front — and spends the rest opening a second one beside it: $5,000 of margin, twenty times, both exits set. Its own device, rebuilt against the app rather than argued down from it, and the only screen here set in the face the app actually uses.',
   },
   {
     href: '/demo/swap',

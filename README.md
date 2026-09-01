@@ -131,7 +131,7 @@ beside it. `/demo` indexes them.
 | `/demo/perps-v2` | the same, cut | 16 | The trade alone: $5,000 of margin into a $100,000 position, and back to the card |
 | `/demo/perps-v3` | the same, quieter | 9 | Half the screen, no pointer: the control lights itself and the figures travel |
 | `/demo/perps-v4` | the marketing cut | 8 | One line of copy at a time, and everything but the moment darkened |
-| `/demo/perps-v5` | ten seconds | 2 | A position already working, and a second one opened beside it — its own device, rebuilt against the app |
+| `/demo/perps-v5` | thirteen seconds | 2 | A position already working, and a second one opened beside it — its own device, rebuilt against the app |
 | `/demo/swap` | 1m 14s | 18 | A USDT balance swapped to NEAR across chains, then the yield chip on the next row |
 | `/demo/earn` | 48s | 17 | Two vaults with their fees, a deposit, and paying someone out of a vault balance |
 | `/demo/confidential-deposit` | 38s | 12 | Rules you must acknowledge, networks a token can arrive on, an address that expires |
@@ -522,22 +522,51 @@ end. It found all of these before a browser could.
   a bare text run beside an `<i>` becomes a grid item of its own, so "Only send
   USDT on the Tron network" laid out as two overlapping fragments.
 
-### v5, and what ten seconds is actually short of
+### v5, and what a short cut is actually short of
 
-`/demo/perps-v5` is a hard limit rather than a target: ten seconds, checked by
-`pnpm check:flows`. The deck plays every beat at `PACE` (1.25), so the budget is
-**8,000ms of authored beats, outro included**, and the assertion exists because
+`/demo/perps-v5` is commissioned to a length, checked by `pnpm check:flows`. The
+deck plays every beat at `PACE` (1.25), so the budget is **10,500ms of authored
+beats, outro included → 13,125ms on screen**, and the assertion exists because
 the length is not a number anywhere in the source — it is a sum of twenty-seven
 beats, and every future edit to one moves it by exactly as much as nobody
 notices.
 
-Ten seconds is not a shorter ninety. It is short of the two things v4 spends
-most of its length on, and each one had to be given up rather than compressed:
+**It was ten seconds and it could not be read**, which is the useful half of the
+story. Ten was not too little *content* — the sequence is already the minimum
+gesture set — it was too little rest. Measured, a sheet takes ~260ms to arrive
+and was being pressed 115ms later; nothing on screen ever came to a stop. That
+does not read as fast, it reads as unresolved, because the eye never gets the
+beat of stillness it uses to decide something finished happening.
 
-**One line of copy per step becomes two lines total.** Eight steps in ten
-seconds is 1.2s a line, which is under the floor for reading one — the copy
-would be present, unreadable and moving, which is worse than absent. Two steps
-give each line about five seconds. The step is also what the dots and `Focus`
+So scene 2 is the same sequence at 1.5x, and the multiplier is on the **shape**
+rather than on the gaps: every beat, keystroke and hold grew by the same factor,
+so the rhythm survives and only the tempo changed. Scene 1 did not grow — it is
+one hold with nothing scripted in it, and a rest does not get more restful by
+lasting longer. **Three other dials moved with it**, or the script would only be
+waiting longer between the same fast animations — the trap `16-modes.css`
+already documents for demo-mode PACE:
+
+| dial | was | is |
+|---|---|---|
+| scene 2's beats | 5,000ms | 7,500ms |
+| `--dur` / `--dur-slow` | 150 / 260 | 225 / 390 |
+| the chart's `candleMs` | 1,500 | 2,000 |
+| every `Count` that travels | 200–640 | 300–960 |
+
+`candleMs` buys something the others do not: a slower candle covers the same
+ground in more time, so a quoted market crosses fewer ticks per second and
+prints less often. It takes the readout from ~15 prints/s to ~11 without
+touching `tick`. It is a prop rather than a change to the module constant
+because `check:flows` multiplies that constant by the ramp's length to assert
+v3 and v4 fill their take profit on the right frame.
+
+A short cut is still short of the two things v4 spends most of its length on,
+and each was given up rather than compressed:
+
+**One line of copy per step becomes two lines total.** Eight steps across a cut
+this short gives each line about a second, which is under the floor for reading
+one — the copy would be present, unreadable and moving, which is worse than
+absent. Two steps give each line five seconds or more. The step is also what the dots and `Focus`
 are keyed to, so three things got quieter for one reason.
 
 **`shot` is absent from both steps.** The cut already spends its whole length on
@@ -547,8 +576,8 @@ controls does not direct the eye; it competes with what it is pointing at. The
 hand and the spotlight go for the same reason, which is why v5 declares no
 `target` at all: a map nothing reads is a map that will rot.
 
-**The take profit never fills.** The climb is fifteen candles — 22.5 real
-seconds — so it cannot even start. The ending is the order landing and a second
+**The take profit never fills.** The climb is fifteen candles — thirty real
+seconds at this candle rate — so it cannot even start. The ending is the order landing and a second
 card joining the first.
 
 ### The one device that is a copy rather than an argument
@@ -566,8 +595,8 @@ a tidier idea disagree, the frame wins.**
 notch. It is the one block on the device that is not the product: 44px at the
 top of a 766px screen spent simulating an operating system, in a cut whose whole
 job is to show an app. The reference frames are crops and have none of it
-either, and a frozen 11:02 is the one detail in a ten-second loop that gives
-away that nothing on screen is live.
+either, and a frozen 11:02 is the one detail in a short loop that gives away
+that nothing on screen is live.
 
 The notch went last and is the interesting half. It is *device* chrome rather
 than status chrome, so it survived the first pass — but a Dynamic Island with
@@ -585,8 +614,8 @@ and nobody notices until it is gone. The other 28 split between the chart and
 the list — and the list is the half that mattered. A card is 164px, so at the
 179 it had before, exactly one fitted and the counter was the only thing saying
 there were two positions. At 193 the second card's top edge shows below the
-first, and the frame the whole ten seconds is spent earning says it in the list
-as well as in the tab.
+first, and the frame the whole cut is spent earning says it in the list as well
+as in the tab.
 
 Its wallet glyph is **Lucide's** (`wallet`, ISC), inlined rather than depended
 on — the repo already keeps its icons as 24-grid paths, and a package for one
@@ -620,7 +649,7 @@ on the `<Chart>` — or loop two opens on a different candle.
 
 **`phase`** was the second attempt at "the market is climbing", and the first
 attempt is the more useful half of the story. A linear drift, a few points per
-candle, was built and thrown away: a slope big enough to see over ten seconds is
+candle, was built and thrown away: a slope big enough to see across a cut is
 690 points across a 46-candle window, which swamps the walk's own shape and
 closes **every** bar green. That is the exact failure `RAMP` has a long note
 about — a ramp with wicks drawn on it. `phase` invents nothing instead: the walk

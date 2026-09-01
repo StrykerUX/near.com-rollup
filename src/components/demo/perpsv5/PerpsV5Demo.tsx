@@ -5,7 +5,7 @@ import { Phone } from './Phone';
 import { perpsV5Flow } from './script';
 
 /**
- * PERPS v5 — the ten-second cut
+ * PERPS v5 — the short cut
  * ==================================================================
  * The room is `shell/V4Stage`, unchanged and shared with the four other
  * marketing cuts. That is the point of it having been written against a phone,

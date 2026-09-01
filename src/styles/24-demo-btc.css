@@ -38,7 +38,7 @@
        40  tab row                    ~193  the list        (flex)
    The list is the smallest number on this page and it is where the whole cut
    lands, so anything that grows above it comes straight out of the frame the
-   ten seconds were spent earning. A card is 164px: at 179 — which is what the
+   clip is spent earning. A card is 164px: at 179 — which is what the
    list got while a status bar was still taking 44px off the top — exactly ONE
    fitted, and "Positions (2)" was the only thing on screen saying there were
    two. Dropping the simulated OS is what bought the next card's top edge.
@@ -64,13 +64,23 @@
   font-family: inherit; font-style: normal;
 }
 
-/* TEMPO. The cut authors 420ms for a sheet to arrive, and the shared slide is
-   480 — so at the site's own timings the script would press the next control
-   while the previous screen was still travelling. Everything here is quicker
-   than everywhere else for that reason and no other; the ratios between the
-   durations are unchanged, which is what keeps it reading as the same app
-   being used faster rather than as a different, twitchier one. */
-.pdev.btc[data-tempo="fast"] { --dur: 150ms; --dur-slow: 260ms }
+/* TEMPO, AND IT MOVES WITH THE SCRIPT OR NOT AT ALL.
+   These were 150 / 260 when scene 2 ran in five seconds — quick enough that a
+   sheet finished arriving just before the next control was pressed, with about
+   115ms to spare. The script is now 1.5x, and these are 1.5x with it, because
+   stretching the beats ALONE only makes a fast animation wait longer between
+   jumps: the screen would still snap into each state and then sit there, which
+   is worse than either. `16-modes.css` documents the same trap for demo-mode
+   PACE and solves it the same way.
+   Still under the site's own 240 / 480: this is an app being used, not a page
+   being read, and the ratio between the two durations is untouched. */
+.pdev.btc[data-tempo="fast"] { --dur: 225ms; --dur-slow: 390ms }
+
+/* the shared entrance is 380ms (15-demo.css). Everything else on this device
+   slowed by half again, and a stagger that did not would be the one motion
+   still moving at the old tempo — which is exactly what makes a screen read as
+   two animations rather than one. */
+.pdev.btc .enter > * { animation-duration: 560ms }
 
 /* ---- the chrome --------------------------------------------------------- */
 
@@ -221,7 +231,7 @@
 /* the switch is a cut, not a cross-fade: the row that arrives is the one that
    replaces the row that had the slot, and two of them dissolving through each
    other would read as neither */
-.pdev.btc[data-motion] .bposact { animation: drise 260ms var(--ease-out) both }
+.pdev.btc[data-motion] .bposact { animation: drise 390ms var(--ease-out) both }
 
 /* ---- the three lists ---------------------------------------------------- */
 
@@ -382,7 +392,7 @@
 }
 
 .pdev.btc .bprot { padding-bottom: 13px }
-.pdev.btc[data-motion] .bprot { animation: drise 260ms var(--ease-out) both }
+.pdev.btc[data-motion] .bprot { animation: drise 390ms var(--ease-out) both }
 .pdev.btc .bfin.wide { width: 100% }
 .pdev.btc .bunit { margin-left: auto; display: flex; align-items: center; gap: 10px }
 .pdev.btc .bunit i { font-style: normal; color: rgba(255, 255, 255, .55) }
@@ -406,7 +416,7 @@
   margin-top: 12px; padding: 12px 14px; border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, .09); background: rgba(255, 255, 255, .04);
 }
-.pdev.btc[data-motion] .bochk { animation: drise 240ms var(--ease-out) both }
+.pdev.btc[data-motion] .bochk { animation: drise 360ms var(--ease-out) both }
 
 /* the app's own footer on this sheet: what the leverage turned the margin
    into, said twice — in dollars and in the coin */

@@ -41,7 +41,7 @@ const MODULES = [
   [`${DEMO}/perpsv2/script.ts`, 'perpsv2-script'],
   [`${DEMO}/perpsv3/script.ts`, 'perpsv3-script'],
   [`${DEMO}/perpsv4/script.ts`, 'perpsv4-script'],
-  /* the ten-second cut, which is its OWN machine rather than a re-grouping
+  /* the short cut, which is its OWN machine rather than a re-grouping
      of the one above it — a different entry price, a book that starts with a
      position on it, and no passkey. Walked for exactly that reason. */
   [`${DEMO}/perpsv5/state.ts`, 'perpsv5-state'],
@@ -252,21 +252,29 @@ for (const [name, m] of Object.entries(machines)) {
 }
 
 /* ==========================================================================
-   6 · THE TEN-SECOND CUT IS TEN SECONDS
+   6 · THE SHORT CUT RUNS THE LENGTH IT SAYS IT DOES
    --------------------------------------------------------------------------
-   `/demo/perps-v5` was commissioned with a hard limit rather than a target: a
-   clip that runs eleven seconds is not a slightly long version of it, it is a
-   different deliverable. The length is not a number anywhere in the source —
-   it is the sum of twenty-seven beats plus an outro, multiplied by the deck's
-   PACE — so nothing about it is visible to a type checker and every future
-   edit to a beat changes it by exactly as much as nobody notices.
+   `/demo/perps-v5` is commissioned to a length rather than to a feel, because
+   a clip that runs a second and a half long is not a slightly long version of
+   it — it is a different deliverable, and a feed does not forgive one. The
+   length is not a number anywhere in the source: it is the sum of twenty-seven
+   beats plus an outro, multiplied by the deck's PACE. Nothing about it is
+   visible to a type checker, and every future edit to a beat changes it by
+   exactly as much as nobody notices.
+
+   It was 10,000 and could not be read: at that tempo a sheet was being pressed
+   115ms after it finished arriving, so nothing on screen ever came to rest.
+   Scene 2 is the same sequence at 1.5x — the shape kept, the tempo changed —
+   and three other dials moved with it, or the script would only have been
+   waiting longer between the same fast animations: the CSS tempo, the chart's
+   `candleMs`, and every `Count` that travels.
 
    Enforced with a tolerance of one frame at 60Hz. Anything looser and the
    guard is decorative; anything tighter and rounding a beat to a round number
    would fail the build.
    ========================================================================== */
 {
-  const LIMIT = 10000;
+  const LIMIT = 13125;
   const TOL = 17;
   const PACE = Number(
     readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
@@ -274,8 +282,8 @@ for (const [name, m] of Object.entries(machines)) {
   const m = machines['demo/perps-v5'];
   const authored = m.beats.reduce((t, b) => t + (b.ms ?? 0), 0) + (m.outro ?? 0);
   const real = Math.round(authored * PACE);
-  console.log(`\n== the ten-second cut\n   demo/perps-v5: ${authored}ms authored `
-    + `x ${PACE} = ${real}ms on screen`);
+  console.log(`\n== the short cut runs the length it says it does\n`
+    + `   demo/perps-v5: ${authored}ms authored x ${PACE} = ${real}ms on screen`);
   if (Math.abs(real - LIMIT) > TOL)
     bad('demo/perps-v5', `runs ${real}ms, and the brief is ${LIMIT}ms. `
       + `The budget is ${Math.round(LIMIT / PACE)}ms of authored beats, outro included — `

@@ -21,8 +21,8 @@ import type { Act } from '@/components/stage/phone/flows/machine';
  * reader still press the same transitions, so `pnpm check:flows` walks this
  * one exactly as it walks the others.
  *
- * WHAT IT DELIBERATELY DROPS is everything the long arc earns and ten seconds
- * cannot: the account screen, the funding chapter, the passkey, the Market ⇄
+ * WHAT IT DELIBERATELY DROPS is everything the long arc earns and thirteen
+ * seconds cannot: the account screen, the funding chapter, the passkey, the Market ⇄
  * Limit switch, the ⇄ unit swap, and the take profit filling. A cut is allowed
  * to be shorter. It is not allowed to be a slideshow, which is why what is left
  * is still a machine and not a list of frames.
@@ -54,8 +54,8 @@ export const MARK = 79567.5;
  *     cut whose first line is "already working" was a market rolling over.
  *   · the last third carries 251 of the window's 306 points, so the rally is
  *     a rally and not a tilt
- *   · it KEEPS rising over the seven candles the ten seconds advance (+53), so
- *     the position in the corner gains while you watch rather than by luck
+ *   · it KEEPS rising over the six and a half candles the clip advances (+55),
+ *     so the position in the corner gains while you watch rather than by luck
  *   · and it still closes EIGHTEEN of its forty-six bars red. This is the one
  *     that matters and the one a slope cannot buy: a window with two red bars
  *     is a ramp, and the chart already has a long note about why a ramp reads
@@ -90,13 +90,34 @@ export const PHASE = 1628;
  */
 export const TICK = 0.5;
 
+/**
+ * HOW LONG A CANDLE TAKES TO FORM HERE.
+ *
+ * The chart's own constant is 1,500 and stays there: `check:flows` multiplies
+ * it by the ramp's length to assert that v3 and v4 fill their take profit on
+ * the frame the market reaches it, so it is not a number this cut gets to move
+ * for everybody.
+ *
+ * 2,000 for the same reason everything else on this screen slowed by half
+ * again — but it buys something the other dials do not. A slower candle means
+ * the price covers the same ground in more time, so a QUOTED market crosses
+ * fewer ticks per second and prints less often: the candle rate is the upstream
+ * dial on how busy the whole readout is, and this takes it from about fifteen
+ * prints a second to eleven without touching `TICK`.
+ *
+ * The clip now advances 6.56 candles instead of 8.75. Re-checked against
+ * `PHASE`: the window still rises (+55 points over the clip, against +53
+ * before) and still closes eighteen of forty-six bars red.
+ */
+export const CANDLE_MS = 2000;
+
 /* ---- the position that is already on ---------------------------------- */
 
 /**
  * IT OPENS ON A TRADE ALREADY WORKING, which is the whole reason this cut
  * exists. Every other version starts on an empty book and spends its first
- * third earning the right to have one; ten seconds does not have a third to
- * spend, and "here is an account with a live position in it" is a stronger
+ * third earning the right to have one; thirteen seconds does not have a third
+ * to spend, and "here is an account with a live position in it" is a stronger
  * first frame than "here is an account".
  *
  * $79,520 against a mark of $79,567.5 puts it $47.50 in front — small, which
@@ -265,7 +286,7 @@ export const money = (v: number) =>
 /**
  * A take profit sits ABOVE the entry on a long and below it on a short; a stop
  * loss is the mirror. This cut never types a wrong one — there is no room in
- * ten seconds for a refusal and its correction, and half of that pair is worse
+ * room for a refusal and its correction, and half of that pair is worse
  * than neither — but the rules stay, because they are what makes the primary
  * button's label mean something and because a reader driving the screen by
  * hand can still walk into them.
