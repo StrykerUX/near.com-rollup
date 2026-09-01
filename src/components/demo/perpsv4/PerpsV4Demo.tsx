@@ -46,7 +46,13 @@ export function PerpsV4Demo() {
         </div>
 
         <div className="v4copy">
-          <span className="v4ch">{perpsV4Flow.chapters.find((c) => c.id === step.ch)?.name}</span>
+          {/* the eyebrow carries the step's number rather than its chapter's:
+              how far through is the thing a viewer wants, and this cut has no
+              rail to read it off */}
+          <span className="v4ch">
+            <i>{String(deck.step + 1).padStart(2, '0')}</i>
+            {perpsV4Flow.chapters.find((c) => c.id === step.ch)?.name}
+          </span>
           {/* keyed so each line arrives rather than being retyped in place */}
           <h1 key={step.id}>{step.title}</h1>
           <p key={step.id + 'n'}>{step.note}</p>

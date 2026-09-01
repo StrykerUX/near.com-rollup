@@ -163,30 +163,26 @@
 .pdch { padding: 0 0 22px; opacity: .5; transition: opacity var(--dur-slow) var(--ease-out) }
 .pdch.on { opacity: 1 }
 .pdch h2 {
-  display: flex; align-items: baseline; gap: 10px; margin: 0;
-  font-family: var(--font-display); font-size: 1.32rem; font-weight: 400; letter-spacing: -.01em;
+  margin: 0; font-family: var(--font-display); font-size: 1.32rem; font-weight: 400;
+  letter-spacing: -.01em;
 }
-.pdch h2 i {
-  font-family: var(--font-mono); font-style: normal; font-size: var(--fs-micro);
-  color: var(--near-green); letter-spacing: .1em;
-}
-.pdblurb { margin: 4px 0 10px 28px; font-size: var(--fs-caption); color: rgba(255, 255, 255, .5) }
-.pdsteps { list-style: none; margin: 0; padding: 0 0 0 28px; display: grid; gap: 2px }
+.pdblurb { margin: 4px 0 10px 0; font-size: var(--fs-caption); color: rgba(255, 255, 255, .5) }
+.pdsteps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px }
 
 .pdstep {
   appearance: none; background: none; border: 0; width: 100%; text-align: left; cursor: pointer;
-  display: grid; grid-template-columns: 14px 1fr; gap: 11px; align-items: start;
+  display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start;
   padding: 8px 10px 8px 0; color: inherit; border-radius: 8px;
   transition: background var(--dur) var(--ease-out);
 }
 .pdstep:hover { background: rgba(255, 255, 255, .05) }
 .pdstep .pdmark {
-  width: 9px; height: 9px; margin-top: 5px; border-radius: 50%; justify-self: center;
-  border: 1.5px solid rgba(255, 255, 255, .28);
-  transition: background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+  margin-top: 2px; justify-self: end; font-family: var(--font-mono);
+  font-size: 14px; letter-spacing: .04em; color: rgba(255, 255, 255, .3);
+  transition: color var(--dur) var(--ease-out);
 }
-.pdstep.past .pdmark { background: rgba(38, 194, 129, .55); border-color: transparent }
-.pdstep.on .pdmark { background: var(--near-green); border-color: transparent; box-shadow: 0 0 0 4px rgba(0, 236, 151, .18) }
+.pdstep.past .pdmark { color: rgba(38, 194, 129, .6) }
+.pdstep.on .pdmark { color: var(--near-green) }
 .pdtxt b { display: block; font-weight: 400; font-size: var(--fs-body-sm); color: rgba(255, 255, 255, .68) }
 .pdstep.on .pdtxt b { color: #fff }
 /* the note belongs to the step being played: everywhere else it is noise */

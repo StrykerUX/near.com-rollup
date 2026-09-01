@@ -100,12 +100,12 @@ function Rail<S, A extends string>({ flow, deck }: { flow: DemoFlow<S, A>; deck:
 
   return (
     <div className="pdrail" ref={ref}>
-      {flow.chapters.map((c, ci) => {
+      {flow.chapters.map((c) => {
         const steps = flow.steps.map((s, i) => ({ s, i })).filter(({ s }) => s.ch === c.id);
         const on = steps.some(({ i }) => i === deck.step);
         return (
           <section className={'pdch' + (on ? ' on' : '')} key={c.id}>
-            <h2><i>{String(ci + 1).padStart(2, '0')}</i>{c.name}</h2>
+            <h2>{c.name}</h2>
             <p className="pdblurb">{c.blurb}</p>
             <ol className="pdsteps">
               {steps.map(({ s, i }) => {
@@ -119,7 +119,16 @@ function Rail<S, A extends string>({ flow, deck }: { flow: DemoFlow<S, A>; deck:
                       onClick={() => deck.seek(i)}
                       aria-current={active ? 'step' : undefined}
                     >
-                      <span className="pdmark" aria-hidden="true" />
+                      {/* THE STEP'S OWN NUMBER, NOT ITS CHAPTER'S.
+                          A chapter index answers "which section is this" — a
+                          question nobody watching a demo asks. The number that
+                          means something is how far through you are, and it
+                          only reads if it counts across the whole flow. It is
+                          also the marker: state lives in its colour, so a
+                          reader is not tracking a number and a dot separately. */}
+                      <span className="pdmark" aria-hidden="true">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
                       <span className="pdtxt"><b>{s.title}</b><em>{s.note}</em></span>
                     </button>
                   </li>
