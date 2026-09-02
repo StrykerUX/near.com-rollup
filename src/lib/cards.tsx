@@ -113,3 +113,46 @@ export const CARDS: Card[] = [
     ),
   },
 ];
+
+/**
+ * THE OFFER, AND THE ONE LINE THAT IS NOT A DESIGN DECISION.
+ *
+ * Both were authored inside `Lockup.tsx` and both are needed by a composition
+ * that does not render the lockup's CTA block. The offer is the reason a Rollup
+ * listener is on this page at all, and the jurisdiction note is a legal
+ * requirement — a narrow layout that quietly drops either is not a smaller
+ * version of this page, it is a different one.
+ */
+export const OFFER = (
+  <p className="offer">
+    Rollup traders keep <b>20% of every fee</b>, back in stablecoins.
+  </p>
+);
+
+/* PENDING LEGAL. Wording and the jurisdiction list are unapproved.
+   Confirm both with counsel before this page ships. */
+export const PERPS_NOTE = (
+  <>
+    Perps are not available to US persons or in other restricted
+    jurisdictions. Leveraged trading carries a substantial risk of loss.
+  </>
+);
+
+/**
+ * THE CLOSING PLATE'S WORDS, AND WHY THEY ARE WORDS AND NOT MARKUP.
+ *
+ * `Stage.tsx` sets these in three `.pw` units, because the closing plate's copy
+ * is the hero recede run backwards and the engine walks `.pw` to do it. The
+ * narrow composition has no closing plate — there is no shrink on a page whose
+ * scroll is its own — so it renders the same sentences as an ordinary section,
+ * and it must NOT wear `.pw`: `qsa('.pw')` is global, and a second set of them
+ * would have the engine animating a block that is nowhere near the plate.
+ *
+ * Hence pieces rather than a node. Each composition brings its own wrapper and
+ * the words cannot drift, which is the same bargain OFFER above already makes.
+ */
+export const PERM_WORDS = ['Permissionless', 'to the core'] as const;
+export const PERM_BODY =
+  'Your account, your signature, your assets. near.com is decentralized by ' +
+  'design. Transact across 30+ chains, no gatekeepers between you, your ' +
+  'peers, and your crypto.';

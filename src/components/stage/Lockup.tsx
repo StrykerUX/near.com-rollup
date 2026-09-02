@@ -1,13 +1,7 @@
-import { CARDS } from '@/lib/cards';
+import { CARDS, OFFER, PERPS_NOTE } from '@/lib/cards';
 import { PhoneShell } from './phone/PhoneShell';
 
 const LOGIN = 'https://near.com/login?ref=therollup';
-
-const OFFER = (
-  <p className="offer">
-    Rollup traders keep <b>20% of every fee</b>, back in stablecoins.
-  </p>
-);
 
 /**
  * THE CARD LOCKUP — copy left, phone centre, offer and CTA right.
@@ -61,12 +55,7 @@ export function Lockup() {
         <p className="friction">No email. No KYC. Ready in seconds.</p>
       </div>
 
-      {/* PENDING LEGAL. Wording and the jurisdiction list are unapproved.
-          Confirm both with counsel before this page ships. */}
-      <p className="perpsdisc">
-        Perps are not available to US persons or in other restricted
-        jurisdictions. Leveraged trading carries a substantial risk of loss.
-      </p>
+      <p className="perpsdisc">{PERPS_NOTE}</p>
 
       <PhoneShell />
 

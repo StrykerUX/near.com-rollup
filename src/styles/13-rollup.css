@@ -54,8 +54,15 @@
    Checked: 390 -> 24 (floor), 1024 -> 32.00, 1622 -> 40.00, 2560 -> 40 (cap).
 
    The preferred term is written as vw + px rather than in rem so the anchors
-   stay the pixel values the brief names, whatever the root size is. */
-.side.l h2{
+   stay the pixel values the brief names, whatever the root size is.
+
+   `.mchhead` IS ON THIS RULE, not on a copy of it. The narrow tour's four
+   sections carry the same four headlines and the brief's floor was written FOR
+   a phone; left off, they fell through to `.h1{font-size:var(--fs-h1)}` and
+   set at 40.8px on a 426px screen — the clamp's own ceiling, on the narrowest
+   frame the page has. One rule, both compositions. */
+.side.l h2,
+.mchhead{
   font-size:clamp(24px, 1.34vw + 18.28px, 40px);
   line-height:1.1;letter-spacing:-.022em;max-width:24ch;
 }

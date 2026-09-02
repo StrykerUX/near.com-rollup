@@ -1,0 +1,304 @@
+/* =========================================================================
+   THE NARROW TOUR — FOUR SECTIONS, AND NO TRICK
+   =========================================================================
+   See MobileTour.tsx for the argument. The arithmetic, because it is what
+   rules out every other arrangement:
+
+     the device lays out 352 x 766. A phone is 390 x 844. Those are the same
+     shape — 2.176 against 2.164 — so a device that is READABLE on a phone is
+     the whole phone, with nothing left over for words.
+
+   Every version that tried to keep the device and the copy on screen together
+   paid for it out of the device. The one this replaces split the frame 48/52,
+   which put `--k` at 0.40: a 142px-wide device, and since the scale is a
+   `transform`, 12px interface type rendering at 4.8px. Nothing in the demo
+   could be read, on the page whose whole argument IS the demo.
+
+   SO CO-PRESENCE IS NOT SIMULATED HERE. The sequence comes apart into four
+   ordinary sections — eyebrow, headline, device, copy — and the reader scrolls
+   through them the way they scroll through anything. No sticky composition, no
+   scrub, no snap, no scroll-driven timeline, no observer picking the chapter.
+   The device is 301px wide at 390 and 334 at 430, nothing is ever drawn on top
+   of anything, and the whole file needs no feature newer than `dvh`.
+
+   WHAT IS STILL SHARED is the field. `.stage-sticky` keeps its pinned box and
+   the sections scroll over the same gradient the wide page is built on; with
+   the engine off, `#gl` never gets its `.on` class and what shows is `.gcss`,
+   the CSS stack the field already carries as its own fallback. A phone gets
+   the field without the shader loop.
+
+   HEIGHT UNITS. `svh` for the device's scale — it is the viewport with the URL
+   bar showing, and it does not move, so the device is never re-scaled
+   mid-scroll. `dvh` for the pinned field, which has to fill whatever is
+   actually there.
+
+   Everything is scoped to the same 1080 breakpoint the lockup already stacks
+   at. Above it not one property changes.
+   ========================================================================= */
+
+.mtour { display: none }
+
+@media (max-width: 1080px) {
+  /* THE 588vh GOES AWAY. `#stage` is as tall as its own content, which is the
+     four sections — so scroll is 1:1 with the finger and there is nothing left
+     to scrub. The engine is not running here at all; see useStageEngine. */
+  #stage { height: auto }
+  .stage-sticky { height: 100dvh }
+  /* it exists to be cross-faded against the cream page by the closing shrink,
+     and with no shrink to drive it `--fade-light` sits at 0 and it is a black
+     sheet over the field */
+  .stage-black { display: none }
+
+  .mtour {
+    display: block;
+    position: relative;
+    z-index: 6;
+    /* up over the pinned field by one viewport, so the page starts where the
+       field starts rather than a screen below it */
+    margin-top: -100dvh;
+  }
+
+  /* ---- THE HEAD OF THE PAGE ------------------------------------------
+     Claim, then incentive, then the tour — the order `13-rollup.css` already
+     chose for the stacked lockup. The brow is the only branding the page has
+     while the stage owns the frame, and the offer is the reason a Rollup
+     listener is here at all, so neither waits until the bottom. */
+  .mtop { padding: 106px var(--gut) clamp(40px, 7vh, 72px) }
+  .mbrow { display: flex; align-items: center; gap: 15px; margin: 0 0 clamp(22px, 4vh, 34px) }
+  .mbrow .nearw {
+    display: block; flex: none;
+    height: 24px; aspect-ratio: 476/117;
+    background: var(--nearlock-src) center/contain no-repeat;
+  }
+  .mbrow .rule {
+    flex: none; width: 3px; height: 28px;
+    background: var(--browrule-src) center/100% 100% no-repeat;
+  }
+  .mbrow .rolllock {
+    display: block; flex: none;
+    height: 40px; aspect-ratio: 759/232;
+    background: var(--rolllock-src) center/contain no-repeat;
+    filter: drop-shadow(0 5px 20px rgba(226, 150, 96, .30));
+  }
+  .mtop .offer {
+    margin: 0; max-width: 22ch;
+    font-family: var(--font-display, inherit); font-weight: 400;
+    font-size: clamp(24px, 6.4vw, 34px); line-height: 1.18; letter-spacing: -.018em;
+    color: rgba(255, 255, 255, .96);
+  }
+  .mtop .offer b { color: #F7BF92; font-weight: 500 }
+  .mtop .btn { margin-top: clamp(22px, 3.4vh, 30px) }
+  .mtop .friction,
+  .mclose .friction {
+    margin: 12px 0 0; font-size: var(--fs-body-sm); color: rgba(255, 255, 255, .72);
+  }
+
+  /* ---- A CHAPTER -----------------------------------------------------
+     Eyebrow, headline, device, copy, in that order and in normal flow. The
+     section is taller than the viewport on purpose: this composition's whole
+     premise is that the device and the copy are not asked to share a screen,
+     and a section squeezed to fit one would be asking again. */
+  .mch {
+    /* flex, so `order` can put the device between the headline and the body
+       while the DOM keeps the copy together — see `.mchtext` in MobileTour. */
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--gut) clamp(56px, 9vh, 104px);
+  }
+  /* the group is transparent to layout on a phone: its three children are flex
+     items of the section itself */
+  .mchtext { display: contents }
+  .mchno { order: 1 }
+  .mchhead { order: 2 }
+  .mch > .mdev { order: 3 }
+  .mchbody { order: 4 }
+
+  /* the step rail is a left-gutter orientation aid and this frame has no left
+     gutter. A number and a name, at the head of the section it names. */
+  .mchno {
+    display: flex; align-items: baseline; gap: 11px; margin: 0 0 14px;
+    font-family: var(--font-mono, var(--font-body));
+    font-size: 12px; letter-spacing: .13em; text-transform: uppercase;
+  }
+  .mchno b { font-weight: 400; color: var(--near-green, #00EC97) }
+  .mchno span { color: rgba(255, 255, 255, .56) }
+
+  /* the size is the clamp `13-rollup.css` shares with the wide composition's
+     left column, whose 24px floor was written for this frame */
+  .mchhead {
+    margin: 0; color: #fff;
+    line-height: 1.1; letter-spacing: -.022em;
+    text-shadow: 0 2px 40px rgba(0, 0, 0, .35);
+  }
+  .mchhead .wordmark { color: #fff }
+
+  .mchbody {
+    margin-top: clamp(22px, 3.4vh, 32px);
+    color: rgba(255, 255, 255, .84);
+    font-size: 16px; line-height: 1.55;
+  }
+  .mchbody p { margin: 0; max-width: 42ch }
+  .mchbody strong { color: #fff }
+
+  /* ---- THE DEVICE, AS BIG AS THE COLUMN ALLOWS -----------------------
+     `--k` used to be chosen by viewport HEIGHT alone, a ladder of max-height
+     rules keyed to the desktop page, and the one width-keyed rule
+     (`min(.95, 86vw / 352px)`) never engaged on a phone because 352 fits
+     inside 86vw of 430. Nothing in that cascade ever asked whether the device
+     could be READ.
+
+     Three bounds now, tightest wins:
+       · 92vw / 352            — the column.
+       · (100svh - 190px) / 766 — the frame, less the nav and enough air to
+                                  show the device is a thing on a page rather
+                                  than the page. This is the binding one on a
+                                  phone: .854 at 390 x 844.
+       · .95                   — a ceiling. The device is drawn at its own size
+                                  on `/demo/*-v5` and blowing it past that here
+                                  would make the same screen two sizes.
+
+     At 390 x 844 that is a 301 x 654 device, with 12px interface type
+     rendering at 10.2 — twice the linear size of what it replaces.
+
+     `--k` is READ by `.pdev` (17-demo.css) as the scale on its transform, so
+     it must be declared on an ancestor of it and the box must carry the scaled
+     size, because a transform does not affect layout. */
+  .mdev {
+    --k: min(.95, calc(92vw / 352px), calc((100svh - 190px) / 766px));
+    position: relative;
+    width: calc(352px * var(--k));
+    height: calc(766px * var(--k));
+    margin: clamp(24px, 3.6vh, 34px) auto 0;
+  }
+
+  /* ---- THE QUOTE COMES HOME ------------------------------------------
+     `.qband` exists because the stacked lockup could not fit a 383px plate
+     under the phone without clipping the app card, so the testimonial was
+     moved to its own band under the stage. This composition has room for it
+     in the chapter it belongs to — Perps, "first screen only", which is what
+     the brief asked for — so it is drawn in `.mchbody` and the band that
+     stood in for it is not. */
+  .qband { display: none }
+  .mchbody .rollquote {
+    margin: 0; padding: 18px 20px;
+    border: 1px solid rgba(255, 255, 255, .13);
+    border-radius: 18px;
+    background: linear-gradient(45deg, rgba(201, 201, 201, .40), rgba(149, 149, 149, .352));
+    box-shadow: 0 18px 44px rgba(0, 0, 0, .28);
+    -webkit-backdrop-filter: blur(9px);
+    backdrop-filter: blur(9px);
+  }
+  .mchbody .rollquote p {
+    margin: 0; max-width: none;
+    font-family: var(--font-display); font-style: normal;
+    font-size: 17px; font-weight: 500; line-height: 1.4; color: rgba(255, 255, 255, .96);
+  }
+  .mchbody .rollquote .qfoot { display: flex; align-items: center; gap: 11px; margin-top: 14px }
+  .mchbody .rollquote .rqmark {
+    width: 22px; aspect-ratio: 1; flex: none;
+    background: var(--rollflat-src) center/contain no-repeat;
+  }
+  .mchbody .rollquote .qwho { display: flex; flex-direction: column; gap: 2px; line-height: 1.15 }
+  .mchbody .rollquote .qwho b { font-size: 15px; font-weight: 500; color: #fff }
+  .mchbody .rollquote .qwho > span {
+    font-family: var(--font-mono, var(--font-body)); font-size: 12px; letter-spacing: .07em;
+    text-transform: uppercase; color: rgba(255, 255, 255, .56);
+  }
+
+  /* ---- THE CLOSE ------------------------------------------------------
+     The closing plate's copy has no plate to land on here — there is no
+     shrink on a page whose scroll is its own — and the jurisdiction note is
+     not a design decision. Both live in an ordinary last section. */
+  .mclose {
+    padding: clamp(20px, 4vh, 40px) var(--gut) calc(120px + env(safe-area-inset-bottom, 0px));
+  }
+  /* `.h1` alone is `font-size: var(--fs-h1)`, a desktop display size: it set
+     this headline at 40.8px on a 426px screen. */
+  .mclose h2 {
+    margin: 0; color: #fff;
+    font-size: clamp(28px, 1.6vw + 22px, 46px);
+    line-height: 1.08; letter-spacing: -.022em;
+  }
+  .mclose h2 em { font-style: italic }
+  .mclosebody {
+    margin: 18px 0 0; max-width: 42ch;
+    color: rgba(255, 255, 255, .82); font-size: 16px; line-height: 1.55;
+  }
+  .mclose .btn { margin-top: clamp(24px, 3.6vh, 32px) }
+  .mdisc {
+    margin: clamp(28px, 5vh, 44px) 0 0;
+    font-family: var(--font-mono, var(--font-body));
+    font-size: 11px; line-height: 1.55; color: rgba(255, 255, 255, .46);
+  }
+
+  /* THE NAV NEEDS A FOOTING IT NEVER NEEDED BEFORE. On a wide frame nothing
+     scrolls under it — the composition is pinned, and `.gshade`'s header scrim
+     is enough. Here headlines and interfaces pass beneath a transparent bar,
+     and at 360px "Everything you own," runs straight into "Sign in". A
+     gradient on the bar itself, not on the field: it has to travel with the
+     nav and it must not exist once the nav has its own cream backdrop. */
+  .nav::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 -20px;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(3, 8, 6, .88) 0%, rgba(3, 8, 6, .62) 58%, rgba(3, 8, 6, 0) 100%);
+    transition: opacity var(--dur-slow) var(--ease-out);
+  }
+  .nav.on-light::before { opacity: 0 }
+
+  /* THE MODE PUCK GETS OUT OF THE CTA'S WAY. `/`, `/guided` and `/live` are
+     three routes of the same page and the puck is how you move between them,
+     but it is fixed 18px off the bottom right — which is where the fixed CTA
+     bar sits for most of this page. */
+  .modesw { bottom: calc(82px + env(safe-area-inset-bottom, 0px)) }
+}
+
+/* Under 800 the fixed bar already carried the CTA, and the footer already
+   cleared it. It runs up to 1080 now, because that is where `.rollcta` stops
+   being drawn — without this there is a band of tablet widths with no call to
+   action on screen at all. */
+@media (min-width: 800px) and (max-width: 1080px) {
+  .mobcta { display: flex }
+  footer { padding-bottom: 86px }
+}
+
+/* A PILL FROM EDGE TO EDGE IS NOT A PILL. The fixed bar is `left:10px;
+   right:10px`, which is right on a phone and 748px of mostly empty glass on a
+   tablet — the label at one end and the button at the other with a third of a
+   screen between them. Held to a readable width and centred. */
+@media (min-width: 620px) and (max-width: 1080px) {
+  .mobcta {
+    left: 50%; right: auto;
+    transform: translate3d(-50%, 120%, 0);
+    width: min(520px, calc(100vw - 20px));
+  }
+  .hero-gone .mobcta { transform: translate3d(-50%, 0, 0) }
+}
+
+/* ---- TABLET WIDTHS ARE TWO COLUMNS ------------------------------------
+   Between 760 and 1080 the constraint flips: there is width to spare and the
+   height budget is the same, so a device centred under its own headline
+   leaves two empty gutters and makes the section twice as tall as it needs to
+   be. Copy left, device right — which is the wide composition's own
+   arrangement, minus the sticky. */
+@media (min-width: 760px) and (max-width: 1080px) {
+  .mch { flex-direction: row; align-items: center; gap: clamp(30px, 4.6vw, 64px) }
+  /* AND HERE THE GROUP IS A REAL BOX. `display:contents` was what let `order`
+     interleave the device on a phone; a column needs something to be a column,
+     and three siblings of a device that spans their rows cannot be centred
+     against it — the device's height is shared out between them and they end
+     up pinned to its top and bottom with a hole in the middle. That hole is
+     what this line is. */
+  .mchtext { display: flex; flex-direction: column; flex: 1; min-width: 0 }
+  .mch > .mdev {
+    /* the device sets the section's height now, so it takes the frame less the
+       nav rather than leaving air below itself */
+    --k: min(.95, calc((100svh - 150px) / 766px));
+    flex: none;
+    margin: 0;
+  }
+  .mchbody p { max-width: 38ch }
+  .mtop .offer { max-width: 26ch }
+}

@@ -3,6 +3,7 @@ import {
   SHRINK_TRIG, SNAP_IDLE, SNAP_MS, SNAP_REACH, SNAP_VMAX, TEXT_TAIL, T_COVER,
   entryEnd, scrubT, yForT,
 } from '@/lib/schedule';
+import { NARROW_MQ } from '@/lib/breakpoints';
 import { clamp, easeShrink, lin, qblur, sm, sstep } from '@/lib/math';
 import { makeGradientField, fireRipple, stepRipple, RIP } from '@/gl/gradientField';
 import { makeVarWriter, sty } from './domCache';
@@ -33,6 +34,16 @@ type FaceGroups = { card: HTMLElement[]; left: HTMLElement[]; right: HTMLElement
 type Cacheable = HTMLElement & { __kids?: HTMLElement[]; __idle?: number; __surface?: boolean };
 
 export function startStageEngine(): () => void {
+  /* THE NARROW COMPOSITION DOES NOT HAVE ONE OF THESE, and this guard is the
+     belt to `useStageEngine(!narrow)`'s braces. The hook cannot know the
+     viewport until after the first client render — there is no viewport during
+     server render, so the first pass has to agree with the markup that arrived
+     — which means on a phone it would otherwise start the engine and tear it
+     down one commit later. Started for one commit is enough to compile a
+     shader, take a WebGL context and leave `#gl.on` behind on a canvas nothing
+     is going to draw to again. */
+  if (matchMedia(NARROW_MQ).matches) return () => {};
+
   const root = document.documentElement;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const qsa = <T extends Element = HTMLElement>(s: string) =>

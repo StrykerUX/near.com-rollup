@@ -47,6 +47,23 @@ import { earnV5Flow } from '@/components/demo/earnv5/script';
 
 const SCREENS = [PerpsScreen, OwnScreen, SwapScreen, EarnScreen];
 
+/**
+ * ONE CHAPTER'S SCREEN, ADDRESSED BY INDEX.
+ *
+ * The wide composition has one device and swaps the screen inside it; the
+ * narrow one (MobileTour.tsx) has four devices and each shows a fixed chapter.
+ * Both want the same four components with the same four flows, and this is the
+ * seam between them — export the mapping, not the device.
+ *
+ * The index is the DISPLAY order, which is `CH_TITLES` in lib/schedule.ts, and
+ * not the `data-face` numbering. Confusing the two puts the swap screen under
+ * the perps headline.
+ */
+export function ChapterScreen({ at }: { at: number }) {
+  const Screen = SCREENS[at] ?? SCREENS[0];
+  return <Screen />;
+}
+
 export function AppDevice() {
   /* the last chapter the engine actually landed on; -1 (mid-move) is ignored */
   const [at, setAt] = useState(0);
