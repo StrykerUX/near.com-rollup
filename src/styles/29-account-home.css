@@ -95,7 +95,6 @@
 .pdev.app .ownrow {
   display: flex; align-items: center; gap: 10px; padding: 16px 14px 18px;
   border-radius: 14px; background: var(--btc-card); border: 1px solid var(--btc-edge);
-  transition: background-color var(--dur) var(--ease-out);
 }
 .pdev.app .ownrowl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px }
 .pdev.app .ownrowl em { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .62) }

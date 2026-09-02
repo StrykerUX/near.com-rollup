@@ -227,8 +227,13 @@ function Swap({ d }: { d: Deck }) {
           explaining an arrow is a form apologising for itself. */}
       <div className="swfield">
         <div className="swrow">
-          <span className={'swfin' + (s.focus === 'amount' ? ' on' : '')}
-                style={fit(s.amount || '0')}
+          {/* NO FOCUS RING HERE, AND THAT IS THE DIFFERENCE BETWEEN THE TWO
+              KINDS OF FIELD. `/demo/perps-v5`'s amount is a bordered input, so
+              being in it brightens the border — `.bfin.on`, eased at `--dur`.
+              This one is a bare figure on a card, and the app marks it with the
+              caret alone. The class was here and the stylesheet never drew it,
+              which is a focus state that exists only in the JSX. */}
+          <span className="swfin" style={fit(s.amount || '0')}
                 data-tap={s.focus === 'amount' ? 'field' : undefined}>
             <b>{s.amount || '0'}</b>
             {s.focus === 'amount' ? <i className="bcaret" /> : null}
@@ -267,7 +272,12 @@ function Swap({ d }: { d: Deck }) {
             which is how `6635.616976` gets there: it is this figure, to the same
             six decimals, and nobody arrives at their own balance by typing. */}
         <span className="swsub">
-          <i>${fmt(usd(s), 0)}<Flip /></i>
+          {/* IT TRAVELS, like every derived figure on `/demo/perps-v5`. The
+              balance tap fills the field and four numbers answer in the same
+              frame; without the trip the eye cannot tell which of them moved
+              because of it. 780ms is that cut's duration for a derived
+              estimate. */}
+          <i><Count value={usd(s)} dp={0} prefix="$" ms={780} /><Flip /></i>
           <em className={'swmax' + live(d.can('max'))} {...press(d.can('max'))} data-tap="max">
             {qty(FROM_BAL)} {from.sym}
           </em>
@@ -308,7 +318,7 @@ function Swap({ d }: { d: Deck }) {
               out, because the trade fills at the quote and the dollars are read
               at spot — see `QUOTE` in state.ts. The two used to be the same
               number twice, which is a swap screen with no spread in it. */}
-          <i>${fmt(outUsd(s), 0)}</i>
+          <i><Count value={outUsd(s)} dp={0} prefix="$" ms={780} /></i>
           <em>{to ? `${qty(balOf(to.sym))} ${to.sym}` : '—'}</em>
         </span>
       </div>
@@ -358,7 +368,11 @@ function Swap({ d }: { d: Deck }) {
           </div>
           <div>
             <dt>Receive at least <Help /></dt>
-            <dd>{qty(least(s))} {to.sym}</dd>
+            {/* the terms sit inside `Enter`, keyed on the destination — so a
+                new token REMOUNTS this and the figure prints rather than
+                travelling from the old token's quantity to the new one's,
+                which would be a trip between two different units */}
+            <dd><Count value={least(s)} dp={6} group={false} trim ms={780} /> {to.sym}</dd>
           </div>
         </Enter>
       ) : null}

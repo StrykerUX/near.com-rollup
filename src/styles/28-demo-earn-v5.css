@@ -167,7 +167,6 @@
 .pdev.earn .ernmax {
   margin-left: auto; font-size: 13px; font-weight: 600; padding: 6px 11px; border-radius: 9px;
   background: rgba(255, 255, 255, .1);
-  transition: background-color var(--dur) var(--ease-out);
 }
 /* the one control on these screens that is ALREADY a fill, so its press takes
    the fill away rather than adding one — the frames show it losing its plate */

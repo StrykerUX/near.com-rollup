@@ -4,6 +4,7 @@ import { live, press } from '@/components/stage/phone/ui/tap';
 import { Enter } from '@/components/stage/phone/ui/Enter';
 import { ProgressList } from '@/components/stage/phone/ui/ProgressList';
 import { Layer, Tabs } from '@/components/demo/shell/Frame';
+import { Count } from '@/components/demo/shell/Count';
 import { Dot } from '@/components/demo/app/Dot';
 import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
@@ -32,15 +33,14 @@ type Deck = GenericDeck<EA, EAAction>;
  */
 
 const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
-/**
- * A DOLLAR FIGURE WITH ITS CENTS CUT, WHICH IS WHAT THE VAULT ROW DOES.
- *
- * $1,047 before the deposit and $1,069 after, on a balance of 1069.555 — the
- * app truncates. Rounding would print $1,070 and be a dollar out in the only
- * number this chapter exists to move. Same habit as `crypto()` in the account
- * chapter and the swap screen's rate row.
+
+/*
+ * THE VAULT ROW'S DOLLARS ARE CUT, NOT ROUNDED — $1,047 before the deposit and
+ * $1,069 after, on a balance of 1069.555. Rounding prints $1,070 and is a
+ * dollar out in the only number this chapter exists to move. The truncation is
+ * done at the call site now, where `Count` can travel to the whole figure:
+ * `Math.trunc` outside, `dp={0}` inside.
  */
-const cut = (v: number) => '$' + fmt(Math.trunc(v), 0);
 const USDC = { sym: 'USDC', color: '#2775CA', ink: '#fff' };
 const NEAR = { sym: 'NEAR', color: '#00EC97', ink: '#000' };
 
@@ -116,7 +116,15 @@ function Vaults({ d }: { d: Deck }) {
                 <b>{v.name}{v.promo ? <i className="ernpromo">Promo</i> : null}</b>
                 <em>TVL {v.tvl} · {v.apr}</em>
               </span>
-              <b className="ernbal">{cut(balanceOf(d.s, v))}</b>
+              {/* THE ONE FIGURE THIS CHAPTER MOVES, so it is the one that
+                  travels. `/demo/perps-v5` eases every derived number it has
+                  for the reason its `Count` file gives: four figures changing
+                  in one frame is correct and unreadable, and the trip is what
+                  makes the link between the press and the answer visible at
+                  all. 960ms is the duration that cut gives a BALANCE. */}
+              <b className="ernbal">
+                <Count value={Math.trunc(balanceOf(d.s, v))} prefix="$" ms={960} />
+              </b>
               <Chev />
             </span>
           );
@@ -228,13 +236,22 @@ function VaultSheet({ d }: { d: Deck }) {
                     SEPARATOR — `22.555228`, which is the whole lot Use max put
                     there. It used to round to a whole USDC, which on a deposit
                     of twenty-two dollars threw away most of the figure. */}
+                {/* THE FIELD AND ITS DOLLARS TRAVEL TOGETHER, at the 780ms
+                    `/demo/perps-v5` gives a derived estimate. `Use max` puts
+                    six decimals in a field that was empty; snapping there is
+                    the screen being replaced rather than answering. */}
                 <div className="ernamt">
                   <span className="ernamtv"
                         style={{ '--len': (s.amount || '0').length } as React.CSSProperties}>
-                    <b>{s.amount || '0'}</b><em>USDC</em>
+                    <b>
+                      <Count value={Number(s.amount) || 0} dp={6} group={false} trim ms={780} />
+                    </b>
+                    <em>USDC</em>
                     {s.focus === 'amount' ? <i className="bcaret" /> : null}
                   </span>
-                  <span className="ernamtu">{usd(Number(s.amount) || 0)}</span>
+                  <span className="ernamtu">
+                    <Count value={Number(s.amount) || 0} dp={2} prefix="$" ms={780} />
+                  </span>
                 </div>
 
                 <div className="ernavail">
@@ -245,7 +262,10 @@ function VaultSheet({ d }: { d: Deck }) {
                       availability the wallet does not have. */}
                   <span className="ernrowt">
                     <em>Available</em>
-                    <b>{(Math.trunc(available(s) * 100) / 100).toFixed(2)} USDC</b>
+                    <b>
+                      <Count value={available(s)} dp={2} group={false} trunc suffix=" USDC"
+                             ms={960} />
+                    </b>
                   </span>
                   <span className={'ernmax' + live(d.can('max'))} {...press(d.can('max'))}
                         data-tap="max" data-lit={s.lit === 'max' ? '1' : undefined}>Use max</span>

@@ -93,7 +93,6 @@
    gets the press affordance the rest of this row has no business wearing.
    `.can` is the shared class `live()` hands out; the hover is this file's,
    because nothing else in the app is a live control drawn as plain dim text. */
-.pdev.swp .swmax { transition: color var(--dur) var(--ease-out) }
 .pdev.swp .swmax.can:hover { color: rgba(255, 255, 255, .8) }
 /* the fiat/token flip: it is why the left side of this row is a dollar figure,
    and it is drawn rather than wired — nothing in this cut types in fiat */

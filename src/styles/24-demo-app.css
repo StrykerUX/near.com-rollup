@@ -464,12 +464,21 @@
    a card-shaped row lightens its fill, and a pill-shaped control drops its own
    instead. Both are what the frames show; neither is a hover.
    ========================================================================= */
+/* EVERY PRESSABLE THING EASES, which is `/demo/perps-v5`'s habit and was
+   nowhere else. Its sides, its tabs, its segmented track and its checkbox all
+   carry this triple; the account, swap and earn rows carried none of it, so
+   the press snapped on and off and read as a repaint rather than as a finger.
+   Declared once against `[data-tap]` — the attribute that already means "this
+   is a control" — and a superset of what those four declare individually, so
+   coming after them in the file costs them nothing. */
+.pdev.app [data-tap] {
+  transition: background-color var(--dur) var(--ease-out),
+              border-color var(--dur) var(--ease-out),
+              color var(--dur) var(--ease-out);
+}
+
 .pdev.app [data-lit='1'] { background: rgba(255, 255, 255, .1) }
 .pdev.app [data-lit='1'].pill { background: transparent }
-
-@media (prefers-reduced-motion: reduce) {
-  .pdev.app [data-lit='1'] { background: rgba(255, 255, 255, .1) }
-}
 
 .pdev.app .bcta {
   display: grid; place-items: center; margin-top: 4px; min-height: 50px; border-radius: 999px;
