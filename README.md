@@ -16,58 +16,68 @@ pnpm typecheck
 
 ## What changed in this pass
 
-A fidelity pass over the account and swap chapters, held against fresh
-screenshots of the real app rather than against the brief. Each entry links to
-the section that explains the reasoning; the short version is here.
+Client feedback across all four chapters of the tour, and one wallet underneath
+them. Every figure on every screen is now arithmetic on five prices read on
+**2 September 2026** and written down once, in `lib/prices.ts`:
 
-**`/demo/own-v5` — the account chapter**
+```
+BTC $77,118.98 · ZEC $797.02 · NEAR $1.84 · AAPL $325.64 · USDC $1.00
+```
 
-- The wallet is now **the recording's three holdings** — Tether and USD Coin on
-  two networks — in place of the brief's five. A deliberate trade, and it costs
-  the chapter its illustration. → [The wallet is the recording's, not the
-  brief's](#the-wallet-is-the-recordings-not-the-briefs)
-- A row is addressed by an **`id`**, because the app lists USD Coin twice and
-  two rows answering to `USDC` collide.
-- The home screen was rebuilt against the real one: the NEAR-mark avatar, the
-  eye on Total balance, an arrow instead of a chevron, and top spacing matched
-  to perps-v5 by measurement (23px and 23px).
-- **Cards are a fill plus a hairline**, which is what the app draws and what
-  these were missing entirely. Two spacing numbers came off the reference as a
-  fraction of screen width. → [The card
-  language](#the-card-language-is-a-fill-plus-a-hairline)
-- The **Earn pill** is on every row that has somewhere to earn, with its rate
-  imported from the Earn chapter. Its column could not be reserved, and that was
-  measured rather than preferred.
-- The action sheet got **four icons**, each already the app's mark for that verb.
-- The flow ran 20,025ms, was cut to 12,775 to fit a fixed dwell, and now runs
-  **14,400** — the 1,300 that came back all went to the opening frame.
+**NEAR is the app's $1.84 and not the market's $1.90.** The reference screenshot
+of the app's own Assets screen prints `1555.3148 NEAR` against `$2,861.78`,
+which divides to 1.8400 exactly. Where the app and the market disagree the app
+wins — the demo has to look like the product, not like a ticker. Gauntlet's rate
+gets the same call: **6.00%**, the current 30-day APY, not the 4.52% an older
+recording shows, because the app's own rows carry an `Earn 6%` pill.
 
-**`/demo/swap-v5` — the swap chapter**
+**`/demo/own-v5` — the account**
 
-- **No back arrow.** Swap is a tab, not a pushed page, so the title moved to the
-  page and the corner holds the confidential lock. It also gained the tab bar it
-  never had. → [This screen has no back
-  arrow](#this-screen-has-no-back-arrow)
-- The form **opens on a pair** — Tether in, ZEC out — instead of on a blank
-  destination, which makes the picker a choice rather than a required step.
-- That change **surfaced a real bug**: the catalogue prices only the pairs it
-  quotes, the quoted pair used to be BTC/NEAR, and the form opened saying
-  `1 USDT = 1.00 ZEC` off a silent `?? 1` fallback.
-- The **picker has sections** now — `Your tokens` with figures and quantities,
-  the `All / RWA (Beta)` tabs, then `More tokens` — and its scroll offset is
-  summed from real heights rather than multiplied by one row height. → [The
-  picker is not one list](#the-picker-is-not-one-list-and-drawing-it-as-one-was-the-miss)
-- **NEAR sits ninth on purpose**, so eight coins go past on the way to it, and
-  the picker rests on your own wallet before it moves. 25,250 → **25,975**.
+- The **Main / Confidential split is gone**, and `bucket` and `Move to Main`
+  with it. near.com is confidential by default now and its own Assets screen
+  carries one total and no halves.
+- The wallet is **the brief's five again** — 0.75 BTC, 25,000 NEAR, 120 AAPL
+  (Ondo), 40 ZEC, 18,400 USDC — which reverses a documented decision to follow
+  the recording's three. → [The wallet is the brief's, and what that
+  cost](#the-wallet-is-the-briefs-and-what-that-cost)
+- **Zcash is 40 where the brief says 400**, and it is the only quantity moved.
+
+**`/demo/perps-v5` — the trade**
+
+- The open position is **ZEC** and the ticket opens **BTC**. Both were Bitcoin,
+  which made the chapter one trade done twice in a product whose claim is that
+  you can trade anything from one account.
+- **The screen does not change market for it** — the pair, the chart and the
+  mark stay Bitcoin's. A position now knows its own symbol and its own mark, or
+  the ZEC card would report a profit every time Bitcoin ticked. → [One account,
+  two markets](#one-account-two-markets)
+- $20,000 at 5x is the $100,000 trade, and the perps balance is **imported**
+  from the account chapter: it was 11,428.61 here and 1,053.89 there.
+
+**`/demo/swap-v5` — the swap**
+
+- **0.25 BTC into ZEC** — $19,280 and 24.189 ZEC. Typed, because a quarter of a
+  holding is a fraction and `Use max` is the wrong gesture for one.
+- **The rate picks its own direction.** It was fixed at "one of what you are
+  buying", which on this pair printed `1 USDC = 0.00001 BTC`. → [A rate is
+  readable when the figure is whole](#a-rate-is-readable-when-the-figure-is-whole)
+- The picker travels down the catalogue and **comes back to the top**, because
+  the token this trade is for turned out to be one the account already holds.
+
+**`/demo/earn-v5` — the yield**
+
+- **Gauntlet**, the row at the top, and its sheet was never on film — the copy
+  is researched rather than invented. 15,000 of 18,400 typed in.
+- **The Staking tab is finally opened.** It has been on the row since the first
+  pass and no recording ever presses it. → [The one screen with no frame behind
+  it](#the-one-screen-with-no-frame-behind-it)
 
 **Everywhere**
 
-- **Twenty real brand marks** replace letter chips — twenty of the twenty-seven
-  assets in the picker, and every holding but the tokenised share. → [Assets](#assets)
-- `tools/check-flows.mjs` pins each clip's length, so both timing changes had to
-  be declared there before the build would pass.
-
----
+- The Apple mark joins the token set as the one silhouette drawn in black.
+- Quantities lose their thousands separators and their padding zeroes to match
+  the reference — and the trailing-zero trim is fixed: `/\.?0+$/` was turning
+  `120 AAPL` into `12`.
 
 ## What the page is
 
@@ -100,7 +110,9 @@ src/
   lib/
     schedule.ts       THE STAGE SCHEDULE — band weights, scrubT, yForT, feel dials
     math.ts           the easing vocabulary
-    tokens.ts         the swap screen's token set
+    prices.ts         THE TOUR'S FIVE PRICES, once — every figure on every v5
+                      screen is arithmetic on this table
+    tokens.ts         the swap screen's token set, and the v1–v4 flows' prices
     quotes.ts         the marquee's testimonials
     format.ts         en-US figure formatting
   gl/
@@ -699,6 +711,33 @@ bottom of a 766px device. The switch is the book being full: while there is a
 trade left to open the row offers to open one, and on the last frame it offers
 the two things you can do with what you have.
 
+### One account, two markets
+
+The book opens with a position on it and the ticket opens another, and for two
+passes **both were Bitcoin** — which made the chapter one trade done twice, in a
+product whose whole claim is that you can trade anything from one account. The
+open position is **ZEC** now and the ticket opens **BTC**.
+
+**The screen does not change market for it.** The pair, the chart, the candles
+and the mark are Bitcoin's throughout, which is what a perps app looks like when
+you are watching one market and holding a position in another. No market picker
+was added, because none was needed.
+
+Two things had to learn about it. A `Position` carries its own `sym` and its own
+`mark`, and `atFor` hands each one the price it should be measured against — the
+ZEC card would otherwise report a profit every time Bitcoin ticked, since the
+live quote is piped into every P&L on screen. And the chart is handed only the
+entries **in its own market**: a ZEC entry at $795 drawn on a scale built around
+$77,000 is either a mile under the floor or a scale that flattens every candle
+trying to fit it.
+
+The trade itself is **$20,000 at 5x** — the app multiplies the margin you type
+by the leverage, so that is the $100,000 position, 1.29670 BTC. And the perps
+balance is **imported from the account chapter**: this file said `11,428.61`
+while the home said `1,053.89`, two figures for one account on two faces of the
+same scroll, and neither of them covered $20,000 of margin against the $6,000
+the ZEC position already holds. It is $28,400, which leaves $22,400 free.
+
 ### The chart learned three things from this
 
 All three are opt-in props that default to what every other flow already does.
@@ -757,7 +796,9 @@ Measured, after:
 | distance travelled | 35 pts / 6s | 35 pts / 6s — *unchanged* |
 
 $0.50 is read off the reference frames, not chosen: every quote in them lands on
-a half dollar — $79,567.5, $79,577.5, $79,585.5. The rate now follows the market
+a half dollar — $79,567.5, $79,577.5, $79,585.5. (Those are the frames' own
+prices; the mark this cut trades at is $77,118.98 now, from `lib/prices.ts`. The
+half-dollar grid is what was read off them, not the level.) The rate now follows the market
 rather than the frame rate, which is the property that matters: a fast market
 crosses more ticks and prints more often, exactly as it should.
 
@@ -839,8 +880,8 @@ spelled out on the position cards directly below either way.
 line's 520ms draw-in is measured from — was latched the first time `entry` went
 non-null and never touched again unless it went back to null. On a screen that
 *opens* with a position on the book that is frame one, so when the second
-position landed and the entry moved from $79,520 to $79,567.5 the fade was long
-finished and the line simply jumped. A new trade's entry appearing and an old
+position landed and the entry moved the fade was long finished and the line
+simply jumped. A new trade's entry appearing and an old
 one's line sliding to a new price look nothing alike, and the cut was drawing
 the second while claiming the first. It now re-arrives whenever the entry is a
 *different price*: measured, the line grows 0 → 73px over ~530ms.
@@ -1034,50 +1075,58 @@ $82,000 / $78,200, for the same reason `demo/perps/state.ts` already gives.
 
 The tour's second chapter and the one the page's headline is about. Three
 frames: the account home, the **Assets** screen behind its Crypto row, and the
-sheet a row opens with Swap / Send / Earn / Move to Main on it. Rebuilt off
+sheet a row opens with Swap / Send / Earn on it. Built off
 `rec-Everything you own + Swap screen.MP4` at one frame per second — the home
 was already known from `rec-perps.MP4`, but what sat behind that chevron had
-never been on film.
+never been on film. What it holds and how it is split have both moved on since;
+the frames are still where the screen's structure came from.
 
-### The wallet is the recording's, not the brief's
+### The wallet is the brief's, and what that cost
 
 Charlie's brief asks for five holdings — 0.75 BTC, 25,000 NEAR, 18,400 USDC,
-400 ZEC, 120 AAPL — and the wallet on film holds Tether and two lots of USD
-Coin. Both versions were built; the recording won, and the reasoning is worth
-keeping because it is a trade and not an obvious call.
+400 ZEC, 120 AAPL (Ondo) — and the wallet on film holds Tether and two lots of
+USD Coin. Both versions have shipped. The recording's three won the first call,
+on the grounds that the chapter's job is to look like the product and a reader
+who has seen the app spots an invented portfolio faster than they read a
+headline. **That has been reversed at the client's direction**, and the reversal
+is worth writing down because it is a trade either way.
 
-The chapter's job on the page is to look like the product, and a reader who has
-seen the app spots an invented portfolio faster than they read a headline. What
-it costs is the illustration: *"Everything you own, one screen"* is now three
-stablecoin rows, with no Bitcoin and no tokenised share. The five-row version is
-in `ownv5/state.ts`'s history with its quantities intact — including the note
-that the brief's list **is not sorted by value and cannot be**: 400 ZEC is
-$201,296, which would make it the largest position rather than the fourth, so
-two quantities had to move for the screen's own claim to be true.
+What the brief's list buys is the illustration: *"Everything you own, one
+screen"* is five different things now — a coin, a network token, a share, a
+privacy coin and a dollar — instead of three stablecoin rows. What it costs is
+the recording as the wallet's source. The old figures closed to the cent against
+two frames, and that check is gone.
+
+**Zcash is 40 and the brief says 400.** It is the only quantity moved, and the
+price is why: ZEC closed at $797.02 on the day these prices were read, so four
+hundred of them is $318,808 — two thirds of the wallet, with three quarters of a
+Bitcoin reading as small change beside it. Forty lands it between the share and
+the dollars and leaves the list ordered without anything crushing the rest. The
+rows sum to **$193,196.84**, and the home's total is that plus two separate
+accounts: $28,400 of perps and $48,690 of earn, **$270,286.83**.
+
+### There is no Main and Confidential any more
+
+The screen carried two halves across the top — `Main $64.95` and
+`Confidential $6,675.32` — because the app used to hold two balances and most of
+the wallet was in the private one. **near.com is confidential by default now**,
+and its own Assets screen has one total and no split. So the halves are gone,
+`bucket` went with them, and so did `Move to Main` from the row's action sheet:
+it was the arrow back into an unshielded balance that no longer exists.
+
+The arithmetic that used to be the proof this screen was read rather than
+approximated went with it. The three rows summed to `$6,699.90`, which was the
+Confidential half the frame printed, and the total truncated its cent the way
+the frame did. All of that belonged to a wallet and a screen the product has
+moved past, and it is in `ownv5/state.ts`'s history with its reasoning intact.
 
 ### A row is addressed by an `id`, not by its symbol
 
-The app lists USD Coin twice, once per network. Two rows answering to `USDC`
-open one sheet between them and collide as React keys, so `Holding` carries an
-`id` and the machine's guard, the taps and the sheet's lookup all use it. The
-network badge on the disc — Solana on one, Ethereum on the other — is the only
-thing on screen saying they are not a duplicate, which is why the app draws it.
-
-### The arithmetic closes, except one cent, and that one is the frame's
-
-The three rows sum to **$6,699.90**, which is the Confidential half the frame
-prints, and $64.95 of Main on top of it is its total. Nothing is tuned to make
-that land; it lands because the recording is one session, and it is the check
-that says the frames were read rather than approximated.
-
-The cent that does not fall out of it: the raw sum is 6764.8455, which rounds to
-**$6,764.85**, and the recording prints **$6,764.84** while printing $6,699.90
-for the confidential half of that same sum. No single rounding rule reaches both
-— for the total to give `.84` the half would have to give `.89` — so the app is
-not using one, and the quantity it shows is truncated too (`6635.6169 …`), which
-is probably where the precision went. Given a frame that disagrees with itself,
-`crypto()` truncates and says so at the definition. It is the difference between
-matching a screenshot and being a cent off in the largest figure on screen.
+The app has listed the same asset twice before now, once per network, and two
+rows answering to one symbol open one sheet between them and collide as React
+keys. So `Holding` carries an `id` and the machine's guard, the taps and the
+sheet's lookup all use it. This wallet has no duplicate in it; the `id` stays
+because the next one might.
 
 ### The card language is a fill plus a hairline
 
@@ -1087,19 +1136,10 @@ dozen steps above its own fill, and that line does more of the work than the
 fill does: against a `#262626` plate on a `#202020` ground — six steps — the
 border is what actually draws the edge. These were fills with no line at all, so
 the sections read as regions of the page rather than as cards sitting on it.
-`--btc-edge` is that line, declared once, so the split, the list and the home
-card cannot drift apart.
-
-Two numbers came off the reference as a **fraction of the screen's width**, so
-the demo's narrower device would not distort them:
-
-| | reference | before | after |
-|---|---|---|---|
-| gap under the Main/Confidential split | 11.2% | 8.5% | 11.4% |
-| height of that split | 17.4% | 20.6% | 17.9% |
-
-That gap is the widest piece of air on the screen and the reason the two halves
-read as a header for the list rather than as its first row.
+`--btc-edge` is that line, declared once, so the list and the home card cannot
+drift apart. (Two of the numbers behind this were measured as a fraction of the
+screen's width, off the Main/Confidential split — the split has since gone, and
+the ratio it taught is what survives.)
 
 **The container goes darker, not lighter, and that took a second pass.** Sitting
 it a hair *above* the ground put it at ~`#252525` against blocks at `#262626` —
@@ -1109,9 +1149,11 @@ and the blocks read as blocks.
 
 ### The Earn pill, and a column that could not be reserved
 
-The app puts an `Earn 5.8%` pill on any holding it has somewhere to put to work.
-All three carry one here for the same reason they do on film — every holding is
-a stablecoin and the Earn tab takes stablecoins — and the rate is **imported**
+The app puts an `Earn 6%` pill on any holding it has somewhere to put to work.
+**One row carries one here**: USD Coin, because the Earn tab's vaults take
+dollars. Bitcoin, Zcash, NEAR and a tokenised share get none — NEAR has staking
+rather than a vault, and the other three have nothing to be put into, so a pill
+offering one would be the demo inventing a product. The rate is **imported**
 from `earnv5/state.ts` rather than typed, because two screens quoting one rate
 at each other is exactly the pair that drifts.
 
@@ -1119,10 +1161,9 @@ Reserving the pill's width on every row is the tidier idea: the figures line up
 whether or not a row earns. It was measured and it does not fit. The card is
 294px inside its padding; a reserved slot plus its gap costs 92 of them, and
 against a 34px mark and an 80px figure that leaves 62px for the name where
-`USD Coin` needs 66 and `40.00 AAPL · Ondo` needed 105. Reserving truncates
-content on every row to align two. Unreserved, three names sit whole on one line
-and only the row that has to truncates its quantity — exactly where the
-recording truncates it.
+`USD Coin` needs 66 and `120 AAPL · Ondo` needs 105. Reserving truncates content
+on every row to align one. Unreserved, the names sit whole on one line and only
+the row that has to truncates its quantity.
 
 ### A chapter cannot be given more dwell on its own
 
@@ -1172,18 +1213,40 @@ in what order — and if the real list differs, `catalogue.ts` is the only file
 that changes.
 
 **Prices are only where they are needed.** A picker row shows a symbol and a
-name; nothing on it is priced. Only the pairs this cut actually quotes carry one
-— the resting pair `USDT`/`ZEC` and the one it swaps into, `NEAR` — and the
-other twenty-four do not. A table of twenty-seven prices nobody reads is
-twenty-seven numbers that can go stale and be wrong on screen.
+name; nothing on it is priced. Only the assets this cut actually quotes carry
+one — and they carry it from `lib/prices.ts`, which is the same table the
+account screen totals and the perps ticket sizes against. A per-file price is
+how `tokens.ts` came to say $68,420.10 for Bitcoin while the perps screen marked
+$79,567.50: two prices for one coin, on two faces of the same scroll.
 
 **And that frugality had a bug in it.** The quoted pair used to be BTC/NEAR, so
 `fromPrice()` was hard-wired to the perps mark and ZEC had no price at all. The
-moment the form's resting pair became USDT into ZEC, it opened quoting
-`1 USDT = 1.00 ZEC` — the `?? 1` fallback, silently. Both are priced now and
-`fromPrice` reads the source's own price whatever the source is. A fallback that
-gives the right answer for the wrong reason is the one that breaks on the day
-you change something else.
+moment the resting pair changed, the form opened quoting a rate off a silent
+`?? 1` fallback. `fromPrice` reads the source's own price whatever the source is
+now. A fallback that gives the right answer for the wrong reason is the one that
+breaks on the day you change something else.
+
+### A rate is readable when the figure is whole
+
+The rate row was fixed at **one of the thing you are buying**, in units of the
+thing you are spending — `1 NEAR = 1.87669 USDT` — because the inverse on that
+pair, `1 USDT = 0.53 NEAR`, is the same fact stated so nobody can hold it. The
+rule was right and the reason was wrong. What makes a rate readable is not which
+side it is quoted from; it is that the figure is a **whole number rather than a
+fraction**.
+
+On Bitcoin into Zcash the readable direction flips: `1 ZEC = 0.0103349 BTC` is
+the fraction and `1 BTC = 96.7591 ZEC` is the price. On Bitcoin into a dollar
+the old rule printed `1 USDC = 0.00001 BTC` — five decimals of nothing. It
+quotes from whichever side lands above one now, which gives the frame's own
+answer on the frame's own pair and a legible one everywhere else.
+
+**And five decimals is not the same as five figures.** The frame's `1.87669` is
+five decimals on a number just over one, which is also six significant figures;
+on `0.0000129` those are not the same thing at all. The precision follows the
+magnitude so the figure always carries about six figures, and it is *truncated* —
+the frame's own 1.8766952 prints as 1.87669, which a rounding would have made
+1.87670.
 
 ### The picker is not one list, and drawing it as one was the miss
 
@@ -1258,12 +1321,83 @@ instead — **one pair of alphas** off `--tk` rather than a table of hand-picked
 tints, because twenty-seven hand-picked tints is twenty-seven chances to get one
 wrong and never look at it again.
 
-**The form opens on a pair, not on a blank.** The source is Tether because that
-is what the wallet holds — the account chapter ends on the Tether row's Swap
-action, and a form offering to spend a Bitcoin that is not in the assets list is
-two chapters contradicting each other on the same scroll. The destination opens
-on ZEC because the app holds the last pair, which makes the picker a *choice*
-rather than a required step. "Swap anything, anywhere" is a claim about choice.
+**The form opens on a pair, not on a blank.** The source is Bitcoin because the
+account chapter ends on the Bitcoin row's Swap action, and a form offering to
+spend something that is not in the assets list is two chapters contradicting each
+other on the same scroll. The destination opens on USD Coin because the app holds
+the last pair, which makes the picker a *choice* rather than a required step.
+"Swap anything, anywhere" is a claim about choice.
+
+**And it spends a quarter, not the lot.** `0.25` of 0.75 BTC — $19,280, and
+24.189 ZEC out. It is TYPED: the previous cut spent a whole Tether position and
+got it into the field with one tap on the balance, because `6635.616976` is not
+a figure anyone enters by hand. Four characters and a fraction of a holding is,
+and `Use max` is the wrong gesture for a fraction.
+
+**The picker goes looking and comes back.** Down past the wallet, into the
+catalogue, and then back to the top — because Zcash is the fourth row of `Your
+tokens` and the token this trade is for turned out to be one the account already
+holds. It used to end nine rows down on NEAR, from a wallet that held no NEAR.
+The list is still long, the reader still sees that it is long, and the answer was
+in their own five the whole time.
+
+## `/demo/earn-v5` — the yield, and the account it lives in
+
+The tour's fourth chapter. It opens on the same `AccountHome` the other two open
+on, presses the **Earn** balance — the third row of the card — and lands on the
+vaults. Earn is not a tab in the bar and never was: it is a room in the account,
+and the gesture says so.
+
+### Gauntlet, and the sheet no frame has ever shown
+
+The chapter deposits into **Gauntlet USDC**, the row at the top, at the client's
+direction. `rec-Earn + being able to send:pay from your earn balance.MP4` opens
+Taler's sheet and only Taler's, so **Gauntlet's disclosure has never been on
+screen** — which puts unobserved copy at the centre of the chapter.
+
+It is at least *researched* rather than invented, and here is the whole of it:
+Gauntlet is a risk firm that has set parameters for onchain lending since 2020,
+its USDC vault is curated on Morpho and runs on Ethereum, its 30-day APY is
+**6.00%** (6.35% over 24 hours), and Morpho curators charge a performance fee on
+yield — Gauntlet's is **15%**.
+
+**The rate is the current one, not the frame's 4.52%.** The reference screenshot
+of the app's own Assets screen carries an `Earn 6%` pill, so the app agrees with
+the market and the older frame is stale. The TVL is still the frame's, because a
+vault's size is a slow number and that one *was* observed.
+
+**15,000 of 18,400 goes in**, which is the brief's figure and leaves 3,400 — a
+decision rather than a sweep. It is typed: `Use max` was the right gesture while
+this cut spent a whole 22.555228 lot, and it is the wrong one for a fraction.
+The button is still drawn and still live for a reader who has the wheel.
+
+### The one screen with no frame behind it
+
+`Staking` has sat on the tab row since the first pass — it is in every frame of
+the recording — and **the recording never presses it**. For two passes neither
+did this cut, and the pane behind it was the brief's with a note saying so.
+
+The reference for what is actually there is one line of a sidebar in a
+screenshot of a different screen: **`Join NEAR@3.33, earn rewards`**. So the
+rate is the app's own **3.33%** — not the market's 4.4–4.9%, the same call
+NEAR's price gets — and the pane is *designed* rather than copied. This is the
+note that says so.
+
+**The stake is not a slice of the assets list.** Earn is its own account: the
+assets screen shows all 25,000 NEAR and this stakes 20,000 on top of it, which
+is two accounts rather than the same NEAR counted twice. Only the home's total
+puts the three together. 20,000 NEAR at $1.84 is **$36,800**, and Earn holds
+$48,690 before the deposit and $63,690 after.
+
+### The settlement is a screen, and the sheet waits
+
+Three rows tick — *Confirm in wallet · Depositing · Deposited* — under the
+amount, with the reference id the app prints, and then it **stops**. The sheet
+holds a white `Close` until something presses it; a settlement that dismisses
+itself is the app deciding you have finished reading the receipt. Closing it
+lands the deposit, and Gauntlet's row goes from **$8,650 to $23,650** on the
+screen the reader started from, which is the only thing this chapter had to
+prove.
 
 ## The home page — four chapters, four real screens
 
@@ -1414,7 +1548,7 @@ app — recordings of Perps, Swap, Earn and Universal Send.
 | Perps | Size a long, set a stop loss the form refuses, fix it, open the position. Live candle chart with an entry line. Market/**Limit** with a resting price, a leverage sheet, and Positions/Orders/Trades. |
 | Account | Universal Send — token and network, the amber notice you have to tick, and a **Pay with** sheet that offers a yield vault beside a wallet balance. The sentence the copy makes, happening. |
 | Swap | Size chips, a token sheet you can type in, then `Finding best price → Executing trade → Trade complete`. |
-| Earn | Vaults/Staking, two vaults, the vault's fees, Deposit/Withdraw, Use max, and a deposit that settles. |
+| Earn | Reached from the account's Earn row. Vaults/Staking, two vaults with their rates and your balance in each, the vault's whole disclosure, Deposit/Withdraw, a typed amount, a settlement that waits to be dismissed, and the NEAR stake behind the second tab. |
 
 ### One state, three drivers
 
@@ -1599,10 +1733,18 @@ a layout constant is a trap for whoever restores that band.)
 The original inlined everything as data URIs. They are now real files:
 
 - `public/fonts/` — PP Neue Montreal Book/Medium and Mono (woff2, self-hosted)
-- `public/img/` — the Rollup wordmark, the 3D copper mark, the field's rollmark
+- `public/img/` — the Rollup wordmark, the 3D copper mark, and `isologo.png`,
+  near.com's own mark, which holds the field's top-right corner. It replaced
+  `rollmark.png` there: that slot carried the Rollup's pinwheel as a silhouette
+  cut out of a copper gradient, and the Rollup's mark still stands in the lockup
+  in three dimensions and at full strength, which is the right place for it.
 - `public/logos/` — the marquee's brand marks
-- `public/logos/tokens/` — twenty token marks, the official full-colour files
-  from the near-intents asset set. **Served as `<img>`, never inlined:** every
+- `public/logos/tokens/` — twenty-two marks. Twenty are the official
+  full-colour SVGs from the near-intents asset set; `usdt.webp` is Tether's own
+  artwork, which replaced an SVG whose `#377e61` disc was a duller green than
+  the `#26A17B` the catalogue paints behind it; and `aapl.webp` is the one
+  **share** in the set and the one mark drawn in black, so its chip's colour is
+  the white it stands on. **Served as `<img>`, never inlined:** every
   file carries its own `<style>` block naming the same classes — `.st0` is
   `#fff` in Bitcoin and `#00ec97` in NEAR — so inlined into one document those
   rules are global, the last one parsed wins, and a picker showing twenty of
