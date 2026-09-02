@@ -190,8 +190,16 @@ export const PICK_TOTAL = pickOffset(PICK_ROWS.length);
 export const STOPS = [5, 9, 12];
 
 export type SV = {
-  /** one screen, and it is the swap. Named so `check:flows` prints a walk. */
-  screen: 'swap';
+  /**
+   * TWO SCREENS, AND THE FIRST IS THE ACCOUNT.
+   *
+   * It was one — the swap page, already loaded — which is a chapter that opens
+   * with no account of how anybody got there. The app reaches it from the tab
+   * bar, so this cut does too: the home screen the other two chapters open on,
+   * and a press on `Swap` down at the bottom. `Swap again` at the end returns
+   * here, which is also what closes the loop.
+   */
+  screen: 'home' | 'swap';
 
   from: string;
   /** never empty on this cut — it opens on the last pair, and the picker
@@ -220,7 +228,7 @@ export type SV = {
 };
 
 export const initial: SV = {
-  screen: 'swap',
+  screen: 'home',
   from: FROM,
   to: START_TO,
   amount: '',
@@ -303,6 +311,7 @@ export function cta(s: SV): { label: string; ok: boolean } {
 /* ---- the transitions -------------------------------------------------- */
 
 export type SVAction =
+  | 'toSwap'
   | 'focus' | 'key' | 'max' | 'done'
   | 'picker' | 'closePicker' | 'scroll' | 'pick'
   | 'confirm' | 'closeReview' | 'swap' | 'step' | 'again';
@@ -314,9 +323,15 @@ const digits = (cur: string, d: string) => {
 };
 
 export const actions: Record<SVAction, Act<SV>> = {
-  focus: (s, v) => (s.submitting ? null : { focus: (v ?? null) as SV['focus'], pressed: null, tap: null }),
+  /** the bottom bar's Swap tab, which is how the app gets to this screen */
+  toSwap: (s) => (s.screen === 'home' ? { screen: 'swap', lit: null, tap: 'tab:Swap' } : null),
+
+  focus: (s, v) =>
+    (s.screen !== 'swap' || s.submitting
+      ? null
+      : { focus: (v ?? null) as SV['focus'], pressed: null, tap: null }),
   key: (s, d) => {
-    if (!s.focus || !d || s.picker || s.submitting) return null;
+    if (s.screen !== 'swap' || !s.focus || !d || s.picker || s.submitting) return null;
     return { amount: digits(s.amount, d), pressed: d, tap: null };
   },
   /**
@@ -331,7 +346,7 @@ export const actions: Record<SVAction, Act<SV>> = {
    * which is how scene one stayed at the 2,300ms `check:flows` has pinned.
    */
   max: (s) =>
-    (s.submitting || s.picker || s.review || s.amount === AMOUNT
+    (s.screen !== 'swap' || s.submitting || s.picker || s.review || s.amount === AMOUNT
       ? null
       : { amount: AMOUNT, focus: null, pressed: null, lit: null, tap: 'max' }),
 
@@ -339,7 +354,9 @@ export const actions: Record<SVAction, Act<SV>> = {
   done: (s) => (s.focus ? { focus: null, pressed: null, tap: null } : null),
 
   picker: (s) =>
-    (s.picker || s.review || s.submitting ? null : { picker: true, at: 0, focus: null, lit: null, tap: 'to' }),
+    (s.screen !== 'swap' || s.picker || s.review || s.submitting
+      ? null
+      : { picker: true, at: 0, focus: null, lit: null, tap: 'to' }),
   closePicker: (s) => (s.picker ? { picker: false, tap: null } : null),
   /**
    * The list moves as a whole rather than a row at a time. A demo that steps a
@@ -370,7 +387,7 @@ export const actions: Record<SVAction, Act<SV>> = {
    * precision the form rounds away.
    */
   confirm: (s) =>
-    (s.submitting || s.review || !cta(s).ok
+    (s.screen !== 'swap' || s.submitting || s.review || !cta(s).ok
       ? null
       : { review: true, focus: null, lit: null, tap: 'confirm' }),
   closeReview: (s) => (s.review && !s.submitting ? { review: false, tap: null } : null),

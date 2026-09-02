@@ -9,6 +9,7 @@ import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import { Dot } from '@/components/demo/app/Dot';
+import { AccountHome } from '@/components/demo/app/AccountHome';
 import { CATALOGUE, type Asset } from './catalogue';
 import { value } from '@/components/demo/ownv5/state';
 import {
@@ -155,12 +156,24 @@ function Sliders() {
 export function Phone({ d }: { d: Deck }) {
   return (
     <div className="pdev app swp" data-motion="rich" data-tempo="fast" style={PALETTE_VARS}>
-      <Chrome />
-      <div className="pdview">
-        <Heading />
-        <Swap d={d} />
-      </div>
-      <Tabs on="Swap" />
+      {/* THE ACCOUNT FIRST, and the swap is reached from the bar like anything
+          else in this app. `AccountHome` is the same component `/demo/own-v5`
+          and `/demo/earn-v5` open on — one account, three chapters, each
+          pressing something different on it. Here it is not a row: swap IS a
+          tab, so the gesture is down at the bottom. */}
+      {d.s.screen === 'home' ? (
+        <div className="pdview"><AccountHome pass={d.pass} lit={d.s.lit} /></div>
+      ) : (
+        <>
+          <Chrome />
+          <div className="pdview">
+            <Heading />
+            <Swap d={d} />
+          </div>
+        </>
+      )}
+      <Tabs on={d.s.screen === 'home' ? 'Home' : 'Swap'}
+            go={{ Swap: d.can('toSwap') }} lit={d.s.lit} />
       <Picker d={d} />
       <Review d={d} />
     </div>

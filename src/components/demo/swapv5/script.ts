@@ -17,14 +17,15 @@ import { STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction } from 
  * `pnpm check:flows` asserts the product, so a beat that grows cannot quietly
  * move the clip's length.
  *
+ *   scene 0    2,300ms   the account, and the tab that leaves it
  *   scene 1    1,980ms   a form that already knows half of what it needs
  *   scene 2    4,220ms   the list, and how long it is
  *   scene 3    2,900ms   the quote
  *   scene 4    2,180ms   the review sheet
- *   scene 5    5,400ms   one press
- *   outro      4,000ms   the same frame again, for the loop
+ *   scene 5    5,400ms   one press, and Swap again
+ *   outro        900ms   the account, which is also where it started
  *   ─────────────────
- *             20,680ms  ×1.25 = 25,850ms on screen
+ *             19,880ms  ×1.25 = 24,850ms on screen
  *
  * THE DEAD HOLDS HAVE COME OUT, and the clip is shorter by exactly what they
  * were: 1,960 between the list stopping and the row being pressed, and 320 in
@@ -61,6 +62,7 @@ import { STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction } from 
  */
 
 const CHAPTERS: Chapter[] = [
+  { id: 'acct', name: 'From the account', blurb: '' },
   { id: 'form', name: 'The form', blurb: '' },
   { id: 'list', name: 'The list', blurb: '' },
   { id: 'quote', name: 'The quote', blurb: '' },
@@ -68,7 +70,23 @@ const CHAPTERS: Chapter[] = [
 ];
 
 const STEPS: Step<SV, SVAction>[] = [
-  /* ---- scene 1 · 2,300ms ---------------------------------------------- */
+  /* ---- scene 0 · 2,300ms ----------------------------------------------
+     THE ACCOUNT, AND THE TAB THAT LEAVES IT. Three seconds is the brief and
+     2,875 on screen is what this is; the frame has already been read twice by
+     anybody who scrolled the other two chapters, so what it owes here is not a
+     read, it is an ANSWER to the question of where the swap screen came from. */
+  {
+    id: 'home', ch: 'acct',
+    title: 'Swap is a tab on your account',
+    note: 'Not a page you navigate to and not another app: the third item in the bar, from the same account screen the other chapters open on.',
+    beats: [
+      { ms: 1400 },
+      { ms: 200, set: { lit: 'tab:Swap' } },
+      { ms: 700, do: 'toSwap' },
+    ],
+  },
+
+  /* ---- scene 1 · 1,980ms ---------------------------------------------- */
   {
     id: 'amount', ch: 'form',
     title: 'A form that already knows half of it',
@@ -179,7 +197,14 @@ const STEPS: Step<SV, SVAction>[] = [
       { ms: 700, do: 'step' },
       /* all three ticked, and then the success state */
       { ms: 900, do: 'step' },
-      { ms: 1940 },
+      { ms: 1120 },
+      /* AND `SWAP AGAIN` IS PRESSED, which is what closes the loop. It used to
+         be a button nobody touched and a four-second outro holding a frame the
+         reader was done with; pressing it lands on the account, which is where
+         this cut starts — so the seam is a gesture rather than a cut, and the
+         outro is a beat rather than a scene. */
+      { ms: 200, set: { lit: 'again' } },
+      { ms: 620, do: 'again' },
     ],
   },
 ];
@@ -192,8 +217,12 @@ export const swapV5Flow = buildFlow<SV, SVAction>({
   /* reduced motion gets the frame with the quote on it: the only one that
      shows both what was asked for and what it buys */
   restStep: 'quote',
-  outro: 4000,
+  /* short, because the frame it holds is the frame the clip opens on: `again`
+     has already taken the reader home, so the loop has nothing left to hide */
+  outro: 900,
   anchor: {
+    toSwap: 'amount',
+    again: 'home',
     max: 'amount',
     picker: 'list',
     scroll: 'list',

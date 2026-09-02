@@ -188,16 +188,35 @@ const TABS: TabName[] = ['Home', 'Assets', 'Swap', 'Perps', 'Menu'];
  * row on the home screen, and every item in the row is dim there. Lighting Home
  * would be the bar claiming you are somewhere you left.
  */
-export function Tabs({ on }: { on: TabName | 'None' }) {
+export function Tabs({ on, go, lit }: {
+  on: TabName | 'None';
+  /**
+   * WHAT A TAB DOES, for the chapters that are reached through one.
+   *
+   * The bar was drawn and inert everywhere — the app's own furniture, correct
+   * and untouchable. The swap chapter starts on the account and gets to its
+   * screen the way anybody would: by pressing Swap down here. So a tab may now
+   * carry a handler, and the ones that do not are what they always were.
+   */
+  go?: Partial<Record<TabName, (() => void) | null>>;
+  /** which tab is being held down — see the note in 24-demo-app.css */
+  lit?: string | null;
+}) {
   return (
     <nav className="dtabs" aria-label="App sections">
-      {TABS.map((t) => (
-        <span className="dtab" key={t} aria-current={t === on ? 'page' : undefined}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
-               strokeLinecap="round" strokeLinejoin="round">{TAB_ICONS[t]}</svg>
-          <em>{t}</em>
-        </span>
-      ))}
+      {TABS.map((t) => {
+        const fn = go?.[t] ?? null;
+        return (
+          <span className={'dtab' + live(fn)} key={t} {...press(fn)}
+                aria-current={t === on ? 'page' : undefined}
+                data-tap={fn ? 'tab:' + t : undefined}
+                data-lit={lit === 'tab:' + t ? '1' : undefined}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
+                 strokeLinecap="round" strokeLinejoin="round">{TAB_ICONS[t]}</svg>
+            <em>{t}</em>
+          </span>
+        );
+      })}
     </nav>
   );
 }

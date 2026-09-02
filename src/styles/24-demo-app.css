@@ -490,6 +490,16 @@
                               scale var(--dur) var(--ease-out) }
 .pdev.app [data-lit='1'].bcta { background: #D7DDDA; scale: .985 }
 
+/* AND A TAB IS NOT A ROW. Filling its box paints a rectangle the height of the
+   whole bar with a label floating in it; what a tab does under a finger is
+   brighten and press, because it is an icon and a word rather than a surface.
+   Its `aria-current` green is untouched — the tab you are pressing is not yet
+   the tab you are on. */
+.pdev.app .dtab {
+  transition: color var(--dur) var(--ease-out), scale var(--dur) var(--ease-out);
+}
+.pdev.app [data-lit='1'].dtab { background: none; color: #fff; scale: .94 }
+
 .pdev.app .bcta {
   display: grid; place-items: center; margin-top: 4px; min-height: 50px; border-radius: 999px;
   font-size: 16px; font-weight: 600; background: #fff; color: #0B0F0D;
