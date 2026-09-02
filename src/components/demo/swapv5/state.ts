@@ -208,6 +208,8 @@ export type SV = {
 
   focus: 'amount' | null;
   pressed: string | null;
+  /** the control being held down — see the note in 24-demo-app.css */
+  lit: string | null;
 
   /* settlement */
   submitting: boolean;
@@ -227,6 +229,7 @@ export const initial: SV = {
   at: 0,
   focus: 'amount',
   pressed: null,
+  lit: null,
   submitting: false,
   step: -1,
   done: false,
@@ -330,13 +333,13 @@ export const actions: Record<SVAction, Act<SV>> = {
   max: (s) =>
     (s.submitting || s.picker || s.review || s.amount === AMOUNT
       ? null
-      : { amount: AMOUNT, focus: null, pressed: null, tap: 'max' }),
+      : { amount: AMOUNT, focus: null, pressed: null, lit: null, tap: 'max' }),
 
   /** the ✓ on the accessory bar — the app's real way out of a numeric field */
   done: (s) => (s.focus ? { focus: null, pressed: null, tap: null } : null),
 
   picker: (s) =>
-    (s.picker || s.review || s.submitting ? null : { picker: true, at: 0, focus: null, tap: 'to' }),
+    (s.picker || s.review || s.submitting ? null : { picker: true, at: 0, focus: null, lit: null, tap: 'to' }),
   closePicker: (s) => (s.picker ? { picker: false, tap: null } : null),
   /**
    * The list moves as a whole rather than a row at a time. A demo that steps a
@@ -354,7 +357,7 @@ export const actions: Record<SVAction, Act<SV>> = {
     /* picking the token you are spending is the one choice the picker refuses:
        a swap from a thing into itself is not a trade */
     if (v === s.from) return null;
-    return { to: v, picker: false, at: 0, tap: 'pick:' + v };
+    return { to: v, picker: false, at: 0, lit: null, tap: 'pick:' + v };
   },
 
   /**
@@ -369,12 +372,12 @@ export const actions: Record<SVAction, Act<SV>> = {
   confirm: (s) =>
     (s.submitting || s.review || !cta(s).ok
       ? null
-      : { review: true, focus: null, tap: 'confirm' }),
+      : { review: true, focus: null, lit: null, tap: 'confirm' }),
   closeReview: (s) => (s.review && !s.submitting ? { review: false, tap: null } : null),
 
   /** and the sheet's own button, which is the one that actually trades */
   swap: (s) =>
-    (!s.review || s.submitting ? null : { review: false, submitting: true, step: 0, tap: 'swap' }),
+    (!s.review || s.submitting ? null : { review: false, submitting: true, step: 0, lit: null, tap: 'swap' }),
   /**
    * THE CHECKLIST TICKS, AND STOPS WHEN THERE IS NOTHING LEFT TO TICK.
    *

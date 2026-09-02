@@ -184,7 +184,7 @@ export function Phone({ d }: { d: Deck }) {
  */
 function Chrome() {
   return (
-    <div className="swtop">
+    <div className="swbar">
       <span className="swlock" aria-hidden="true">
         {/* lucide `lock-keyhole` with a tick — the app draws it green, which on
             a screen whose whole argument is confidentiality is not decoration */}
@@ -237,8 +237,8 @@ function Swap({ d }: { d: Deck }) {
           field on top is what leaves, the field under the arrow is what
           arrives, and the arrow between them is the sentence. Two labels
           explaining an arrow is a form apologising for itself. */}
-      <div className="swfield">
-        <div className="swrow">
+      <div className="swbox">
+        <div className="swline">
           {/* NO FOCUS RING HERE, AND THAT IS THE DIFFERENCE BETWEEN THE TWO
               KINDS OF FIELD. `/demo/perps-v5`'s amount is a bordered input, so
               being in it brightens the border — `.bfin.on`, eased at `--dur`.
@@ -291,14 +291,15 @@ function Swap({ d }: { d: Deck }) {
             THAT DOES SOMETHING. Tapping it puts the whole position in the field,
             which is how `6635.616976` gets there: it is this figure, to the same
             six decimals, and nobody arrives at their own balance by typing. */}
-        <span className="swsub">
+        <span className="swfoot">
           {/* IT TRAVELS, like every derived figure on `/demo/perps-v5`. The
               balance tap fills the field and four numbers answer in the same
               frame; without the trip the eye cannot tell which of them moved
               because of it. 780ms is that cut's duration for a derived
               estimate. */}
           <i><Count value={usd(s)} dp={0} prefix="$" ms={780} /><Flip /></i>
-          <em className={'swmax' + live(d.can('max'))} {...press(d.can('max'))} data-tap="max">
+          <em className={'swmax' + live(d.can('max'))} {...press(d.can('max'))} data-tap="max"
+              data-lit={s.lit === 'max' ? '1' : undefined}>
             {qty(FROM_BAL)} {from.sym}
           </em>
         </span>
@@ -313,8 +314,8 @@ function Swap({ d }: { d: Deck }) {
       </span>
 
       {/* ---- the destination, empty and waiting ---- */}
-      <div className="swfield">
-        <div className="swrow">
+      <div className="swbox">
+        <div className="swline">
           {/* NO THOUSANDS SEPARATOR in the amount fields. The app writes
               `3535.799`, and it is right to: this is the contents of an input,
               which is a thing you could have typed, and nobody types a comma. */}
@@ -348,7 +349,7 @@ function Swap({ d }: { d: Deck }) {
             side used to repeat the output amount that is already six times the
             size directly above it; what belongs there is `0 NEAR`, the app
             saying you do not hold any yet, which is the reason for the screen. */}
-        <span className="swsub">
+        <span className="swfoot">
           {/* AND IT IS THE SMALLER FIGURE. `$6,636` goes in and `$6,612` comes
               out, because the trade fills at the quote and the dollars are read
               at spot — see `QUOTE` in state.ts. The two used to be the same
@@ -373,7 +374,8 @@ function Swap({ d }: { d: Deck }) {
           at the bottom of the frame is a button belonging to the screen rather
           than to the pair above it. */}
       <span className={'bcta' + (c.ok ? '' : ' off') + live(d.can('confirm'))}
-            {...press(d.can('confirm'))} data-tap="confirm">{c.label}</span>
+            {...press(d.can('confirm'))} data-tap="confirm"
+            data-lit={s.lit === 'confirm' ? '1' : undefined}>{c.label}</span>
 
       {/* ---- what the quote actually says, under it ----
 
@@ -525,7 +527,8 @@ function Review({ d }: { d: Deck }) {
           <div><dt>Receive at least</dt><dd>{qty(least(s))} {to.sym}</dd></div>
         </div>
 
-        <span className={'bcta' + live(go)} {...press(go)} data-tap="swap">Swap</span>
+        <span className={'bcta' + live(go)} {...press(go)} data-tap="swap"
+              data-lit={s.lit === 'swap' ? '1' : undefined}>Swap</span>
       </div>
     </Layer>
   );
@@ -630,7 +633,8 @@ function PickRowView({ r, d }: { r: PickRow; d: Deck }) {
   if (r.kind === 'own') {
     const pick = d.can('pick', r.h.sym);
     return (
-      <span className={'switem own' + live(pick)} {...press(pick)} data-tap={'pick:' + r.h.sym}>
+      <span className={'switem own' + live(pick)} {...press(pick)} data-tap={'pick:' + r.h.sym}
+            data-lit={d.s.lit === 'pick:' + r.h.sym ? '1' : undefined}>
         <Chip a={r.h} chain={r.h.chain} />
         <span className="switemt"><b>{r.h.sym}</b><em>{r.h.name}</em></span>
         {/* the figure and the quantity, which is the whole reason this section
@@ -644,7 +648,8 @@ function PickRowView({ r, d }: { r: PickRow; d: Deck }) {
 
   const pick = d.can('pick', r.a.sym);
   return (
-    <span className={'switem' + live(pick)} {...press(pick)} data-tap={'pick:' + r.a.sym}>
+    <span className={'switem' + live(pick)} {...press(pick)} data-tap={'pick:' + r.a.sym}
+          data-lit={d.s.lit === 'pick:' + r.a.sym ? '1' : undefined}>
       <Chip a={r.a} />
       <span className="switemt"><b>{r.a.sym}</b><em>{r.a.name}</em></span>
     </span>

@@ -21,7 +21,7 @@
    against the right edge of the device while every card under it stopped 16px
    short — the one element on this screen not standing on the page's own
    margin, which reads as a bleed rather than as a corner control. */
-.pdev.swp .swtop {
+.pdev.swp .swbar {
   flex: none; display: flex; justify-content: flex-end; height: 50px;
   padding: 14px 16px 0;
 }
@@ -39,10 +39,24 @@
 
 .pdev.swp .swform { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 6px }
 
-.pdev.swp .swfield {
-  flex: none; padding: 16px; border-radius: 20px; background: var(--btc-card);
+/* THE HAIRLINE IS WRITTEN DOWN NOW, and it used to arrive by accident.
+   This box was `.swfield` — which is ALSO a class in `07-stage.css`, the ported
+   site stylesheet, where it carries a background and a
+   `border: 1px solid rgba(255,255,255,.10)`. Our rule overrode the fill and
+   never mentioned the border, so the edge on these cards was a rule from an
+   unrelated component leaking in. Third time this repo has been bitten by one
+   class naming two things (`.btk`, then `.blev`), and the first where the thing
+   it broke was a COLOUR: `.swrow` there sets `color: rgba(255,255,255,.55)`,
+   which is why the amount was grey, and `.swrow b { color: #fff }` is why it
+   had been white for as long as it was a `<b>`.
+   Four names moved — swfield/swrow/swsub/swtop → swbox/swline/swfoot/swbar —
+   and the border is `--btc-edge`, the one hairline token every other card on
+   these screens is edged with. */
+.pdev.swp .swbox {
+  flex: none; padding: 16px; border-radius: 20px;
+  background: var(--btc-card); border: 1px solid var(--btc-edge);
 }
-.pdev.swp .swrow { display: flex; align-items: center; gap: 10px }
+.pdev.swp .swline { display: flex; align-items: center; gap: 10px }
 
 /* THE AMOUNT SHRINKS TO MAKE ROOM FOR THE PILL.
    The field is 320px of page less its own 32 of padding, and the token pill and
@@ -83,12 +97,12 @@
 }
 .pdev.swp .swtok.empty .bcv { color: #04140E }
 
-.pdev.swp .swsub {
+.pdev.swp .swfoot {
   display: flex; align-items: center; gap: 8px; margin-top: 10px;
   font-size: 13px; color: rgba(255, 255, 255, .45); font-variant-numeric: tabular-nums;
 }
-.pdev.swp .swsub i { font-style: normal; display: flex; align-items: center; gap: 6px }
-.pdev.swp .swsub em { margin-left: auto; font-style: normal }
+.pdev.swp .swfoot i { font-style: normal; display: flex; align-items: center; gap: 6px }
+.pdev.swp .swfoot em { margin-left: auto; font-style: normal }
 /* the balance is a control — it fills the field with the whole position — so it
    gets the press affordance the rest of this row has no business wearing.
    `.can` is the shared class `live()` hands out; the hover is this file's,
@@ -273,18 +287,26 @@
 }
 
 .pdev.swp .swlistwrap { flex: 1; min-height: 0; overflow: hidden; position: relative }
+/* HOW A FINGER MOVES A LIST, which is not how `--ease-out` moves anything.
+   `ease-out` leaves at full speed and slows: correct for a thing that was
+   PUSHED, wrong for a thing somebody is dragging, because a list that is still
+   does not reach its top speed in the first frame. This curve has a soft head,
+   a quick middle and a long tail — the flick and the settle — and it is 100ms
+   shorter than what it replaces, so the travel is both faster and calmer. The
+   three stops then read as move · settle · move rather than as three cuts. */
 .pdev.swp .swlist {
   display: flex; flex-direction: column;
-  /* slower than the device's own `--dur-slow`: a list is heavy, and a
-     twenty-seven-row track that snaps between stops reads as a cut rather
-     than as someone scrolling */
-  transition: transform 620ms var(--ease-out);
+  transition: transform 520ms cubic-bezier(.32, .72, 0, 1);
 }
 /* the rail is drawn inside this wrap, so the rows are inset from it — a
    holding's figure running under a scrollbar reads as a clipping bug */
+/* A ROW THAT CAN BE CHOSEN IS SHAPED LIKE ONE. It was a flush 54px band with
+   no corners, so the press underneath it — `[data-lit]` in 24-demo-app.css —
+   painted a full-bleed rectangle across the sheet. The radius and the inset are
+   what make that fill read as the row lighting up rather than as a bar. */
 .pdev.swp .switem {
   flex: none; height: 54px; display: flex; align-items: center; gap: 12px;
-  padding-right: 14px;
+  padding: 0 14px 0 8px; margin-left: -8px; border-radius: 13px;
 }
 .pdev.swp .switem.own { height: 58px }
 
@@ -324,7 +346,8 @@
 .pdev.swp .swrail i {
   position: absolute; left: 0; width: 3px; height: 34%; border-radius: 2px;
   background: rgba(255, 255, 255, .28);
-  transition: top 620ms var(--ease-out);
+  /* the rail rides the same curve as the track, or it arrives on its own clock */
+  transition: top 520ms cubic-bezier(.32, .72, 0, 1);
 }
 
 /* the list fades at both edges so a row leaving the frame reads as travelling

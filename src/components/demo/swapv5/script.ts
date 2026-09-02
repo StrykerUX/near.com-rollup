@@ -72,8 +72,9 @@ const STEPS: Step<SV, SVAction>[] = [
       /* the opening frame: Tether in, ZEC already in the destination, nothing
          entered. It holds before anything moves, because what it is showing is
          a form that was filled in somewhere else. */
-      { ms: 900 },
+      { ms: 700 },
       /* one tap on the balance, and the whole position is in the field */
+      { ms: 200, set: { lit: 'max' } },
       { ms: 900, do: 'max' },
       { ms: 500 },
     ],
@@ -93,14 +94,20 @@ const STEPS: Step<SV, SVAction>[] = [
          sheet was still arriving, so `Your tokens` — the wallet the reader saw
          two faces ago, with the same three quantities — went past unread. */
       { ms: 1200, do: 'picker' },
-      { ms: 900, do: 'scroll', arg: String(STOPS[0]) },
-      { ms: 1100, do: 'scroll', arg: String(STOPS[1]) },
+      { ms: 760, do: 'scroll', arg: String(STOPS[0]) },
+      { ms: 780, do: 'scroll', arg: String(STOPS[1]) },
       /* and on until the row it came for comes into view. It travels one way:
          the destination the form opened with is already valid, so this is not
          someone hunting for an answer, it is someone seeing what else there is
          on the way to a better one. */
-      { ms: 1400, do: 'scroll', arg: String(STOPS[2]) },
-      { ms: 1580 },
+      { ms: 900, do: 'scroll', arg: String(STOPS[2]) },
+      /* THE HOPS GOT CLOSER AND THE REST GOT LONGER, and the scene is the same
+         length. At 620ms of travel against 900/1100/1400 of beat the list spent
+         longer stopped than moving, which reads as three cuts rather than as
+         somebody scrolling. The travel is 520 now and the gaps are ~250 — move,
+         settle, move — and everything those three beats gave up went here, onto
+         the frame that has NEAR on it. */
+      { ms: 2540 },
     ],
   },
 
@@ -110,10 +117,11 @@ const STEPS: Step<SV, SVAction>[] = [
     title: 'The quote fills itself in',
     note: 'One tap on the destination and every derived figure on the screen answers: the rate, the amount out, the least you can receive.',
     beats: [
-      { ms: 700, do: 'pick', arg: TO },
+      { ms: 220, set: { lit: 'pick:' + TO } },
+      { ms: 620, do: 'pick', arg: TO },
       /* the rest is the whole scene: four figures land at once and the eye
          needs somewhere to put them down */
-      { ms: 2200 },
+      { ms: 2060 },
     ],
   },
 
@@ -128,7 +136,8 @@ const STEPS: Step<SV, SVAction>[] = [
     title: 'The trade, at full precision',
     note: 'The form rounds to what fits in a box. The sheet does not: the same figures to five decimals, the rate, and the least you can receive — and only then a button that trades.',
     beats: [
-      { ms: 680, do: 'confirm' },
+      { ms: 200, set: { lit: 'confirm' } },
+      { ms: 480, do: 'confirm' },
       { ms: 1500 },
     ],
   },
@@ -143,7 +152,8 @@ const STEPS: Step<SV, SVAction>[] = [
     title: 'One press',
     note: 'Finding best price, executing, complete — and the Tether balance that was whole a moment ago.',
     beats: [
-      { ms: 620, do: 'swap' },
+      { ms: 200, set: { lit: 'swap' } },
+      { ms: 420, do: 'swap' },
       { ms: 620, do: 'step' },
       { ms: 620, do: 'step' },
       { ms: 700, do: 'step' },
