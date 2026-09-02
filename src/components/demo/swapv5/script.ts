@@ -17,18 +17,20 @@ import { STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction } from 
  * `pnpm check:flows` asserts the product, so a beat that grows cannot quietly
  * move the clip's length.
  *
- *   scene 1    2,300ms   a form that already knows half of what it needs
+ *   scene 1    1,980ms   a form that already knows half of what it needs
  *   scene 2    4,220ms   the list, and how long it is
  *   scene 3    2,900ms   the quote
  *   scene 4    2,180ms   the review sheet
  *   scene 5    5,400ms   one press
  *   outro      4,000ms   the same frame again, for the loop
  *   ─────────────────
- *             21,000ms  ×1.25 = 26,250ms on screen
+ *             20,680ms  ×1.25 = 25,850ms on screen
  *
- * SCENE 2 IS 1,960 SHORTER THAN IT WAS, and the clip is shorter by exactly
- * that: the dead hold between the list stopping and the row being pressed did
- * not move somewhere else, it went. 28,700 → 26,250.
+ * THE DEAD HOLDS HAVE COME OUT, and the clip is shorter by exactly what they
+ * were: 1,960 between the list stopping and the row being pressed, and 320 in
+ * front of the first thing that happens. Neither moved somewhere else in the
+ * script — a beat that is doing nothing is not a beat to spend elsewhere.
+ * 28,700 → 25,850.
  *
  * It also said 5,600 here for two passes while authoring 6,180, and the
  * assertion caught it the moment a new scene made somebody add the column up.
@@ -74,12 +76,21 @@ const STEPS: Step<SV, SVAction>[] = [
     beats: [
       /* the opening frame: Tether in, ZEC already in the destination, nothing
          entered. It holds before anything moves, because what it is showing is
-         a form that was filled in somewhere else. */
-      { ms: 700 },
+         a form that was filled in somewhere else.
+
+         380, AND IT USED TO BE 700. What this frame has to say is that the pair
+         is already there, and the pair is still there while the amount writes —
+         the card does not change except for the figure in it. Holding it empty
+         first was half a second of a screen that had already been read, and on
+         a loop the reader has just watched the same form settle. */
+      { ms: 380 },
       /* one tap on the balance, and the whole position is in the field */
       { ms: 200, set: { lit: 'max' } },
       { ms: 900, do: 'max' },
-      { ms: 500 },
+      { ms: 300 },
+      /* and the chip is pressed here, on this screen, rather than the sheet
+         simply being up on the next one */
+      { ms: 200, set: { lit: 'to' } },
     ],
   },
 

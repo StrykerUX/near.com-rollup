@@ -91,6 +91,20 @@
   border: 1px solid color-mix(in srgb, var(--tk, #fff) 34%, transparent);
 }
 .pdev.swp .swtok .bcv { color: rgba(255, 255, 255, .55) }
+/* AND THE CHIP DEEPENS WHEN IT IS PRESSED, in the colour it is already wearing.
+   The shared 10% white does nothing legible over a tint that is already a
+   colour; going from 18/34 to 30/52 of the SAME colour is the chip being held
+   rather than a grey wash laid over it. Same idea as the picker rows it opens. */
+.pdev.swp .swtok {
+  transition: background-color var(--dur) var(--ease-out),
+              border-color var(--dur) var(--ease-out),
+              scale var(--dur) var(--ease-out);
+}
+.pdev.swp [data-lit='1'].swtok {
+  background: color-mix(in srgb, var(--tk, #fff) 30%, transparent);
+  border-color: color-mix(in srgb, var(--tk, #fff) 52%, transparent);
+  scale: .985;
+}
 /* the one state with no token behind it, so it has no colour to borrow */
 .pdev.swp .swtok.empty {
   background: var(--btc-up); border-color: transparent; color: #04140E; padding: 0 12px;

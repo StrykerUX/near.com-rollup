@@ -480,6 +480,16 @@
 .pdev.app [data-lit='1'] { background: rgba(255, 255, 255, .1) }
 .pdev.app [data-lit='1'].pill { background: transparent }
 
+/* A WHITE BUTTON CANNOT LIGHT UP, and the rule above was doing nothing to
+   every primary on these screens: ten per cent white over `#fff` is `#fff`.
+   A white pill under a finger goes DOWN in value, not up — which is also the
+   only direction available to it — so it dims a step and presses in. The
+   scale is the same one the picker row uses, because it is the same gesture. */
+.pdev.app .bcta { transition: background-color var(--dur) var(--ease-out),
+                              color var(--dur) var(--ease-out),
+                              scale var(--dur) var(--ease-out) }
+.pdev.app [data-lit='1'].bcta { background: #D7DDDA; scale: .985 }
+
 .pdev.app .bcta {
   display: grid; place-items: center; margin-top: 4px; min-height: 50px; border-radius: 999px;
   font-size: 16px; font-weight: 600; background: #fff; color: #0B0F0D;

@@ -340,7 +340,8 @@ function Swap({ d }: { d: Deck }) {
               : <b className="off">0</b>}
           </span>
           <span className={'swtok' + (to ? ' picked' : ' empty') + live(open)}
-                style={to ? tint(to.color) : undefined} {...press(open)} data-tap="to">
+                style={to ? tint(to.color) : undefined} {...press(open)} data-tap="to"
+                data-lit={s.lit === 'to' ? '1' : undefined}>
             {to ? <><Dot a={to} size={26} /><b>{to.sym}</b></> : <b>Select token</b>}
             <Cv />
           </span>
