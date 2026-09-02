@@ -1,0 +1,169 @@
+/* =========================================================================
+   /demo/earn-v5 — TWO VAULTS, A STAKE, AND BOTH AT ONCE
+   -------------------------------------------------------------------------
+   The Vaults half is quoted from `rec-Earn + being able to send:pay from your
+   earn balance.MP4`: the Beta badge, the subtitle, the paragraph, the table's
+   own column headers, the `TVL … · rate` line under each name, and the whole
+   of Taler's sheet. The Staking and Positions panes are the brief's — see
+   `STAKED_NEAR` and `POSITIONS_TAB` in state.ts.
+
+   `.pdev.app` carries the face, the palette, the tempo, the CTA and the sheet
+   mechanics. SCOPED TO `.pdev.earn`, all of it.
+   ========================================================================= */
+
+.pdev.earn .pdview { padding: 0 16px }
+
+.pdev.earn .ernhead { flex: none; display: flex; align-items: center; gap: 8px; padding: 14px 0 2px }
+.pdev.earn .ernhead b { font-size: 22px; font-weight: 600 }
+.pdev.earn .ernbeta {
+  font-style: normal; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 6px;
+  background: rgba(39, 117, 202, .28); color: #6FB4FF;
+}
+.pdev.earn .ernsub { flex: none; font-size: 14px; color: rgba(255, 255, 255, .5) }
+
+.pdev.earn .erntabs {
+  flex: none; display: flex; align-items: center; gap: 20px; height: 40px; margin-top: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+.pdev.earn .erntab {
+  position: relative; height: 40px; display: flex; align-items: center;
+  font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, .42);
+  transition: color var(--dur) var(--ease-out);
+}
+.pdev.earn .erntab.on { color: #fff }
+.pdev.earn .erntab.on::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  background: #fff; border-radius: 2px;
+}
+
+.pdev.earn .ernpane { flex: 1; min-height: 0; display: flex; flex-direction: column }
+.pdev.earn .ernblurb {
+  flex: none; margin: 14px 0 4px; font-size: 13px; line-height: 1.45;
+  color: rgba(255, 255, 255, .5);
+}
+
+/* the table's own headers, and they are on screen in every frame */
+.pdev.earn .erncols {
+  flex: none; display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 2px 8px; border-bottom: 1px solid rgba(255, 255, 255, .08);
+  font-size: 12px; color: rgba(255, 255, 255, .42);
+}
+.pdev.earn .erncols i { font-style: normal }
+
+.pdev.earn .ernlist { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column }
+.pdev.earn .ernrow {
+  flex: none; display: flex; align-items: center; gap: 11px; padding: 13px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+.pdev.earn[data-motion] .ernrow { animation: drise 340ms var(--ease-out) both }
+.pdev.earn .ernrow:nth-child(2) { animation-delay: 60ms }
+.pdev.earn .ernrowt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px }
+.pdev.earn .ernrowt b { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600 }
+.pdev.earn .ernrowt em {
+  font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45);
+  font-variant-numeric: tabular-nums;
+}
+.pdev.earn .ernpromo {
+  font-style: normal; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 5px;
+  background: rgba(39, 117, 202, .28); color: #6FB4FF;
+}
+.pdev.earn .ernbal { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums }
+.pdev.earn .ernchev { width: 17px; height: 17px; flex: none; color: rgba(255, 255, 255, .35) }
+
+/* ---- the stake --------------------------------------------------------- */
+
+.pdev.earn .ernstake {
+  flex: none; margin-top: 6px; padding: 16px; border-radius: 16px; background: var(--btc-card);
+}
+.pdev.earn .ernstakeh { display: flex; align-items: center; gap: 11px }
+.pdev.earn .ernlive {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--btc-up);
+}
+.pdev.earn .ernlive i {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--btc-up);
+  animation: ernpulse 1.8s ease-in-out infinite;
+}
+@keyframes ernpulse { 50% { opacity: .3 } }
+.pdev.earn .ernstakev {
+  display: block; margin-top: 16px; font-size: 30px; font-weight: 600; letter-spacing: -.025em;
+  font-variant-numeric: tabular-nums;
+}
+.pdev.earn .ernstakev em { font-style: normal; font-size: 17px; color: rgba(255, 255, 255, .45) }
+.pdev.earn .ernstakeu {
+  display: block; margin-top: 2px; font-size: 14px; color: rgba(255, 255, 255, .45);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- the vault's sheet ------------------------------------------------- */
+
+.pdev.earn .ernsheet { padding-bottom: 20px }
+.pdev.earn .ernsh { display: block; font-size: 18px; font-weight: 600; margin: 10px 0 6px }
+.pdev.earn .erndesc {
+  font-size: 13px; line-height: 1.45; color: rgba(255, 255, 255, .5); margin-bottom: 14px;
+}
+.pdev.earn .ernstat { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.pdev.earn .ernstat span { display: flex; flex-direction: column; gap: 2px }
+.pdev.earn .ernstat i { font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45) }
+.pdev.earn .ernstat b { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums }
+
+.pdev.earn .ernfees { margin: 14px 0; display: grid; gap: 9px }
+.pdev.earn .ernfees > div {
+  display: flex; align-items: flex-start; gap: 12px; padding-top: 9px;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+}
+.pdev.earn .ernfees dt {
+  flex: none; display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: rgba(255, 255, 255, .45);
+}
+.pdev.earn .ernfees dd {
+  margin-left: auto; text-align: right; font-size: 12px; font-weight: 500; max-width: 58%;
+}
+
+.pdev.earn .ernside {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 12px;
+  background: rgba(255, 255, 255, .05);
+}
+.pdev.earn .ernsg {
+  display: grid; place-items: center; padding: 8px 0; border-radius: 9px;
+  font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, .55);
+  transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+}
+.pdev.earn .ernsg.on { background: rgba(255, 255, 255, .12); color: #fff }
+
+.pdev.earn .ernamt { text-align: center; padding: 20px 0 14px }
+.pdev.earn .ernamtv {
+  display: flex; align-items: baseline; justify-content: center; gap: 6px;
+  font-size: 30px; font-weight: 600; letter-spacing: -.025em; font-variant-numeric: tabular-nums;
+}
+.pdev.earn .ernamtv em { font-style: normal; font-size: 17px; color: rgba(255, 255, 255, .45) }
+.pdev.earn .ernamtu {
+  display: block; margin-top: 3px; font-size: 13px; color: rgba(255, 255, 255, .45);
+  font-variant-numeric: tabular-nums;
+}
+
+.pdev.earn .ernavail {
+  display: flex; align-items: center; gap: 10px; padding: 11px 13px; border-radius: 13px;
+  background: rgba(255, 255, 255, .05); margin-bottom: 12px;
+}
+.pdev.earn .ernavail .ernrowt em { font-size: 12px }
+.pdev.earn .ernavail .ernrowt b { font-size: 14px; font-variant-numeric: tabular-nums }
+.pdev.earn .ernmax {
+  font-size: 13px; font-weight: 600; padding: 6px 11px; border-radius: 9px;
+  background: rgba(255, 255, 255, .1);
+}
+
+.pdev.earn .ernsettle { margin-top: 6px }
+.pdev.earn .ernsettleh { display: block; font-size: 15px; font-weight: 600; margin-bottom: 12px }
+.pdev.earn[data-motion] .ernsettle { animation: drise 300ms var(--ease-out) both }
+.pdev.earn .ernref {
+  display: flex; align-items: center; margin-top: 14px; padding-top: 11px;
+  border-top: 1px solid rgba(255, 255, 255, .08); font-size: 12px;
+}
+.pdev.earn .ernref i { font-style: normal; color: rgba(255, 255, 255, .45) }
+.pdev.earn .ernref b { margin-left: auto; font-weight: 500; font-variant-numeric: tabular-nums }
+
+@media (prefers-reduced-motion: reduce) {
+  .pdev.earn[data-motion] .ernrow, .pdev.earn[data-motion] .ernsettle { animation: none }
+  .pdev.earn .ernlive i { animation: none }
+}

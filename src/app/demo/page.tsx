@@ -57,6 +57,14 @@ const DEMOS = [
       'The cut for a feed rather than a room. It opens on a Long already working — $120,000 at 20x, in front — and spends the rest opening a second one beside it: $5,000 of margin, twenty times, both exits set. Its own device, rebuilt against the app rather than argued down from it, and the only screen here set in the face the app actually uses.',
   },
   {
+    href: '/demo/earn-v5',
+    name: 'Earn v5',
+    len: 'twenty-three seconds',
+    steps: 5,
+    blurb:
+      'Two managed vaults with their rate on the row, fifteen thousand into one of them in a single press, and a stake that has been accruing the whole time. The Vaults half is quoted frame by frame; the Staking and Positions tabs are the brief’s and say so where they are declared.',
+  },
+  {
     href: '/demo/swap',
     name: 'Swap',
     len: '1m 14s',
