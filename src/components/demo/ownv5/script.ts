@@ -20,13 +20,13 @@ import { actions, initial, type OW, type OWAction } from './state';
  * THE ARITHMETIC. Beats play at `PACE` (1.25) and `pnpm check:flows` asserts
  * the product.
  *
- *   scene 1    1,300ms   the account, and what is in it
- *   scene 2    2,720ms   the five rows
+ *   scene 1    2,600ms   the account, and what is in it
+ *   scene 2    2,720ms   the rows
  *   scene 3    2,100ms   a row opens
  *   scene 4    2,100ms   Swap, and the handoff
  *   outro      2,000ms   the same frame again, for the loop
  *   ─────────────────
- *             10,220ms  ×1.25 = 12,775ms on screen
+ *             11,520ms  ×1.25 = 14,400ms on screen
  *
  * IT WAS 20,025 AND THAT WAS TOO LONG FOR WHERE IT LIVES. On its own route the
  * length costs nothing — a reader can watch it twice. On `/home-v2` it is one
@@ -38,8 +38,13 @@ import { actions, initial, type OW, type OWAction } from './state';
  * So the flow got shorter instead, and nothing was cut to do it — same four
  * gestures, same order. What went is dead hold: 1,100ms off the opening frame,
  * 1,200 off the list, 600 each off the sheet and the handoff, and half the
- * outro. Every rest that remains is one a value or a screen needs to be seen
- * landing, which is the only kind this family keeps.
+ * outro.
+ *
+ * AND 1,300 OF THAT CAME BACK, ALL OF IT TO THE OPENING FRAME. The trim was
+ * right about where the dead hold was and wrong about that one: 1,625ms on
+ * screen is a glance at four figures, not a read of them, and the account home
+ * is the frame the chapter's headline is making a claim about. The other three
+ * scenes keep their trimmed lengths. 12,775 → 14,400.
  */
 
 const CHAPTERS: Chapter[] = [
@@ -50,15 +55,21 @@ const CHAPTERS: Chapter[] = [
 ];
 
 const STEPS: Step<OW, OWAction>[] = [
-  /* ---- scene 1 · 1,300ms ----------------------------------------------
+  /* ---- scene 1 · 2,600ms ----------------------------------------------
      One beat and nothing fires. The whole claim of this chapter is on screen
      already — three balances and a total that is their sum — so the first
-     thing it does is let that be read. */
+     thing it does is let that be read.
+
+     IT WAS 1,300, WHICH IS 1,625ms ON SCREEN, AND THAT IS NOT A READ. Four
+     figures and three labels in a second and a half is a glance. This is now
+     the same dwell the assets frame gets (620 to arrive plus 2,100 to sit,
+     3,400ms), which is the right comparison: both are frames whose whole job
+     is to be looked at, and they carry about the same amount of reading. */
   {
     id: 'home', ch: 'home',
     title: 'One account, three balances',
     note: 'Crypto, perps and earn on one screen, and a total that is the sum of the three rows under it.',
-    beats: [{ ms: 1300 }],
+    beats: [{ ms: 2600 }],
   },
 
   /* ---- scene 2 · 2,720ms ---------------------------------------------- */
