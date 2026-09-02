@@ -51,7 +51,7 @@ export function Phone({ d }: { d: Deck }) {
     <div className="pdev app earn" data-motion="rich" data-tempo="fast" style={PALETTE_VARS}>
       <div className="pdview">
         {s.screen === 'home'
-          ? <AccountHome pass={d.pass} lit={s.lit} go={{ earn: d.can('toEarn') }} />
+          ? <AccountHome lit={s.lit} go={{ earn: d.can('toEarn') }} />
           : <Earn d={d} />}
       </div>
 

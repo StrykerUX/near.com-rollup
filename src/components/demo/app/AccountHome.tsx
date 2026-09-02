@@ -36,9 +36,7 @@ const SYMS = [...new Set(HOLDINGS.map((h) => h.sym))];
 
 export type HomeRow = 'crypto' | 'perps' | 'earn';
 
-export function AccountHome({ pass, go, lit }: {
-  /** the loop pass, so the entrance replays rather than snapping */
-  pass: number | string;
+export function AccountHome({ go, lit }: {
   /** what pressing a row does. A row with no entry is drawn and inert. */
   go?: Partial<Record<HomeRow, (() => void) | null>>;
   /**
@@ -48,8 +46,23 @@ export function AccountHome({ pass, go, lit }: {
    */
   lit?: string | null;
 }) {
+  /**
+   * THE ENTRANCE PLAYS ON ARRIVAL, WHICH IS NOT THE SAME AS ONCE A PASS.
+   *
+   * It was keyed on the loop pass, so the swap chapter's home animated TWICE
+   * every loop: once when `Swap again` brought the reader back to it, and again
+   * a second later when the pass ticked over under a screen that had not
+   * changed. Two entrances for one arrival, and the second one landed on a
+   * frame nobody had left.
+   *
+   * A constant key is right because this component is CONDITIONALLY RENDERED:
+   * leaving the home unmounts it and coming back mounts it again, and a CSS
+   * entrance plays on mount without being asked. The key was only ever forcing
+   * a replay in the one case that should not have had one — the loop seam,
+   * where the screen is already the screen it is about to become.
+   */
   return (
-    <Enter k={`h${pass}`} className="ownhome">
+    <Enter k="home" className="ownhome">
       {/* THE CHROME, from the app's own home screen: a green rounded square
           carrying the NEAR mark, the word Account, and one control on the
           right. Not two — the reference has a single scan button where the

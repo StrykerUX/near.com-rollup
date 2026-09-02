@@ -162,7 +162,7 @@ export function Phone({ d }: { d: Deck }) {
           pressing something different on it. Here it is not a row: swap IS a
           tab, so the gesture is down at the bottom. */}
       {d.s.screen === 'home' ? (
-        <div className="pdview"><AccountHome pass={d.pass} lit={d.s.lit} /></div>
+        <div className="pdview"><AccountHome lit={d.s.lit} /></div>
       ) : (
         <>
           <Chrome />

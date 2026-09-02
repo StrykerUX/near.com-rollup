@@ -37,7 +37,7 @@ export function Phone({ d }: { d: Deck }) {
     <div className="pdev app own" data-motion="rich" data-tempo="fast" style={PALETTE_VARS}>
       <div className="pdview">
         {s.screen === 'home'
-          ? <AccountHome pass={d.pass} lit={s.lit} go={{ crypto: d.can('toAssets') }} />
+          ? <AccountHome lit={s.lit} go={{ crypto: d.can('toAssets') }} />
           : <Assets d={d} />}
       </div>
       <Tabs on={s.screen === 'home' ? 'Home' : 'Assets'} />
