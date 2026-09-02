@@ -12,7 +12,7 @@ import { Layer } from '@/components/demo/shell/Frame';
 import { PALETTE, PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
-  CANDLE_MS, JITTER, MARK, PHASE, REACH, TAPE, TICK, WICK_BIAS, ORDERS_0, ORDER_STEPS, TRADES_0, avail, btcSize, cta, liqPct, liqPrice, money,
+  CANDLE_MS, JITTER, MARK, PHASE, REACH, TAPE, TICK, WICK_BIAS, ORDERS_0, ORDER_STEPS, TRADES_0, PAIR, atFor, avail, btcSize, cta, liqPct, liqPrice, money,
   notional, pnl, pnlPct, slBad, tpBad, type BD, type BDAction, type Position,
 } from './state';
 
@@ -214,13 +214,13 @@ function Market({ d }: { d: Deck }) {
     el.querySelectorAll<HTMLElement>('[data-pnl]').forEach((n) => {
       const p = book[Number(n.dataset.pnl)];
       if (!p) return;
-      const v = pnl(p, quote);
+      const v = pnl(p, atFor(p, quote));
       put(n, signed(v), v);
     });
     el.querySelectorAll<HTMLElement>('[data-pnlp]').forEach((n) => {
       const p = book[Number(n.dataset.pnlp)];
       if (!p) return;
-      const v = pnlPct(p, quote);
+      const v = pnlPct(p, atFor(p, quote));
       put(n, signedPct(v), v);
     });
   }, [book]);
@@ -265,12 +265,15 @@ function Market({ d }: { d: Deck }) {
           up={PALETTE.up}
           down={PALETTE.down}
           face={AXIS_FACE}
-          /* ONE LINE PER POSITION, newest first — the whole book, not its head.
-             Handing the chart only `book[0]` meant the first position's line
-             vanished the instant a second trade landed, so what a viewer saw
-             was one blue line MOVING: the position changed price, which is the
-             opposite of what happened. */
-          entry={s.book.map((p) => p.entry)}
+          /* ONE LINE PER POSITION IN THIS MARKET, newest first — the whole
+             book, not its head. Handing the chart only `book[0]` meant the
+             first position's line vanished the instant a second trade landed,
+             so what a viewer saw was one blue line MOVING: the position changed
+             price, which is the opposite of what happened.
+             AND ONLY THIS MARKET'S. The book holds a ZEC position at $795 and
+             this chart is drawn around $77,000 — its line would be a mile
+             under the floor, or it would flatten every candle trying to fit. */
+          entry={s.book.filter((p) => p.sym === PAIR).map((p) => p.entry)}
           side={head?.side ?? null}
           /**
            * THE BRACKET GOES ON THE CHART, because a trade that was set and
@@ -356,8 +359,8 @@ function PositionBar({ d }: { d: Deck }) {
       <div className={'bposh' + live(open)} {...press(open)} data-tap="posbar">
         <span className="bposl">Position: <b className={p.side}>{p.side === 'long' ? 'Long' : 'Short'} {p.lev}x</b></span>
         <span className="bposp">
-          <b data-pnl="0">{signed(pnl(p, MARK))}</b>
-          <i data-pnlp="0" className="bpct">{signedPct(pnlPct(p, MARK))}</i>
+          <b data-pnl="0">{signed(pnl(p, atFor(p, MARK)))}</b>
+          <i data-pnlp="0" className="bpct">{signedPct(pnlPct(p, atFor(p, MARK)))}</i>
         </span>
         <Icon d={CHEV} className={'bcv bposc' + (s.posOpen ? ' on' : '')} />
       </div>
@@ -414,30 +417,44 @@ function Book({ d }: { d: Deck }) {
   );
 }
 
+/**
+ * A CARD KNOWS WHICH MARKET IT IS IN, and for two passes it did not: every
+ * position on this book was drawn as Bitcoin because the only one that existed
+ * was. The book holds a ZEC position now, opened before the reader arrived,
+ * and the ticket opens Bitcoin over the top of it — one account, two markets,
+ * which is the claim.
+ *
+ * ITS PRICES ARE ITS OWN. `atFor` hands each position the quote it should be
+ * measured against, so the ZEC card does not report a profit when Bitcoin
+ * ticks, and the entry prints its cents when the asset is worth hundreds
+ * rather than tens of thousands.
+ */
 function PositionCard({ p, i }: { p: Position; i: number }) {
   const qty = p.size / p.entry;
+  const at = atFor(p, MARK);
+  const dp = p.entry < 1000 ? 2 : 0;
   return (
     <div className="bcard">
       <div className="bcardh">
-        <TokenDot token={BTC} size={30} />
-        <span className="bcardt"><b>BTC</b><em>{p.side === 'long' ? 'Long' : 'Short'} {p.lev}x</em></span>
+        <TokenDot token={findToken(p.sym)} size={30} />
+        <span className="bcardt"><b>{p.sym}</b><em>{p.side === 'long' ? 'Long' : 'Short'} {p.lev}x</em></span>
         <span className="bcardp">
-          <b data-pnl={i}>{signed(pnl(p, MARK))}</b>
-          <i data-pnlp={i} className="bpct">{signedPct(pnlPct(p, MARK))}</i>
+          <b data-pnl={i}>{signed(pnl(p, at))}</b>
+          <i data-pnlp={i} className="bpct">{signedPct(pnlPct(p, at))}</i>
         </span>
       </div>
       <dl className="bcardd">
         <div>
           <dt>Value</dt>
-          <dd>{money(p.size)} <i>{qty.toFixed(5)} BTC</i></dd>
+          <dd>{money(p.size)} <i>{qty.toFixed(qty < 100 ? 5 : 2)} {p.sym}</i></dd>
         </div>
         <div>
           <dt>Entry price</dt>
-          <dd>{usd(p.entry, 0)}</dd>
+          <dd>{usd(p.entry, dp)}</dd>
         </div>
         <div>
           <dt>Liquidation</dt>
-          <dd>{usd(liqPrice(p.entry, p.lev, p.side))} <i>{(liqPct(p.lev) * 100).toFixed(1)}% below</i></dd>
+          <dd>{usd(liqPrice(p.entry, p.lev, p.side), dp)} <i>{(liqPct(p.lev) * 100).toFixed(1)}% below</i></dd>
         </div>
       </dl>
     </div>

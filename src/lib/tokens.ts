@@ -58,7 +58,7 @@ export const TOK_ICONS: Record<string, TokenGlyph> = {
    * `<img>` gets its own document, and the collision cannot happen.
    *
    * WHAT IS NOT HERE keeps its letter chip: LINK, DOT, HBAR, XMR, UNI, SHIB and
-   * PEPE have no file in the set, and AAPL is a share rather than a coin. A
+   * PEPE have no file in the set. A
    * letter where the real mark exists is a worse lie than a letter where none
    * does — nobody mistakes a `D` on gold, and everybody knows the ₿.
    */
@@ -86,4 +86,9 @@ export const TOK_ICONS: Record<string, TokenGlyph> = {
   LTC: { img: '/logos/tokens/ltc.svg' },
   ARB: { img: '/logos/tokens/arb.svg' },
   OP: { img: '/logos/tokens/op.svg' },
+  /* THE ONE SHARE IN THE SET, and the only mark drawn in black. Every other
+     file here is a disc that covers its own square in the brand's colour; the
+     Apple mark is a silhouette on nothing, so the chip's own `color` has to be
+     the white it stands on. See `aapl` in ownv5/state.ts. */
+  AAPL: { img: '/logos/tokens/aapl.webp' },
 };

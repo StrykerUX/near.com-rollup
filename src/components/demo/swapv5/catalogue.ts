@@ -1,4 +1,4 @@
-import { MARK } from '@/components/demo/perpsv5/state';
+import { PRICE } from '@/lib/prices';
 
 /**
  * THE DESTINATION PICKER'S LIST
@@ -43,23 +43,19 @@ export type Asset = {
 };
 
 /**
- * BITCOIN'S PRICE IS IMPORTED, NOT REPEATED.
+ * THE PRICES ARE THE ACCOUNT CHAPTER'S, NOT THIS FILE'S.
  *
- * `tokens.ts` says $68,420.10 and `/demo/perps-v5` marks $79,567.50, which is
- * two prices for one coin in one product. On a page that can show the perps
- * screen and the swap screen within a few seconds of each other, that is not a
- * tolerable amount of disagreement — so this screen quotes the mark, from the
- * file that owns it. `tokens.ts` still serves the older flows, which were
- * built against their own recordings and should keep their own figures.
+ * `lib/prices.ts` carries one table for the whole tour — five figures read on
+ * 2 September 2026 — because every screen here is arithmetic on top of them and
+ * two files quoting one coin is exactly the pair that drifts. It happened once
+ * already: `tokens.ts` said $68,420.10 for Bitcoin while `/demo/perps-v5`
+ * marked $79,567.50, two prices for one coin on two faces of the same scroll.
+ * `tokens.ts` still serves the older flows, which were built against their own
+ * recordings and keep their own figures.
  */
-export const BTC_PRICE = MARK;
-
-/**
- * NEAR, read off `rec-Swap.MP4`'s own arithmetic: the recording swaps into
- * 3,535.3148 NEAR for $6,611.04, which is $1.87 each. `demo/swap/state.ts`
- * derives the same number from the same two figures.
- */
-export const NEAR_PRICE = 1.87;
+export const BTC_PRICE = PRICE.BTC;
+export const NEAR_PRICE = PRICE.NEAR;
+export const ZEC_PRICE = PRICE.ZEC;
 
 export const CATALOGUE: Asset[] = [
   { sym: 'BTC', name: 'Bitcoin', color: '#F7931A', ink: '#fff', price: BTC_PRICE },
@@ -67,17 +63,17 @@ export const CATALOGUE: Asset[] = [
   /* PRICED BECAUSE IT IS SPENT. A dollar-pegged token resolving through the
      `?? 1` fallback gives the right answer for the wrong reason, and the day
      something else is spent the fallback is what breaks. */
-  { sym: 'USDT', name: 'Tether', color: '#26A17B', ink: '#fff', price: 1 },
+  { sym: 'USDT', name: 'Tether', color: '#26A17B', ink: '#fff' },
   { sym: 'NEAR', name: 'NEAR', color: '#00EC97', ink: '#000', price: NEAR_PRICE },
   { sym: 'XRP', name: 'XRP', color: '#23292F', ink: '#fff' },
-  { sym: 'USDC', name: 'USD Coin', color: '#2775CA', ink: '#fff' },
+  { sym: 'USDC', name: 'USD Coin', color: '#2775CA', ink: '#fff', price: PRICE.USDC },
   { sym: 'SOL', name: 'Solana', color: '#9945FF', ink: '#fff' },
   { sym: 'BNB', name: 'BNB', color: '#F0B90B', ink: '#000' },
   /* PRICED BECAUSE THE FORM OPENS ON IT. The screen's resting pair is
      USDT into ZEC, so this is a quoted pair now and not a name on a list.
      503.24 is `lib/tokens.ts`'s figure, which is where Zcash was priced when
      the account chapter still held some. */
-  { sym: 'ZEC', name: 'Zcash', color: '#F4B728', ink: '#000', price: 503.24 },
+  { sym: 'ZEC', name: 'Zcash', color: '#F4B728', ink: '#000', price: ZEC_PRICE },
   { sym: 'DOGE', name: 'Dogecoin', color: '#C2A633', ink: '#000' },
   { sym: 'ADA', name: 'Cardano', color: '#0033AD', ink: '#fff' },
   { sym: 'TRX', name: 'TRON', color: '#EB0029', ink: '#fff' },

@@ -90,7 +90,7 @@ const STEPS: Step<OW, OWAction>[] = [
          is about. Five rows is more reading than any other screen in this
          family asks for, and it keeps the most time of the four. */
       { ms: 1900 },
-      { ms: 200, set: { lit: 'row:usdt' } },
+      { ms: 200, set: { lit: 'row:btc' } },
     ],
   },
 
@@ -100,7 +100,7 @@ const STEPS: Step<OW, OWAction>[] = [
     title: 'Every row is a menu',
     note: 'Swap, send, earn or move it out of the confidential balance — from the row, without leaving the list.',
     beats: [
-      { ms: 700, do: 'actions', arg: 'usdt' },
+      { ms: 700, do: 'actions', arg: 'btc' },
       { ms: 1200 },
       { ms: 200, set: { lit: 'swap' } },
     ],

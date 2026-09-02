@@ -1,5 +1,8 @@
-import { buildFlow, type Chapter, type Step } from '@/components/demo/shell/flow';
-import { STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction } from './state';
+import { buildFlow, typing, type Chapter, type Step } from '@/components/demo/shell/flow';
+import { AMOUNT, STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction } from './state';
+
+const type_ = (act: SVAction, chars: string, lead?: number, gap?: number) =>
+  typing<SV, SVAction>(act, chars, lead, gap);
 
 /**
  * SWAP v5 — THE SHORT CUT
@@ -110,10 +113,12 @@ const STEPS: Step<SV, SVAction>[] = [
          first was half a second of a screen that had already been read, and on
          a loop the reader has just watched the same form settle. */
       { ms: 380 },
-      /* one tap on the balance, and the whole position is in the field */
-      { ms: 200, set: { lit: 'max' } },
-      { ms: 900, do: 'max' },
-      { ms: 300 },
+      /* AND IT IS TYPED. The previous cut spent a whole Tether position and got
+         it in with one tap on the balance, because `6635.616976` is not a
+         figure anyone enters by hand. `0.25` is four characters and a QUARTER
+         of the holding, and `Use max` is the wrong gesture for a fraction. */
+      ...type_('key', AMOUNT, 380, 160),
+      { ms: 540 },
       /* and the chip is pressed here, on this screen, rather than the sheet
          simply being up on the next one */
       { ms: 200, set: { lit: 'to' } },
@@ -140,6 +145,7 @@ const STEPS: Step<SV, SVAction>[] = [
          the destination the form opened with is already valid, so this is not
          someone hunting for an answer, it is someone seeing what else there is
          on the way to a better one. */
+      /* and back to the top, where it turns out the account already held it */
       { ms: 820, do: 'scroll', arg: String(STOPS[2]) },
       /* AND THEN IT PRESSES, rather than sitting on the answer for two and a
          half seconds first. This beat was 2,780: 380 of travel and then 2,400

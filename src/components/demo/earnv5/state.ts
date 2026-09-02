@@ -1,5 +1,5 @@
 import type { Act } from '@/components/stage/phone/flows/machine';
-import { NEAR_PRICE } from '@/components/demo/swapv5/catalogue';
+import { PRICE } from '@/lib/prices';
 import { HOLDINGS } from '@/components/demo/ownv5/state';
 
 /**
@@ -64,23 +64,37 @@ export type Vault = {
 
 export const VAULTS: Vault[] = [
   {
-    id: 'gauntlet', name: 'Gauntlet USDC', tvl: '$432.92M', apr: '4.52%', balance: 1343.03,
+    id: 'gauntlet', name: 'Gauntlet USDC', tvl: '$432.92M', apr: '6.00%', balance: 8650,
     /**
-     * NOT READ OFF THE RECORDING. It opens Taler's sheet and only Taler's, so
-     * Gauntlet's disclosure was never on screen. These carry the SHAPE the
-     * sheet takes, not figures anybody observed — the same call
-     * `demo/earn/state.ts` made, and its note is worth reading.
+     * NOT READ OFF A FRAME, AND THIS IS THE NOTE THAT SAYS SO.
+     *
+     * The recording opens Taler's sheet and only Taler's, so Gauntlet's
+     * disclosure was never on screen. This cut deposits into Gauntlet at the
+     * client's direction, which puts unobserved copy at the centre of the
+     * chapter — so the copy is at least RESEARCHED rather than invented:
+     * Gauntlet is a risk firm that has set parameters for onchain lending since
+     * 2020, its USDC vault is curated on Morpho and runs on Ethereum, its 30-day
+     * APY is 6.00% (6.35% over 24h), and Morpho curators charge a performance
+     * fee on yield — Gauntlet's is 15%.
+     *
+     * THE RATE IS THE CURRENT ONE, NOT THE FRAME'S 4.52%. The reference
+     * screenshot of the app's own Assets screen carries an `Earn 6%` pill, so
+     * the app agrees with the market and the old frame is stale. The TVL is
+     * still the frame's, because a vault's size is a slow number and that one
+     * WAS observed.
      */
-    desc: 'This yield vault is provided by Gauntlet, and is built on Ethereum.',
-    apy: '4.52%', tvlFull: '$432,921,004',
+    desc: 'This yield vault is curated by Gauntlet, a risk management firm that has '
+      + 'set parameters for onchain lending since 2020, and is built on Morpho on '
+      + 'Ethereum.',
+    apy: '6.00%', tvlFull: '$432,921,004',
     fees: [
       ['Deposit fee', 'Variable, up to 0.01%'],
       ['Withdrawal fee', 'Fixed, 0.05%'],
-      ['Performance fee', '10% of yield earned'],
+      ['Performance fee', '15% of yield earned'],
     ],
   },
   {
-    id: 'taler', name: 'Taler USDC', tvl: '$854.15K', apr: '5.80%', balance: 1047.0, promo: true,
+    id: 'taler', name: 'Taler USDC', tvl: '$854.15K', apr: '5.80%', balance: 3240, promo: true,
     /* every line below is quoted from frames 0:06 to 0:15 */
     desc: 'This yield vault is provided by Taler, a NEAR ecosystem company, and '
       + 'managed by the TAU Labs team, and is built on Ethereum.',
@@ -102,45 +116,51 @@ export const REFERENCE = 'CcX9D…FtYC';
 /* ---- what is actually spent -------------------------------------------- */
 
 /**
- * THE DEPOSIT IS THE WALLET'S OWN USD COIN, AND NOBODY TYPES IT.
+ * THE DEPOSIT IS THE WALLET'S OWN USD COIN, AND IT IS A PART OF IT.
  *
- * It was `15000` typed a digit at a time against an invented `USDC_AVAIL` of
- * 18,400 — the brief's figures, and a third wallet on a page that already has
- * one. The recording taps **Use max** on the smaller of the two USD Coin lots
- * the account chapter lists two faces earlier: 22.555228, `Available 22.55`,
- * and a field nobody touched.
+ * The account holds 18,400 USDC and this puts 15,000 to work, leaving 3,400 —
+ * which is the brief's figure and reads as a decision rather than a sweep. The
+ * previous cut spent a 22.555228 lot with one tap on `Use max`, because six
+ * decimals of somebody's own balance is not a figure anyone types; 15,000 is
+ * five characters and a FRACTION of the holding, and `Use max` is the wrong
+ * gesture for a fraction. So it is typed, and the field fills a glyph at a time
+ * the way `Typed` fills it either way.
  *
- * IT IS IMPORTED RATHER THAN RETYPED. `usdc-b` is the Ethereum lot on the
- * assets screen; if that row ever changes, this chapter spends the new figure
- * instead of quietly disagreeing with the screen a reader just came from.
+ * THE BALANCE IS IMPORTED, NOT RETYPED. If the assets screen's USD Coin row
+ * ever changes, this chapter spends the new figure instead of quietly
+ * disagreeing with the screen a reader just came from.
  */
-/**
- * IT IS A FUNCTION, NOT A CONSTANT, AND THAT IS THE IMPORT CYCLE TALKING.
- * The account chapter already imports this file for Taler's rate, so a
- * top-level read of `HOLDINGS` here makes two modules each need the other
- * finished before they can start. Reading the lot when somebody asks for it
- * costs nothing and the cycle stops being a cycle at load time.
- */
-const lot = () => HOLDINGS.find((h) => h.id === 'usdc-b')!;
+const lot = () => HOLDINGS.find((h) => h.sym === 'USDC')!;
 
-/** what the sheet says is available, to the decimal `Use max` puts in the field */
+/** what the sheet says is available */
 export const usdcAvail = () => lot().qty;
-/** and what goes in, because Use max spends the lot */
-export const deposited = () => usdcAvail();
-/** which vault it goes into: the one whose sheet is actually on film */
-export const INTO = 'taler';
+/** and what goes in */
+export const DEPOSIT = 15000;
+/** what gets typed into the amount field, digit by digit */
+export const AMOUNT = String(DEPOSIT);
+/** which vault it goes into: the one at the top of the table */
+export const INTO = 'gauntlet';
 
 /**
- * THE STAKING HALF IS THE BRIEF'S, AND NOTHING BEHIND IT IS OBSERVED.
+ * THE STAKE, AND ITS RATE IS THE APP'S OWN.
  *
- * The recording shows the tab and never opens it, so the tab is drawn and this
- * cut does not go there. The pane is kept for a reader who has the wheel in
- * free mode — but it IS a claim about a product feature and this is the note.
- * If staking is not live, these three lines are the only thing to delete.
+ * 3.33% comes from the reference screenshot's sidebar — `Join NEAR@3.33, earn
+ * rewards` — and not from the market, which pays 4.4% to 4.9% depending on the
+ * validator. Where the app and the market disagree the app wins, the same call
+ * NEAR's price gets in `lib/prices.ts`.
+ *
+ * WHAT IS NOT OBSERVED IS THE SCREEN. No frame of any recording opens the
+ * Staking tab; the reference for it is that one line of a sidebar. So the pane
+ * is DESIGNED here rather than copied, and this is the note that says so.
+ *
+ * THE STAKE IS NOT A SLICE OF THE ASSETS LIST. Earn is its own account: the
+ * assets screen shows all 25,000 NEAR and this stakes 20,000 on top of it,
+ * which is two accounts rather than the same NEAR counted twice. Only the
+ * home's total puts the three together.
  */
 export const STAKED_NEAR = 20000;
-export const STAKE_APY = '9.2%';
-export const stakeUsd = () => STAKED_NEAR * NEAR_PRICE;
+export const STAKE_APY = '3.33%';
+export const stakeUsd = () => STAKED_NEAR * PRICE.NEAR;
 
 /**
  * THERE ARE TWO TABS, AND THERE WAS A THIRD.
@@ -207,8 +227,8 @@ export const initial: EA = {
  * in the only figure this chapter exists to move.
  */
 export const balanceOf = (s: EA, v: Vault) =>
-  v.balance + (s.earned && v.id === INTO ? deposited() : 0);
-export const available = (s: EA) => usdcAvail() - (s.earned ? deposited() : 0);
+  v.balance + (s.earned && v.id === INTO ? DEPOSIT : 0);
+export const available = (s: EA) => usdcAvail() - (s.earned ? DEPOSIT : 0);
 export const ready = (s: EA) => Number(s.amount) > 0 && Number(s.amount) <= available(s);
 
 /** what the primary button says, which is how the sheet reports itself */
@@ -248,7 +268,11 @@ export const actions: Record<EAAction, Act<EA>> = {
   openVault: (s, v) =>
     s.open || s.screen !== 'earn' || s.tab !== 'vaults' || !v || !VAULTS.some((x) => x.id === v)
       ? null
-      : { open: v, side: 'deposit', amount: '', focus: null, lit: null, tap: 'vault:' + v },
+      /* THE FIELD IS FOCUSED ON OPEN, because this cut types into it again.
+         It was `null` while `Use max` was the only way in, and `key` refuses
+         without a focus — five beats in a row, silently, until check:flows
+         walked them. */
+      : { open: v, side: 'deposit', amount: '', focus: 'amount', lit: null, tap: 'vault:' + v },
   closeVault: (s) =>
     s.open && !s.submitting ? { open: null, amount: '', focus: null, tap: null } : null,
   side: (s, v) => (!s.open || s.side === v ? null : { side: (v as EA['side']) ?? 'deposit', amount: '', tap: 'side' }),
@@ -260,12 +284,13 @@ export const actions: Record<EAAction, Act<EA>> = {
   },
   done: (s) => (s.focus ? { focus: null, pressed: null, tap: null } : null),
   /**
-   * `USE MAX`, AND IT IS THE ONLY WAY AN AMOUNT GETS IN HERE NOW.
+   * `USE MAX` IS DRAWN AND LIVE, AND THE SCRIPT DOES NOT USE IT.
    *
-   * The recording never touches a keypad: it taps Use max and 22.555228 is in
-   * the field. Six decimals of somebody's own balance is not a figure anyone
-   * types, and a demo that types it is a demo that did not watch what it was
-   * copying. `key` stays for a reader who has the wheel.
+   * It was the only way an amount got in here while this cut spent a whole
+   * 22.555228 lot — six decimals of somebody's own balance is not a figure
+   * anyone types. It deposits 15,000 of 18,400 now, which is a fraction and a
+   * thing you enter, so the script types it and the button stays for a reader
+   * who has the wheel.
    */
   max: (s) =>
     (s.open && !s.submitting && s.amount !== String(available(s))

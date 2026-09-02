@@ -102,6 +102,9 @@
 .pdev.app .ownpills {
   display: flex; align-items: center; gap: 6px; margin-top: 6px;
   font-size: 12px; color: rgba(255, 255, 255, .45);
+  /* one line, always: a balance row that grows a line taller than its
+     neighbours makes the card read as three rows of different importance */
+  white-space: nowrap;
 }
 .pdev.app .ownpills i { font-style: normal }
 .pdev.app .ownpills i b { font-weight: 600; color: rgba(255, 255, 255, .72) }

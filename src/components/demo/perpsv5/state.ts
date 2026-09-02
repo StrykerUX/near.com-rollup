@@ -1,4 +1,6 @@
 import type { Act } from '@/components/stage/phone/flows/machine';
+import { PERPS_BAL as ACCOUNT } from '@/components/demo/ownv5/state';
+import { PRICE } from '@/lib/prices';
 
 /**
  * PERPS, THE TEN-SECOND CUT — the figures and the machine
@@ -36,7 +38,7 @@ import type { Act } from '@/components/stage/phone/flows/machine';
  * purpose: a demo whose header, whose candles and whose ticket disagree about
  * the price is a demo of nothing.
  */
-export const MARK = 79567.5;
+export const MARK = PRICE.BTC;
 
 /**
  * WHICH STRETCH OF THE CHART'S WALK THIS CUT SITS ON.
@@ -191,16 +193,42 @@ export const TAPE = 0.9;
  * points past is not a position, it is a lottery ticket, and the figure it
  * would print is the only thing on the screen nobody would believe.
  */
-export const OPEN_ENTRY = 79520;
-export const OPEN_SIZE = 120000;
-export const OPEN_LEV = 20;
+export const OPEN_SYM = 'ZEC';
+export const OPEN_MARK = PRICE.ZEC;
+export const OPEN_ENTRY = 795.4;
+export const OPEN_SIZE = 60000;
+export const OPEN_LEV = 10;
+
+/**
+ * AND IT IS A DIFFERENT ASSET FROM THE ONE THE TICKET OPENS.
+ *
+ * Both were Bitcoin for two passes, which made the whole chapter one trade
+ * done twice: an open BTC long at the top of the screen and a new BTC long
+ * arriving under it, in a product whose claim is that you can trade anything
+ * from one account. The book holds ZEC now and the ticket opens BTC.
+ *
+ * THE SCREEN DOES NOT CHANGE MARKET FOR IT. The pair, the chart, the candles
+ * and the mark are Bitcoin's throughout — which is what a perps app looks like
+ * when you are watching one market and holding a position in another. The ZEC
+ * position is priced against its own mark rather than the quote on screen, or
+ * it would report a profit every time Bitcoin ticked.
+ *
+ * $795.40 against $797.02 puts it $1.62 in front — 0.2% of the price and 2% of
+ * the margin at 10x. Small, which is right: a position opened at a price the
+ * market has already run past is not a position, it is a lottery ticket, and
+ * the figure it prints is the only thing on the screen nobody would believe.
+ */
 
 /* ---- the trade this cut is about -------------------------------------- */
 
-/** what gets typed into the amount field, digit by digit */
-export const NEW_MARGIN = '5000';
+/**
+ * WHAT GETS TYPED INTO THE AMOUNT FIELD, digit by digit — and it is the margin
+ * rather than the position. The app multiplies it by the leverage, so $20,000
+ * at 5x is the $100,000 trade the chapter is about.
+ */
+export const NEW_MARGIN = '20000';
 /** where the leverage lands, and where the slider passes through on the way */
-export const NEW_LEV = 20;
+export const NEW_LEV = 5;
 
 /**
  * THE TWO EXITS, SIZED TO THE MARKET THEY ARE SET IN.
@@ -228,25 +256,24 @@ export const NEW_LEV = 20;
  * 420 in an hour. `demo/perps/state.ts` walked away from them for a version of
  * the same reason.)
  */
-export const TAKE_PROFIT = '79867';
-export const STOP_LOSS = '79417';
+export const TAKE_PROFIT = '77419';
+export const STOP_LOSS = '76969';
 
 /* ---- the account ------------------------------------------------------ */
 
 /**
- * THE BALANCE IS DERIVED FROM THE TRADE, NOT COPIED OFF A FRAME.
+ * THE BALANCE IS THE ACCOUNT CHAPTER'S, NOT THIS FILE'S.
  *
- * The reference ticket reads "Available to trade $1,087" — and this cut types
- * $5,000 of margin into it, which that balance cannot pay for. One of the two
- * numbers had to move and it was not going to be the trade: $5,000 at 20x is
- * the $100,000 position the whole cut is for, and a demo of a leveraged
- * product whose example is $1,087 is a demo of a form.
+ * It was 11,428.61 here and 1,053.89 in `ownv5/state.ts` — two figures for one
+ * account, on two faces of the same scroll, and the home screen printed the
+ * smaller one under the word Perps while this screen offered the larger one to
+ * trade with. It is imported now and there is one of it.
  *
- * So the perps balance is sized to cover both positions with room: $11,428.61,
- * less the $6,000 already committed to the open one, is the $5,428.61 the
- * ticket offers. It is not a figure off a frame and it does not pretend to be.
+ * IT IS ALSO BIG ENOUGH FOR THE TRADE, which the old one was not: $20,000 of
+ * margin against the $6,000 the ZEC position already holds needs more than the
+ * $5,428.61 that used to be free. $28,400 leaves $22,400.
  */
-export const PERPS_BAL = 11428.61;
+export const PERPS_BAL = ACCOUNT;
 
 /** maintenance margin — the same 1/lev − 0.03 the other two machines use */
 export const MMR = 0.03;
@@ -268,11 +295,19 @@ export const ORDERS_0 = 2;
 export type Side = 'long' | 'short';
 
 export type Position = {
+  /** which market it is in. The screen's own is `PAIR`. */
+  sym: string;
+  /** the price it is measured against when it is NOT the screen's market */
+  mark?: number;
   side: Side; lev: number; size: number; entry: number;
   tp: number | null; sl: number | null;
 };
 
+/** the market this screen is showing, and the one the ticket opens into */
+export const PAIR = 'BTC';
+
 export const OPEN_POS: Position = {
+  sym: OPEN_SYM, mark: OPEN_MARK,
   side: 'long', lev: OPEN_LEV, size: OPEN_SIZE, entry: OPEN_ENTRY, tp: null, sl: null,
 };
 
@@ -348,6 +383,15 @@ export const avail = (s: BD) => PERPS_BAL - marginUsed(s);
 /** notional: the app multiplies the margin you type by the leverage */
 export const notional = (s: BD) => (Number(s.amount) || 0) * s.lev;
 export const btcSize = (s: BD) => notional(s) / MARK;
+
+/**
+ * WHICH PRICE A POSITION IS MEASURED AGAINST.
+ *
+ * The quote on screen is Bitcoin's, and a ZEC position must not move when
+ * Bitcoin ticks. A position in the screen's own market rides the live quote;
+ * anything else rides the mark it was given.
+ */
+export const atFor = (p: Position, quote: number) => (p.sym === PAIR ? quote : p.mark ?? quote);
 
 /** what a position is worth at a given price, and what that is on the margin */
 export const pnl = (p: Position, at: number) =>
@@ -522,6 +566,8 @@ export const actions: Record<BDAction, Act<BD>> = {
          animation is on and the one the viewer is looking for. */
       book: [
         {
+          /* the ticket only ever opens the market the screen is showing */
+          sym: PAIR,
           side: s.side, lev: s.lev, size: notional(s), entry: MARK,
           tp: Number(s.tp) > 0 ? Number(s.tp) : null,
           sl: Number(s.sl) > 0 ? Number(s.sl) : null,

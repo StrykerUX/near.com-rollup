@@ -13,8 +13,8 @@ import { AccountHome } from '@/components/demo/app/AccountHome';
 import { CATALOGUE, type Asset } from './catalogue';
 import { value } from '@/components/demo/ownv5/state';
 import {
-  FROM_BAL, PICK_ROWS, PICK_TOTAL, SLIPPAGE, SWAP_STEPS, balOf, cta, invRate, least, out,
-  outUsd, pickOffset, quoteOf, usd,
+  FROM_BAL, PICK_ROWS, PICK_TOTAL, SLIPPAGE, SWAP_STEPS, balOf, cta, least, out,
+  outUsd, pickOffset, rateOf, usd,
   type PickRow, type SV, type SVAction,
 } from './state';
 
@@ -55,7 +55,7 @@ const tint = (c: string) => ({ '--tk': c }) as React.CSSProperties;
  * character that does not belong there. `0.000000 ZEC` is the same mistake in
  * the other direction — six zeroes claiming a precision about nothing.
  */
-const qty = (n: number, dp = 6) => (n ? n.toFixed(dp).replace(/\.?0+$/, '') : '0');
+const qty = (n: number, dp = 6) => (n ? n.toFixed(dp).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '') : '0');
 
 /**
  * HOW BIG THE AMOUNT IS ALLOWED TO BE, WHICH DEPENDS ON HOW LONG IT IS.
@@ -95,18 +95,32 @@ const wait = (s: SV) => writeMs(s.amount || '0');
 /** what the destination field prints — three decimals, cut rather than rounded */
 const fieldOut = (s: SV) => {
   const v = Math.trunc(out(s) * 1e3) / 1e3;
-  return v ? v.toFixed(3).replace(/\.?0+$/, '') : '0';
+  return v ? v.toFixed(3).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '') : '0';
 };
 
 /** a figure with its extra decimals CUT rather than rounded — see `Settle` */
 const cut = (n: number, dp: number) => {
   const k = 10 ** dp;
-  return (Math.trunc(n * k) / k).toFixed(dp).replace(/\.?0+$/, '');
+  return (Math.trunc(n * k) / k).toFixed(dp).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
 };
 
-const rateStr = (n: number, dp = 5) => {
+/**
+ * FIVE DECIMALS IS NOT THE SAME AS FIVE FIGURES.
+ *
+ * The frame prints `1.87669` — five decimals on a number just over one, which
+ * is also five significant figures. On a rate of 96.7649 those are the same
+ * thing again; on 0.0000129 they are not, and five decimals rounds it to
+ * `0.00001`. The precision follows the magnitude so the figure always carries
+ * about five figures of information, and it is TRUNCATED — the frame's own
+ * 1.8766952 prints as 1.87669, which a rounding would have made 1.87670.
+ */
+const rateStr = (n: number) => {
+  /* about six figures of information wherever the decimal point lands, never
+     fewer than two places and never more than nine: 77118.98, 96.7591,
+     1.87669, 0.000012966 */
+  const dp = Math.min(9, Math.max(2, 5 - Math.floor(Math.log10(Math.abs(n) || 1))));
   const k = 10 ** dp;
-  return (Math.trunc(n * k) / k).toFixed(dp).replace(/\.?0+$/, '');
+  return (Math.trunc(n * k) / k).toFixed(dp).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
 };
 
 /** lucide `chevron-down` (ISC) — every token pill carries one */
@@ -411,7 +425,7 @@ function Swap({ d }: { d: Deck }) {
         <Enter k={`q${s.to}`} className="swquote">
           <div>
             <dt>Exchange rate</dt>
-            <dd>1 {to.sym} = {rateStr(invRate(s))} {s.from}</dd>
+            <dd>1 {rateOf(s).one} = {rateStr(rateOf(s).n)} {rateOf(s).per}</dd>
           </div>
           <div>
             <dt>Max slippage <Help /></dt>
@@ -535,7 +549,7 @@ function Review({ d }: { d: Deck }) {
         <div className="swrevd">
           <div>
             <dt>Exchange rate</dt>
-            <dd>1 {to.sym} = {rateStr(quoteOf(s))} {s.from}</dd>
+            <dd>1 {rateOf(s).one} = {rateStr(rateOf(s).n)} {rateOf(s).per}</dd>
           </div>
           <div><dt>Max slippage</dt><dd>{fmt(SLIPPAGE * 100, 2)}%</dd></div>
           <div><dt>Receive at least</dt><dd>{qty(least(s))} {to.sym}</dd></div>

@@ -1,5 +1,8 @@
-import { buildFlow, type Chapter, type Step } from '@/components/demo/shell/flow';
-import { INTO, STEPS, actions, initial, type EA, type EAAction } from './state';
+import { buildFlow, typing, type Chapter, type Step } from '@/components/demo/shell/flow';
+import { AMOUNT, INTO, STEPS, actions, initial, type EA, type EAAction } from './state';
+
+const type_ = (act: EAAction, chars: string, lead?: number, gap?: number) =>
+  typing<EA, EAAction>(act, chars, lead, gap);
 
 /**
  * EARN — THE SHORT CUT
@@ -10,10 +13,11 @@ import { INTO, STEPS, actions, initial, type EA, type EAAction } from './state';
  *
  *   the account home, with Crypto, Perps and Earn
  *   the Earn row lights, and the vaults are there
- *   the Taler row lights, and its sheet comes up
- *   Use max, and the whole USD Coin lot is in the field
+ *   the Gauntlet row lights, and its sheet comes up
+ *   fifteen thousand typed into it
  *   Deposit, three rows ticking, a reference id
- *   Close, and Taler's balance carries the deposit
+ *   Close, and Gauntlet's balance carries the deposit
+ *   the Staking tab, and the NEAR that has been working all along
  *
  * IT USED TO START ON THE EARN PAGE, with no account of how anyone got there —
  * and then invented two scenes the recording does not have: a Staking pane it
@@ -22,11 +26,10 @@ import { INTO, STEPS, actions, initial, type EA, type EAAction } from './state';
  * stated as a gesture: the yield is a room in the account, not a separate
  * product, and you reach it by pressing a balance.
  *
- * NOBODY TYPES ANYTHING IN THIS CUT. The old scene 2 typed `15000` into a
- * wallet that held an invented 18,400; the recording taps **Use max** on the
- * smaller of the two USD Coin lots the account chapter lists two faces
- * earlier. One gesture where there were five keystrokes, and one wallet where
- * there were two.
+ * IT DEPOSITS INTO GAUNTLET, THE ROW AT THE TOP, at the client's direction —
+ * and 15,000 of the 18,400 the account holds, which is a fraction and a thing
+ * you type. `Use max` was the gesture while this cut spent a whole 22.555228
+ * lot; it is drawn and live and the script no longer uses it.
  *
  * THE PRESS IS A BEAT, NOT A TRANSITION. `set: { lit }` lights the row for
  * ~200ms and the transition that follows puts it out. On a screen with no
@@ -37,17 +40,19 @@ import { INTO, STEPS, actions, initial, type EA, type EAAction } from './state';
  *
  *   scene 1    2,900ms   the account, and the row that goes to the yield
  *   scene 2    3,180ms   two vaults, their rates, and what you already hold
- *   scene 3    3,100ms   the disclosure, and the whole lot in one tap
+ *   scene 3    3,100ms   the disclosure, and fifteen thousand typed into it
  *   scene 4    4,400ms   one press, three rows, a reference id
- *   scene 5    2,200ms   closed, and the balance carries it
+ *   scene 5    1,600ms   closed, and the balance carries it
+ *   scene 6    3,000ms   the other tab, and the stake behind it
  *   outro      2,000ms   the same frame again, for the loop
  *   ─────────────────
- *             17,780ms  ×1.25 = 22,225ms on screen
+ *             20,180ms  ×1.25 = 25,225ms on screen
  *
- * SHORTER THAN THE 23,475 IT REPLACES, which matters more here than anywhere:
- * `W_REST` in lib/schedule.ts is identical for all four cards by construction,
- * so a chapter that grows buys the same dwell for the other three and moves the
- * shipped page's composition. Two invented scenes went; one real one arrived.
+ * THE STAKING SCENE IS THE ONE THING HERE NO FRAME SHOWS. `Staking` has been
+ * on the tab row since the first pass — it is in every frame of the recording —
+ * and the recording never presses it. The reference for what is behind it is
+ * one line of a sidebar in a screenshot of a different screen: `Join NEAR@3.33,
+ * earn rewards`. The rate is that; the pane is designed. See `STAKE_APY`.
  */
 
 const CHAPTERS: Chapter[] = [
@@ -55,6 +60,7 @@ const CHAPTERS: Chapter[] = [
   { id: 'page', name: 'The vaults', blurb: '' },
   { id: 'in', name: 'Into one', blurb: '' },
   { id: 'sign', name: 'One press', blurb: '' },
+  { id: 'stake', name: 'And the stake', blurb: '' },
 ];
 
 const STEPS_: Step<EA, EAAction>[] = [
@@ -95,13 +101,16 @@ const STEPS_: Step<EA, EAAction>[] = [
   {
     id: 'in', ch: 'in',
     title: 'The whole disclosure, then one tap',
-    note: 'Who runs it, what it holds and all three fees are on screen before an amount is. Then Use max, because six decimals of your own balance is not a figure anybody types.',
+    note: 'Who runs it, what it holds and all three fees are on screen before an amount is. Then fifteen thousand of the eighteen four hundred the account holds — a decision rather than a sweep.',
     beats: [
-      { ms: 1600 },
-      { ms: 200, set: { lit: 'max' } },
-      { ms: 700, do: 'max' },
+      { ms: 1400 },
+      /* AND IT IS TYPED. `Use max` was right while this cut spent a whole
+         22.555228 lot — six decimals of somebody's own balance is not a figure
+         anyone enters by hand. It puts 15,000 of 18,400 to work now, which is a
+         fraction and a thing you type. */
+      ...type_('key', AMOUNT, 380, 160),
       /* the rest after the value lands, as everywhere in this family */
-      { ms: 600 },
+      { ms: 680 },
     ],
   },
 
@@ -132,11 +141,30 @@ const STEPS_: Step<EA, EAAction>[] = [
   {
     id: 'done', ch: 'sign',
     title: 'And the row carries it',
-    note: 'Taler was $1,047 when the sheet opened. It is $1,069 when it closes, which is the only thing this chapter had to prove.',
+    note: 'Gauntlet was $8,650 when the sheet opened. It is $23,650 when it closes, which is the only thing this chapter had to prove.',
     beats: [
       { ms: 200, set: { lit: 'close' } },
       { ms: 620, do: 'close' },
-      { ms: 1380 },
+      { ms: 780 },
+    ],
+  },
+
+  /* ---- scene 6 · 3,000ms ----------------------------------------------
+     THE OTHER TAB, AND THE CHAPTER HAD NEVER OPENED IT. `Staking` has been on
+     screen since the first pass — it is in every frame of the recording — and
+     the recording never presses it, so neither did this. What is behind it is
+     the second half of what Earn means: a vault is somebody managing your
+     dollars, and a stake is you securing the network with your own NEAR. One
+     press, and then a hold, because there is no flow here to run: it has been
+     working the whole time. */
+  {
+    id: 'stake', ch: 'stake',
+    title: 'And the other half of Earn',
+    note: 'Twenty thousand NEAR, staked and accruing at the rate the app itself quotes. No flow to run — it has been working the whole time.',
+    beats: [
+      { ms: 200, set: { lit: 'tab:staking' } },
+      { ms: 700, do: 'tab', arg: 'staking' },
+      { ms: 2100 },
     ],
   },
 ];
@@ -151,6 +179,7 @@ export const earnV5Flow = buildFlow<EA, EAAction>({
   restStep: 'in',
   outro: 2000,
   anchor: {
+    tab: 'stake',
     toEarn: 'page',
     openVault: 'in',
     max: 'in',

@@ -83,7 +83,8 @@ function Earn({ d }: { d: Deck }) {
           const on = d.can('tab', k);
           return (
             <span className={'erntab' + (s.tab === k ? ' on' : '') + live(on)} key={k}
-                  {...press(on)} data-tap={'tab:' + k}>
+                  {...press(on)} data-tap={'tab:' + k}
+                  data-lit={s.lit === 'tab:' + k ? '1' : undefined}>
               {TAB_NAMES[k]}
             </span>
           );
@@ -275,9 +276,13 @@ function VaultSheet({ d }: { d: Deck }) {
                       availability the wallet does not have. */}
                   <span className="ernrowt">
                     <em>Available</em>
+                    {/* TRUNCATED, NOT ROUNDED, AND GROUPED. The frame reads
+                        `22.55 USDC` for a balance of 22.555228 — rounding would
+                        print 22.56, an availability the wallet does not have.
+                        Grouped and trimmed because this one is five digits:
+                        `18,400` is a balance and `18400.00` is a serial. */}
                     <b>
-                      <Count value={available(s)} dp={2} group={false} trunc suffix=" USDC"
-                             ms={960} />
+                      <Count value={available(s)} dp={2} trim trunc suffix=" USDC" ms={960} />
                     </b>
                   </span>
                   <span className={'ernmax' + live(d.can('max'))} {...press(d.can('max'))}

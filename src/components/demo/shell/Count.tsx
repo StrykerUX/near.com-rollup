@@ -70,7 +70,8 @@ export function Count({
           maximumFractionDigits: dp,
         })
       : trim
-        ? v.toFixed(dp).replace(/\.?0+$/, '')
+        /* only inside the fraction — a bare `/\.?0+$/` turns 120 into 12 */
+        ? v.toFixed(dp).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '')
         : v.toFixed(dp);
     return prefix + body + suffix;
   };

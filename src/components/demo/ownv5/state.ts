@@ -1,5 +1,6 @@
 import type { Act } from '@/components/stage/phone/flows/machine';
 import { vaultOf } from '@/components/demo/earnv5/state';
+import { PRICE } from '@/lib/prices';
 
 /**
  * EVERYTHING YOU OWN — the figures and the machine
@@ -19,21 +20,19 @@ import { vaultOf } from '@/components/demo/earnv5/state';
  * decimal, which is how we know the two recordings are the same session.
  */
 
-/* ---- the prices, and there is one of each --------------------------- */
+/* ---- the prices, and they are one table for four chapters ------------ */
 
 /**
- * TWO PRICES, BOTH OF THEM A DOLLAR.
- *
- * Everything in this wallet is dollar-pegged, so the row's dollar figure is its
- * quantity and nothing here can go stale. The five-asset version of this screen
- * needed Bitcoin's mark, NEAR's swap-recording price and a guess at Apple; none
- * of that survives, and neither do the imports it needed.
+ * THE PRICES LIVE IN `lib/prices.ts` and are re-exported here for the callers
+ * that think of them as the wallet's. They are not this file's because putting
+ * them here made an import cycle — see the note over there.
  */
-export const PRICE: Record<string, number> = { USDT: 1, USDC: 1 };
+export { PRICE };
 
 export type Holding = {
-  /** what a row is addressed by. NOT the symbol — the app lists USD Coin twice,
-      once per network, and two rows answering to `USDC` would open one sheet */
+  /** what a row is addressed by. NOT the symbol — the app has listed the same
+      asset twice before now, once per network, and two rows answering to one
+      symbol would open one sheet */
   id: string;
   sym: string;
   name: string;
@@ -41,9 +40,8 @@ export type Holding = {
   by?: string;
   /**
    * the network it is held on, as a logo key in `public/logos/tokens`.
-   * Only set where it DISTINGUISHES: the wallet holds USD Coin twice and on a
-   * list showing symbol and name the two rows are identical, so the badge is
-   * the only thing on screen saying one is on Solana and the other on Ethereum.
+   * Only set where it DISTINGUISHES — a badge on a row nothing else shares is
+   * a decoration.
    */
   chain?: string;
   qty: number;
@@ -57,99 +55,106 @@ export type Holding = {
 };
 
 /**
- * THE THREE ROWS THE RECORDING ACTUALLY HOLDS.
+ * THE FIVE HOLDINGS, AND THEY ARE THE BRIEF'S AGAIN.
  *
- * THIS REPLACES THE BRIEF'S FIVE, AND THAT WAS A CALL RATHER THAN A READING.
- * Charlie's brief asks for "0.75 BTC, 25,000 NEAR, 18,400 USDC, 400 ZEC, 120
- * AAPL"; the wallet on film holds Tether and two lots of USD Coin. Asked which
- * one this screen should be, the answer was the recording — the chapter's job
- * on the page is to look like the product, and a reader who has seen the app
- * spots an invented portfolio faster than they read a headline. What it costs
- * is the illustration: "Everything you own" is now three stablecoin rows, with
- * no Bitcoin and no tokenised share. If that trade is ever revisited, the
- * five-row version is in this file's history, quantities and reasoning intact.
+ * This screen carried the RECORDING'S three for two passes — Tether and two
+ * lots of USD Coin — because the wallet on film held those and a reader who has
+ * seen the app spots an invented portfolio. That call has been reversed at the
+ * client's direction: the brief asks for `0.75 BTC, 25,000 NEAR, 18,400 USDC,
+ * 400 ZEC, 120 AAPL (Ondo)`, and that is what the tour is for.
  *
- * THE FIGURES ARE THE FRAMES'. Quantities to four decimals, values, changes and
- * both `USD Coin` rows — the app lists the same asset twice because it is held
- * on two networks, which is why a row needs an `id` that its symbol cannot be.
+ * WHAT IT COSTS is the recording as the wallet's source. The old figures closed
+ * to the cent against two frames — $6,699.90 confidential, $6,764.84 crypto —
+ * and none of that survives. In exchange the tour finally shows the five things
+ * the product is about instead of three stablecoins.
  *
- * AND THE ARITHMETIC CLOSES, which is the check that says these were read
- * correctly rather than approximately: the three rows sum to $6,699.90, which
- * is the Confidential half the frame prints, and $64.95 of Main on top of that
- * is the total it prints. Nothing here is tuned to make that land; it lands
- * because the recording is one session. The one cent that does not fall out of
- * it is explained at `crypto()` — the frame disagrees with itself there.
+ * ZCASH IS 40 AND THE BRIEF SAYS 400, and that is the one number moved. ZEC
+ * closed at $797.02 on the day these prices were read, so four hundred of them
+ * is $318,808 — two thirds of the wallet, with three quarters of a Bitcoin
+ * reading as small change beside it. Forty lands it between the share and the
+ * dollars and leaves the list ordered without anything crushing the rest.
+ *
+ * ORDERED BY VALUE, largest first, which is how the app's own Assets screen
+ * lists them.
  */
 export const HOLDINGS: Holding[] = [
-  { id: 'usdt', sym: 'USDT', name: 'Tether USD', qty: 6635.6169, dp: 4, chg: '+0.01%', up: true, color: '#26A17B', ink: '#fff' },
-  { id: 'usdc-a', sym: 'USDC', name: 'USD Coin', chain: 'sol', qty: 41.7234, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
-  /* SIX DECIMALS, PRINTED AT FOUR. The assets list truncates to `22.5552`, and
-     the earn chapter's vault sheet — which spends this exact lot — prints
-     `22.555228`. Same relationship the Tether row has with the swap screen:
-     the app carries six and the list shows four. */
-  { id: 'usdc-b', sym: 'USDC', name: 'USD Coin', chain: 'eth', qty: 22.555228, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
+  { id: 'btc', sym: 'BTC', name: 'Bitcoin', qty: 0.75, dp: 4, chg: '-1.80%', up: false, color: '#F7931A', ink: '#fff' },
+  { id: 'near', sym: 'NEAR', name: 'Near', qty: 25000, dp: 4, chg: '-4.13%', up: false, color: '#00EC97', ink: '#000' },
+  /* the only row with an issuer: a share is held THROUGH somebody, and Ondo is
+     who tokenises this one */
+  { id: 'aapl', sym: 'AAPL', name: 'Apple Inc', by: 'Ondo', qty: 120, dp: 0, chg: '+0.16%', up: true, color: '#fff', ink: '#000' },
+  { id: 'zec', sym: 'ZEC', name: 'Zcash', qty: 40, dp: 4, chg: '+2.00%', up: true, color: '#F4B728', ink: '#000' },
+  { id: 'usdc', sym: 'USDC', name: 'USD Coin', qty: 18400, dp: 4, chg: '-0.02%', up: false, color: '#2775CA', ink: '#fff' },
 ];
 
-/** the Main half of the Assets header, frame 0:03 of both recordings */
-export const MAIN_BAL = 64.95;
-/** the other two rows of the home's balances card, frame 0:00 */
-export const PERPS_BAL = 1053.89;
-export const EARN_BAL = 2347.81;
+/**
+ * THE OTHER TWO BALANCES ON THE HOME, AND THEY ARE THEIR OWN ACCOUNTS.
+ *
+ * Perps and Earn are not slices of the assets list — they are separate
+ * balances, and only the home's total puts the three together. That is what
+ * lets 20,000 NEAR be staked under Earn while the assets list still shows all
+ * 25,000: they are not the same NEAR twice, they are two accounts.
+ *
+ * PERPS IS IMPORTED BY `/demo/perps-v5` RATHER THAN RETYPED THERE. That screen
+ * carried its own `PERPS_BAL` of 11,428.61 while this one said 1,053.89 — two
+ * figures for one account, on two faces of the same scroll. It is one number
+ * now, and it is large enough to open the position the perps chapter opens:
+ * $20,000 of margin against $6,000 already committed needs more than the
+ * $5,428.61 that was free.
+ */
+export const PERPS_BAL = 28400;
+/**
+ * AND EARN'S, WHICH IS THE SUM OF WHAT THAT CHAPTER HOLDS: $8,650 in Gauntlet,
+ * $3,240 in Taler and 20,000 NEAR staked at $1.84. Written out rather than
+ * imported, because importing it would close the cycle this file spent two
+ * passes opening — `earnv5/state.ts` already needs the wallet from here.
+ */
+export const EARN_BAL = 8650 + 3240 + 20000 * 1.84;
 
 /** what a row is worth */
 export const value = (h: Holding) => h.qty * (PRICE[h.sym] ?? 0);
-/** the confidential half, which is where the three holdings live */
-export const confidential = () => HOLDINGS.reduce((t, h) => t + value(h), 0);
+
 /**
- * The Assets screen's headline, and the home's Crypto row.
+ * THE ASSETS SCREEN'S HEADLINE, AND THE HOME'S CRYPTO ROW.
  *
- * THE CENT IS TRUNCATED, NOT ROUNDED, AND THAT IS THE FRAME'S DOING. The three
- * rows and the Main half come to 6764.8455, which rounds up to $6,764.85; the
- * recording prints $6,764.84 while printing $6,699.90 for the confidential half
- * of the same sum. Both cannot be reached by one rounding rule — for the total
- * to round to .84 the half would have to print .89 — so the app is not using
- * one, and the quantity it shows is truncated too (`6635.6169 …`), which is
- * probably where the missing precision went.
- *
- * Given a frame that disagrees with itself, this reproduces the frame: the
- * halves round and this one truncates. It is the difference between a demo that
- * matches a screenshot and one that is a cent off in the largest figure on the
- * screen, which is the kind of thing a reader checks.
+ * IT USED TO BE HALVES. The screen carried a Main / Confidential split across
+ * the top, because the app used to hold two balances and most of this wallet
+ * was in the private one. near.com is confidential BY DEFAULT now — the app's
+ * own Assets screen has one total and no split — so there is one figure here
+ * and the machinery that told them apart is gone.
  */
-export const crypto = () => Math.floor((confidential() + MAIN_BAL) * 100) / 100;
-/** the home's headline is the sum of its three rows, always */
+export const crypto = () => HOLDINGS.reduce((t, h) => t + value(h), 0);
+/** the home's headline is the sum of its three accounts, always */
 export const total = () => crypto() + PERPS_BAL + EARN_BAL;
 
-/** what a row's sheet offers, frame 0:09 */
 /**
  * WHAT EARNS, AND AT WHAT RATE — the pill on the right of a row.
  *
- * The app puts an "Earn 5.8%" pill on any holding it has somewhere to put to
- * work, and in the recording every row carries one because every holding in
- * that wallet is a stablecoin. Here two of five do: USDC has a vault and NEAR
- * has staking. BITCOIN, ZCASH AND A TOKENISED SHARE GET NO PILL, and that is
- * the app rather than an omission — there is nothing in the Earn tab to put
- * them in, so a pill offering one would be the demo inventing a product.
+ * The app puts an "Earn 6%" pill on any holding it has somewhere to put to
+ * work. Here it is USD Coin, because the Earn tab's vaults take dollars.
+ * BITCOIN, ZCASH, NEAR AND A TOKENISED SHARE GET NO PILL — NEAR has staking
+ * rather than a vault, and the other three have nothing to be put into, so a
+ * pill offering one would be the demo inventing a product.
  *
- * THE RATE IS IMPORTED, NOT TYPED. It is Taler's APR, the same number the Earn
+ * THE RATE IS IMPORTED, NOT TYPED. It is Gauntlet's, the same number the Earn
  * chapter prints two faces later, and two screens quoting one rate at each
  * other is exactly the pair that drifts.
  */
-const EARNABLE = new Set(['USDT', 'USDC']);
+const EARNABLE = new Set(['USDC']);
 /**
  * A FUNCTION RATHER THAN A TABLE, and for the same reason `usdcAvail` in the
  * earn chapter is one: the two files import each other, and a table built at
  * module scope makes each of them need the other finished before it can start.
  */
 export const earnsOn = (sym: string) =>
-  (EARNABLE.has(sym) ? vaultOf('taler').apr.replace(/0%$/, '%') : undefined);
+  (EARNABLE.has(sym) ? vaultOf('gauntlet').apr.replace(/\.00%$/, '%') : undefined);
 
-export const ACTIONS = ['Swap', 'Send', 'Earn', 'Move to Main'] as const;
+/* WITHOUT `MOVE TO MAIN`, which was an action for an app that had two
+   balances. There is one now. */
+export const ACTIONS = ['Swap', 'Send', 'Earn'] as const;
 
 export type OW = {
   screen: 'home' | 'assets';
-  /** the Assets header's two halves; most of this wallet is confidential */
-  bucket: 'main' | 'conf';
   /** which row's actions sheet is up */
   acted: string | null;
   /**
@@ -173,7 +178,6 @@ export type OW = {
 
 export const initial: OW = {
   screen: 'home',
-  bucket: 'conf',
   acted: null,
   handoff: null,
   lit: null,
@@ -182,15 +186,14 @@ export const initial: OW = {
 
 /* ---- the transitions -------------------------------------------------- */
 
-export type OWAction = 'toAssets' | 'home' | 'bucket' | 'actions' | 'closeSheet' | 'swap';
+/* `bucket` is gone with the halves it switched between — see `crypto()`. */
+export type OWAction = 'toAssets' | 'home' | 'actions' | 'closeSheet' | 'swap';
 
 export const actions: Record<OWAction, Act<OW>> = {
   /* every transition that follows a lit beat puts the light out: the press is
      over the moment the thing it was pressing happens */
   toAssets: (s) => (s.screen === 'home' ? { screen: 'assets', lit: null, tap: 'crypto' } : null),
   home: (s) => (s.screen === 'assets' ? { screen: 'home', acted: null, lit: null, tap: 'home' } : null),
-  bucket: (s, v) =>
-    s.screen !== 'assets' || s.bucket === v ? null : { bucket: (v as OW['bucket']) ?? 'conf', tap: 'bucket' },
 
   actions: (s, v) => {
     if (s.screen !== 'assets' || !v || s.acted) return null;

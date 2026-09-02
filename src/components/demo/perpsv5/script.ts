@@ -121,12 +121,17 @@ const STEPS: Step<BD, BDAction>[] = [
          120, and both were quicker than a hand can actually move — a run of
          digits that arrives faster than anyone could type it reads as pasted
          however many of them there are. */
+      /* one keystroke longer than the $5,000 this used to be — the 160 comes
+         off the rest below rather than out of the clip's length */
       ...type_('key', NEW_MARGIN, 420, 160),
-      /* AND THEN NOTHING, ON PURPOSE. Half a second of a finished field before
-         anything touches the screen again. Every rest in this scene is here for
-         the same reason: a value that lands and is immediately built on has not
-         been seen to land — the eye uses the pause to decide something ended. */
-      { ms: 500 },
+      /* AND THEN NOTHING, ON PURPOSE. A third of a second of a finished field
+         before anything touches the screen again. Every rest in this scene is
+         here for the same reason: a value that lands and is immediately built
+         on has not been seen to land — the eye uses the pause to decide
+         something ended. It was 500 while the figure was four digits; $20,000
+         is five, and the keystroke came out of here rather than out of the
+         clip. */
+      { ms: 340 },
 
       /* the leverage. Two stops rather than a sweep: the slider is not the
          feature, the figure answering it is, and `Count` needs a value change

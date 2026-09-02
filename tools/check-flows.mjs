@@ -30,6 +30,9 @@ const SHELL = 'src/components/demo/shell';
 /* [source file, name it is written out under] */
 const MODULES = [
   [`${FLOWS}/machine.ts`, 'machine'],
+  /* the tour's price table. Its own module because putting it in the account
+     chapter made an import cycle — see the note in the file. */
+  ['src/lib/prices.ts', 'prices'],
   [`${SHELL}/flow.ts`, 'flow'],
   [`${FLOWS}/perps.ts`, 'perps'],
   [`${FLOWS}/swap.ts`, 'swap'],
@@ -99,7 +102,9 @@ for (const [src, f] of MODULES) {
     /* the swap's catalogue is data beside its state, and its state imports it */
     .replace(/from ['"]\.\/catalogue['"]/g, "from './swapv5-catalogue.mjs'")
     /* the account chapter imports the swap's catalogue for NEAR's price */
-    .replace(/from ['"]@\/components\/demo\/swapv5\/catalogue['"]/g, "from './swapv5-catalogue.mjs'");
+    .replace(/from ['"]@\/components\/demo\/swapv5\/catalogue['"]/g, "from './swapv5-catalogue.mjs'")
+    /* and everything that does arithmetic imports the price table */
+    .replace(/from ['"]@\/lib\/prices['"]/g, "from './prices.mjs'");
   writeFileSync(join(dir, `${f}.mjs`), js);
 }
 const load = (f) => import(pathToFileURL(join(dir, `${f}.mjs`)).href);
@@ -302,7 +307,7 @@ for (const [name, m] of Object.entries(machines)) {
     readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
   );
   console.log('\n== the short cuts run the length they say they do');
-  for (const [name, limit] of [['demo/perps-v5', LIMIT], ['demo/swap-v5', 23625], ['demo/own-v5', 14400], ['demo/earn-v5', 22225]]) {
+  for (const [name, limit] of [['demo/perps-v5', LIMIT], ['demo/swap-v5', 23625], ['demo/own-v5', 14400], ['demo/earn-v5', 25225]]) {
     const m = machines[name];
     const authored = m.beats.reduce((t, b) => t + (b.ms ?? 0), 0) + (m.outro ?? 0);
     const real = Math.round(authored * PACE);

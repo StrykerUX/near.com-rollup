@@ -34,6 +34,18 @@ const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
 /** the distinct assets behind the Crypto row, in the order they first appear */
 const SYMS = [...new Set(HOLDINGS.map((h) => h.sym))];
 
+/**
+ * THREE NAMES AND A COUNT, NOT FIVE NAMES.
+ *
+ * The strip listed every symbol, which was fine at two and wrapped onto a
+ * second line at five — and a Crypto row a line taller than Perps and Earn
+ * makes the card read as three rows of different importance. The marks beside
+ * it already say which assets these are; the text only has to say how many.
+ */
+const STRIP = SYMS.length > 3
+  ? `${SYMS.slice(0, 3).join(', ')} +${SYMS.length - 3}`
+  : SYMS.join(', ');
+
 export type HomeRow = 'crypto' | 'perps' | 'earn';
 
 export function AccountHome({ go, lit }: {
@@ -123,7 +135,7 @@ export function AccountHome({ go, lit }: {
               two networks and a strip reading "USDC, USDC" is a duplicate,
               not a second holding */}
           {SYMS.map((sym) => <Dot a={HOLDINGS.find((h) => h.sym === sym)!} size={17} key={sym} />)}
-          <i>{SYMS.join(', ')}</i>
+          <i>{STRIP}</i>
         </Row>
 
         <Row row="perps" label="Perps" value={PERPS_BAL} go={go} lit={lit}>

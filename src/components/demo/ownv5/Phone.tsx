@@ -9,7 +9,7 @@ import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
-  ACTIONS, HOLDINGS, MAIN_BAL, confidential, crypto, earnsOn, value,
+  ACTIONS, HOLDINGS, crypto, earnsOn, value,
   type OW, type OWAction, type Holding,
 } from './state';
 
@@ -23,13 +23,28 @@ type Deck = GenericDeck<OW, OWAction>;
  *
  *   the account home        frame 0:00 — total, Receive/Send, three balances
  *   the assets screen       frames 0:01–0:08 — total, Main/Confidential, rows
- *   a row's actions sheet   frame 0:09 — Swap, Send, Earn, Move to Main
+ *   a row's actions sheet   frame 0:09 — Swap, Send, Earn
  *
  * `.pdev.app` carries the face, the palette, the tempo, the chrome and the
  * sheet mechanics, so this file draws only what is actually an account.
  */
 
 const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
+
+/**
+ * A QUANTITY OF AN ASSET, WHICH IS NOT A FIGURE IN DOLLARS.
+ *
+ * `0.75 BTC` and `25000 NEAR` — no thousands separator, and no decimals where
+ * there are none to show. The reference screen prints `1555.3148 NEAR` and
+ * `45.4039 USDC`: ungrouped, and to as many places as the quantity actually
+ * has. Grouped and padded, this wallet read `25,000.0000 NEAR`, which is four
+ * zeroes claiming a precision about nothing and a comma in a figure you could
+ * paste into a field.
+ */
+const qty = (v: number, dp: number) =>
+  /* ONLY INSIDE THE FRACTION. `/\.?0+$/` ate the zero off `120 AAPL` and made
+     it 12 — a share count is not a decimal place. */
+  v.toFixed(dp).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
 
 export function Phone({ d }: { d: Deck }) {
   const { s } = d;
@@ -55,7 +70,6 @@ export function Phone({ d }: { d: Deck }) {
 /* ---- 2 · the assets ---------------------------------------------------- */
 
 function Assets({ d }: { d: Deck }) {
-  const { s } = d;
   return (
     <Enter k={`a${d.pass}`} className="ownassets">
       <b className="ownh">Assets</b>
@@ -72,25 +86,14 @@ function Assets({ d }: { d: Deck }) {
       </span>
       <span className="owntotal">{usd(crypto())}</span>
 
-      {/* THE TWO HALVES, and they are in every frame of this screen. The brief
-          does not mention them; keeping them is not a liberty, dropping them
-          would be — most of this wallet is confidential and the header is where
-          the app says so. */}
-      <div className="ownsplit">
-        {(['main', 'conf'] as const).map((k) => {
-          const on = d.can('bucket', k);
-          return (
-            <span className={'ownhalf' + (s.bucket === k ? ' on' : '') + live(on)} key={k}
-                  {...press(on)} data-tap={'bucket:' + k}>
-              <i>{k === 'main' ? 'Main' : 'Confidential'}</i>
-              <b>{usd(k === 'main' ? MAIN_BAL : confidential())}</b>
-            </span>
-          );
-        })}
-      </div>
+      {/* NO MAIN / CONFIDENTIAL SPLIT. It was two halves across the top of this
+          screen, because the app used to hold two balances and most of this
+          wallet was in the private one. near.com is confidential BY DEFAULT
+          now — its own Assets screen has one total and no split — so the halves
+          are gone and so is the `bucket` they switched between. */}
 
-      {/* the three rows the recording holds — see HOLDINGS in state.ts for why
-          these and not the brief's five */}
+      {/* the five holdings — see HOLDINGS in state.ts for the reversal that put
+          the brief's list back and the one number in it that moved */}
       <div className="ownlist">
         {HOLDINGS.map((h, i) => (
           <Row h={h} d={d} key={h.id} i={i} />
@@ -110,7 +113,7 @@ function Row({ h, d, i }: { h: Holding; d: Deck; i: number }) {
       <Dot a={h} size={34} />
       <span className="ownitemt">
         <b>{h.name}</b>
-        <em>{fmt(h.qty, h.dp)} {h.sym}{h.by ? ` · ${h.by}` : ''}</em>
+        <em>{qty(h.qty, h.dp)} {h.sym}{h.by ? ` · ${h.by}` : ''}</em>
       </span>
       <span className="ownitemv">
         <b>{usd(value(h))}</b>
@@ -159,9 +162,8 @@ function Bars() {
  * Each is the mark the app already uses for that verb somewhere else on this
  * device, which is the point of them: Swap is the tab bar's own glyph, Send is
  * the paper plane from the home screen's button, Earn is the bar chart on the
- * row pills, and Move to Main is the arrow back into the unshielded balance.
- * Drawing four new marks for four verbs the device has already named would make
- * the sheet look like a different app's.
+ * row pills. Drawing new marks for verbs the device has already named would
+ * make the sheet look like a different app's.
  */
 const ACT_ICON: Record<string, ReactNode> = {
   /* SCALED, because it is drawn on the tab bar's grid and the others are not.
@@ -191,12 +193,8 @@ const ACT_ICON: Record<string, ReactNode> = {
       <path d="M5 20v-4" /><path d="M12 20V9" /><path d="M19 20V4" />
     </svg>
   ),
-  'Move to Main': (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
-         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="m12 19-7-7 7-7" /><path d="M19 12H5" />
-    </svg>
-  ),
+  /* `Move to Main` had one here — an arrow back into the unshielded balance —
+     and it went with the balance. There is one now. */
 };
 
 /* ---- 3 · what a row opens ---------------------------------------------- */

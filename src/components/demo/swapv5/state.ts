@@ -33,40 +33,37 @@ import { HOLDINGS, type Holding } from '@/components/demo/ownv5/state';
  * offering to spend a Bitcoin that is not in the assets list is the two
  * chapters contradicting each other on the same scroll.
  */
-export const FROM = 'USDT';
+export const FROM = 'BTC';
 
-/** the wallet's whole Tether position, to the decimal the frame prints */
-export const FROM_BAL = 6635.616976;
+/** the wallet's whole Bitcoin position, from the account chapter's own list */
+export const FROM_BAL = HOLDINGS.find((h) => h.sym === FROM)!.qty;
 
 /**
- * WHAT GOES IN THE FIELD, AND NOBODY TYPED IT.
+ * A QUARTER OF IT, AND IT IS TYPED.
  *
- * The frame swaps THE WHOLE TETHER POSITION — 6635.616976, to the last of six
- * decimals — and that is not a figure anyone enters by hand. It got there the
- * way it gets there in the app: by tapping the balance on the right of the
- * sub-row, which is what that balance is for.
- *
- * It used to be `2500`, typed a digit at a time. Four digits is a plausible
- * thing to type and eleven is not, so keeping the typing would have meant
- * keeping a round number the frame does not show — and the round number was
- * the reason the two dollar figures on this screen could never disagree, which
- * is the other half of what the frame is actually saying. See `QUOTE`.
+ * The previous cut spent a whole Tether position and got it into the field with
+ * one tap on the balance, because `6635.616976` is not a figure anyone enters
+ * by hand. `0.25` is: it is four characters, it is a FRACTION of the holding
+ * rather than all of it, and `Use max` is the wrong gesture for a fraction.
+ * So the keypad is back for this one, and the field fills a glyph at a time
+ * the way `Typed` fills it either way.
  */
-export const AMOUNT = String(FROM_BAL);
+export const AMOUNT = '0.25';
 
 /**
  * WHERE IT ENDS UP, which is not where it starts.
  *
- * The screen opens with ZEC already in the destination — the app holds the last
- * pair rather than an empty field, and the reference frame shows exactly that.
+ * The screen opens with USD Coin already in the destination — the app holds the
+ * last pair rather than an empty field, and the reference frame shows exactly
+ * that. What the reader is here for is Zcash, which is nine rows down.
  * The picker then does what this chapter is for: it opens over a destination
  * that is already valid, which is the honest version of the argument. A picker
  * you only ever see because the form cannot proceed without it is a required
  * step; one you open with a working answer already in the field is a choice,
  * and "swap anything, anywhere" is a claim about choice.
  */
-export const START_TO = 'ZEC';
-export const TO = 'NEAR';
+export const START_TO = 'USDC';
+export const TO = 'ZEC';
 
 /**
  * The spread the quote is shown net of. `demo/swap/state.ts` reads 0.50% off
@@ -76,43 +73,20 @@ export const TO = 'NEAR';
 export const SLIPPAGE = 0.005;
 
 /**
- * THE RATE THE TRADE EXECUTES AT, WHICH IS NOT THE PRICE THE DOLLARS USE.
+ * THE RATE A TRADE EXECUTES AT, WHEN IT IS NOT THE PRICE THE DOLLARS USE.
  *
- * The frame prints THREE figures that only make sense together:
+ * A quote fills at a spread, so the dollars in and the dollars out are not the
+ * same figure — and the USDT/NEAR frame showed exactly that: $6,636 in and
+ * $6,612 out, twenty-four dollars that could not exist while one price served
+ * both sides. `quoteOf` still carries that idea and this table is where a
+ * measured spread goes.
  *
- *   6635.616976 USDT   ·   $6,636
- *   3535.799    NEAR   ·   $6,612
- *
- * Twenty-four dollars go missing between the two fields, and for as long as
- * this screen divided by NEAR's price they could not: one price for both sides
- * makes the two dollar figures identical by construction, and a swap screen
- * saying you get exactly what you put in is a swap screen with no spread in it.
- *
- * So there are two numbers, because there are two questions. `price` in the
- * catalogue is the SPOT — what a NEAR is worth, and what both dollar figures
- * are read off. This is the QUOTE — what this trade actually fills at, spread
- * included. $6,636 in at spot, 3535.799 out at the quote, and those 3535.799
- * NEAR are worth $6,612 back at spot again. The gap is the spread, and it is
- * the only honest reason the second figure is smaller.
- *
- * IT IS DERIVED FROM `RECEIVE AT LEAST`, WHICH IS THE FRAME'S MOST PRECISE
- * FIGURE. The review sheet prints five figures for one trade and four of them
- * are roundings of the fifth:
- *
- *   6,635.61698 USDT     the balance, to five
- *   3,535.79972 NEAR     what comes out, to five
- *   3518.120719 NEAR     the same thing less 0.5%, to SIX
- *   1.87669              the rate, to five
- *   $6,636 / $6,612      both sides at spot, to none
- *
- * So the six-decimal one is the reading, and everything else falls out of it.
- * Written as the division rather than pasted as a constant: a nine-digit
- * number in this file is a number nobody can check, and this way the two
- * figures in it are both on the frame.
+ * IT IS EMPTY, AND THAT IS THE POINT. This cut swaps Bitcoin into Zcash and no
+ * frame anywhere quotes that pair, so there is no spread to read — the two
+ * dollar figures are equal, which is honest, and a number invented to make
+ * them differ would be a spread pretending to have been observed.
  */
-export const QUOTE: Record<string, number> = {
-  NEAR: FROM_BAL / (3518.120719 / (1 - SLIPPAGE)),
-};
+export const QUOTE: Record<string, number> = {};
 
 /** the settlement, read off `rec-Swap.MP4` */
 export const SWAP_STEPS = ['Finding best price', 'Executing trade', 'Trade complete'];
@@ -137,16 +111,14 @@ export const SWAP_STEPS = ['Finding best price', 'Executing trade', 'Trade compl
 const MINE = new Set(HOLDINGS.map((h) => h.sym));
 
 /**
- * AND NEAR IS DELIBERATELY DOWN THE LIST.
+ * AND NOTHING YOU ALREADY HOLD IS IN THE CATALOGUE TWICE.
  *
- * The catalogue's own order would put it third, one flick from the top, and a
- * picker that finds what it wants immediately has not shown you anything. The
- * point of this scene is that there is more every time you look, so the list
- * leads with the current destination and the assets a reader recognises, and
- * NEAR sits ninth — far enough that getting to it means passing eight coins
- * you did not come for, which is the argument.
+ * `Your tokens` is the wallet and `More tokens` is everything else, so the head
+ * of the second list has to skip the five the first one has. It listed ZEC,
+ * BTC and NEAR before now, from a wallet that held none of them.
  */
-const HEAD_ORDER = ['ZEC', 'BTC', 'ETH', 'XRP', 'SOL', 'BNB', 'DOGE', 'ADA', 'NEAR'];
+const HEAD_ORDER = ['ETH', 'XRP', 'SOL', 'BNB', 'DOGE', 'ADA', 'TRX', 'LINK', 'AVAX']
+  .filter((sym) => !MINE.has(sym));
 const MORE: Asset[] = [
   ...HEAD_ORDER.map((sym) => CATALOGUE.find((a) => a.sym === sym)!),
   ...CATALOGUE.filter((a) => !MINE.has(a.sym) && !HEAD_ORDER.includes(a.sym)),
@@ -176,18 +148,24 @@ export const pickOffset = (i: number) =>
 export const PICK_TOTAL = pickOffset(PICK_ROWS.length);
 
 /**
- * HOW FAR THE PICKER TRAVELS, as indices into PICK_ROWS.
+ * HOW FAR THE PICKER TRAVELS, as indices into PICK_ROWS — AND WHERE IT ENDS UP.
+ *
+ * Down past the wallet, into the catalogue, and then BACK TO THE TOP, because
+ * the token this trade is for turned out to be one the account already holds.
+ * Zcash is the fourth row of `Your tokens`, four rows from where the sheet
+ * opened, and the scroll goes looking anyway — which is the truer version of
+ * the argument this scene was always making. It used to end nine rows down on
+ * NEAR, from a wallet that held no NEAR; now the list is long, the reader sees
+ * that it is long, and the answer was in their own five the whole time.
  *
  * Three stops rather than one glide: the eye reads one continuous move as one
- * fact, and three read as someone looking. Down past the wallet, into the
- * catalogue, and on until the row it came for comes into view — which with NEAR
- * ninth means eight other coins go past on the way. The first stop is 5 rather
- * than 0: the picker RESTS on `Your tokens` before it moves, because a wallet
- * section nobody sees is a wallet section that may as well not be there. `check:flows` walks these
- * as ordinary beats; that NEAR is actually on screen at the last one is checked
+ * fact, and three read as someone looking. The first is 5 rather than 0 so the
+ * picker RESTS on `Your tokens` before it moves — a wallet section nobody sees
+ * is a wallet section that may as well not be there. `check:flows` walks these
+ * as ordinary beats; that ZEC is actually on screen at the last one is checked
  * against the rendered device rather than against this file.
  */
-export const STOPS = [5, 9, 12];
+export const STOPS = [5, 9, 0];
 
 export type SV = {
   /**
@@ -266,15 +244,29 @@ export const out = (s: SV) => (s.to ? usd(s) / quoteOf(s) : 0);
 export const outUsd = (s: SV) => out(s) * toPrice(s);
 export const least = (s: SV) => out(s) * (1 - SLIPPAGE);
 /**
- * THE RATE ROW, AND IT IS QUOTED THE OTHER WAY ROUND.
+ * THE RATE ROW, AND IT IS QUOTED IN WHICHEVER DIRECTION GIVES A NUMBER ≥ 1.
  *
- * `Exchange rate — 1 NEAR = 1.87669 USDT`: one of the thing you are BUYING, in
- * units of the thing you are spending. It used to be `1 USDT = 0.53 NEAR`,
- * which is the same fact stated so that nobody can hold it — on a stablecoin
- * pair the app's direction is a price a reader already knows how to read, and
- * the inverse is a fraction of a coin per dollar.
+ * It was fixed at "one of the thing you are BUYING, in units of the thing you
+ * are spending" — `1 NEAR = 1.87669 USDT` — because on that pair the inverse,
+ * `1 USDT = 0.53 NEAR`, is the same fact stated so nobody can hold it. The
+ * rule was right and the reason was wrong: what makes a rate readable is not
+ * which side it is quoted from, it is that the figure is a WHOLE NUMBER rather
+ * than a fraction.
+ *
+ * On Bitcoin into Zcash the readable direction flips. `1 ZEC = 0.01033 BTC` is
+ * the fraction and `1 BTC = 96.7649 ZEC` is the price — and on Bitcoin into a
+ * dollar the old rule printed `1 USDC = 0.00001 BTC`, five decimals of nothing.
+ * Quoting from whichever side lands above one gives the frame's own answer on
+ * the frame's own pair and a legible one everywhere else.
  */
-export const invRate = (s: SV) => (s.to ? quoteOf(s) / fromPrice() : 0);
+export const rateOf = (s: SV) => {
+  const inv = s.to ? quoteOf(s) / fromPrice() : 0;
+  return inv >= 1
+    ? { one: s.to ?? '', per: s.from, n: inv }
+    : { one: s.from, per: s.to ?? '', n: inv ? 1 / inv : 0 };
+};
+
+
 
 /**
  * WHAT THE WALLET HOLDS OF A SYMBOL — the right-hand side of a field's sub-row.
