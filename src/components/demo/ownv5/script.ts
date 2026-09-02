@@ -29,8 +29,8 @@ import { actions, initial, type OW, type OWAction } from './state';
  *             11,520ms  ×1.25 = 14,400ms on screen
  *
  * IT WAS 20,025 AND THAT WAS TOO LONG FOR WHERE IT LIVES. On its own route the
- * length costs nothing — a reader can watch it twice. On `/home-v2` it is one
- * of four chapters in a scroll a reader is MOVING through, and `W_REST` in
+ * length costs nothing — a reader can watch it twice. On the home page it is
+ * one of four chapters in a scroll a reader is MOVING through, and `W_REST` in
  * lib/schedule.ts is documented as identical for all four cards by
  * construction: there is no way to buy this chapter more dwell that does not
  * buy it for the other three and move the shipped page's composition with it.

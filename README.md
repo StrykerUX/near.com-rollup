@@ -93,7 +93,8 @@ src/
     14-refactor.css   the one rule the DOM-shuffle used to do imperatively
     15..23-*.css      the rebuilt app screens, v1 through v4
     24-demo-app.css   `.pdev.app` — the shared language every v5 screen wears
-    25-home-app.css   the gutted plate that holds the real device on /home-v2
+    25-home-app.css   the gutted plate that holds the real device — the deck
+                      `/`, `/guided` and `/live` all run
     26..28-*.css      swap-v5 · own-v5 · earn-v5, each scoped to its own class
   lib/
     schedule.ts       THE STAGE SCHEDULE — band weights, scrubT, yForT, feel dials
@@ -1263,7 +1264,7 @@ two chapters contradicting each other on the same scroll. The destination opens
 on ZEC because the app holds the last pair, which makes the picker a *choice*
 rather than a required step. "Swap anything, anywhere" is a claim about choice.
 
-## `/home-v2` — four chapters, four real screens
+## The home page — four chapters, four real screens
 
 The page's own structure turned out to be the brief's. `Lockup.tsx` already
 writes a headline per chapter and the engine already fades between them:
@@ -1295,10 +1296,10 @@ first beat rather than dropping a reader into a loop that has been running
 unseen — and only one clock, one chart and one settlement are ever alive.
 
 Verified by sweeping the 5,292px of stage: perps at 2%, account at 17%, swap at
-32%, earn at 53%, each under its own headline, with `/`, `/guided` and `/live`
-still mounting all four faces in the plate at 348×696.
+32%, earn at 53%, each under its own headline, with `/home-v2` still mounting
+all four faces in the plate at 348×696.
 
-## `/home-v2` — the plate gives up and holds the real device
+## The plate gives up and holds the real device
 
 The screen `/demo/perps-v5` runs, unchanged, standing in the home page's room:
 its gradient field, its lockup, its quote, its scroll, its light zone. Not a
@@ -1326,7 +1327,7 @@ engine writes to it — `--card-y` (the peek), `--card-s` (the plate shrink),
 to it. What it gives up is being a *surface*: no glass, no blur, no border, no
 halo, and no clip, because the device carries its own bezel and is taller than
 the height the engine writes. The header, the tab bar and the three other faces
-are not rendered. **The tour is one screen long on this route**, which is the
+are not rendered. **The tour is one screen long on this deck**, which is the
 trade and was accepted as one.
 
 The engine tolerates that: `chromeTitleEl` is null-guarded, and nothing in it

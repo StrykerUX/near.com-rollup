@@ -1,5 +1,11 @@
 /* =========================================================================
-   /home-v2 — THE PLATE GIVES UP AND HOLDS THE REAL DEVICE
+   THE PLATE GIVES UP AND HOLDS THE REAL DEVICE
+   -------------------------------------------------------------------------
+   SCOPED TO `.appmorph`, WHICH IS THE DECK AND NOT A ROUTE. It is what `/`,
+   `/guided` and `/live` all wear now; `/home-v2` is the one that does not.
+   The file was named for the route it was built on, back when that route was
+   the variant — the name is kept because the stylesheets are numbered and
+   renumbering them costs more than it explains.
    -------------------------------------------------------------------------
    `.morph` on this route is not a card. It keeps its id and every transform
    the stage engine writes to it — `--card-y` (the peek), `--card-s` (the plate
