@@ -96,6 +96,7 @@ src/
     25-home-app.css   the gutted plate that holds the real device — the deck
                       `/`, `/guided` and `/live` all run
     26..28-*.css      swap-v5 · own-v5 · earn-v5, each scoped to its own class
+    29-account-home.css  the home two of those chapters open on, `.pdev.app`
   lib/
     schedule.ts       THE STAGE SCHEDULE — band weights, scrubT, yForT, feel dials
     math.ts           the easing vocabulary

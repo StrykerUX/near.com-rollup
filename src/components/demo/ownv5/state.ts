@@ -83,7 +83,11 @@ export type Holding = {
 export const HOLDINGS: Holding[] = [
   { id: 'usdt', sym: 'USDT', name: 'Tether USD', qty: 6635.6169, dp: 4, chg: '+0.01%', up: true, color: '#26A17B', ink: '#fff' },
   { id: 'usdc-a', sym: 'USDC', name: 'USD Coin', chain: 'sol', qty: 41.7234, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
-  { id: 'usdc-b', sym: 'USDC', name: 'USD Coin', chain: 'eth', qty: 22.5552, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
+  /* SIX DECIMALS, PRINTED AT FOUR. The assets list truncates to `22.5552`, and
+     the earn chapter's vault sheet — which spends this exact lot — prints
+     `22.555228`. Same relationship the Tether row has with the swap screen:
+     the app carries six and the list shows four. */
+  { id: 'usdc-b', sym: 'USDC', name: 'USD Coin', chain: 'eth', qty: 22.555228, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
 ];
 
 /** the Main half of the Assets header, frame 0:03 of both recordings */
@@ -131,10 +135,14 @@ export const total = () => crypto() + PERPS_BAL + EARN_BAL;
  * chapter prints two faces later, and two screens quoting one rate at each
  * other is exactly the pair that drifts.
  */
-export const EARNS: Record<string, string> = {
-  USDT: vaultOf('taler').apr.replace(/0%$/, '%'),
-  USDC: vaultOf('taler').apr.replace(/0%$/, '%'),
-};
+const EARNABLE = new Set(['USDT', 'USDC']);
+/**
+ * A FUNCTION RATHER THAN A TABLE, and for the same reason `usdcAvail` in the
+ * earn chapter is one: the two files import each other, and a table built at
+ * module scope makes each of them need the other finished before it can start.
+ */
+export const earnsOn = (sym: string) =>
+  (EARNABLE.has(sym) ? vaultOf('taler').apr.replace(/0%$/, '%') : undefined);
 
 export const ACTIONS = ['Swap', 'Send', 'Earn', 'Move to Main'] as const;
 
@@ -154,6 +162,12 @@ export type OW = {
    * exactly what `/demo/swap-v5` opens with pre-filled.
    */
   handoff: string | null;
+  /**
+   * WHICH CONTROL IS BEING HELD DOWN, and it is the only thing on a cursorless
+   * screen that says why the next one arrived. Set by a beat and cleared by the
+   * transition that follows it — see the note in 24-demo-app.css.
+   */
+  lit: string | null;
   tap: string | null;
 };
 
@@ -162,6 +176,7 @@ export const initial: OW = {
   bucket: 'conf',
   acted: null,
   handoff: null,
+  lit: null,
   tap: null,
 };
 
@@ -170,17 +185,19 @@ export const initial: OW = {
 export type OWAction = 'toAssets' | 'home' | 'bucket' | 'actions' | 'closeSheet' | 'swap';
 
 export const actions: Record<OWAction, Act<OW>> = {
-  toAssets: (s) => (s.screen === 'home' ? { screen: 'assets', tap: 'crypto' } : null),
-  home: (s) => (s.screen === 'assets' ? { screen: 'home', acted: null, tap: 'home' } : null),
+  /* every transition that follows a lit beat puts the light out: the press is
+     over the moment the thing it was pressing happens */
+  toAssets: (s) => (s.screen === 'home' ? { screen: 'assets', lit: null, tap: 'crypto' } : null),
+  home: (s) => (s.screen === 'assets' ? { screen: 'home', acted: null, lit: null, tap: 'home' } : null),
   bucket: (s, v) =>
     s.screen !== 'assets' || s.bucket === v ? null : { bucket: (v as OW['bucket']) ?? 'conf', tap: 'bucket' },
 
   actions: (s, v) => {
     if (s.screen !== 'assets' || !v || s.acted) return null;
-    return HOLDINGS.some((h) => h.id === v) ? { acted: v, tap: 'row:' + v } : null;
+    return HOLDINGS.some((h) => h.id === v) ? { acted: v, lit: null, tap: 'row:' + v } : null;
   },
   closeSheet: (s) => (s.acted ? { acted: null, tap: null } : null),
 
   /* the sheet's first row, and the end of this chapter */
-  swap: (s) => (s.acted && !s.handoff ? { handoff: s.acted, tap: 'swap' } : null),
+  swap: (s) => (s.acted && !s.handoff ? { handoff: s.acted, lit: null, tap: 'swap' } : null),
 };

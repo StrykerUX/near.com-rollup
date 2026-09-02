@@ -5,11 +5,12 @@ import { Enter } from '@/components/stage/phone/ui/Enter';
 import { ProgressList } from '@/components/stage/phone/ui/ProgressList';
 import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { Dot } from '@/components/demo/app/Dot';
+import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
-  BETA, BLURB, COLS, DEPOSIT, REFERENCE, STAKE_APY, STAKED_NEAR, STEPS, SUB, TITLE, VAULTS,
-  available, balanceOf, cta, stakeUsd, vaultOf, type EA, type EAAction, type Vault,
+  BETA, BLURB, COLS, REFERENCE, STAKE_APY, STAKED_NEAR, STEPS, SUB, TABS, TAB_NAMES, TITLE,
+  VAULTS, available, balanceOf, cta, stakeUsd, vaultOf, type EA, type EAAction, type Vault,
 } from './state';
 
 type Deck = GenericDeck<EA, EAAction>;
@@ -17,17 +18,29 @@ type Deck = GenericDeck<EA, EAAction>;
 /**
  * EARN — THE DEVICE
  * ==================================================================
- * Read off `rec-Earn + being able to send:pay from your earn balance.MP4` at
- * one frame per second. The Vaults half is quoted: the Beta badge, the
- * subtitle, the paragraph, the table's own `Vault` / `Balance` headers, both
- * rows with `TVL … · rate` under the name, and Taler's sheet down to the fee
- * wording and the reference id.
+ * Read off `rec-Earn + being able to send:pay from your earn balance.MP4`. The
+ * Vaults half is quoted: the Beta badge, the subtitle, the paragraph, the
+ * table's own `Vault` / `Balance` headers, both rows with `TVL … · rate` under
+ * the name, and Taler's sheet down to the fee wording and the reference id.
  *
- * The Staking and Positions tabs are the brief's — see `STAKED_NEAR` and
- * `POSITIONS_TAB` in state.ts, which carry the note about what is not on film.
+ * IT OPENS ON THE ACCOUNT HOME, which is the same screen `/demo/own-v5` opens
+ * on — `demo/app/AccountHome.tsx`, one component, because it is one account.
+ * That chapter presses Crypto; this one presses the Earn balance.
+ *
+ * The Staking pane is the brief's — see `STAKED_NEAR` in state.ts. This cut
+ * does not go there; the tab is drawn because it is on film.
  */
 
 const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
+/**
+ * A DOLLAR FIGURE WITH ITS CENTS CUT, WHICH IS WHAT THE VAULT ROW DOES.
+ *
+ * $1,047 before the deposit and $1,069 after, on a balance of 1069.555 — the
+ * app truncates. Rounding would print $1,070 and be a dollar out in the only
+ * number this chapter exists to move. Same habit as `crypto()` in the account
+ * chapter and the swap screen's rate row.
+ */
+const cut = (v: number) => '$' + fmt(Math.trunc(v), 0);
 const USDC = { sym: 'USDC', color: '#2775CA', ink: '#fff' };
 const NEAR = { sym: 'NEAR', color: '#00EC97', ink: '#000' };
 
@@ -36,34 +49,48 @@ export function Phone({ d }: { d: Deck }) {
   return (
     <div className="pdev app earn" data-motion="rich" data-tempo="fast" style={PALETTE_VARS}>
       <div className="pdview">
-        <div className="ernhead">
-          <b>{TITLE}</b><i className="ernbeta">{BETA}</i>
-        </div>
-        <span className="ernsub">{SUB}</span>
-
-        <div className="erntabs">
-          {(['vaults', 'staking', 'positions'] as const).map((k) => {
-            const on = d.can('tab', k);
-            return (
-              <span className={'erntab' + (s.tab === k ? ' on' : '') + live(on)} key={k}
-                    {...press(on)} data-tap={'tab:' + k}>
-                {k === 'vaults' ? 'Vaults' : k === 'staking' ? 'Staking' : 'Positions'}
-              </span>
-            );
-          })}
-        </div>
-
-        {s.tab === 'vaults' ? <Vaults d={d} />
-          : s.tab === 'staking' ? <Staking d={d} />
-            : <Positions d={d} />}
+        {s.screen === 'home'
+          ? <AccountHome pass={d.pass} lit={s.lit} go={{ earn: d.can('toEarn') }} />
+          : <Earn d={d} />}
       </div>
 
       {/* THE TAB BAR HAS NO EARN. Home / Assets / Swap / Perps / Menu is the
           whole row in every frame of every recording — Earn is reached from
-          the Home screen's third balance row, so Home is what stays lit. */}
-      <Tabs on="Home" />
+          the Home screen's third balance row.
+          AND NOTHING IS LIT ON THE EARN PAGE, which is the frame: every item in
+          that row is dim there, because Earn is not one of them. Lighting Home
+          would be the bar claiming you are somewhere you left. */}
+      <Tabs on={s.screen === 'home' ? 'Home' : 'None'} />
       <VaultSheet d={d} />
     </div>
+  );
+}
+
+/* ---- the earn page ----------------------------------------------------- */
+
+function Earn({ d }: { d: Deck }) {
+  const { s } = d;
+  return (
+    <Enter k={`e${d.pass}`} className="ernpage">
+      <div className="ernhead">
+        <b>{TITLE}</b><i className="ernbeta">{BETA}</i>
+      </div>
+      <span className="ernsub">{SUB}</span>
+
+      <div className="erntabs">
+        {TABS.map((k) => {
+          const on = d.can('tab', k);
+          return (
+            <span className={'erntab' + (s.tab === k ? ' on' : '') + live(on)} key={k}
+                  {...press(on)} data-tap={'tab:' + k}>
+              {TAB_NAMES[k]}
+            </span>
+          );
+        })}
+      </div>
+
+      {s.tab === 'vaults' ? <Vaults d={d} /> : <Staking d={d} />}
+    </Enter>
   );
 }
 
@@ -82,13 +109,14 @@ function Vaults({ d }: { d: Deck }) {
           const open = d.can('openVault', v.id);
           return (
             <span className={'ernrow' + live(open)} key={v.id} {...press(open)}
-                  data-tap={'vault:' + v.id}>
+                  data-tap={'vault:' + v.id}
+                  data-lit={d.s.lit === 'vault:' + v.id ? '1' : undefined}>
               <Dot a={USDC} size={30} />
               <span className="ernrowt">
                 <b>{v.name}{v.promo ? <i className="ernpromo">Promo</i> : null}</b>
                 <em>TVL {v.tvl} · {v.apr}</em>
               </span>
-              <b className="ernbal">{usd(balanceOf(d.s, v), 0)}</b>
+              <b className="ernbal">{cut(balanceOf(d.s, v))}</b>
               <Chev />
             </span>
           );
@@ -130,34 +158,8 @@ function Staking({ d }: { d: Deck }) {
   );
 }
 
-/* ---- 3 · both ---------------------------------------------------------- */
-
-function Positions({ d }: { d: Deck }) {
-  const v = vaultOf('taler');
-  return (
-    <Enter k={`p${d.pass}`} className="ernpane">
-      <div className="erncols"><i>Position</i><i>Value</i></div>
-      <div className="ernlist">
-        <span className="ernrow">
-          <Dot a={USDC} size={30} />
-          <span className="ernrowt">
-            <b>{v.name}</b>
-            <em>Yield vault · {v.apr}</em>
-          </span>
-          <b className="ernbal">{usd(Number(DEPOSIT), 0)}</b>
-        </span>
-        <span className="ernrow">
-          <Dot a={NEAR} size={30} />
-          <span className="ernrowt">
-            <b>NEAR</b>
-            <em>Staked · {STAKE_APY}</em>
-          </span>
-          <b className="ernbal">{usd(stakeUsd(), 0)}</b>
-        </span>
-      </div>
-    </Enter>
-  );
-}
+/* `Positions` was a third tab and a third pane, and no frame of any recording
+   has either — see `TABS` in state.ts. Both are gone. */
 
 /* ---- the vault's sheet ------------------------------------------------- */
 
@@ -192,9 +194,23 @@ function VaultSheet({ d }: { d: Deck }) {
 
             {s.submitting ? (
               <div className="ernsettle">
-                <b className="ernsettleh">Depositing {fmt(Number(s.amount), 2)} USDC</b>
+                {/* FIVE DECIMALS, ROUNDED. The frame reads `Depositing 22.55523
+                    USDC` for a figure of 22.555228 — the same five the other
+                    recording's `41.72349` gives for 41.723488. The field above
+                    carries all six; the sentence about it does not. */}
+                <b className="ernsettleh">Depositing {Number(s.amount).toFixed(5)} USDC</b>
                 <ProgressList steps={STEPS} at={s.step} />
                 <span className="ernref"><i>Reference ID</i><b>{REFERENCE}</b></span>
+                {/* THE SHEET WAITS. Three ticks and a reference id, and then a
+                    button — the recording sits here until something presses it.
+                    A settlement that dismisses itself is the app deciding you
+                    have finished reading the receipt. */}
+                {s.settled ? (
+                  <span className={'bcta' + live(d.can('close'))} {...press(d.can('close'))}
+                        data-tap="close" data-lit={s.lit === 'close' ? '1' : undefined}>
+                    Close
+                  </span>
+                ) : null}
               </div>
             ) : (
               <>
@@ -208,9 +224,14 @@ function VaultSheet({ d }: { d: Deck }) {
                   })}
                 </div>
 
+                {/* THE FIELD PRINTS WHAT IS IN IT, TO SIX DECIMALS AND WITH NO
+                    SEPARATOR — `22.555228`, which is the whole lot Use max put
+                    there. It used to round to a whole USDC, which on a deposit
+                    of twenty-two dollars threw away most of the figure. */}
                 <div className="ernamt">
-                  <span className="ernamtv">
-                    <b>{s.amount ? fmt(Number(s.amount), 0) : '0'}</b><em>USDC</em>
+                  <span className="ernamtv"
+                        style={{ '--len': (s.amount || '0').length } as React.CSSProperties}>
+                    <b>{s.amount || '0'}</b><em>USDC</em>
                     {s.focus === 'amount' ? <i className="bcaret" /> : null}
                   </span>
                   <span className="ernamtu">{usd(Number(s.amount) || 0)}</span>
@@ -218,13 +239,21 @@ function VaultSheet({ d }: { d: Deck }) {
 
                 <div className="ernavail">
                   <Dot a={USDC} size={22} />
-                  <span className="ernrowt"><em>Available</em><b>{fmt(available(s), 2)} USDC</b></span>
+                  {/* TRUNCATED, NOT ROUNDED — the frame reads `22.55 USDC` for
+                      a balance of 22.555228, and `Use max` then puts all six
+                      decimals in the field. Rounding prints 22.56, which is an
+                      availability the wallet does not have. */}
+                  <span className="ernrowt">
+                    <em>Available</em>
+                    <b>{(Math.trunc(available(s) * 100) / 100).toFixed(2)} USDC</b>
+                  </span>
                   <span className={'ernmax' + live(d.can('max'))} {...press(d.can('max'))}
-                        data-tap="max">Use max</span>
+                        data-tap="max" data-lit={s.lit === 'max' ? '1' : undefined}>Use max</span>
                 </div>
 
                 <span className={'bcta' + (c.ok ? '' : ' off') + live(d.can('confirm'))}
-                      {...press(d.can('confirm'))} data-tap="deposit">{c.label}</span>
+                      {...press(d.can('confirm'))} data-tap="deposit"
+                      data-lit={s.lit === 'deposit' ? '1' : undefined}>{c.label}</span>
               </>
             )}
           </>

@@ -10,101 +10,13 @@
    ========================================================================= */
 
 .pdev.own .pdview { padding: 0 16px }
-.pdev.own .ownhome, .pdev.own .ownassets {
-  flex: 1; min-height: 0; display: flex; flex-direction: column;
-}
+.pdev.own .ownassets { flex: 1; min-height: 0; display: flex; flex-direction: column }
 
-/* ---- the account ------------------------------------------------------- */
-
-/* THE SAME TOP SPACING AS `/demo/perps-v5`. That device's chrome row is 62px
-   tall with 16 of padding above it, so its first control's top edge sits 22px
-   into the screen. This row was 52 with none, which put the avatar at 11 — a
-   difference nobody could name and everybody could see, on two screens that
-   are meant to be the same phone. Matched by the numbers, not by eye. */
-.pdev.own .ownhead {
-  flex: none; display: flex; align-items: center; gap: 10px;
-  height: 62px; padding-top: 16px;
-}
-.pdev.own .ownhead b { font-size: 17px; font-weight: 600 }
-/* a green ROUNDED SQUARE carrying the NEAR mark, not a circle and not a
-   gradient — the reference is a flat brand green with the logo knocked out */
-.pdev.own .ownav {
-  width: 34px; height: 34px; border-radius: 11px; flex: none;
-  display: grid; place-items: center;
-  background: var(--btc-up); color: #04140E;
-}
-.pdev.own .ownav svg { width: 17px; height: 17px; display: block }
-.pdev.own .ownscan {
-  margin-left: auto; width: 34px; height: 34px; border-radius: 11px;
-  display: grid; place-items: center;
-  background: var(--btc-card); color: rgba(255, 255, 255, .8);
-}
-.pdev.own .ownscan svg { width: 18px; height: 18px }
+/* ---- the account, and the heading the assets screen shares -------------
+   THE HOME ITSELF MOVED to 29-account-home.css: the earn chapter opens on it
+   too, and a screen two chapters draw is not this file's to own. What is left
+   here is the one rule the assets screen uses out of that block. */
 .pdev.own .ownh { flex: none; display: block; font-size: 22px; font-weight: 600; padding: 30px 0 6px }
-
-.pdev.own .ownlab {
-  flex: none; display: flex; align-items: center; gap: 6px;
-  font-size: 13px; color: rgba(255, 255, 255, .5); margin-top: 14px;
-}
-.pdev.own .owneye { width: 14px; height: 14px; opacity: .8 }
-/* the figure is the loudest thing on the screen, and the reference gives it
-   room on both sides rather than stacking it against the label */
-.pdev.own .owntotal {
-  flex: none; display: block; font-size: 34px; font-weight: 600; letter-spacing: -.03em;
-  margin-top: 4px; font-variant-numeric: tabular-nums;
-}
-
-.pdev.own .ownpair {
-  flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0 22px;
-}
-.pdev.own .ownbtn {
-  display: flex; align-items: center; justify-content: center; gap: 7px; height: 42px;
-  border-radius: 999px; background: #fff; color: #0B0F0D; font-size: 15px; font-weight: 600;
-}
-.pdev.own .ownbtn svg { width: 16px; height: 16px }
-
-/* ---- the balances card ------------------------------------------------- */
-
-/* EACH BALANCE IS ITS OWN CARD, not a row in a list.
-   They were hairline-separated rows sharing one fill, which packs three
-   balances into the space the reference gives one and makes the card read as a
-   table. In the reference the container is barely lighter than the page and
-   each balance sits INSIDE it as a lighter block with air around it — so the
-   separation is a gap and a change in tone rather than a rule, and each figure
-   gets a plate of its own to be the largest thing on.
-   THE CONTAINER GOES DARKER, NOT LIGHTER, and that took a second pass. Sitting
-   it a hair ABOVE the ground put it at ~#252525 against blocks at #262626 —
-   one shade apart, which is a difference that exists in the stylesheet and not
-   on the screen. Dropping it 25% toward black lands it at ~#181818 against the
-   same #262626: fourteen steps, and the blocks read as blocks.
-   Both fills still come from the palette — one is the ground darkened, the
-   other is `--btc-card`. No fourth colour was invented for this. */
-.pdev.own .owncard {
-  flex: none; border-radius: 18px; padding: 6px 6px 8px;
-  background: rgba(0, 0, 0, .25);
-  display: flex; flex-direction: column; gap: 8px;
-}
-.pdev.own .owncardh {
-  display: block; padding: 10px 10px 4px; font-size: 13px; color: rgba(255, 255, 255, .5);
-}
-/* the same fill-plus-hairline as the assets card — one card language, not two */
-.pdev.own .ownrow {
-  display: flex; align-items: center; gap: 10px; padding: 16px 14px 18px;
-  border-radius: 14px; background: var(--btc-card); border: 1px solid var(--btc-edge);
-}
-.pdev.own .ownrowl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px }
-.pdev.own .ownrowl em { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .62) }
-.pdev.own .ownrowl > b { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums }
-.pdev.own .ownpills {
-  display: flex; align-items: center; gap: 6px; margin-top: 6px;
-  font-size: 12px; color: rgba(255, 255, 255, .45);
-}
-.pdev.own .ownpills i { font-style: normal }
-.pdev.own .ownpills i b { font-weight: 600; color: rgba(255, 255, 255, .72) }
-.pdev.own .ownchev { width: 19px; height: 19px; flex: none; color: rgba(255, 255, 255, .55) }
-
-.pdev.own .ownup { color: #2FD48A }
-.pdev.own .owndown { color: #F0616B }
 
 /* ---- the assets screen ------------------------------------------------- */
 
@@ -116,7 +28,8 @@
    no line at all, which is why the sections read as regions of the page rather
    than as cards sitting on it. `--btc-edge` is that line, once, so the split and
    the list cannot drift apart. */
-.pdev.own { --btc-edge: rgba(255, 255, 255, .07) }
+/* `--btc-edge` is declared on `.pdev.app` in 29-account-home.css now: the
+   account home moved there and took the token it uses with it. */
 
 /* THE TWO HALVES, and they are in every frame of this screen. Most of this
    wallet is confidential and the header is where the app says so.

@@ -69,7 +69,14 @@ const STEPS: Step<OW, OWAction>[] = [
     id: 'home', ch: 'home',
     title: 'One account, three balances',
     note: 'Crypto, perps and earn on one screen, and a total that is the sum of the three rows under it.',
-    beats: [{ ms: 2600 }],
+    beats: [
+      { ms: 2380 },
+      /* THE PRESS, AND IT COMES OUT OF THE HOLD RATHER THAN ADDING TO IT.
+         220ms is what the recording gives it: the Crypto row lightens, and the
+         assets list is there on the next frame. Taken off this scene's own
+         dwell so the chapter's length does not move. */
+      { ms: 220, set: { lit: 'crypto' } },
+    ],
   },
 
   /* ---- scene 2 · 2,720ms ---------------------------------------------- */
@@ -82,7 +89,8 @@ const STEPS: Step<OW, OWAction>[] = [
       /* still the longest hold in the cut, on the frame the chapter's headline
          is about. Five rows is more reading than any other screen in this
          family asks for, and it keeps the most time of the four. */
-      { ms: 2100 },
+      { ms: 1900 },
+      { ms: 200, set: { lit: 'row:usdt' } },
     ],
   },
 
@@ -93,7 +101,8 @@ const STEPS: Step<OW, OWAction>[] = [
     note: 'Swap, send, earn or move it out of the confidential balance — from the row, without leaving the list.',
     beats: [
       { ms: 700, do: 'actions', arg: 'usdt' },
-      { ms: 1400 },
+      { ms: 1200 },
+      { ms: 200, set: { lit: 'swap' } },
     ],
   },
 

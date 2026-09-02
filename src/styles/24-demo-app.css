@@ -447,6 +447,30 @@
 .pdev.app .bswap { width: 17px; height: 17px; color: rgba(255, 255, 255, .55) }
 .pdev.app .berr { display: block; margin-top: 7px; font-size: 13px; font-style: normal; color: #FF7079 }
 
+/* =========================================================================
+   THE PRESS, AND IT IS THE ONLY THING THAT SAYS WHY THE SCREEN CHANGED
+   -------------------------------------------------------------------------
+   These recordings have no cursor in them. A row is dark, then it is lighter
+   for about two hundred milliseconds, then the next screen is there — and that
+   lighter fill is the entire causal chain a viewer gets. Without it a scripted
+   demo is a slideshow: screens replacing each other for no reason anybody
+   watching can name.
+
+   `data-lit="1"` is set by a BEAT rather than by a transition — it is not
+   something anyone can do, it is the app drawing a finger — so it rides
+   `Beat.set` in the flow and is cleared by the transition that follows.
+
+   Two rules, because there are two kinds of pressable thing on these screens:
+   a card-shaped row lightens its fill, and a pill-shaped control drops its own
+   instead. Both are what the frames show; neither is a hover.
+   ========================================================================= */
+.pdev.app [data-lit='1'] { background: rgba(255, 255, 255, .1) }
+.pdev.app [data-lit='1'].pill { background: transparent }
+
+@media (prefers-reduced-motion: reduce) {
+  .pdev.app [data-lit='1'] { background: rgba(255, 255, 255, .1) }
+}
+
 .pdev.app .bcta {
   display: grid; place-items: center; margin-top: 4px; min-height: 50px; border-radius: 999px;
   font-size: 16px; font-weight: 600; background: #fff; color: #0B0F0D;

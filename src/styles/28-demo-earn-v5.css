@@ -4,14 +4,19 @@
    The Vaults half is quoted from `rec-Earn + being able to send:pay from your
    earn balance.MP4`: the Beta badge, the subtitle, the paragraph, the table's
    own column headers, the `TVL … · rate` line under each name, and the whole
-   of Taler's sheet. The Staking and Positions panes are the brief's — see
-   `STAKED_NEAR` and `POSITIONS_TAB` in state.ts.
+   of Taler's sheet. The Staking pane is the brief's — see `STAKED_NEAR`.
+
+   THE ACCOUNT HOME THIS CHAPTER OPENS ON IS NOT HERE. It is the same screen
+   `/demo/own-v5` opens on, and it lives in 29-account-home.css scoped to
+   `.pdev.app` — one account, one stylesheet.
 
    `.pdev.app` carries the face, the palette, the tempo, the CTA and the sheet
    mechanics. SCOPED TO `.pdev.earn`, all of it.
    ========================================================================= */
 
 .pdev.earn .pdview { padding: 0 16px }
+
+.pdev.earn .ernpage { flex: 1; min-height: 0; display: flex; flex-direction: column }
 
 .pdev.earn .ernhead { flex: none; display: flex; align-items: center; gap: 8px; padding: 14px 0 2px }
 .pdev.earn .ernhead b { font-size: 22px; font-weight: 600 }
@@ -132,9 +137,14 @@
 .pdev.earn .ernsg.on { background: rgba(255, 255, 255, .12); color: #fff }
 
 .pdev.earn .ernamt { text-align: center; padding: 20px 0 14px }
+/* THE FIGURE SHRINKS AS IT LENGTHENS. `0` and `22.555228` are the same control
+   holding two and nine glyphs, and at one size the long one runs into the edges
+   of a sheet that is already inset twice. `--len` is set inline in Phone.tsx;
+   the arithmetic is here because the width it has to fit is this box's. */
 .pdev.earn .ernamtv {
   display: flex; align-items: baseline; justify-content: center; gap: 6px;
-  font-size: 30px; font-weight: 600; letter-spacing: -.025em; font-variant-numeric: tabular-nums;
+  font-size: min(30px, calc(300px / var(--len, 2)));
+  font-weight: 600; letter-spacing: -.025em; font-variant-numeric: tabular-nums;
 }
 .pdev.earn .ernamtv em { font-style: normal; font-size: 17px; color: rgba(255, 255, 255, .45) }
 .pdev.earn .ernamtu {
@@ -149,11 +159,17 @@
 .pdev.earn .ernavail .ernrowt em { font-size: 12px }
 .pdev.earn .ernavail .ernrowt b { font-size: 14px; font-variant-numeric: tabular-nums }
 .pdev.earn .ernmax {
-  font-size: 13px; font-weight: 600; padding: 6px 11px; border-radius: 9px;
+  margin-left: auto; font-size: 13px; font-weight: 600; padding: 6px 11px; border-radius: 9px;
   background: rgba(255, 255, 255, .1);
+  transition: background-color var(--dur) var(--ease-out);
 }
+/* the one control on these screens that is ALREADY a fill, so its press takes
+   the fill away rather than adding one — the frames show it losing its plate */
+.pdev.earn [data-lit='1'].ernmax { background: rgba(255, 255, 255, .02) }
 
 .pdev.earn .ernsettle { margin-top: 6px }
+/* the sheet waits to be dismissed — see the note in Phone.tsx */
+.pdev.earn .ernsettle .bcta { margin-top: 18px }
 .pdev.earn .ernsettleh { display: block; font-size: 15px; font-weight: 600; margin-bottom: 12px }
 .pdev.earn[data-motion] .ernsettle { animation: drise 300ms var(--ease-out) both }
 .pdev.earn .ernref {

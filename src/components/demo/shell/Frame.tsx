@@ -182,7 +182,13 @@ const TAB_ICONS: Record<TabName, ReactNode> = {
 
 const TABS: TabName[] = ['Home', 'Assets', 'Swap', 'Perps', 'Menu'];
 
-export function Tabs({ on }: { on: TabName }) {
+/**
+ * `on` may be a tab, or `'None'` — which is what the bar looks like on a screen
+ * the bar has no item for. The earn page is one: it is reached from a balance
+ * row on the home screen, and every item in the row is dim there. Lighting Home
+ * would be the bar claiming you are somewhere you left.
+ */
+export function Tabs({ on }: { on: TabName | 'None' }) {
   return (
     <nav className="dtabs" aria-label="App sections">
       {TABS.map((t) => (
