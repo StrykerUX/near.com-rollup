@@ -42,25 +42,44 @@ export type TokenGlyph = { d: string } | { points: string } | { img: string };
 
 export const TOK_ICONS: Record<string, TokenGlyph> = {
   /**
-   * BITCOIN, AS THE MARK RATHER THAN AS A TRACING OF IT.
+   * TWENTY BRAND MARKS, AS FILES RATHER THAN AS TRACINGS.
    *
-   * The other two glyphs here are paths because they arrived as paths. This
-   * one arrived as the official artwork, and the ₿ inside it is a
-   * counter-in-a-counter — a shape that survives being redrawn by hand about
-   * as well as a signature does. A demo whose whole claim is that it is a
-   * pixel copy of the app cannot open on an approximation of the one logo
-   * every reader already knows by heart.
+   * These are the official full-colour SVGs from the near-intents asset set,
+   * copied into `public/logos/tokens`. Each one is a 600-grid disc with the
+   * mark knocked out of it, so a token dot rendering one covers its own
+   * background rather than tinting one; `token.color` is still the right brand
+   * colour underneath, which is what shows for the frame before it decodes.
    *
-   * The disc is baked into the file, so a token dot rendering this covers its
-   * own background rather than tinting one. `token.color` is still the right
-   * orange underneath, which is what shows for the frame before it decodes.
+   * THEY ARE SERVED AS `<img>`, NOT INLINED, AND THAT IS NOT A STYLE CHOICE.
+   * Every file in the set carries its own `<style>` block naming the same
+   * classes — `.st0` is #fff in Bitcoin and #00ec97 in NEAR. Inlined into one
+   * document those rules are global and the last one parsed wins, so a picker
+   * showing twenty of them would repaint most of them the wrong colour. An
+   * `<img>` gets its own document, and the collision cannot happen.
+   *
+   * WHAT IS NOT HERE keeps its letter chip: LINK, DOT, HBAR, XMR, UNI, SHIB and
+   * PEPE have no file in the set, and AAPL is a share rather than a coin. A
+   * letter where the real mark exists is a worse lie than a letter where none
+   * does — nobody mistakes a `D` on gold, and everybody knows the ₿.
    */
-  BTC: { img: '/img/btc.png' },
-  NEAR: {
-    d: 'M429.68,135.21c-12.21,0-23.54,6.33-29.93,16.73l-68.89,102.28c-2.24,3.37-1.33,7.92,2.04,10.16,2.73,1.82,6.35,1.6,8.84-.54l67.81-58.82c1.13-1.01,2.86-.91,3.88.22.46.52.7,1.18.7,1.87v184.15c0,1.52-1.23,2.74-2.75,2.74-.82,0-1.59-.36-2.1-.99l-204.99-245.37c-6.68-7.88-16.48-12.42-26.8-12.43h-7.16c-19.39,0-35.11,15.72-35.11,35.11v259.36c0,19.39,15.72,35.11,35.11,35.11,12.21,0,23.54-6.33,29.93-16.73l68.89-102.28c2.24-3.37,1.33-7.92-2.04-10.16-2.73-1.82-6.35-1.6-8.84.54l-67.81,58.82c-1.13,1.01-2.86.91-3.88-.22-.46-.52-.7-1.18-.7-1.87v-184.2c0-1.52,1.23-2.74,2.75-2.74.81,0,1.59.36,2.1.99l204.96,245.42c6.68,7.88,16.48,12.42,26.8,12.43h7.16c19.39,0,35.12-15.7,35.14-35.09V170.32c0-19.39-15.72-35.11-35.11-35.11h0Z',
-  },
-  ZEC: {
-    points:
-      '407.01 160.77 407.01 206.4 280.06 378.63 407.01 378.63 407.01 439.19 325.16 439.19 325.16 489.36 274.84 489.36 274.84 439.19 192.99 439.19 192.99 393.56 319.82 221.33 192.99 221.33 192.99 160.77 274.84 160.77 274.84 110.44 325.16 110.44 325.16 160.77 407.01 160.77',
-  },
+  BTC: { img: '/logos/tokens/btc.svg' },
+  ETH: { img: '/logos/tokens/eth.svg' },
+  USDT: { img: '/logos/tokens/usdt.svg' },
+  NEAR: { img: '/logos/tokens/near.svg' },
+  XRP: { img: '/logos/tokens/xrp.svg' },
+  USDC: { img: '/logos/tokens/usdc.svg' },
+  SOL: { img: '/logos/tokens/sol.svg' },
+  BNB: { img: '/logos/tokens/bnb.svg' },
+  ZEC: { img: '/logos/tokens/zec.svg' },
+  DOGE: { img: '/logos/tokens/doge.svg' },
+  ADA: { img: '/logos/tokens/ada.svg' },
+  TRX: { img: '/logos/tokens/trx.svg' },
+  AVAX: { img: '/logos/tokens/avax.svg' },
+  XLM: { img: '/logos/tokens/xlm.svg' },
+  SUI: { img: '/logos/tokens/sui.svg' },
+  BCH: { img: '/logos/tokens/bch.svg' },
+  TON: { img: '/logos/tokens/ton.svg' },
+  LTC: { img: '/logos/tokens/ltc.svg' },
+  ARB: { img: '/logos/tokens/arb.svg' },
+  OP: { img: '/logos/tokens/op.svg' },
 };

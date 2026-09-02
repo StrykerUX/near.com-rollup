@@ -7,10 +7,15 @@ import { TOK_ICONS } from '@/lib/tokens';
  * anything it has no mark for — and with twenty-seven assets in a picker and
  * five in a wallet, most of them have none.
  *
- * The exceptions are the assets whose artwork the repo already has (`TOK_ICONS`
- * in lib/tokens.ts, which today is Bitcoin, NEAR and Zcash). A letter where the
- * real mark exists is a worse lie than a letter where none does — nobody
- * mistakes a `D` on gold, and everybody knows the ₿.
+ * The exceptions are the assets whose artwork the repo has (`TOK_ICONS` in
+ * lib/tokens.ts — twenty of the twenty-seven in the picker, as official
+ * full-colour files). A letter where the real mark exists is a worse lie than a
+ * letter where none does — nobody mistakes a `D` on gold, and everybody knows
+ * the ₿.
+ *
+ * The brand colour stays under the artwork on purpose: each file is a disc that
+ * covers its own square, so what `a.color` paints is the single frame before
+ * the image decodes, in the right colour rather than in a hole.
  */
 export type Chip = { sym: string; color: string; ink: string };
 

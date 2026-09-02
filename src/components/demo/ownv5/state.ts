@@ -1,6 +1,7 @@
 import type { Act } from '@/components/stage/phone/flows/machine';
 import { MARK } from '@/components/demo/perpsv5/state';
 import { NEAR_PRICE } from '@/components/demo/swapv5/catalogue';
+import { STAKE_APY, vaultOf } from '@/components/demo/earnv5/state';
 
 /**
  * EVERYTHING YOU OWN — the figures and the machine
@@ -118,6 +119,25 @@ export const crypto = () => confidential() + MAIN_BAL;
 export const total = () => crypto() + PERPS_BAL + EARN_BAL;
 
 /** what a row's sheet offers, frame 0:09 */
+/**
+ * WHAT EARNS, AND AT WHAT RATE — the pill on the right of a row.
+ *
+ * The app puts an "Earn 5.8%" pill on any holding it has somewhere to put to
+ * work, and in the recording every row carries one because every holding in
+ * that wallet is a stablecoin. Here two of five do: USDC has a vault and NEAR
+ * has staking. BITCOIN, ZCASH AND A TOKENISED SHARE GET NO PILL, and that is
+ * the app rather than an omission — there is nothing in the Earn tab to put
+ * them in, so a pill offering one would be the demo inventing a product.
+ *
+ * THE RATES ARE IMPORTED, NOT TYPED. They are the same two numbers the Earn
+ * chapter prints four faces later — Taler's APR and the staking APY — and two
+ * screens quoting one rate at each other is exactly the pair that drifts.
+ */
+export const EARNS: Record<string, string> = {
+  USDC: vaultOf('taler').apr.replace(/0%$/, '%'),
+  NEAR: STAKE_APY,
+};
+
 export const ACTIONS = ['Swap', 'Send', 'Earn', 'Move to Main'] as const;
 
 export type OW = {

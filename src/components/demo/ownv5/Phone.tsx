@@ -1,4 +1,5 @@
 'use client';
+import type { ReactNode } from 'react';
 import { fmt } from '@/lib/format';
 import { live, press } from '@/components/stage/phone/ui/tap';
 import { Enter } from '@/components/stage/phone/ui/Enter';
@@ -7,7 +8,7 @@ import { Dot } from '@/components/demo/app/Dot';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
-  ACTIONS, EARN_BAL, HOLDINGS, MAIN_BAL, PERPS_BAL, confidential, crypto, total, value,
+  ACTIONS, EARNS, EARN_BAL, HOLDINGS, MAIN_BAL, PERPS_BAL, confidential, crypto, total, value,
   type OW, type OWAction, type Holding,
 } from './state';
 
@@ -216,6 +217,7 @@ function Assets({ d }: { d: Deck }) {
 
 function Row({ h, d, i }: { h: Holding; d: Deck; i: number }) {
   const open = d.can('actions', h.sym);
+  const apy = EARNS[h.sym];
   return (
     <span className={'ownitem' + live(open)} {...press(open)} data-tap={'row:' + h.sym}
           style={{ animationDelay: `${i * 45}ms` }}>
@@ -228,9 +230,63 @@ function Row({ h, d, i }: { h: Holding; d: Deck; i: number }) {
         <b>{usd(value(h))}</b>
         <i className={h.up ? 'ownup' : 'owndown'}>{h.chg}</i>
       </span>
+      {/* only where there is something to earn — see `.ownearn` in the
+          stylesheet for why the column is not reserved on the other three */}
+      {apy ? (
+        <span className="ownearn">
+          <i className="ownpill"><Bars /><b>Earn {apy}</b></i>
+        </span>
+      ) : null}
     </span>
   );
 }
+
+/** lucide `bar-chart` (ISC), ascending — the mark the app's Earn tab carries */
+function Bars() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+         strokeLinecap="round" aria-hidden="true">
+      <path d="M5 20v-4" /><path d="M12 20V9" /><path d="M19 20V4" />
+    </svg>
+  );
+}
+
+/**
+ * THE FOUR ICONS THE SHEET CARRIES, and it had none.
+ *
+ * Each is the mark the app already uses for that verb somewhere else on this
+ * device, which is the point of them: Swap is the tab bar's own glyph, Send is
+ * the paper plane from the home screen's button, Earn is the bar chart on the
+ * row pills, and Move to Main is the arrow back into the unshielded balance.
+ * Drawing four new marks for four verbs the device has already named would make
+ * the sheet look like a different app's.
+ */
+const ACT_ICON: Record<string, ReactNode> = {
+  Swap: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M7 9.4h9l-2.4-2.4M17 14.6H8l2.4 2.4" />
+    </svg>
+  ),
+  Send: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" />
+    </svg>
+  ),
+  Earn: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
+         strokeLinecap="round" aria-hidden="true">
+      <path d="M5 20v-4" /><path d="M12 20V9" /><path d="M19 20V4" />
+    </svg>
+  ),
+  'Move to Main': (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m12 19-7-7 7-7" /><path d="M19 12H5" />
+    </svg>
+  ),
+};
 
 /* ---- 3 · what a row opens ---------------------------------------------- */
 
@@ -259,7 +315,7 @@ function ActionSheet({ d }: { d: Deck }) {
               return (
                 <span className={'ownaction' + (s.handoff && first ? ' taken' : '') + live(fn)}
                       key={a} {...press(fn)} data-tap={first ? 'swap' : undefined}>
-                  {a}
+                  {ACT_ICON[a]}{a}
                 </span>
               );
             })}

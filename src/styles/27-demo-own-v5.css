@@ -165,7 +165,10 @@
 .pdev.own[data-motion] .ownitem { animation: drise 340ms var(--ease-out) both }
 
 .pdev.own .ownitemt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px }
-.pdev.own .ownitemt b { font-size: 15px; font-weight: 600 }
+.pdev.own .ownitemt b {
+  font-size: 15px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .pdev.own .ownitemt em {
   font-style: normal; font-size: 13px; color: rgba(255, 255, 255, .45);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -176,6 +179,38 @@
 .pdev.own .ownitemv b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums }
 .pdev.own .ownitemv i { font-style: normal; font-size: 12px; font-variant-numeric: tabular-nums }
 
+/* ---- the earn pill ----------------------------------------------------- */
+
+/* NO RESERVED COLUMN, AND THAT WAS MEASURED RATHER THAN PREFERRED.
+   Reserving the pill's width on every row is the tidier idea — the figures line
+   up whether or not a row has anywhere to put its money — and it does not fit.
+   The card is 294px inside its padding; a reserved slot plus its gap costs 92
+   of them, and against a 34px mark and an 80px figure that leaves 62px for the
+   name. `USD Coin` needs 66 and `40.00 AAPL · Ondo` needs 105, so reserving
+   truncates content on all five rows to align two.
+   Unreserved, the three rows with nothing to earn get their full width back and
+   print their quantities whole, issuer and all. The cost is that the figures
+   step in on the two rows carrying a pill, which is what a list does when a row
+   has one more thing in it. */
+.pdev.own .ownearn { flex: none; display: flex; justify-content: flex-end }
+/* the app's one blue: a tinted fill with a brighter line and brighter ink, and
+   the only thing on this screen that is not white, grey, green or red — which
+   is what makes a pill read as an offer rather than as another figure */
+.pdev.own .ownpill {
+  display: flex; align-items: center; gap: 3px; font-style: normal;
+  padding: 5px 6px; border-radius: 999px;
+  background: rgba(64, 132, 214, .16); border: 1px solid rgba(96, 160, 232, .34);
+  color: #7FB6F2;
+}
+.pdev.own .ownpill b { font-size: 10.5px; font-weight: 600; white-space: nowrap }
+.pdev.own .ownpill svg { width: 10px; height: 10px; flex: none }
+
+/* the quantity is what gives when the pill takes its column, and truncating it
+   is the app's own answer — the recording prints `6635.6169 …` for exactly this
+   reason. The name above it never truncates; it is the row's subject. */
+.pdev.own .ownitemt { min-width: 0 }
+.pdev.own .ownitemv { min-width: 0 }
+
 /* ---- what a row opens -------------------------------------------------- */
 
 .pdev.own .ownact { padding-bottom: 20px }
@@ -184,11 +219,15 @@
   border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
 .pdev.own .ownaction {
-  display: flex; align-items: center; height: 46px; margin-top: 8px; padding: 0 15px;
-  border-radius: 12px; background: rgba(255, 255, 255, .05);
+  display: flex; align-items: center; height: 48px; margin-top: 8px; padding: 0 16px;
+  border-radius: 13px; background: rgba(255, 255, 255, .05);
   font-size: 15px; font-weight: 500;
   transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
 }
+/* the icon sits in a fixed column so the four labels start on one line — in the
+   app they do, and a plane and a chevron are different enough widths that
+   letting them set their own indent would stagger the list */
+.pdev.own .ownaction svg { width: 18px; height: 18px; flex: none; margin-right: 14px }
 /* the row that was pressed, and the last frame of the chapter. It stays lit
    rather than navigating: the swap screen is the next chapter's to tell. */
 .pdev.own .ownaction.taken { background: var(--btc-up); color: #04140E; font-weight: 600 }
