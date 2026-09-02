@@ -140,7 +140,9 @@
 .sdrail{
   position:absolute;left:clamp(18px,2.6vw,42px);top:50%;
   transform:translateY(-50%);
-  display:flex;flex-direction:column;gap:17px;
+  /* 32 between the rings, so the centres sit 46 apart — three and a bit
+     diameters, which is what makes four marks a column rather than a stack */
+  display:flex;flex-direction:column;gap:32px;
   opacity:0;pointer-events:none;
   transition:opacity var(--dur-slow) var(--ease-out);
 }
@@ -154,21 +156,21 @@
   pointer-events:auto;
 }
 .stepdots.on .sdrail:hover{opacity:calc(1 - var(--shr, 0))}
-/* the spine runs behind the dots and is what makes four marks read as one
-   sequence rather than four unrelated points */
-.sdrail .spine{
-  position:absolute;left:3px;top:3px;bottom:3px;width:1px;
-  background:rgba(255,255,255,.13);
-}
 .sdrail button{
-  position:relative;display:flex;align-items:center;gap:12px;
+  position:relative;display:flex;align-items:center;gap:14px;
   padding:0;background:none;border:0;cursor:pointer;color:#fff;
 }
-.sdrail .dot{
-  width:7px;height:7px;border-radius:50%;flex:none;
+/* A RING, AND IT IS 14px WHERE IT WAS 7.
+   `.dot` was the class, and `18-demo-perps.css` has one too — a padded, filled
+   chip on the perps ticket, loaded after this file, which was turning these
+   into 22x16 pills with a background nobody wrote. `.sddot` cannot collide with
+   anything, which is the whole point of the prefix the rail's other classes
+   already had. */
+.sdrail .sddot{
+  width:14px;height:14px;border-radius:50%;flex:none;box-sizing:border-box;
   background:transparent;
-  border:1px solid rgba(255,255,255,.34);
-  transition:background-color var(--dur) var(--ease-out),border-color var(--dur) var(--ease-out),transform var(--dur) var(--ease-out);
+  border:1.5px solid rgba(255,255,255,.34);
+  transition:background-color var(--dur) var(--ease-out),border-color var(--dur) var(--ease-out);
 }
 .sdrail .lbl{
   font-family:var(--font-mono,var(--font-body));
@@ -179,25 +181,30 @@
   text-shadow:0 1px 14px rgba(0,0,0,.5);
   white-space:nowrap;
 }
-/* passed steps read as filled, the current one as the brand mark, and only the
-   current one is labelled — four labels at once would compete with the card */
-.sdrail button.done .dot{background:rgba(255,255,255,.5);border-color:transparent}
-/* No halo, no brand green at full strength, and a much smaller size step. The
-   active mark only has to be findable, not announced. */
-.sdrail button.now .dot{
-  background:rgba(0,236,151,.9);border-color:transparent;transform:scale(1.25);
+/* A PASSED STEP IS A BRIGHTER RING, NOT A FILLED DISC. Filling it made a second
+   solid mark in a column whose whole grammar is "one of these is filled and it
+   is the one you are on" — two fills and the eye has to work out which green.
+   Progress still reads: the ring gets brighter behind you. */
+.sdrail button.done .sddot{border-color:rgba(255,255,255,.62)}
+/* the current one is the only filled mark on the rail, and it is the SAME SIZE
+   as the others. It was scaled 1.25 on top of the fill, which is the same fact
+   said twice and leaves the column with one mark out of line. */
+.sdrail button.now .sddot{
+  background:rgba(0,236,151,.92);border-color:transparent;
 }
-/* Labels are hover/focus only. Showing the active one permanently put it
-   straight into the left edge of the card headline at 1440 — the rail lives in
-   the gutter, and the gutter is not wide enough for a word. The active dot is
-   already unambiguous by colour and size. */
+/* THE ACTIVE STEP IS LABELLED, ALWAYS. It was hover-only, because showing it
+   permanently once collided with the left edge of the card headline at 1440 —
+   with the rail at `clamp(18px,2.6vw,42px)` and a 14px mark, the word now ends
+   around 110px and the headline starts past 280. The note that forbade it is
+   older than the layout it was about. */
+.sdrail button.now .lbl{opacity:1;transform:none}
 .stepdots button:hover .lbl,
 .stepdots button:focus-visible .lbl{opacity:1;transform:none}
-.sdrail button:hover .dot{border-color:#fff}
+.sdrail button:hover .sddot{border-color:#fff}
 /* the rail needs the left gutter the stacked layout does not have */
 @media(max-width:799px){ .stepdots{display:none} }
 @media(prefers-reduced-motion:reduce){
-  .stepdots,.stepdots .dot,.sdrail .lbl{transition:none}
+  .stepdots,.stepdots .sddot,.sdrail .lbl{transition:none}
 }
 
 /* --- short desktop: the shell narrows, so its widest type follows --------- */
