@@ -42,8 +42,13 @@ export function PhoneShell() {
    * no arrangement of those two numbers that leaves the device unchanged, so
    * this route does not try: `.morph` keeps its id and its transforms — the
    * engine still owns the peek, the shrink and the fade — and holds the real
-   * device instead of a viewport. The header, the tab bar and the three other
-   * faces are not rendered. The tour is one screen long here, on purpose.
+   * device instead of a viewport.
+   *
+   * The tour is still four chapters long. What changed is where they live:
+   * instead of four faces sliding inside a plate, one device shows whichever
+   * chapter the scroll has landed on, and each carries its own screen and its
+   * own flow. See AppDevice. The header and the tab bar go with the viewport —
+   * the device brings its own.
    */
   if (deck === 'app') {
     return (

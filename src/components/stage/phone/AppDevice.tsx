@@ -1,38 +1,88 @@
 'use client';
+import { useEffect, useState } from 'react';
+import { subscribeActiveFace } from '@/stage/bus';
 import { useDeck } from '@/components/demo/shell/deck';
-import { Phone } from '@/components/demo/perpsv5/Phone';
+
+import { Phone as PerpsPhone } from '@/components/demo/perpsv5/Phone';
 import { perpsV5Flow } from '@/components/demo/perpsv5/script';
+import { Phone as OwnPhone } from '@/components/demo/ownv5/Phone';
+import { ownV5Flow } from '@/components/demo/ownv5/script';
+import { Phone as SwapPhone } from '@/components/demo/swapv5/Phone';
+import { swapV5Flow } from '@/components/demo/swapv5/script';
+import { Phone as EarnPhone } from '@/components/demo/earnv5/Phone';
+import { earnV5Flow } from '@/components/demo/earnv5/script';
 
 /**
- * THE `/demo/perps-v5` DEVICE, ON THE HOME PAGE, UNCHANGED.
+ * THE APP, ON THE HOME PAGE, WITH THE SCROLL CHOOSING THE SCREEN
  * ==================================================================
- * Not a version of it. The same `<Phone>` file, the same `useDeck`, the same
- * flow, the same 352 x 766 — so every pixel of that screen is this screen, and
- * anything that gets fixed there is fixed here by construction.
+ * Four chapters, four screens, and the four are the same files `/demo/*-v5`
+ * run — not versions of them. Anything fixed there is fixed here.
  *
- * THE FIRST ATTEMPT WAS A REBUILD AND IT WAS THE WRONG ANSWER. It compacted
- * the screen into the tour's plate — `.cswap` gives 547px and the device lays
- * out 763 — which meant dropping the chrome, the time axis, and the ticket's
- * sheet, and re-authoring the ticket as a composition. All of that is defensible
- * work and none of it was what was asked for: the point of looking at this
- * screen on this page is to look at THAT screen, and a version of it edited
- * down to fit answers a question nobody had.
+ * THE MAPPING IS THE PAGE'S OWN. `Lockup.tsx` already writes a headline per
+ * chapter and the engine already fades between them; all this does is put the
+ * matching screen under each one:
  *
- * So the plate stops being a plate. `.morph` keeps its id and its transforms —
- * the stage engine still owns the peek, the shrink and the fade — and becomes a
- * transparent carrier for a device that is simply the right size. The other
- * three faces are not rendered on this route, which is the trade: the tour is
- * one screen long here.
+ *   0  Perps     "Trade where the liquidity is. Hedge where your assets are."
+ *   1  Account   "Everything you own, one screen"
+ *   2  Swap      "Swap anything, anywhere"
+ *   3  Earn      "Earn on what you're not using"
  *
- * It runs on its OWN clock rather than the tour's, because that is also part of
- * "the same screen": `useDeck` is what `/demo/perps-v5` plays through, at its
- * PACE, with its 20-second script and its loop.
+ * That order is `CH_TITLES` in lib/schedule.ts, which is the DISPLAY order —
+ * the `data-face` attributes on the copy column carry the original indices and
+ * are a different numbering. Getting those two confused puts the swap screen
+ * under the perps headline, which is the one mistake this component can make.
+ *
+ * THE INDEX COMES FROM THE ENGINE, not from the DOM. `setActiveFace(curIdx)`
+ * is computed from the schedule, so it keeps working on a route where the
+ * four-card deck is not rendered at all. It publishes -1 while a card is MOVING
+ * — mid-transition neither card owns the frame — and that is deliberately
+ * ignored here: the plate is what slides, and a screen that blanked out during
+ * the slide would be the device reacting to a move that is not about it.
+ *
+ * EACH CHAPTER MOUNTS ITS OWN FLOW, so arriving at a chapter starts that flow
+ * from its first beat rather than dropping the reader into the middle of a
+ * loop that has been running unseen. Only the chapter on stage is mounted, so
+ * only one clock, one chart and one settlement are ever running.
  */
+
+const SCREENS = [PerpsScreen, OwnScreen, SwapScreen, EarnScreen];
+
 export function AppDevice() {
-  const deck = useDeck(perpsV5Flow);
+  /* the last chapter the engine actually landed on; -1 (mid-move) is ignored */
+  const [at, setAt] = useState(0);
+  useEffect(() => subscribeActiveFace((i) => { if (i >= 0) setAt(i); }), []);
+
+  const Screen = SCREENS[at] ?? SCREENS[0];
   return (
     <div className="appdev">
-      <Phone d={deck} />
+      {/* keyed on the chapter so the incoming screen arrives rather than
+          replacing the outgoing one in place — the same reason `Enter` takes
+          a key everywhere else in this repo */}
+      <div className="appswap" key={at}>
+        <Screen />
+      </div>
     </div>
   );
+}
+
+/* Four one-line components, because a hook cannot be called conditionally and
+   each flow needs its own deck. Rendering one of four components is the ordinary
+   way to say that; a single component with four `useDeck` calls would run four
+   clocks to show one screen. */
+
+function PerpsScreen() {
+  const d = useDeck(perpsV5Flow);
+  return <PerpsPhone d={d} />;
+}
+function OwnScreen() {
+  const d = useDeck(ownV5Flow);
+  return <OwnPhone d={d} />;
+}
+function SwapScreen() {
+  const d = useDeck(swapV5Flow);
+  return <SwapPhone d={d} />;
+}
+function EarnScreen() {
+  const d = useDeck(earnV5Flow);
+  return <EarnPhone d={d} />;
 }

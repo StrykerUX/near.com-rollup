@@ -1036,7 +1036,42 @@ utilities (`fixed`, `absolute`, `static`, `block`, `flex`, `grid`, `hidden`,
 `visible`, `border`, `container`, `transform`, …); run over every `className` in
 `src/components`, it found exactly one.
 
-## `/home-v2` — the real device, on the real page
+## `/home-v2` — four chapters, four real screens
+
+The page's own structure turned out to be the brief's. `Lockup.tsx` already
+writes a headline per chapter and the engine already fades between them:
+
+| | chapter | headline | screen |
+|---|---|---|---|
+| 0 | Perps | *Trade where the liquidity is…* | `/demo/perps-v5` |
+| 1 | Account | **Everything you own, one screen** | `/demo/own-v5` |
+| 2 | Swap | *Swap anything, anywhere* | `/demo/swap-v5` |
+| 3 | Earn | *Earn on what you're not using* | `/demo/earn-v5` |
+
+All four are the same files those routes run — not versions of them. Anything
+fixed there is fixed here.
+
+**The index comes from the engine, not the DOM.** `setActiveFace(curIdx)` is
+computed from the schedule, so it keeps working on a route where the four-card
+deck is not rendered at all. It publishes `-1` while a card is *moving* —
+mid-transition neither card owns the frame — and `AppDevice` ignores that: the
+plate is what slides, and a screen that blanked during the slide would be the
+device reacting to a move that is not about it.
+
+**That order is `CH_TITLES`, which is DISPLAY order.** The `data-face`
+attributes on the copy column carry the original indices and are a different
+numbering — 2, 0, 1, 3. Confusing the two puts the swap screen under the perps
+headline, and it is the one mistake `AppDevice` can make.
+
+**Each chapter mounts its own flow**, so arriving starts that flow from its
+first beat rather than dropping a reader into a loop that has been running
+unseen — and only one clock, one chart and one settlement are ever alive.
+
+Verified by sweeping the 5,292px of stage: perps at 2%, account at 17%, swap at
+32%, earn at 53%, each under its own headline, with `/`, `/guided` and `/live`
+still mounting all four faces in the plate at 348×696.
+
+## `/home-v2` — the plate gives up and holds the real device
 
 The screen `/demo/perps-v5` runs, unchanged, standing in the home page's room:
 its gradient field, its lockup, its quote, its scroll, its light zone. Not a
