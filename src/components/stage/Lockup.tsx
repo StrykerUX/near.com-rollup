@@ -1,3 +1,4 @@
+import { CARDS } from '@/lib/cards';
 import { PhoneShell } from './phone/PhoneShell';
 
 const LOGIN = 'https://near.com/login?ref=therollup';
@@ -40,26 +41,16 @@ export function Lockup() {
           every resize and invalidated the engine's cached child lists. */}
       <div className="offerslot">{OFFER}</div>
 
+      {/* THE HEADLINES, RENDERED FROM `CARDS`. Both columns walk the same
+          array, so the pairing that the engine relies on — `.side.l .face[n]`
+          and `.side.r .face[n]` are the same chapter — is now a fact of the
+          data rather than a convention two blocks of markup had to keep. */}
       <div className="side l">
-        <div className="face" data-face="2">
-          <h2 className="h1">
-            Trade where the liquidity is.<br />
-            Hedge where your assets are.<br />
-            <span className="wordmark">near.com</span>
-          </h2>
-        </div>
-        <div className="face" data-face="0">
-          <h2 className="h1 stack">
-            Everything you own,<br />one screen<br />
-            <span className="wordmark">near.com</span>
-          </h2>
-        </div>
-        <div className="face" data-face="1">
-          <h2 className="h1">Swap anything, <em>anywhere</em></h2>
-        </div>
-        <div className="face" data-face="3">
-          <h2 className="h1">Earn on what<br /><em>you&rsquo;re not using</em></h2>
-        </div>
+        {CARDS.map((c) => (
+          <div className="face" data-face={c.face} key={c.id}>
+            <h2 className={'h1' + (c.headClass ?? '')}>{c.head}</h2>
+          </div>
+        ))}
       </div>
 
       <div className="rollcta">
@@ -80,46 +71,9 @@ export function Lockup() {
       <PhoneShell />
 
       <div className="side r">
-        <div className="face" data-face="2">
-          {/* PLACEHOLDER QUOTE. Not said by Robbie Klages and not approved by
-              The Rollup. Replace this text and this comment before ship. */}
-          <blockquote className="rollquote">
-            <p>
-              &ldquo;Bridging was the tax on trading Hyperliquid. Watching it
-              disappear is the part I keep showing people.&rdquo;
-            </p>
-            <div className="qfoot">
-              <span className="rqmark" aria-hidden="true" />
-              <span className="qwho">
-                <b>Robbie Klages</b>
-                <span>Co-founder, The Rollup</span>
-              </span>
-            </div>
-          </blockquote>
-        </div>
-        <div className="face" data-face="0">
-          <p>
-            Fully confidential swaps, transfers, deposits, and withdrawals. Trade
-            perps, earn yield, and hold RWAs across 30+ chains, all from one
-            account, your assets in your control. The way crypto should work.
-          </p>
-        </div>
-        <div className="face" data-face="1">
-          <p>
-            Cross-chain paths you can&rsquo;t get anywhere else. Optimized routing
-            in seconds, under a cent per swap. You define the outcome, NEAR
-            handles the route.
-          </p>
-        </div>
-        <div className="face" data-face="3">
-          <p>
-            Earn onchain yield from the same account you already hold assets in.{' '}
-            <strong style={{ fontWeight: 500, color: '#fff' }}>
-              Spend directly from a yield-earning deposit
-            </strong>{' '}
-            — no unwinding, no moving funds out.
-          </p>
-        </div>
+        {CARDS.map((c) => (
+          <div className="face" data-face={c.face} key={c.id}>{c.aside}</div>
+        ))}
       </div>
     </div>
   );
