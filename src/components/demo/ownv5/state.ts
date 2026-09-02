@@ -39,6 +39,13 @@ export type Holding = {
   name: string;
   /** the issuer, for anything that is not the asset itself */
   by?: string;
+  /**
+   * the network it is held on, as a logo key in `public/logos/tokens`.
+   * Only set where it DISTINGUISHES: the wallet holds USD Coin twice and on a
+   * list showing symbol and name the two rows are identical, so the badge is
+   * the only thing on screen saying one is on Solana and the other on Ethereum.
+   */
+  chain?: string;
   qty: number;
   /** the quantity's own decimals, as the app prints them */
   dp: number;
@@ -75,8 +82,8 @@ export type Holding = {
  */
 export const HOLDINGS: Holding[] = [
   { id: 'usdt', sym: 'USDT', name: 'Tether USD', qty: 6635.6169, dp: 4, chg: '+0.01%', up: true, color: '#26A17B', ink: '#fff' },
-  { id: 'usdc-a', sym: 'USDC', name: 'USD Coin', qty: 41.7234, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
-  { id: 'usdc-b', sym: 'USDC', name: 'USD Coin', qty: 22.5552, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
+  { id: 'usdc-a', sym: 'USDC', name: 'USD Coin', chain: 'sol', qty: 41.7234, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
+  { id: 'usdc-b', sym: 'USDC', name: 'USD Coin', chain: 'eth', qty: 22.5552, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
 ];
 
 /** the Main half of the Assets header, frame 0:03 of both recordings */

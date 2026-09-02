@@ -8,7 +8,7 @@ import {
  * ==================================================================
  * The brief, in four lines:
  *
- *   the swap page, already loaded, BTC pre-filled from the home screen tap,
+ *   the swap page, already loaded, Tether pre-filled from the home screen tap,
  *   0.25 entered, destination empty and waiting
  *   the destination picker opens, and a long list is scrolled
  *   the destination is picked and the quote fills in
@@ -57,11 +57,11 @@ const STEPS: Step<SV, SVAction>[] = [
   {
     id: 'amount', ch: 'form',
     title: 'A form that already knows half of it',
-    note: 'BTC is in the top field because the reader tapped it a screen ago. What is left is how much, and into what.',
+    note: 'Tether is in the top field because the reader tapped it a screen ago, and the destination is the pair the app was last on. What is left is how much.',
     beats: [
-      /* the opening frame: BTC in, destination empty, nothing typed. It holds
-         before anything moves, because what it is showing is a form that was
-         filled in somewhere else. */
+      /* the opening frame: Tether in, ZEC already in the destination, nothing
+         typed. It holds before anything moves, because what it is showing is a
+         form that was filled in somewhere else. */
       { ms: 900 },
       ...type_('key', AMOUNT, 420, 160),
       { ms: 500 },
@@ -76,13 +76,18 @@ const STEPS: Step<SV, SVAction>[] = [
   {
     id: 'list', ch: 'list',
     title: 'Everything, and it keeps going',
-    note: 'The destination picker, scrolled. Twenty-seven assets, and the list is the argument.',
+    note: 'The picker opens on your own tokens, then the catalogue. NEAR is nine rows down, so getting to it means passing eight coins you did not come for — which is the argument.',
     beats: [
-      { ms: 620, do: 'picker' },
+      /* IT RESTS BEFORE IT MOVES. At 620 the track started travelling while the
+         sheet was still arriving, so `Your tokens` — the wallet the reader saw
+         two faces ago, with the same three quantities — went past unread. */
+      { ms: 1200, do: 'picker' },
       { ms: 900, do: 'scroll', arg: String(STOPS[0]) },
       { ms: 1100, do: 'scroll', arg: String(STOPS[1]) },
-      /* and back up to the row it wanted, which is what looking down a list
-         and finding nothing better actually looks like */
+      /* and on until the row it came for comes into view. It travels one way:
+         the destination the form opened with is already valid, so this is not
+         someone hunting for an answer, it is someone seeing what else there is
+         on the way to a better one. */
       { ms: 1400, do: 'scroll', arg: String(STOPS[2]) },
       { ms: 1580 },
     ],
@@ -109,7 +114,7 @@ const STEPS: Step<SV, SVAction>[] = [
   {
     id: 'send', ch: 'send',
     title: 'One press',
-    note: 'Finding best price, executing, complete — and the balance that was 0.75 BTC a moment ago.',
+    note: 'Finding best price, executing, complete — and the Tether balance that was whole a moment ago.',
     beats: [
       { ms: 620, do: 'confirm' },
       { ms: 620, do: 'step' },

@@ -14,7 +14,19 @@
    ========================================================================= */
 
 .pdev.swp .pdview { padding: 0 16px }
-.pdev.swp .swtitle { font-size: 17px; font-weight: 600; margin-left: 2px }
+/* THE TOP BAR HOLDS ONE CONTROL, and it is not a back arrow. Swap is a tab —
+   you are already there and there is nothing behind it — so the name drops out
+   of the bar and becomes a heading on the page. */
+.pdev.swp .swtop { flex: none; display: flex; justify-content: flex-end; height: 50px; padding-top: 14px }
+.pdev.swp .swlock {
+  width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center;
+  background: var(--btc-card); color: var(--btc-up);
+}
+.pdev.swp .swlock svg { width: 19px; height: 19px }
+
+.pdev.swp .swhead { flex: none; display: flex; align-items: center; gap: 8px; padding: 8px 0 18px }
+.pdev.swp .swhead b { font-size: 25px; font-weight: 600; letter-spacing: -.02em }
+.pdev.swp .swhelp { width: 16px; height: 16px; color: rgba(255, 255, 255, .38) }
 
 /* ---- the form ----------------------------------------------------------- */
 
@@ -23,8 +35,7 @@
 .pdev.swp .swfield {
   flex: none; padding: 14px; border-radius: 16px; background: var(--btc-card);
 }
-.pdev.swp .swlab { display: block; font-size: 13px; color: rgba(255, 255, 255, .5) }
-.pdev.swp .swrow { display: flex; align-items: center; gap: 10px; margin-top: 8px }
+.pdev.swp .swrow { display: flex; align-items: center; gap: 10px }
 
 .pdev.swp .swfin {
   flex: 1; min-width: 0; display: flex; align-items: center;
@@ -35,21 +46,31 @@
 .pdev.swp .swfin b.off, .pdev.swp .swfin.quiet { color: rgba(255, 255, 255, .3) }
 .pdev.swp .swfin.quiet span { color: #fff }
 
-/* the token chip. `given` is the source — chosen a screen ago and not offered
-   back, because offering it back is offering to undo the tap that got here.
-   NOT `fixed`: that is a Tailwind utility, and naming a modifier after one is
-   a `position: fixed` nobody wrote and nobody can see in this file. */
+/* THE TOKEN CHIP IS TINTED IN THE TOKEN'S OWN COLOUR, from `--tk` set inline
+   off the catalogue. Two grey pills make you read the pair to know which way
+   round it is; a green one and a gold one you know at a glance.
+   ONE PAIR OF ALPHAS RATHER THAN A TABLE OF TINTS: at 18% and 34% every one of
+   the twenty-seven brand colours lands somewhere readable on this ground, and a
+   hand-picked tint per token is twenty-seven chances to get one wrong and never
+   look at it again.
+   `given` is the source, chosen a screen ago. NOT `fixed`: that is a Tailwind
+   utility, and naming a modifier after one is a `position: fixed` nobody wrote
+   and nobody can see in this file. */
 .pdev.swp .swtok {
-  flex: none; display: flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px;
-  border-radius: 999px; background: rgba(255, 255, 255, .08);
-  font-size: 15px; font-weight: 600; white-space: nowrap;
+  flex: none; display: flex; align-items: center; gap: 7px; height: 40px; padding: 0 11px 0 7px;
+  border-radius: 999px; font-size: 15px; font-weight: 600; white-space: nowrap;
+  background: color-mix(in srgb, var(--tk, #fff) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tk, #fff) 34%, transparent);
 }
-.pdev.swp .swtok.given { background: rgba(255, 255, 255, .06) }
-.pdev.swp .swtok.empty { background: var(--btc-up); color: #04140E }
+.pdev.swp .swtok .bcv { color: rgba(255, 255, 255, .55) }
+/* the one state with no token behind it, so it has no colour to borrow */
+.pdev.swp .swtok.empty {
+  background: var(--btc-up); border-color: transparent; color: #04140E; padding: 0 12px;
+}
 .pdev.swp .swtok.empty .bcv { color: #04140E }
 
 .pdev.swp .swsub {
-  display: flex; align-items: baseline; gap: 8px; margin-top: 8px;
+  display: flex; align-items: baseline; gap: 8px; margin-top: 10px;
   font-size: 13px; color: rgba(255, 255, 255, .45); font-variant-numeric: tabular-nums;
 }
 .pdev.swp .swsub em { margin-left: auto; font-style: normal }
@@ -120,7 +141,42 @@
    ========================================================================= */
 
 .pdev.swp .swpick { height: 78%; padding-bottom: 0 }
-.pdev.swp .swpickh { flex: none; display: block; font-size: 18px; font-weight: 600; margin: 4px 0 12px }
+.pdev.swp .swpickh { flex: none; display: block; font-size: 20px; font-weight: 600; margin: 2px 0 14px }
+
+/* drawn and not wired — see the note in Phone.tsx */
+.pdev.swp .swsearch {
+  flex: none; display: flex; align-items: center; gap: 9px; height: 44px; padding: 0 14px;
+  margin-bottom: 16px; border-radius: 999px;
+  background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .07);
+}
+.pdev.swp .swsearch svg { width: 17px; height: 17px; color: rgba(255, 255, 255, .45) }
+.pdev.swp .swsearch em { font-style: normal; font-size: 15px; color: rgba(255, 255, 255, .38) }
+
+/* the section headers, and they are rows in the track like everything else —
+   `PICK_H` in state.ts is where these heights are actually decided */
+.pdev.swp .swsec {
+  flex: none; height: 34px; display: flex; align-items: center;
+  font-size: 13px; color: rgba(255, 255, 255, .45);
+}
+.pdev.swp .swcat {
+  flex: none; height: 52px; display: flex; align-items: center; gap: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+.pdev.swp .swcat i {
+  position: relative; font-style: normal; font-size: 15px; font-weight: 600;
+  display: flex; align-items: center; gap: 7px; height: 100%;
+  color: rgba(255, 255, 255, .42);
+}
+.pdev.swp .swcat i.on { color: #fff }
+/* the underline is the tab's own, not the row's — it marks one of the two */
+.pdev.swp .swcat i.on::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  border-radius: 2px; background: #fff;
+}
+.pdev.swp .swbeta {
+  font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 999px;
+  background: rgba(64, 132, 214, .22); color: #7FB6F2;
+}
 
 .pdev.swp .swlistwrap { flex: 1; min-height: 0; overflow: hidden; position: relative }
 .pdev.swp .swlist {
@@ -130,8 +186,28 @@
      than as someone scrolling */
   transition: transform 620ms var(--ease-out);
 }
+/* the rail is drawn inside this wrap, so the rows are inset from it — a
+   holding's figure running under a scrollbar reads as a clipping bug */
 .pdev.swp .switem {
-  flex: none; height: 56px; display: flex; align-items: center; gap: 12px;
+  flex: none; height: 54px; display: flex; align-items: center; gap: 12px;
+  padding-right: 14px;
+}
+.pdev.swp .switem.own { height: 58px }
+
+/* a holding carries what you have of it, which is the whole reason `Your
+   tokens` is a section and not the top of the catalogue */
+.pdev.swp .switemv {
+  margin-left: auto; display: flex; flex-direction: column; align-items: flex-end;
+  line-height: 1.15; font-variant-numeric: tabular-nums;
+}
+.pdev.swp .switemv b { font-size: 15px; font-weight: 600 }
+.pdev.swp .switemv i { font-style: normal; font-size: 13px; color: rgba(255, 255, 255, .45) }
+
+/* the network badge, and it is the only thing separating two USD Coin rows */
+.pdev.swp .swchip { position: relative; flex: none; display: block }
+.pdev.swp .swnet {
+  position: absolute; right: -2px; bottom: -2px; width: 15px; height: 15px;
+  border-radius: 50%; box-shadow: 0 0 0 2px var(--btc-card);
 }
 .pdev.swp .switemt { display: flex; flex-direction: column; line-height: 1.15 }
 .pdev.swp .switemt b { font-size: 15px; font-weight: 600 }
