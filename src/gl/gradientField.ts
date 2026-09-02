@@ -79,6 +79,8 @@ function srgbToOklab(hex: string): [number, number, number] {
 export type GradientField = {
   el: HTMLCanvasElement;
   resize: () => void;
+  /** re-read the canvas box. Cheap to call, expensive to call every frame. */
+  measure: () => void;
   draw: (
     time: number,
     surge: number,
@@ -156,6 +158,29 @@ export function makeGradientField(cv: HTMLCanvasElement | null): GradientField |
 
   let w = 0,
     h = 0;
+
+  /**
+   * THE CANVAS BOX, MEASURED WHEN IT MOVES AND NOT EVERY FRAME.
+   *
+   * `draw()` used to open with `cv.getBoundingClientRect()`. That is a FORCED
+   * LAYOUT: the browser has to flush every pending style and geometry change
+   * before it can answer, and it was being asked sixty times a second by the
+   * one loop on the page that already had the most competition for the main
+   * thread. It is the single most expensive line in this file and it was
+   * re-measuring a box that, for the whole of the sticky stage, does not move.
+   *
+   * The box changes on three occasions and this file hears about all of them:
+   * `resize()` (window resize and the ResizeObserver), and the engine calling
+   * `measure()` when the page scrolls past the sticky range. Between those it
+   * is the same rectangle, and reading it again cannot learn anything.
+   */
+  let bx = 0, by = 0, bw = 1, bh = 1;
+  function measure() {
+    const r = cv!.getBoundingClientRect();
+    bx = r.left; by = r.top;
+    bw = Math.max(r.width, 1); bh = Math.max(r.height, 1);
+  }
+
   function resize() {
     /* Render small and let the upscale do most of the softening. A CSS blur has
        to be recomputed over the whole surface every frame the canvas repaints,
@@ -172,11 +197,13 @@ export function makeGradientField(cv: HTMLCanvasElement | null): GradientField |
     h = cv!.height = nh;
     g.viewport(0, 0, w, h);
     g.uniform2f(U.res, w, h);
+    measure();
   }
 
   return {
     el: cv,
     resize,
+    measure,
     draw(time, surge, px, py, inx, iny, lift) {
       g.uniform1f(U.time, time);
       g.uniform1f(U.surge, surge);
@@ -185,22 +212,21 @@ export function makeGradientField(cv: HTMLCanvasElement | null): GradientField |
       /* scroll parallax — 0.05 canvas-heights per viewport scrolled. Position-
          mapped so it mirrors perfectly on reverse scroll. */
       g.uniform1f(U.scy, (window.scrollY || 0) / Math.max(window.innerHeight, 1) * 0.05);
-      const r = cv!.getBoundingClientRect();
       /* smoothed pointer, mapped into THIS canvas's own uv space (y up).
          Clamped a little beyond 0..1 so the mass can lean off-frame without the
          coordinate running away when the cursor is far from the canvas. */
       g.uniform2f(
         U.ptr,
-        clamp((px - r.left) / Math.max(r.width, 1), -0.35, 1.35),
-        clamp(1 - (py - r.top) / Math.max(r.height, 1), -0.35, 1.35),
+        clamp((px - bx) / bw, -0.35, 1.35),
+        clamp(1 - (py - by) / bh, -0.35, 1.35),
       );
       /* the ripple centre goes through the same mapping but is NOT clamped: a
          button on another canvas has to be allowed to land far outside this one
          so the falloff can erase it rather than pinning it to an edge. */
       g.uniform3f(
         U.rip,
-        (RIP.x - r.left) / Math.max(r.width, 1),
-        1 - (RIP.y - r.top) / Math.max(r.height, 1),
+        (RIP.x - bx) / bw,
+        1 - (RIP.y - by) / bh,
         RIP.a,
       );
       g.uniform1f(U.ript, RIP.t);
@@ -209,8 +235,8 @@ export function makeGradientField(cv: HTMLCanvasElement | null): GradientField |
          r.height — which is why the x term uses r.height too. */
       g.uniform2f(
         U.rips,
-        (RIP.w * 0.5) / Math.max(r.height, 1),
-        ((RIP.h * 0.5) / Math.max(r.height, 1)) * 1.15,
+        (RIP.w * 0.5) / bh,
+        ((RIP.h * 0.5) / bh) * 1.15,
       );
       g.drawArrays(g.TRIANGLES, 0, 3);
     },

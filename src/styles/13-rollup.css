@@ -26,28 +26,56 @@
 /* The locked line is three clauses, not a three-word headline. At the homepage
    h1 size it ran to four lines and overflowed the absolutely-positioned face
    into the body copy. Smaller and wider is the fix: the line has to read as
-   one thought, and it cannot do that if it wraps mid-clause. */
+   one thought, and it cannot do that if it wraps mid-clause.
+
+   ONE CLAMP FOR ALL FOUR CARD HEADLINES, AND IT IS THE ONLY ONE. There were
+   three — a base and two media-query overrides at 1080 and 640 — each a clamp
+   of its own, so the size of a headline was decided by whichever breakpoint the
+   viewport happened to be in and the three curves did not meet at the seams.
+   A clamp already IS a responsive function; wrapping it in breakpoints is
+   solving the same problem twice and disagreeing with yourself.
+
+   THE BRIEF GIVES THREE ANCHORS: 24px at mobile, 32px at 1024, and a ceiling.
+   Three points normally need two slopes, and clamp has one — but these are
+   collinear to within a rounding error. Through (1024, 32) and (1920, 44):
+
+     slope     12px / 896px = 0.013393  -> 1.34vw
+     intercept 32 - 0.013393 x 1024     -> 18.28px
+
+   and that line reaches 24px at a 426px viewport, so every phone width sits on
+   the floor exactly as asked.
+
+   THE CEILING IS 40, NOT 44, AND THE SLOPE DID NOT MOVE WITH IT. Lowering the
+   cap is one edit; re-deriving the line so it arrives at 40 at 1920 would be a
+   different headline entirely — that slope is 0.89vw, and it lands 26.3px on a
+   390px phone instead of the 24 the brief names. The two anchors that were
+   given as widths are the line; the ceiling is where the line stops. It now
+   engages at a 1622px viewport, so anything from a 16-inch laptop up is flat 40.
+   Checked: 390 -> 24 (floor), 1024 -> 32.00, 1622 -> 40.00, 2560 -> 40 (cap).
+
+   The preferred term is written as vw + px rather than in rem so the anchors
+   stay the pixel values the brief names, whatever the root size is. */
 .side.l h2{
-  font-size:clamp(1.85rem,2.85vw,2.55rem);
+  font-size:clamp(24px, 1.34vw + 18.28px, 40px);
   line-height:1.1;letter-spacing:-.022em;max-width:24ch;
 }
 .side.r p{max-width:42ch}
 
 /* --- co-brand eyebrow ---------------------------------------------------
-   Both marks are ALPHA MASKS tinted in CSS, not baked images. That is what
-   lets The Rollup's wordmark take the same copper the shader is throwing:
-   one light source, falling on both brands. */
+   THE MARKS USED TO BE ALPHA MASKS TINTED IN CSS. That was the point of them:
+   The Rollup's wordmark took the same copper the shader was throwing, so one
+   light source appeared to fall on both brands. It is supplied artwork now —
+   each brand drawn by whoever owns it, colour baked in — so the tinting, the
+   masks and the three sizing passes that kept the four pieces in step are all
+   gone. What is left in this file is layout.
+
+   EVERY DECLARATION FOR THESE CHILDREN IS IN THE v06.2 BLOCK, near the bottom.
+   `.nearw`, `.rule`, `.mark3d` and `.rollw` were each declared in three passes
+   of this file, and the last copy silently won — the same trap `.isomark` had.
+   Only `.rollbrow` itself is tuned per pass now; its children are not. */
 .rollbrow{display:flex;align-items:center;gap:14px;margin-bottom:26px;opacity:.92}
-.rollbrow .nearw{font-family:var(--font-display,inherit);font-weight:600;
-  font-size:22px;letter-spacing:-.03em;color:#fff;line-height:1}
 .rollbrow .x{width:11px;height:11px;opacity:.5;flex:none}
 .rollbrow .x svg{display:block;width:100%;height:100%}
-.rollbrow .rollw{
-  width:132px;height:23.6px;flex:none;
-  background:linear-gradient(96deg,#FFFFFF 0%,#FFE9D6 46%,#E8A470 100%);
-  -webkit-mask:var(--rollw-src) center/contain no-repeat;
-          mask:var(--rollw-src) center/contain no-repeat;
-}
 
 /* --- persistent CTA block ----------------------------------------------
    The tour never carried a CTA. On a page whose only job is signups that was
@@ -70,21 +98,54 @@
 .rollstats dd{margin:0;font-family:var(--font-mono,var(--font-body));font-size:10px;
   letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.78)}
 
-/* --- THE COPPER LIGHT --------------------------------------------------
-   The palette alone could not carry this. The shader's top stops are only
-   reached at the very brightest points of the noise, so a copper highlight
-   sitting at stop 5 barely appeared, and pushing copper further down the ramp
-   put the midtones back in the olive band the palette test was built to avoid.
-   So the connection is made with an actual second light instead: one warm
-   source, screened over the green field, placed where the shader is already
-   brightest so it reads as the same light warmed rather than a sticker. */
+/* --- THE CORNER IS A COLOUR --------------------------------------------
+   THE COPPER LIGHT USED TO LIVE HERE. Two warm radials screened over the top
+   right, standing in for a co-brand the palette itself could not carry: the
+   shader's top stops are only reached at the very brightest points of the
+   noise, so a copper stop at position 5 barely appeared, and pushing copper
+   further down the ramp put the midtones back in the olive band the palette
+   test was built to avoid. The second light was the way around that. The
+   copper is gone at the client's direction; it still stands in the lockup and
+   on the quote's rule, which is where a partner's colour belongs.
+
+   WHY THIS IS A LAYER AND NOT A PALETTE STOP. The field is a LUMINANCE RAMP:
+   `palette(g)` maps how much light reaches a pixel onto a colour, and nothing
+   in it knows where on screen it is. There is no stop that means "the top
+   right" — the corner is bright because the light position is pinned there,
+   and the colour it lands on is whatever the ramp holds at that brightness.
+   Move a stop to green the corner and the whole field moves with it.
+
+   AND WHY THE CORE IS OPAQUE. The brief was a literal value, #1C4419, visibly
+   in that corner. Everything under this layer is uncertain by design — the
+   shader's own noise, `saturate(.80) brightness(.58) contrast(1.06)` on the
+   canvas, and the ::before scrim over that — so any translucent green would
+   land on a value that is a composite of four things and holds only until one
+   of them is tuned. At alpha 1 the corner IS the hex, provably, and stays the
+   hex whatever happens beneath it. It goes translucent within ~60px and the
+   long tail is what makes it light rather than a plate.
+
+   `z-index: 2` keeps it over .gshade, so the header scrim does not tint it
+   either. */
 .grad::after{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
   background:
-    radial-gradient(56% 44% at 79% 6%,  rgba(240,178,124,.62), rgba(232,164,112,.20) 44%, transparent 72%),
-    radial-gradient(40% 34% at 96% 40%, rgba(228,150,96,.34),  transparent 66%);
-  mix-blend-mode:screen;
+    radial-gradient(40% 36% at 100% 0%,
+      #1C4419 0%,
+      #1C4419 8%,
+      rgba(28,68,25,.78) 22%,
+      rgba(28,68,25,.44) 44%,
+      rgba(28,68,25,.17) 66%,
+      rgba(28,68,25,0)   88%);
 }
+
+/* IT WAS TWICE THIS SIZE FOR AN HOUR, AND IT ATE THE MARK. At 62% x 52% with a
+   second lobe at 88% 26% the light covered the whole upper right, and the
+   isologo — which lives at z-index 1, under it — came through as a smudge.
+   The prototype has the mark sitting ON the corner's green, legible, which
+   means the green in that quadrant has to be the SHADER's and not a layer over
+   it. So the light is now a corner rather than a quadrant: the solid core that
+   makes #1C4419 literal is untouched, the falloff is roughly half as long, and
+   the second lobe — which was centred exactly on the mark — is gone. */
 
 /* --- the mark as an object in the field --------------------------------
    Not a logo pasted in a corner. It sits behind the phone, cropped by the frame
@@ -97,22 +158,58 @@
    with and nothing to cut it out of. The Rollup's mark still stands in the
    lockup, in three dimensions and at full strength.
 
-   `aspect-ratio` is the file's own 529:482 rather than the square the mask
-   needed, and the artwork is cropped at its own top and right edges — so the
-   bleed is in the PNG and the offsets only have to finish it. */
+   THE ARTWORK CHANGED AND THE GEOMETRY HAD TO CHANGE WITH IT. The first file
+   was 529x482 and ALREADY CROPPED at its own top and right edges — the bleed
+   was baked into the PNG, so the offsets only had to finish a crop the file had
+   started, which is why they were as deep as -9% / -19%. The supplied file is
+   568x589 and COMPLETE: a whole pinwheel with its own margin. Keep the old
+   numbers against it and the mark walks off the corner and takes half of itself
+   with it. So the offsets are re-derived from the prototype rather than
+   carried over, and `aspect-ratio` is the new file's own 568:589.
+
+   MEASURED OFF THE PROTOTYPE FRAME, which is where these four numbers come
+   from and the only reason they are not round. In that composition the mark's
+   centre sits at 86% across and 25% down, and it spans about 41% of the frame's
+   width — big enough to be an object in the field, cropped by the top and the
+   right edge like one. Working back from a centre: half of 41vw is 20.5vw, so
+   `right` is 86% - 100% + 20.5% ~= -6%, and `top` is 25% - (20.5vw * 589/568
+   expressed against height) ~= -11%. The cap tracks: 730px is 41vw at the
+   1780px the frame was measured on. */
+/* Z-INDEX 1, WHICH IS UNDER THE CORNER LIGHT — and it was tried at 3 for an
+   hour. Over the light the mark is legible everywhere, and the corner is then
+   pale mint over the green rather than the green, which is the one thing the
+   brief asked for by number. Under it, the light's solid core takes the ~55px
+   at the very corner and the mark comes out of it below and to the left, lit
+   rather than pasted. That is the trade, and the named value wins it. */
 .isomark{
   position:absolute;z-index:1;pointer-events:none;
-  right:-9%;top:-19%;width:min(48vw,620px);aspect-ratio:529/482;
+  /* GEOMETRY IS NOT HERE. `right`, `top` and `width` live in one place, at the
+     bottom of the v06.1 pass, because an unconditional `.isomark{...}` rule
+     down there overrides both this block and the max-width:1080 media query
+     above it — later rule, same specificity. That was a live trap: the offsets
+     were tuned twice in this file and only the last copy did anything, so an
+     edit here moved nothing and read as the browser ignoring the change. What
+     stays here is what nothing else redeclares. */
+  aspect-ratio:568/589;
   background:var(--isologo-src) center/contain no-repeat;
   /* ONE OPACITY, WHERE THE OLD MARK HAD A LADDER OF THREE (.22, .13, .09).
      That ladder existed because the Rollup mark was competing with the Rollup
      mark: a copper silhouette in the corner, and the same logo in three
      dimensions in the lockup below it, so the big one had to keep stepping
      back. This is a different brand from the one in the lockup and has nothing
-     to give way to. .30 is what a near-white shape needs over this field to
-     read as an object rather than as a smudge — the file's own alpha does the
-     rest. */
-  opacity:.30;
+     to give way to.
+
+     .30 WAS RIGHT AND IS NOW .52, BECAUSE THE CORNER GOT HEAVIER. Two things
+     landed on this mark at once: the duplicate div was removed (it was drawn
+     twice at .30 and compositing to .51, which is what the corner actually
+     looked like all along) and the green corner light went in above it. The
+     first halved the mark and the second buried what was left — the top right
+     came back a smooth field with no mark in it at all, which is not what this
+     element is for. .52 is measured back to what the corner read as before,
+     now reached by one layer instead of two. The light's opaque core still
+     takes the ~55px at the very corner; the mark comes through everywhere the
+     tail is translucent, which is all of its visible arc. */
+  opacity:.52;
 }
 
 @media(max-width:1080px){
@@ -123,8 +220,24 @@
     padding:78px var(--gut) 40px;
   }
   .morph{justify-self:center;margin-bottom:22px}
-  .isomark{right:-24%;top:-6%;width:min(72vw,480px)}
-  .side.l h2{max-width:22ch;font-size:clamp(1.6rem,4.6vw,2.1rem)}
+  /* AND THE CORNER LIGHT HAS TO SHRINK WITH THE FRAME. Its radius is a
+     PERCENTAGE OF THE BOX, so `40% x 36%` is a corner on a 1780px frame and
+     three quarters of the upper right on a 430px one — at which point it stops
+     being a light and becomes a panel, and the mark underneath disappears into
+     it. Half the radii keeps it the same OBJECT at both widths. The solid core
+     is untouched, so the named colour is still in the corner. */
+  .grad::after{
+    background:
+      radial-gradient(24% 20% at 100% 0%,
+        #1C4419 0%,
+        #1C4419 8%,
+        rgba(28,68,25,.78) 22%,
+        rgba(28,68,25,.44) 44%,
+        rgba(28,68,25,.17) 66%,
+        rgba(28,68,25,0)   88%);
+  }
+  /* measure only — the size is the one clamp above, at every width */
+  .side.l h2{max-width:22ch}
   .side.r p{max-width:none}
 }
 /* On a 390px screen there is no "right side", and brow + phone + headline +
@@ -145,11 +258,8 @@
   .lockup{padding:70px var(--gut) 28px}
   .side.l{min-height:132px}
   .side.r{min-height:126px}
-  .side.l h2{font-size:clamp(1.45rem,5.4vw,1.9rem)}
   .side.r p{font-size:.94rem;line-height:1.5}
   .rollbrow{margin-bottom:16px}
-  .rollbrow .nearw{font-size:18px}
-  .rollbrow .rollw{width:108px;height:19.3px}
   .rollcta{margin-top:12px}
   .rollcta .btn,.rollcta .friction{display:none}   /* the fixed bar carries it */
   .rollcta .offer{margin-bottom:10px;font-size:11.5px}
@@ -174,11 +284,8 @@
   content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
   background:linear-gradient(163deg,rgba(2,14,10,.30) 0%,rgba(2,12,9,.58) 52%,rgba(1,9,7,.80) 100%);
 }
-.grad::after{
-  background:
-    radial-gradient(52% 40% at 80% 5%, rgba(226,160,110,.40), rgba(220,150,102,.13) 46%, transparent 74%),
-    radial-gradient(38% 30% at 97% 38%, rgba(214,138,88,.22), transparent 68%);
-}
+/* (v06.1 dimmed the copper light here. There is no copper light any more, and
+   the corner does not dim: a value the brief names is not a value to taste.) */
 
 /* --- 2. the frame ------------------------------------------------------
    Reference set (OKX, Kraken, Revolut Business on Mobbin) all hold their
@@ -201,23 +308,6 @@
   display:flex;align-items:center;gap:clamp(14px,1.5vw,22px);
   margin-bottom:clamp(26px,3vh,40px);opacity:1;
 }
-.rollbrow .nearw{
-  font-family:var(--font-display,inherit);font-weight:600;
-  font-size:clamp(26px,2.2vw,32px);letter-spacing:-.035em;color:#fff;line-height:1;
-}
-.rollbrow .rule{width:1px;height:34px;background:linear-gradient(180deg,
-  transparent,rgba(255,255,255,.34) 22%,rgba(232,164,112,.55) 78%,transparent);flex:none}
-.rollbrow .mark3d{
-  width:clamp(46px,4vw,58px);aspect-ratio:1;flex:none;
-  background:var(--roll3d-src) center/contain no-repeat;
-  filter:drop-shadow(0 3px 14px rgba(232,164,112,.30));
-}
-.rollbrow .rollw{
-  width:clamp(112px,10vw,140px);height:auto;aspect-ratio:620/111;flex:none;
-  background:linear-gradient(96deg,#FFFFFF 0%,#FFE9D6 44%,#E8A470 100%);
-  -webkit-mask:var(--rollw-src) center/contain no-repeat;
-          mask:var(--rollw-src) center/contain no-repeat;
-}
 
 /* --- 4. the quote ------------------------------------------------------
    The single most consistent element across every partner page studied, and
@@ -238,14 +328,40 @@
   letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.62);
 }
 
-/* the corner mark takes the frame the lockup's arrival left it — geometry
-   only now: it is not the same brand as the mark in the lockup, so it has no
-   reason to dim for it */
-.isomark{right:-12%;top:-22%;width:min(44vw,560px)}
+/* THE CORNER MARK'S GEOMETRY, AND THIS IS THE ONLY COPY THAT RUNS. It takes
+   the frame the lockup's arrival left it, and it is declared here rather than
+   with the rest of the element because an unconditional rule at the bottom of
+   the file beats both the base block and the responsive one above it. Two
+   earlier passes tuned the numbers up there and neither took effect.
+
+   -12% / -22% / 44vw WERE FOR A DIFFERENT FILE. The old artwork was 529x482 and
+   already cropped at its own top and right edges — the bleed was in the PNG, so
+   the offsets only had to finish it, which is why they ran that deep. The
+   supplied file is 568x589 and COMPLETE, with its own margin: the same offsets
+   against it walk the pinwheel off the corner and leave the quadrant empty.
+
+   MEASURED OFF THE PROTOTYPE FRAME, which is why these are not round numbers.
+   There the mark's centre sits at ~86% across and ~25% down and it spans ~41%
+   of the frame's width — an object in the field, cropped by the top and right
+   edges like one.
+
+   THEN TAKEN DOWN A STEP, 41vw -> 35vw, AND THE OFFSETS CAME WITH IT. Shrinking
+   the width alone would have been the wrong edit: `right` and `top` pin two
+   edges, so a narrower box loses its bleed from the other two and the mark
+   stops being cropped — it drifts inward and starts reading as a whole logo
+   parked near the corner rather than an object running off the frame. The crop
+   is held PROPORTIONAL instead: it was 14.7% of the mark's own width off the
+   right edge and 13% of its height off the top, and it still is. Same picture,
+   smaller. */
+.isomark{right:-5%;top:-9%;width:min(35vw,620px)}
 
 @media(max-width:1080px){
   .lockup{max-width:none;padding:78px clamp(20px,5vw,40px) 40px}
   .rollquote{max-width:none}
+  /* narrow frames need the mark pulled BACK IN, not pushed further out: at
+     430px a -5% offset is 21px and the crop stops reading as a crop. Down the
+     same step as the desktop figure, offsets held proportional with it. */
+  .isomark{right:-9%;top:-3%;width:min(55vw,360px)}
 }
 @media(max-width:640px){
   .rollbrow{gap:11px;margin-bottom:16px}
@@ -273,25 +389,33 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
     radial-gradient(66% 70% at 4% 96%, rgba(0,9,6,.52), transparent 62%),
     linear-gradient(163deg,rgba(2,14,10,.34) 0%,rgba(2,12,9,.60) 52%,rgba(1,9,7,.84) 100%);
 }
-.grad::after{
-  background:
-    radial-gradient(52% 40% at 80% 5%, rgba(226,160,110,.34), rgba(220,150,102,.11) 46%, transparent 74%),
-    radial-gradient(38% 30% at 97% 38%, rgba(214,138,88,.18), transparent 68%);
-}
+/* (and v06.3 dimmed it again — same note as above) */
 
 /* --- the nav was left bare when the brand moved into the lockup. Fill it
    with the ask, not with the logo again: primary is Create account, sign-in
-   demotes to a text link. This is the open item from the conversion audit. */
+   demotes to a text link. This is the open item from the conversion audit.
+
+   AND IT IS AN OUTLINED PILL AGAIN, WHICH IS WHAT THE PROTOTYPE DRAWS. The
+   demotion went one step too far: `border:0` with 4px of side padding left a
+   bare word floating in the corner of a full-bleed field, with nothing to say
+   it was a control. `.btn` already carries the pill radius and a 1px border in
+   `transparent` — the ghost variant was cancelling both. Giving the border a
+   colour is the whole change; the padding goes back to the base button's so
+   the word sits inside its own shape rather than against it.
+
+   IT DOES NOT COMPETE WITH `Create account`. That one is a filled green pill;
+   this is a white outline on nothing, which is the standard pair. */
 .nav .btn-ghost{
-  background:none;border:0;color:rgba(255,255,255,.80);
-  font-size:var(--fs-body-sm);padding:10px 4px;margin-right:18px;
-  transition:color var(--tr-ui);
+  background:none;color:#fff;
+  border:1px solid rgba(255,255,255,.72);
+  font-size:var(--fs-body-sm);padding:9px 22px;margin-right:18px;
+  transition:var(--tr-ui);
 }
-.nav .btn-ghost:hover{color:#fff}
-/* the nav flips to a light plate over the light zone, and a white text link
+.nav .btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.10)}
+/* the nav flips to a light plate over the light zone, and a white outline
    disappears into it. Follow the plate. */
-.nav.on-light .btn-ghost{color:rgba(11,15,13,.72)}
-.nav.on-light .btn-ghost:hover{color:#0B0F0D}
+.nav.on-light .btn-ghost{color:#0B0F0D;border-color:rgba(11,15,13,.34)}
+.nav.on-light .btn-ghost:hover{border-color:#0B0F0D;background:rgba(11,15,13,.06)}
 
 /* --- the cue was parked mid-frame between the two columns, pointing at
    nothing. Bottom edge, dimmer, out of the composition. */
@@ -313,36 +437,68 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
    v06.6 — THE OFFER SPEAKS, THE QUOTE GETS A SURFACE
    ========================================================================= */
 
-/* --- the offer, at the size its job deserves --------------------------- */
+/* --- the offer, at the size its job deserves ---------------------------
+   24px FLAT, NOT A CLAMP, AND THAT IS THE WHOLE RANGE. This element is
+   desktop-only — 14-refactor.css hides it under 1080 and `.offerslot` carries
+   the same sentence on narrow frames with its own sizing — so a clamp here was
+   scaling across 1081..1631 and then sitting on its ceiling for every width
+   above that. It read 25.28px on a normal desktop, which is where the 1.58rem
+   cap landed. A single number says what the brief says. */
 .rollcta .offer{
   font-family:var(--font-display,inherit);font-weight:400;
-  font-size:clamp(1.16rem,1.55vw,1.58rem);line-height:1.24;letter-spacing:-.016em;
+  font-size:24px;line-height:1.24;letter-spacing:-.016em;
   color:rgba(255,255,255,.95);text-transform:none;
   margin:0 0 clamp(16px,1.8vh,22px);max-width:26ch;
 }
 .rollcta .offer b{color:#F7BF92;font-weight:500}
 
-/* --- the quote, on its own plate --------------------------------------- */
+/* --- the quote, on its own plate ---------------------------------------
+   GLASS, AND GREY RATHER THAN COPPER. It was a warm plate — a copper gradient
+   inside a copper border — from the pass where copper was the co-brand's second
+   light. That light is gone from the field, and a warm card left behind on a
+   green frame reads as the one element nobody updated.
+
+   THE NUMBERS ARE THE PROTOTYPE'S, and they compose the way a design tool
+   states them: two stops, #C9C9C9 at full and #959595 at 88%, and then the
+   whole fill at 40%. That last one is a multiply, not a third stop — .88 x .40
+   is .352, which is why the second alpha is not a round number. Written out
+   rather than stacked as `opacity` on the element, because `opacity` would take
+   the type down with it. */
 .side.r .rollquote{
   margin:0;max-width:44ch;padding:clamp(16px,1.6vw,20px) clamp(18px,1.8vw,22px);
-  border:1px solid rgba(232,164,112,.30);border-radius:16px;
-  background:linear-gradient(180deg,rgba(236,172,120,.15),rgba(232,164,112,.055));
+  border:1px solid rgba(255,255,255,.13);border-radius:16px;
+  background:linear-gradient(45deg,rgba(201,201,201,.40),rgba(149,149,149,.352));
   box-shadow:0 18px 44px rgba(0,0,0,.28);
-  -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);
 }
+/* THE QUOTE IS SET IN THE UI FACE NOW, NOT THE SERIF. It was Kepler italic —
+   the page's pull-quote voice, and the right one while this plate was a warm
+   editorial card. On glass, beside a phone, an italic serif reads as a different
+   document pasted into the frame. Montreal at 500 is the same family the whole
+   product speaks in, which is what makes the quote sound like it belongs to the
+   page rather than being quoted into it.
+
+   FIXED px AND NOT A CLAMP, because this plate is desktop-only — the
+   max-width:1080 block hides it and the light-zone `.qband` carries the quote
+   on narrow frames with its own sizes. A clamp here would be tuning a range
+   that never renders. */
 .side.r .rollquote p{
-  margin:0;font-family:"Kepler Std",var(--font-display,Georgia),serif;font-style:italic;
-  font-size:clamp(1rem,1.15vw,1.17rem);line-height:1.4;color:rgba(255,255,255,.96);
+  margin:0;font-family:var(--font-display);font-style:normal;
+  font-size:18px;font-weight:500;line-height:1.4;color:rgba(255,255,255,.96);
 }
 .side.r .rollquote .qfoot{display:flex;align-items:center;gap:11px;margin-top:14px}
 .side.r .rollquote .rqmark{
   width:22px;aspect-ratio:1;flex:none;
-  background:var(--roll3d-src) center/contain no-repeat;
+  background:var(--rollflat-src) center/contain no-repeat;
 }
 .side.r .rollquote .qwho{display:flex;flex-direction:column;gap:3px;line-height:1.15}
-.side.r .rollquote .qwho b{font-size:12.5px;font-weight:600;color:#fff;letter-spacing:.005em}
+.side.r .rollquote .qwho b{font-size:16px;font-weight:600;color:#fff;letter-spacing:.005em}
+/* 14px, up from 10. The tracking comes DOWN with the rise: .11em was measured
+   for a 10px line, where wide letterspacing is what stops small caps setting
+   solid — at 14 the same ratio is 1.54px between glyphs and the role runs wider
+   than the name above it. .07em holds the same optical gap. */
 .side.r .rollquote .qwho>span{
-  font-family:var(--font-mono,var(--font-body));font-size:10px;letter-spacing:.11em;
+  font-family:var(--font-mono,var(--font-body));font-size:14px;letter-spacing:.07em;
   text-transform:uppercase;color:rgba(255,255,255,.56);
 }
 
@@ -401,28 +557,45 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
    ========================================================================= */
 
 /* --- 1. the lockup is now the only brand on the page --------------------
-   Nav brand removed in script. The near mark here is the real SVG, lifted
-   out of the nav, so this is the actual wordmark and not a font that looks
-   like it. */
-.rollbrow{gap:clamp(16px,1.6vw,24px);margin-bottom:clamp(22px,2.6vh,34px)}
-.rollbrow .nearw{display:block;line-height:0}
-.rollbrow .nearw svg{display:block;height:clamp(24px,2vw,30px);width:auto;color:#fff}
-.rollbrow .rule{height:clamp(30px,3vw,42px)}
+   Nav brand removed in script. THE ONLY DECLARATIONS FOR THESE CHILDREN ARE
+   HERE — see the note at the top of the file for why that matters.
 
-/* the object. Copper against a green field is the whole co-brand idea, so it
-   gets the size to carry it. */
-.rollbrow .mark3d{
-  width:clamp(58px,5.4vw,80px);
-  background-image:var(--roll3d-src);
-  filter:drop-shadow(0 5px 20px rgba(226,150,96,.34));
+   SIZED BY HEIGHT, NOT WIDTH, because height is what makes two lockups sit on
+   one line. Each is a fixed aspect against its own file, so the width follows
+   and neither can be squashed by a clamp tuned for the other.
+
+   AND THE ROLLUP IS ~1.7x THE NEAR MARK, WHICH IS SHORTER THAN IT WAS. The
+   assembled version ran the pinwheel to 80px against a 30px near wordmark —
+   2.7x, because it was a separate object that had to carry the co-brand on its
+   own. In the supplied artwork the pinwheel comes with its wordmark attached
+   and the prototype sets them at about 1.7, so the eyebrow reads as two brands
+   at the same rank instead of a logo with a small partner beside it. */
+.rollbrow{gap:clamp(16px,1.6vw,24px);margin-bottom:clamp(22px,2.6vh,34px)}
+.rollbrow .nearw{
+  display:block;flex:none;
+  height:clamp(24px,2vw,30px);aspect-ratio:476/117;
+  background:var(--nearlock-src) center/contain no-repeat;
 }
-/* type only. The pinwheel that used to sit inside this wordmark is now the
-   3D object two slots to its left. */
-.rollbrow .rollw{
-  width:clamp(104px,9vw,132px);aspect-ratio:470/111;
-  background:linear-gradient(96deg,#FFFFFF 0%,#FFE9D6 40%,#F0B183 100%);
-  -webkit-mask-image:var(--rollw-src);
-          mask-image:var(--rollw-src);
+.rollbrow .rolllock{
+  display:block;flex:none;
+  height:clamp(40px,3.4vw,52px);aspect-ratio:759/232;
+  background:var(--rolllock-src) center/contain no-repeat;
+  /* the copper glow the 3D mark used to carry, kept: it is what makes the
+     pinwheel an object lit by the same field rather than a sticker */
+  filter:drop-shadow(0 5px 20px rgba(226,150,96,.30));
+}
+/* THE RULE IS ARTWORK NOW TOO, so it stretches to the height it is given
+   rather than being drawn by a gradient. `100% 100%` and not `contain`: the
+   file is 8x268 and `contain` would letterbox it to a hairline the moment the
+   height clamp moved.
+
+   3px AND NOT 8px. The file's 8px is its EXPORT width, not its drawn width —
+   at 8 logical pixels it reads as a green bar between the two brands rather
+   than a rule holding them together, and the prototype's divider is a hairline.
+   3 is the same artwork at roughly the 3x it was exported at. */
+.rollbrow .rule{
+  flex:none;width:3px;height:clamp(30px,3vw,42px);
+  background:var(--browrule-src) center/100% 100% no-repeat;
 }
 
 /* --- 2. air ------------------------------------------------------------
@@ -452,13 +625,14 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 
 @media(max-width:1080px){
   .lockup{align-content:start;padding-block:70px 36px}
-  .rollbrow .mark3d{width:clamp(48px,8vw,62px)}
+  .rollbrow .rolllock{height:clamp(34px,6vw,44px)}
 }
 @media(max-width:640px){
   .side.l{min-height:118px}
   .side.r{min-height:110px}
-  .rollbrow .nearw svg{height:20px}
-  .rollbrow .rollw{width:96px}
+  .rollbrow .nearw{height:20px}
+  .rollbrow .rolllock{height:34px}
+  .rollbrow .rule{height:26px}
 }
 
 /* =========================================================================
@@ -467,7 +641,16 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 .h1 .wordmark,
 .display .wordmark{
   font-family:var(--font-display);font-style:normal;
-  font-weight:400;   /* literal, not --w-roman: see the note above */
+  /* 300, LITERAL, NOT --w-roman: see the note above.
+     AND IT DOES NOT PAINT YET. PP Neue Montreal is loaded as exactly two faces,
+     Book at 400 and Medium at 500 (public/fonts). Browsers synthesize BOLD and
+     ITALIC and nothing else — there is no such thing as a faked light weight —
+     so 300 resolves to the nearest face it has, which is Book, and the line
+     renders identically to 400 until a Light or Thin .woff2 is added and
+     declared in 01-fonts.css. The declaration is right and goes live the day
+     that file lands; it is written here rather than left at 400 so the intent
+     is not lost in the gap. */
+  font-weight:300;
   font-size:inherit;line-height:inherit;letter-spacing:-.02em;
   display:inline-block;transform:none;color:#fff;
 }
@@ -582,8 +765,23 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
    backdrop-filter was the problem: a backdrop root samples what is BEHIND the
    element at its UNTRANSFORMED position, so the blurred panel stayed put while
    its own content slid out from under it. That reads as a card that will not
-   move. The gradient carries the plate on its own. */
-.side.r .rollquote{-webkit-backdrop-filter:none;backdrop-filter:none}
+   move.
+
+   THE KILL IS LIFTED, because the plate is glass now and glass without a
+   backdrop is just a grey rectangle — the blur is the effect, not a garnish on
+   it. And the pinning does not reproduce. Sampled at the exact coordinates the
+   fault would show at, mid-crossfade with the plate part way out —
+
+     transform  translate3d(0px, -129.7px, 0px)
+     opacity    0.189
+     backdrop   blur(9px), computed, live
+
+   — the blurred fill travels with its own content and leaves nothing behind at
+   the untransformed position. Whether Chrome fixed it or the paint loop moved
+   under it, the observation the old rule was written from no longer holds, and
+   a rule kept for a fault that cannot be reproduced is just a disabled feature.
+   If it ever comes back the fix is a non-transformed inner wrapper to own the
+   backdrop root, NOT turning the blur off again. */
 
 /* And it does not take the exit blur. The build already exempts body copy on
    the grounds that blurring a paragraph reads as a rendering fault rather than

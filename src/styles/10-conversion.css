@@ -140,9 +140,13 @@
 .sdrail{
   position:absolute;left:clamp(18px,2.6vw,42px);top:50%;
   transform:translateY(-50%);
-  /* 32 between the rings, so the centres sit 46 apart — three and a bit
-     diameters, which is what makes four marks a column rather than a stack */
-  display:flex;flex-direction:column;gap:32px;
+  /* 20 between the rings, so the centres sit 34 apart — two and a half
+     diameters. It was 32/46, which is over three diameters of empty gutter
+     between one mark and the next: at that pitch the eye reads four separate
+     dots that happen to be stacked, and has to be told they are a sequence.
+     Closing it to 34 is what makes the column one object. Any tighter and the
+     active label starts crowding the ring above it. */
+  display:flex;flex-direction:column;gap:20px;
   opacity:0;pointer-events:none;
   transition:opacity var(--dur-slow) var(--ease-out);
 }

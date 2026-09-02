@@ -20,6 +20,14 @@
  * scrim, so the same darkening the type is read against passes over it and it
  * belongs to the field rather than to the copy in front of it.
  *
+ * AND IT IS DRAWN ONCE. It was in this list twice — the same div before .gcss
+ * and again after the canvas, both at z-index 1 — so a mark authored at .30
+ * opacity was compositing over itself and arriving at .51. The corner it sits
+ * in is the one the brief names a colour for, and a doubled pale-mint mark is
+ * what was lightening that colour out of reach: removing the copy moved the
+ * top right of the frame more than any palette change did. The header comment
+ * above says four layers and always did; the markup had five.
+ *
  * The whole group is clipped by --ci-*, which the closing shrink drives.
  */
 export function GradientField() {
@@ -28,7 +36,6 @@ export function GradientField() {
       <div className="isomark" aria-hidden="true" />
       <div className="gcss" />
       <canvas id="gl" aria-hidden="true" />
-      <div className="isomark" aria-hidden="true" />
       <div className="gshade" />
     </div>
   );

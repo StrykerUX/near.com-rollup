@@ -1,4 +1,3 @@
-import { NearMark } from '@/components/marks';
 import { PhoneShell } from './phone/PhoneShell';
 
 const LOGIN = 'https://near.com/login?ref=therollup';
@@ -20,11 +19,17 @@ const OFFER = (
 export function Lockup() {
   return (
     <div className="lockup" id="lockup">
+      {/* THREE PIECES, NOT FOUR. It was a near wordmark SVG, a CSS hairline, a
+          3D pinwheel and The Rollup's wordmark masked out of a copper
+          gradient — four elements assembled into something that had to be
+          re-tuned every time either brand moved. The supplied artwork already
+          contains each brand's mark and wordmark at the spacing they belong
+          in, so the assembly is gone and what is left is two lockups and the
+          rule between them. */}
       <div className="rollbrow" aria-label="near.com and The Rollup">
-        <span className="nearw"><NearMark /></span>
+        <span className="nearw" role="img" aria-label="near.com" />
         <span className="rule" aria-hidden="true" />
-        <span className="mark3d" role="img" aria-label="The Rollup" />
-        <span className="rollw" aria-hidden="true" />
+        <span className="rolllock" role="img" aria-label="The Rollup" />
       </div>
 
       {/* Below 1080px the layout stacks brow / head / offer / phone / body /

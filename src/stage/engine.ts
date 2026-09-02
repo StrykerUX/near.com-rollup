@@ -792,22 +792,67 @@ export function startStageEngine(): () => void {
   addEventListener('pointermove', onPointerMove, { passive: true });
 
   const GL = makeGradientField(document.getElementById('gl') as HTMLCanvasElement | null);
-  let glRAF = 0, glRO: ResizeObserver | null = null;
+  let glRAF = 0, glRO: ResizeObserver | null = null, glIO: IntersectionObserver | null = null;
   const onGLResize = () => GL?.resize();
+  /* the canvas box only moves when the page scrolls out of the sticky range;
+     re-measuring it there is what lets `draw()` stop measuring it at all */
+  const onGLScroll = () => GL?.measure();
   if (GL) {
     GL.resize();
     addEventListener('resize', onGLResize);
     let prev = 0;
-    const simTime = 0;
+    /* ---- THE FIELD MOVES AGAIN, ON A BUDGET -------------------------------
+       `simTime` was pinned at 0 in v06.1, which is what froze the composition:
+       the shader's own drift terms (`dr`, the slow field, the swirl's sine) are
+       all functions of uTime, so a constant clock is a still image. It moves
+       again — under four gates, because the reason it was stopped was real.
+
+       WHY IT WAS STOPPED. A redraw is not free even when the pixels match, and
+       `draw()` opened with a getBoundingClientRect(): sixty forced layouts a
+       second on the one main thread that also carries a 588vh scroll, the card
+       sequence, React, and the phone's own rAF writers. It measured 3.805s of
+       main-thread task time in a 4s window. What the viewer got for that was
+       scroll judder and the demo's numbers arriving in steps.
+
+       WHAT PAYS FOR IT NOW, in the order the frame budget notices:
+
+         · the forced layout is gone — see `measure()` in gradientField.ts
+         · TIME-DRIVEN redraws are capped at 30fps. The field is low-frequency,
+           blurred by 12–30px of CSS and upscaled from a 0.375x buffer; there is
+           no detail in it that 30 can show and 60 cannot. Half the draws.
+         · INPUT-driven redraws are NOT capped. Scroll parallax, the shrink and
+           the CTA ripple still land on the frame they happen, because those are
+           the ones a viewer can actually catch lagging.
+         · nothing is drawn while the canvas is off screen or the tab is hidden.
+           The stage is 588vh; past it the sticky child is gone and the old loop
+           kept painting it anyway.
+
+       Reduced motion keeps the still, which is the whole point of the setting. */
+    const FRAME = 1000 / 30;
+    let simTime = 0, lastDraw = -1e9;
+    /* `visible` starts true so the first paint happens even where there is no
+       IntersectionObserver to say otherwise. */
+    let visible = true;
     let sgS = 0, glSig = '', glDirty = 1;
     const markDirty = () => { glDirty = 1; };
     addEventListener('resize', markDirty);
+    addEventListener('scroll', onGLScroll, { passive: true });
     /* A ResizeObserver is the right primitive here: the canvas box can change
        without a window resize, and it fires exactly when the box changes and
        never reads layout on a frame where it did not. */
     if (window.ResizeObserver) {
       glRO = new ResizeObserver(() => { GL.resize(); glDirty = 1; });
       glRO.observe(GL.el);
+    }
+    /* OFF SCREEN IS OFF. A 588vh scroller means the stage spends most of the
+       page's height behind the viewport, and a field nobody can see costs
+       exactly as much to draw as one they can. */
+    if (window.IntersectionObserver) {
+      glIO = new IntersectionObserver(
+        (es) => { visible = es[0].isIntersecting; if (visible) glDirty = 1; },
+        { rootMargin: '10%' },
+      );
+      glIO.observe(GL.el);
     }
     glRAF = requestAnimationFrame(function loop(ms) {
       const dt = prev ? Math.min((ms - prev) / 1000, 0.05) : 0;
@@ -822,21 +867,28 @@ export function startStageEngine(): () => void {
       sgS += (surge - sgS) * (1 - Math.exp(-dt / 0.12));
       if (Math.abs(surge - sgS) < 0.001) sgS = surge;
 
-      /* ---- DON'T REDRAW A STILL ---------------------------------------
-         A full-screen fbm + domain-warp fragment shader running 60 times a
-         second to produce the same image measured 3.805s of main-thread task
-         time in a 4s window. The draw is not free even when the pixels are
-         identical, and each draw() also does a getBoundingClientRect() — a
-         forced layout read. Every live input is in the signature; scrollY is
-         one of them, because the shader has a scroll parallax term. glDirty
-         covers resize, where the drawing buffer is reallocated. */
+      /* THE CLOCK IS NOT WALL TIME. It advances only on frames the field is
+         actually being drawn on, so a tab that comes back from the background
+         resumes the composition where it left it instead of jumping forward by
+         however long nobody was looking. Pointer activity warms the tempo a
+         little — the same `activity` the surge already uses. */
+      const live = visible && !document.hidden && !reduce;
+      if (live) simTime += dt * (1 + activity * 0.5);
+
+      /* ---- WHAT IS WORTH A DRAW --------------------------------------
+         Every live input is in the signature; scrollY is one of them, because
+         the shader has a scroll parallax term. glDirty covers resize, where the
+         drawing buffer is reallocated. A signature change is a redraw NOW; the
+         clock alone is a redraw at 30fps. */
       const sig =
         sgS.toFixed(4) + '|' + ptrSX.toFixed(1) + '|' + ptrSY.toFixed(1) + '|' +
         shrinkInX.toFixed(4) + '|' + shrinkInY.toFixed(4) + '|' + (window.scrollY || 0) + '|' +
         RIP.a + '|' + RIP.t.toFixed(3);
-      if (glDirty || sig !== glSig) {
+      const moved = glDirty || sig !== glSig;
+      if ((moved && (visible || glDirty)) || (live && ms - lastDraw >= FRAME)) {
         glSig = sig;
         glDirty = 0;
+        lastDraw = ms;
         GL.draw(simTime, sgS, ptrSX, ptrSY, shrinkInX, shrinkInY);
       }
       glRAF = requestAnimationFrame(loop);
@@ -850,6 +902,7 @@ export function startStageEngine(): () => void {
     removeEventListener('load', remeasure);
     removeEventListener('pointermove', onPointerMove);
     removeEventListener('resize', onGLResize);
+    removeEventListener('scroll', onGLScroll);
     dotBtns.forEach((b, i) => b.removeEventListener('click', dotHandlers[i]));
     rippleEls.forEach((el, i) => {
       el.removeEventListener('pointerenter', rippleHandlers[i]);
@@ -860,5 +913,6 @@ export function startStageEngine(): () => void {
     snapAbort();
     if (snapTimer) clearTimeout(snapTimer);
     glRO?.disconnect();
+    glIO?.disconnect();
   };
 }
