@@ -94,20 +94,21 @@ const STEPS: Step<SV, SVAction>[] = [
          sheet was still arriving, so `Your tokens` — the wallet the reader saw
          two faces ago, with the same three quantities — went past unread. */
       { ms: 1200, do: 'picker' },
-      { ms: 760, do: 'scroll', arg: String(STOPS[0]) },
-      { ms: 780, do: 'scroll', arg: String(STOPS[1]) },
+      { ms: 680, do: 'scroll', arg: String(STOPS[0]) },
+      { ms: 700, do: 'scroll', arg: String(STOPS[1]) },
       /* and on until the row it came for comes into view. It travels one way:
          the destination the form opened with is already valid, so this is not
          someone hunting for an answer, it is someone seeing what else there is
          on the way to a better one. */
-      { ms: 900, do: 'scroll', arg: String(STOPS[2]) },
+      { ms: 820, do: 'scroll', arg: String(STOPS[2]) },
       /* THE HOPS GOT CLOSER AND THE REST GOT LONGER, and the scene is the same
          length. At 620ms of travel against 900/1100/1400 of beat the list spent
          longer stopped than moving, which reads as three cuts rather than as
-         somebody scrolling. The travel is 520 now and the gaps are ~250 — move,
-         settle, move — and everything those three beats gave up went here, onto
-         the frame that has NEAR on it. */
-      { ms: 2540 },
+         somebody scrolling. The travel is 380 now and the beats 680/700/820 —
+         move, settle, move, with the move the shorter half of the pair — and
+         everything those three beats gave up went here, onto the frame that has
+         NEAR on it. */
+      { ms: 2780 },
     ],
   },
 

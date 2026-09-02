@@ -634,6 +634,7 @@ function PickRowView({ r, d }: { r: PickRow; d: Deck }) {
     const pick = d.can('pick', r.h.sym);
     return (
       <span className={'switem own' + live(pick)} {...press(pick)} data-tap={'pick:' + r.h.sym}
+            style={tint(r.h.color)}
             data-lit={d.s.lit === 'pick:' + r.h.sym ? '1' : undefined}>
         <Chip a={r.h} chain={r.h.chain} />
         <span className="switemt"><b>{r.h.sym}</b><em>{r.h.name}</em></span>
@@ -649,6 +650,7 @@ function PickRowView({ r, d }: { r: PickRow; d: Deck }) {
   const pick = d.can('pick', r.a.sym);
   return (
     <span className={'switem' + live(pick)} {...press(pick)} data-tap={'pick:' + r.a.sym}
+          style={tint(r.a.color)}
           data-lit={d.s.lit === 'pick:' + r.a.sym ? '1' : undefined}>
       <Chip a={r.a} />
       <span className="switemt"><b>{r.a.sym}</b><em>{r.a.name}</em></span>
