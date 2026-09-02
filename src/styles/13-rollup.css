@@ -87,16 +87,32 @@
 }
 
 /* --- the mark as an object in the field --------------------------------
-   Not a logo pasted in a corner. It is cut out of the same light the field is
-   made of, sitting behind the phone, cropped by the frame like a real object. */
-.rollmark{
+   Not a logo pasted in a corner. It sits behind the phone, cropped by the frame
+   like a real object.
+
+   IT WAS THE ROLLUP'S AND IT IS near.com's. Same slot and the same geometry —
+   what changed is the brand and how it is drawn. The old one was a silhouette
+   cut out of a copper gradient with a mask; this is the supplied artwork
+   itself, already the pale mint it wants to be, so there is nothing to tint it
+   with and nothing to cut it out of. The Rollup's mark still stands in the
+   lockup, in three dimensions and at full strength.
+
+   `aspect-ratio` is the file's own 529:482 rather than the square the mask
+   needed, and the artwork is cropped at its own top and right edges — so the
+   bleed is in the PNG and the offsets only have to finish it. */
+.isomark{
   position:absolute;z-index:1;pointer-events:none;
-  right:-9%;top:-19%;width:min(48vw,620px);aspect-ratio:1;
-  background:linear-gradient(150deg,#FFE2C6 0%,#E8A470 34%,#B4713F 58%,#2C6B55 88%);
-  -webkit-mask:var(--rollmark-src) center/contain no-repeat;
-          mask:var(--rollmark-src) center/contain no-repeat;
-  opacity:.22;
-  filter:blur(.4px);
+  right:-9%;top:-19%;width:min(48vw,620px);aspect-ratio:529/482;
+  background:var(--isologo-src) center/contain no-repeat;
+  /* ONE OPACITY, WHERE THE OLD MARK HAD A LADDER OF THREE (.22, .13, .09).
+     That ladder existed because the Rollup mark was competing with the Rollup
+     mark: a copper silhouette in the corner, and the same logo in three
+     dimensions in the lockup below it, so the big one had to keep stepping
+     back. This is a different brand from the one in the lockup and has nothing
+     to give way to. .30 is what a near-white shape needs over this field to
+     read as an object rather than as a smudge — the file's own alpha does the
+     rest. */
+  opacity:.30;
 }
 
 @media(max-width:1080px){
@@ -107,7 +123,7 @@
     padding:78px var(--gut) 40px;
   }
   .morph{justify-self:center;margin-bottom:22px}
-  .rollmark{right:-24%;top:-6%;width:min(72vw,480px);opacity:.16}
+  .isomark{right:-24%;top:-6%;width:min(72vw,480px)}
   .side.l h2{max-width:22ch;font-size:clamp(1.6rem,4.6vw,2.1rem)}
   .side.r p{max-width:none}
 }
@@ -222,8 +238,10 @@
   letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.62);
 }
 
-/* the big background mark steps back now that a real one sits in the lockup */
-.rollmark{opacity:.13;right:-12%;top:-22%;width:min(44vw,560px)}
+/* the corner mark takes the frame the lockup's arrival left it — geometry
+   only now: it is not the same brand as the mark in the lockup, so it has no
+   reason to dim for it */
+.isomark{right:-12%;top:-22%;width:min(44vw,560px)}
 
 @media(max-width:1080px){
   .lockup{max-width:none;padding:78px clamp(20px,5vw,40px) 40px}
@@ -260,7 +278,6 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
     radial-gradient(52% 40% at 80% 5%, rgba(226,160,110,.34), rgba(220,150,102,.11) 46%, transparent 74%),
     radial-gradient(38% 30% at 97% 38%, rgba(214,138,88,.18), transparent 68%);
 }
-.rollmark{opacity:.09}
 
 /* --- the nav was left bare when the brand moved into the lockup. Fill it
    with the ask, not with the logo again: primary is Create account, sign-in

@@ -64,7 +64,11 @@ export const TOK_ICONS: Record<string, TokenGlyph> = {
    */
   BTC: { img: '/logos/tokens/btc.svg' },
   ETH: { img: '/logos/tokens/eth.svg' },
-  USDT: { img: '/logos/tokens/usdt.svg' },
+  /* THE ONLY WEBP IN THE SET, and it is the supplied artwork rather than a
+     redraw. The file it replaces was a #377e61 disc — a duller green than the
+     `#26A17B` the catalogue paints behind it, so the mark and the chip under it
+     disagreed on what colour Tether is in every frame of every screen. */
+  USDT: { img: '/logos/tokens/usdt.webp' },
   NEAR: { img: '/logos/tokens/near.svg' },
   XRP: { img: '/logos/tokens/xrp.svg' },
   USDC: { img: '/logos/tokens/usdc.svg' },
