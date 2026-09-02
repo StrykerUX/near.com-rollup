@@ -18,7 +18,13 @@
 
 .pdev.earn .ernpage { flex: 1; min-height: 0; display: flex; flex-direction: column }
 
-.pdev.earn .ernhead { flex: none; display: flex; align-items: center; gap: 8px; padding: 14px 0 2px }
+/* THE SAME 30px THE ASSETS SCREEN'S HEADING GETS. `.ownh` in
+   27-demo-own-v5.css is the first thing in its own `.pdview` too, so the two
+   pages' titles now start at the same height — which they must, because they
+   are two rooms in one app reached from the same home and a reader crosses
+   between them in one scroll. It was 14, and the Earn title sat sixteen pixels
+   proud of the Assets one for no reason anybody chose. */
+.pdev.earn .ernhead { flex: none; display: flex; align-items: center; gap: 8px; padding: 30px 0 2px }
 .pdev.earn .ernhead b { font-size: 22px; font-weight: 600 }
 .pdev.earn .ernbeta {
   font-style: normal; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 6px;
