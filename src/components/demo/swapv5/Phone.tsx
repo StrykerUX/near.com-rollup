@@ -4,6 +4,7 @@ import { live, press } from '@/components/stage/phone/ui/tap';
 import { ProgressList } from '@/components/stage/phone/ui/ProgressList';
 import { Enter } from '@/components/stage/phone/ui/Enter';
 import { Count } from '@/components/demo/shell/Count';
+import { Typed } from '@/components/demo/shell/Typed';
 import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -233,10 +234,18 @@ function Swap({ d }: { d: Deck }) {
               This one is a bare figure on a card, and the app marks it with the
               caret alone. The class was here and the stylesheet never drew it,
               which is a focus state that exists only in the JSX. */}
-          <span className="swfin" style={fit(s.amount || '0')}
-                data-tap={s.focus === 'amount' ? 'field' : undefined}>
-            <b>{s.amount || '0'}</b>
-            {s.focus === 'amount' ? <i className="bcaret" /> : null}
+          {/* THE FIELD IS WRITTEN, NOT COUNTED. `Count` is right for a figure
+              that answered and wrong for the contents of an input: easing 0 to
+              `6635.616976` scrambles ten digits at once, which is what read as
+              aggressive. It fills left to right instead — one new glyph a
+              frame, which is a thing a reader can follow.
+
+              AND NO CARET. This is a phone with no keyboard on it: a blinking
+              bar is a cursor belonging to an input nobody is in. The balance
+              was tapped, the app filled the field, and that is the whole
+              gesture. */}
+          <span className="swfin" style={fit(s.amount || '0')} data-tap="field">
+            <Typed className="swfinb" text={s.amount || '0'} />
           </span>
           {/* THE TOKEN IS NOT A PICKER HERE. The reader chose it on the home
               screen by tapping the asset, which is the whole reason this form
@@ -298,9 +307,12 @@ function Swap({ d }: { d: Deck }) {
           {/* NO THOUSANDS SEPARATOR in the amount fields. The app writes
               `3535.799`, and it is right to: this is the contents of an input,
               which is a thing you could have typed, and nobody types a comma. */}
+          {/* AND SO IS THIS ONE. It is the same control drawn twice, and a
+              form where one figure types while the other spins reads as two
+              different mechanisms answering one gesture. */}
           <span className="swfin quiet" style={fit(fieldOut(s))}>
             {to && usd(s) > 0
-              ? <Count value={out(s)} dp={3} group={false} trim trunc />
+              ? <Typed className="swfinb" text={fieldOut(s)} />
               : <b className="off">0</b>}
           </span>
           <span className={'swtok' + (to ? ' picked' : ' empty') + live(open)}

@@ -56,7 +56,7 @@
   font-weight: 600; letter-spacing: -.02em;
   font-variant-numeric: tabular-nums;
 }
-.pdev.swp .swfin b { font-weight: 600 }
+.pdev.swp .swfin b, .pdev.swp .swfinb { font-weight: 600 }
 .pdev.swp .swfin b.off, .pdev.swp .swfin.quiet { color: rgba(255, 255, 255, .3) }
 .pdev.swp .swfin.quiet span { color: #fff }
 

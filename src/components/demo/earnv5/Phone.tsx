@@ -5,6 +5,7 @@ import { Enter } from '@/components/stage/phone/ui/Enter';
 import { ProgressList } from '@/components/stage/phone/ui/ProgressList';
 import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { Count } from '@/components/demo/shell/Count';
+import { Typed } from '@/components/demo/shell/Typed';
 import { Dot } from '@/components/demo/app/Dot';
 import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
@@ -243,11 +244,13 @@ function VaultSheet({ d }: { d: Deck }) {
                 <div className="ernamt">
                   <span className="ernamtv"
                         style={{ '--len': (s.amount || '0').length } as React.CSSProperties}>
-                    <b>
-                      <Count value={Number(s.amount) || 0} dp={6} group={false} trim ms={780} />
-                    </b>
+                    {/* WRITTEN, NOT COUNTED — the same field the swap screen
+                        has, and for the same reason: easing 0 to `22.555228`
+                        scrambles nine glyphs at once, and `Use max` did not
+                        compute this figure, it PUT it there. No caret either;
+                        there is no keyboard on this phone. */}
+                    <b><Typed text={s.amount || '0'} /></b>
                     <em>USDC</em>
-                    {s.focus === 'amount' ? <i className="bcaret" /> : null}
                   </span>
                   <span className="ernamtu">
                     <Count value={Number(s.amount) || 0} dp={2} prefix="$" ms={780} />
