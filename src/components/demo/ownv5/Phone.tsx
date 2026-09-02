@@ -285,10 +285,19 @@ function Bars() {
  * the sheet look like a different app's.
  */
 const ACT_ICON: Record<string, ReactNode> = {
+  /* SCALED, because it is drawn on the tab bar's grid and the others are not.
+     This path spans 10 units of the 24 viewBox where Send spans 20 and the
+     other two span 14, so at the same 18px box it rendered at about half their
+     size. 1.4 takes it to 14 and puts it with the arrow and the bars rather
+     than matching Send, which is the largest of the four. The stroke is
+     pre-divided so it still lands at the 1.9 the others use — scaling a path
+     scales its stroke with it. */
   Swap: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.36"
          strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M7 9.4h9l-2.4-2.4M17 14.6H8l2.4 2.4" />
+      <g transform="translate(12 12) scale(1.4) translate(-12 -12)">
+        <path d="M7 9.4h9l-2.4-2.4M17 14.6H8l2.4 2.4" />
+      </g>
     </svg>
   ),
   Send: (
