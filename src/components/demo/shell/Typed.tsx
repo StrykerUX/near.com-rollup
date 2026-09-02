@@ -22,6 +22,16 @@ import { useEffect, useRef } from 'react';
  * Writes to the DOM on its own frame loop and never re-renders React — the same
  * split `Count` uses, and for the same reason.
  */
+/**
+ * HOW LONG WRITING `text` TAKES, so a figure that DEPENDS on it can wait.
+ *
+ * The destination amount is not typed by anybody — it is what the source
+ * amount buys — so it has no business filling in while the source is still
+ * being written. It answers once there is something to answer about, which is
+ * this many milliseconds later.
+ */
+export const writeMs = (text: string, per = 55) => text.length * per;
+
 export function Typed({
   text, per = 55, className,
 }: {

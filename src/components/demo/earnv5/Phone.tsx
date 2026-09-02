@@ -5,7 +5,7 @@ import { Enter } from '@/components/stage/phone/ui/Enter';
 import { ProgressList } from '@/components/stage/phone/ui/ProgressList';
 import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { Count } from '@/components/demo/shell/Count';
-import { Typed } from '@/components/demo/shell/Typed';
+import { Typed, writeMs } from '@/components/demo/shell/Typed';
 import { Dot } from '@/components/demo/app/Dot';
 import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
@@ -252,8 +252,12 @@ function VaultSheet({ d }: { d: Deck }) {
                     <b><Typed text={s.amount || '0'} /></b>
                     <em>USDC</em>
                   </span>
+                  {/* the dollars are what the field is worth, so they wait for
+                      the field to finish being written — same rule the swap
+                      screen's destination follows */}
                   <span className="ernamtu">
-                    <Count value={Number(s.amount) || 0} dp={2} prefix="$" ms={780} />
+                    <Count value={Number(s.amount) || 0} dp={2} prefix="$"
+                           delay={writeMs(s.amount || '0')} ms={780} />
                   </span>
                 </div>
 

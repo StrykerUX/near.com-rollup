@@ -17,7 +17,7 @@ import { useEffect, useRef } from 'react';
  */
 export function Count({
   value, dp = 0, prefix = '', suffix = '', group = true, trim = false, trunc = false,
-  ms = 520, className,
+  ms = 520, delay = 0, className,
 }: {
   value: number;
   dp?: number;
@@ -46,6 +46,16 @@ export function Count({
   trim?: boolean;
   /** how long the trip takes */
   ms?: number;
+  /**
+   * How long it waits before starting, holding its old value meanwhile.
+   *
+   * FOR A FIGURE THAT DEPENDS ON ONE STILL BEING WRITTEN. The swap screen's
+   * destination is what the source amount buys: it cannot answer a figure that
+   * is only half entered, and a demo where both halves fill at once is a form
+   * with no arithmetic in it. `writeMs` in Typed.tsx is where that wait comes
+   * from, so the two cannot drift.
+   */
+  delay?: number;
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -73,7 +83,13 @@ export function Count({
       el.textContent = fmt(value);
       return;
     }
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    /* A HIDDEN TAB HAS NO ANIMATION FRAMES. This used to be safe here — React's
+       own render left the final figure in the node and the trip only overwrote
+       it — but a delayed trip has to hold the OLD value while it waits, and a
+       wait whose first frame never comes is a figure stuck on last year's
+       number. Same rule as `Typed`, and as reduced motion, which wants no trip
+       at all. */
+    if (document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches) {
       shown.current = value;
       el.textContent = fmt(value);
       return;
@@ -81,9 +97,13 @@ export function Count({
 
     let raf = 0;
     let t0 = 0;
+    /* it holds the OLD value while it waits — a figure that blanks or jumps to
+       its answer and then eases has answered twice */
+    el.textContent = fmt(from);
     raf = requestAnimationFrame(function step(now) {
       if (!t0) t0 = now;
-      const p = Math.min(1, (now - t0) / ms);
+      if (now - t0 < delay) { raf = requestAnimationFrame(step); return; }
+      const p = Math.min(1, (now - t0 - delay) / ms);
       /* ease-out: a figure that decelerates into its value reads as arriving,
          where a linear one reads as a counter being spun */
       const e = 1 - Math.pow(1 - p, 3);
@@ -97,7 +117,7 @@ export function Count({
        figure on these screens, and listing it would restart the trip on every
        parent render */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, ms]);
+  }, [value, ms, delay]);
 
   return <span className={className} ref={ref}>{fmt(value)}</span>;
 }

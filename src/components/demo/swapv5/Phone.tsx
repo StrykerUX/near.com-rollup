@@ -4,7 +4,7 @@ import { live, press } from '@/components/stage/phone/ui/tap';
 import { ProgressList } from '@/components/stage/phone/ui/ProgressList';
 import { Enter } from '@/components/stage/phone/ui/Enter';
 import { Count } from '@/components/demo/shell/Count';
-import { Typed } from '@/components/demo/shell/Typed';
+import { Typed, writeMs } from '@/components/demo/shell/Typed';
 import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -80,6 +80,17 @@ const fit = (text: string) => ({ '--len': text.length }) as React.CSSProperties;
  * `crypto()` in `ownv5/state.ts`): given a screen that truncates, a demo that
  * rounds is a demo that is one digit off in the number a reader would check.
  */
+/**
+ * HOW LONG EVERY DERIVED FIGURE ON THIS SCREEN WAITS.
+ *
+ * The length of the source field's write. The dollars under the pair, the
+ * amount out and the least you can receive are all answers to one number, and
+ * that number is still being entered — so they hold until it is there. It is
+ * one call rather than one constant because the source amount is not always
+ * the same length.
+ */
+const wait = (s: SV) => writeMs(s.amount || '0');
+
 /** what the destination field prints — three decimals, cut rather than rounded */
 const fieldOut = (s: SV) => {
   const v = Math.trunc(out(s) * 1e3) / 1e3;
@@ -307,12 +318,24 @@ function Swap({ d }: { d: Deck }) {
           {/* NO THOUSANDS SEPARATOR in the amount fields. The app writes
               `3535.799`, and it is right to: this is the contents of an input,
               which is a thing you could have typed, and nobody types a comma. */}
-          {/* AND SO IS THIS ONE. It is the same control drawn twice, and a
-              form where one figure types while the other spins reads as two
-              different mechanisms answering one gesture. */}
+          {/* THIS ONE IS NOT WRITTEN, AND IT DOES NOT START UNTIL THE OTHER
+              ONE HAS FINISHED BEING.
+
+              Nobody types the destination — it is what the source amount buys.
+              So it eases rather than fills, and it WAITS: a figure that cannot
+              be known until the amount is entered has no business answering a
+              figure that is still halfway through going in. `writeMs` is how
+              long the field above takes, so the wait and the write are one
+              number and cannot drift. */}
+          {/* AND IT IS MOUNTED THE WHOLE TIME, showing `0` until there is
+              something to answer. It used to swap between a dead `0` and the
+              figure, which meant the figure MOUNTED holding its answer — and a
+              `Count` that mounts on its value prints it, it does not travel to
+              it. The wait was wired and never ran once. */}
           <span className="swfin quiet" style={fit(fieldOut(s))}>
-            {to && usd(s) > 0
-              ? <Typed className="swfinb" text={fieldOut(s)} />
+            {to
+              ? <Count value={out(s)} dp={3} group={false} trim trunc
+                       delay={wait(s)} ms={640} />
               : <b className="off">0</b>}
           </span>
           <span className={'swtok' + (to ? ' picked' : ' empty') + live(open)}
@@ -330,7 +353,7 @@ function Swap({ d }: { d: Deck }) {
               out, because the trade fills at the quote and the dollars are read
               at spot — see `QUOTE` in state.ts. The two used to be the same
               number twice, which is a swap screen with no spread in it. */}
-          <i><Count value={outUsd(s)} dp={0} prefix="$" ms={780} /></i>
+          <i><Count value={outUsd(s)} dp={0} prefix="$" delay={wait(s)} ms={780} /></i>
           <em>{to ? `${qty(balOf(to.sym))} ${to.sym}` : '—'}</em>
         </span>
       </div>
@@ -384,7 +407,9 @@ function Swap({ d }: { d: Deck }) {
                 new token REMOUNTS this and the figure prints rather than
                 travelling from the old token's quantity to the new one's,
                 which would be a trip between two different units */}
-            <dd><Count value={least(s)} dp={6} group={false} trim ms={780} /> {to.sym}</dd>
+            <dd>
+              <Count value={least(s)} dp={6} group={false} trim delay={wait(s)} ms={780} /> {to.sym}
+            </dd>
           </div>
         </Enter>
       ) : null}
