@@ -16,13 +16,34 @@ import { useEffect, useRef } from 'react';
  * split `Ticker` uses one level up, and for the same reason.
  */
 export function Count({
-  value, dp = 0, prefix = '', suffix = '', group = true, ms = 520, className,
+  value, dp = 0, prefix = '', suffix = '', group = true, trim = false, trunc = false,
+  ms = 520, className,
 }: {
   value: number;
   dp?: number;
   prefix?: string;
   suffix?: string;
   group?: boolean;
+  /**
+   * Cut the extra decimals off rather than rounding them in.
+   *
+   * An amount field is not a calculator: the app prints `3535.799` for a figure
+   * whose next digit is a 7, which a rounding would have shown as `3535.800`.
+   * It is the same habit the account chapter's total has, documented at
+   * `crypto()` there — and a demo that rounds where the app truncates is a demo
+   * that is one digit off in exactly the number a reader would check.
+   */
+  trunc?: boolean;
+  /**
+   * Drop trailing zeros, and the point with them if nothing survives it.
+   *
+   * A QUANTITY OF A TOKEN IS NOT A PRICE. `$6,612.00` is right and
+   * `3535.799000` is not — the app prints six decimals when there are six to
+   * print and three when there are three, because the zeroes are claiming a
+   * precision the figure does not have. `dp` stays the CEILING; this is what
+   * happens underneath it.
+   */
+  trim?: boolean;
   /** how long the trip takes */
   ms?: number;
   className?: string;
@@ -30,12 +51,19 @@ export function Count({
   const ref = useRef<HTMLSpanElement>(null);
   const shown = useRef(value);
 
-  const fmt = (v: number) =>
-    prefix +
-    (group
-      ? v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp })
-      : v.toFixed(dp)) +
-    suffix;
+  const fmt = (raw: number) => {
+    const k = 10 ** dp;
+    const v = trunc ? Math.trunc(raw * k) / k : raw;
+    const body = group
+      ? v.toLocaleString('en-US', {
+          minimumFractionDigits: trim ? 0 : dp,
+          maximumFractionDigits: dp,
+        })
+      : trim
+        ? v.toFixed(dp).replace(/\.?0+$/, '')
+        : v.toFixed(dp);
+    return prefix + body + suffix;
+  };
 
   useEffect(() => {
     const el = ref.current;

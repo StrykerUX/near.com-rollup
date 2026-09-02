@@ -1,7 +1,5 @@
-import { buildFlow, typing, type Chapter, type Step } from '@/components/demo/shell/flow';
-import {
-  AMOUNT, STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction,
-} from './state';
+import { buildFlow, type Chapter, type Step } from '@/components/demo/shell/flow';
+import { STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction } from './state';
 
 /**
  * SWAP v5 — THE SHORT CUT
@@ -9,47 +7,59 @@ import {
  * The brief, in four lines:
  *
  *   the swap page, already loaded, Tether pre-filled from the home screen tap,
- *   0.25 entered, destination empty and waiting
+ *   the whole position put in by a tap on the balance, destination already set
  *   the destination picker opens, and a long list is scrolled
  *   the destination is picked and the quote fills in
- *   one press, a success state, and back to the top
+ *   the trade is reviewed at full precision, then swapped
+ *   a success state, and back to the top
  *
  * THE ARITHMETIC. The deck plays every beat at `PACE` (1.25), and
  * `pnpm check:flows` asserts the product, so a beat that grows cannot quietly
  * move the clip's length.
  *
  *   scene 1    2,300ms   a form that already knows half of what it needs
- *   scene 2    5,600ms   the list, and how long it is
+ *   scene 2    6,180ms   the list, and how long it is
  *   scene 3    2,900ms   the quote
- *   scene 4    5,400ms   one press
+ *   scene 4    2,180ms   the review sheet
+ *   scene 5    5,400ms   one press
  *   outro      4,000ms   the same frame again, for the loop
  *   ─────────────────
- *             20,200ms  ×1.25 = 25,250ms on screen
+ *             22,960ms  ×1.25 = 28,700ms on screen
+ *
+ * SCENE 2 SAID 5,600 HERE FOR TWO PASSES WHILE AUTHORING 6,180, and the
+ * assertion caught it the moment a new scene made somebody add the column up.
+ * The 580 went in when the picker gained its rest-before-it-moves beat and the
+ * header did not. Same lesson as the 3,300 below: a total in a comment is a
+ * claim, and this one is the only file in the repo where a claim is checked.
  *
  * The header above said 3,300 for scene 1 and 26,500 for the total on the
  * first pass, which is what the assertion is for: four digits at 160ms with a
  * 420ms lead is 900, not 1,900. Nobody would have caught that by reading.
  *
+ * SCENE 1 IS STILL 2,300 THOUGH THE GESTURE IN IT CHANGED. It used to type
+ * `2500` a digit at a time; it now taps the balance, because the frame swaps
+ * the whole Tether position and `6635.616976` is not a figure anyone enters by
+ * hand. Eleven keystrokes at 160ms would have been 2,020 where four were 900 —
+ * a second and an eighth of somebody typing their own balance at you — so the
+ * 900 the typing had went to the tap and its landing, and the clip's length
+ * did not move.
+ *
  * IT IS PACED LIKE `/demo/perps-v5` AND NOT LIKE ITS OWN FIRST DRAFT. Every
  * number below is the one that cut arrived at after two rounds of being too
- * fast: keystrokes 160ms apart rather than 105, a 500ms rest after each value
- * lands, sheets given longer than the 390ms they take to arrive, and a hold on
- * the last frame that is the longest beat in the script. None of that was
- * guessed twice.
+ * fast: a 500ms rest after each value lands, sheets given longer than the 390ms
+ * they take to arrive, and a hold on the last frame that is the longest beat in
+ * the script. None of that was guessed twice.
  *
  * FOUR STEPS, NOT ONE. The copy is not drawn on this route — the stage has no
  * headline — but the steps are what `check:flows` walks and what a reader of
  * this file needs to see the shape of the thing.
  */
 
-const type_ = (act: SVAction, chars: string, lead?: number, gap?: number) =>
-  typing<SV, SVAction>(act, chars, lead, gap);
-
 const CHAPTERS: Chapter[] = [
   { id: 'form', name: 'The form', blurb: '' },
   { id: 'list', name: 'The list', blurb: '' },
   { id: 'quote', name: 'The quote', blurb: '' },
-  { id: 'send', name: 'One press', blurb: '' },
+  { id: 'send', name: 'Review, and one press', blurb: '' },
 ];
 
 const STEPS: Step<SV, SVAction>[] = [
@@ -57,13 +67,14 @@ const STEPS: Step<SV, SVAction>[] = [
   {
     id: 'amount', ch: 'form',
     title: 'A form that already knows half of it',
-    note: 'Tether is in the top field because the reader tapped it a screen ago, and the destination is the pair the app was last on. What is left is how much.',
+    note: 'Tether is in the top field because the reader tapped it a screen ago, and the destination is the pair the app was last on. What is left is how much — and the balance underneath is the answer.',
     beats: [
       /* the opening frame: Tether in, ZEC already in the destination, nothing
-         typed. It holds before anything moves, because what it is showing is a
-         form that was filled in somewhere else. */
+         entered. It holds before anything moves, because what it is showing is
+         a form that was filled in somewhere else. */
       { ms: 900 },
-      ...type_('key', AMOUNT, 420, 160),
+      /* one tap on the balance, and the whole position is in the field */
+      { ms: 900, do: 'max' },
       { ms: 500 },
     ],
   },
@@ -106,7 +117,23 @@ const STEPS: Step<SV, SVAction>[] = [
     ],
   },
 
-  /* ---- scene 4 · 5,400ms ----------------------------------------------
+  /* ---- scene 4 · 2,180ms ----------------------------------------------
+     THE SHEET IS A SCENE, and it was nothing at all until now: `Review trade`
+     used to settle the trade it named. It gets long enough to be read, because
+     what it is for is the four decimals the form rounds away — `3535.799` in
+     the box, `3,535.79972` here — and a sheet that flashes past has stated
+     nothing. */
+  {
+    id: 'review', ch: 'send',
+    title: 'The trade, at full precision',
+    note: 'The form rounds to what fits in a box. The sheet does not: the same figures to five decimals, the rate, and the least you can receive — and only then a button that trades.',
+    beats: [
+      { ms: 680, do: 'confirm' },
+      { ms: 1500 },
+    ],
+  },
+
+  /* ---- scene 5 · 5,400ms ----------------------------------------------
      `step` runs one past the last row so all three read as done before the
      success state replaces them — the fix /demo/perps-v5 needed and the
      reason is the same: a settlement whose last line is still spinning when
@@ -116,7 +143,7 @@ const STEPS: Step<SV, SVAction>[] = [
     title: 'One press',
     note: 'Finding best price, executing, complete — and the Tether balance that was whole a moment ago.',
     beats: [
-      { ms: 620, do: 'confirm' },
+      { ms: 620, do: 'swap' },
       { ms: 620, do: 'step' },
       { ms: 620, do: 'step' },
       { ms: 700, do: 'step' },
@@ -137,10 +164,13 @@ export const swapV5Flow = buildFlow<SV, SVAction>({
   restStep: 'quote',
   outro: 4000,
   anchor: {
+    max: 'amount',
     picker: 'list',
     scroll: 'list',
     pick: 'quote',
-    confirm: 'send',
+    confirm: 'review',
+    closeReview: 'quote',
+    swap: 'send',
     step: 'send',
   },
   /* a settlement is not waiting for anyone: while a reader holds the wheel it

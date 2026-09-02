@@ -17,7 +17,14 @@
 /* THE TOP BAR HOLDS ONE CONTROL, and it is not a back arrow. Swap is a tab —
    you are already there and there is nothing behind it — so the name drops out
    of the bar and becomes a heading on the page. */
-.pdev.swp .swtop { flex: none; display: flex; justify-content: flex-end; height: 50px; padding-top: 14px }
+/* IT IS OUTSIDE `.pdview`, SO IT PAYS ITS OWN PADDING. The lock was hard
+   against the right edge of the device while every card under it stopped 16px
+   short — the one element on this screen not standing on the page's own
+   margin, which reads as a bleed rather than as a corner control. */
+.pdev.swp .swtop {
+  flex: none; display: flex; justify-content: flex-end; height: 50px;
+  padding: 14px 16px 0;
+}
 .pdev.swp .swlock {
   width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center;
   background: var(--btc-card); color: var(--btc-up);
@@ -33,13 +40,20 @@
 .pdev.swp .swform { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 6px }
 
 .pdev.swp .swfield {
-  flex: none; padding: 14px; border-radius: 16px; background: var(--btc-card);
+  flex: none; padding: 16px; border-radius: 20px; background: var(--btc-card);
 }
 .pdev.swp .swrow { display: flex; align-items: center; gap: 10px }
 
+/* THE AMOUNT SHRINKS TO MAKE ROOM FOR THE PILL.
+   The field is 320px of page less its own 32 of padding, and the token pill and
+   the gap take about 100 of what is left — so the figure has ~150px, and at
+   0.52em per tabular glyph `n` of them fit at 270/n pixels. 28 is the ceiling a
+   short figure keeps; `6635.616976` is eleven glyphs and comes down to 24.
+   `--len` is set inline in Phone.tsx, which is where the string is. */
 .pdev.swp .swfin {
   flex: 1; min-width: 0; display: flex; align-items: center;
-  font-size: 28px; font-weight: 600; letter-spacing: -.02em;
+  font-size: min(28px, calc(270px / var(--len, 4)));
+  font-weight: 600; letter-spacing: -.02em;
   font-variant-numeric: tabular-nums;
 }
 .pdev.swp .swfin b { font-weight: 600 }
@@ -70,64 +84,145 @@
 .pdev.swp .swtok.empty .bcv { color: #04140E }
 
 .pdev.swp .swsub {
-  display: flex; align-items: baseline; gap: 8px; margin-top: 10px;
+  display: flex; align-items: center; gap: 8px; margin-top: 10px;
   font-size: 13px; color: rgba(255, 255, 255, .45); font-variant-numeric: tabular-nums;
 }
+.pdev.swp .swsub i { font-style: normal; display: flex; align-items: center; gap: 6px }
 .pdev.swp .swsub em { margin-left: auto; font-style: normal }
+/* the balance is a control — it fills the field with the whole position — so it
+   gets the press affordance the rest of this row has no business wearing.
+   `.can` is the shared class `live()` hands out; the hover is this file's,
+   because nothing else in the app is a live control drawn as plain dim text. */
+.pdev.swp .swmax { transition: color var(--dur) var(--ease-out) }
+.pdev.swp .swmax.can:hover { color: rgba(255, 255, 255, .8) }
+/* the fiat/token flip: it is why the left side of this row is a dollar figure,
+   and it is drawn rather than wired — nothing in this cut types in fiat */
+.pdev.swp .swflip { width: 13px; height: 13px; color: rgba(255, 255, 255, .55) }
 
 /* the arrow between the two fields. It overlaps both by design — that is what
-   says they are one control and not two forms stacked. */
+   says they are one control and not two forms stacked.
+   A ROUNDED SQUARE, NOT A DISC, and the difference is not cosmetic: a circle
+   with a thick ring in the chart's near-black read as a badge sitting on top of
+   the form. The app cuts a notch out of the gap — same radius family as the
+   fields, one hairline, the page's own ground — so it reads as part of the
+   control it is joining. */
 .pdev.swp .swarrow {
-  align-self: center; width: 34px; height: 34px; margin: -10px 0; z-index: 1;
-  display: grid; place-items: center; border-radius: 50%;
-  background: var(--btc-bg); border: 3px solid var(--btc-chart);
-  color: rgba(255, 255, 255, .6);
+  align-self: center; width: 40px; height: 40px; margin: -8px 0; z-index: 1;
+  display: grid; place-items: center; border-radius: 13px;
+  background: var(--btc-bg); border: 1px solid rgba(255, 255, 255, .1);
+  color: rgba(255, 255, 255, .72);
 }
 .pdev.swp .swarrow svg { width: 16px; height: 16px }
 
-/* ---- the quote ---------------------------------------------------------- */
+/* ---- the terms, and they are UNDER the button ---------------------------
+   NOT A CARD. Three plain rows on the page, which is what the app writes: a
+   fill and a hairline would make them a second thing on the screen, and they
+   are a footnote to the pair above. They also sit BELOW the primary button —
+   available to whoever wants them, in nobody's way — where the boxed version
+   was an obstacle between saying what you want and doing it. */
 
-.pdev.swp .swquote {
-  flex: none; margin-top: 14px; padding: 12px 14px; border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, .09);
-  display: grid; gap: 7px;
+.pdev.swp .swquote { flex: none; margin-top: 22px; display: grid; gap: 15px }
+.pdev.swp .swquote > div { display: flex; align-items: center; gap: 8px; min-height: 22px }
+.pdev.swp .swquote dt {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; color: rgba(255, 255, 255, .5);
 }
-.pdev.swp .swquote > div { display: flex; align-items: center; gap: 8px }
-.pdev.swp .swquote dt { font-size: 13px; color: rgba(255, 255, 255, .45) }
 .pdev.swp .swquote dd {
-  margin-left: auto; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums;
+  margin-left: auto; font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums;
 }
+.pdev.swp .swqh { width: 14px; height: 14px; color: rgba(255, 255, 255, .34) }
 
-/* the primary button sits at the floor whatever is above it */
-.pdev.swp .bcta { margin-top: auto }
+/* the tolerance is a CONTROL and the only one down here, so it is the only
+   thing on these rows wearing a fill */
+.pdev.swp .swslip {
+  font-style: normal; display: inline-flex; align-items: center; gap: 7px;
+  height: 30px; padding: 0 11px; border-radius: 999px;
+  background: var(--btc-card); font-size: 14px; font-weight: 600;
+}
+.pdev.swp .swsl { width: 15px; height: 15px; color: rgba(255, 255, 255, .6) }
+
+/* the button follows the pair rather than the frame — see the note in
+   Phone.tsx. Nothing on this form is pinned to the floor. */
+.pdev.swp .bcta { margin-top: 22px }
 .pdev.swp .bochk { margin-bottom: 4px }
 
-/* ---- the success state -------------------------------------------------- */
+/* ---- the settlement, which is a screen and not a footer ----------------- */
 
-.pdev.swp .swdone {
-  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; padding-bottom: 24px;
+.pdev.swp .swset { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-top: 6px }
+.pdev.swp .swsetcard {
+  flex: none; padding: 22px 20px; border-radius: 24px; background: var(--btc-card);
 }
-.pdev.swp .swtick {
-  width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center;
-  background: rgba(3, 192, 118, .16); color: var(--btc-up); margin-bottom: 16px;
+.pdev.swp .swsetchk {
+  margin-top: 22px; padding-top: 22px; border-top: 1px solid rgba(255, 255, 255, .1);
 }
-.pdev.swp .swtick svg { width: 28px; height: 28px }
-.pdev.swp .swdoneh { font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, .6) }
-.pdev.swp .swdonev {
-  font-size: 30px; font-weight: 600; letter-spacing: -.025em; margin-top: 6px;
-  font-variant-numeric: tabular-nums;
+/* the shared checklist was sized for a 210px column inside a sheet; here it is
+   the lower half of a card and gets the room that implies */
+.pdev.swp .swsetchk .plist { max-width: none; gap: 6px }
+.pdev.swp .swsetchk .pstep { min-height: 36px; gap: 13px }
+.pdev.swp .swsetchk .plabel { font-size: 15px }
+
+/* the icon and the label sit side by side AS ONE BLOCK, centred together.
+   `.bcta` is a centred grid, so two columns split the pill in half and put the
+   glyph against the left edge — `max-content` columns and a centred track is
+   what makes them read as one label with a mark on it. */
+.pdev.swp .swagain {
+  margin-top: 20px; grid-auto-flow: column; grid-auto-columns: max-content;
+  justify-content: center; gap: 10px; align-items: center;
 }
-.pdev.swp .swdonep { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .45); margin-top: 4px }
-.pdev.swp .swdoned {
-  width: 100%; margin-top: 26px; padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, .09); display: grid; gap: 8px;
+.pdev.swp .swagain svg { width: 18px; height: 18px }
+
+/* the rail between the rows is the app's white, not the checklist's green:
+   what it marks is how far the list has got, and a green thread under a green
+   tick is the same fact drawn twice */
+.pdev.swp .swsetchk .pstep:not(:last-child)::before { top: 26px; bottom: -10px; width: 1.5px }
+.pdev.swp .swsetchk .pstep[data-state='done']::before { background: rgba(255, 255, 255, .8) }
+
+/* =========================================================================
+   THE REVIEW SHEET — where the figures are stated at full precision
+   -------------------------------------------------------------------------
+   The form is an input and rounds to what fits in a box; this is a statement
+   and does not. `3535.799` upstairs, `3,535.79972` here — same figure, four
+   more digits, and grouped, because down here it is a fact rather than
+   something you could have typed.
+   ========================================================================= */
+
+.pdev.swp .swrev { padding-bottom: 22px }
+.pdev.swp .swrevh { display: flex; align-items: center; padding: 6px 0 20px }
+.pdev.swp .swrevh b { font-size: 19px; font-weight: 600; letter-spacing: -.01em }
+.pdev.swp .swrevx {
+  margin-left: auto; width: 26px; height: 26px; display: grid; place-items: center;
+  color: rgba(255, 255, 255, .6);
 }
-.pdev.swp .swdoned > div { display: flex; align-items: center; gap: 8px }
-.pdev.swp .swdoned dt { font-size: 13px; color: rgba(255, 255, 255, .45) }
-.pdev.swp .swdoned dd {
-  margin-left: auto; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums;
+.pdev.swp .swrevx svg { width: 20px; height: 20px }
+
+.pdev.swp .swrevleg { display: flex; align-items: center; gap: 15px }
+.pdev.swp .swrevt { display: flex; flex-direction: column; gap: 3px; min-width: 0 }
+.pdev.swp .swrevt b {
+  font-size: 21px; font-weight: 600; letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
 }
+.pdev.swp .swrevt i { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .45) }
+
+/* the arrow is INDENTED TO THE MARKS' COLUMN rather than centred: it is
+   reading order, not a control joining two boxes, and the two marks are the
+   column the eye is already travelling down */
+.pdev.swp .swrevar {
+  display: block; width: 54px; padding: 10px 0; color: rgba(255, 255, 255, .55);
+}
+.pdev.swp .swrevar svg { width: 22px; height: 22px; margin: 0 auto; display: block }
+
+.pdev.swp .swrevd {
+  margin-top: 22px; padding-top: 20px; display: grid; gap: 14px;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+}
+.pdev.swp .swrevd > div { display: flex; align-items: center; gap: 8px }
+.pdev.swp .swrevd dt { font-size: 14px; color: rgba(255, 255, 255, .5) }
+.pdev.swp .swrevd dd {
+  margin-left: auto; font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums;
+}
+/* the sheet's button is the one that trades, so it gets room above it that the
+   form's — which only opens this — does not need */
+.pdev.swp .swrev .bcta { margin-top: 26px }
 
 /* =========================================================================
    THE PICKER — the only new idea on this screen

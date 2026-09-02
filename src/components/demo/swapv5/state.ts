@@ -38,8 +38,21 @@ export const FROM = 'USDT';
 /** the wallet's whole Tether position, to the decimal the frame prints */
 export const FROM_BAL = 6635.616976;
 
-/** what gets typed, digit by digit, into the amount field */
-export const AMOUNT = '2500';
+/**
+ * WHAT GOES IN THE FIELD, AND NOBODY TYPED IT.
+ *
+ * The frame swaps THE WHOLE TETHER POSITION — 6635.616976, to the last of six
+ * decimals — and that is not a figure anyone enters by hand. It got there the
+ * way it gets there in the app: by tapping the balance on the right of the
+ * sub-row, which is what that balance is for.
+ *
+ * It used to be `2500`, typed a digit at a time. Four digits is a plausible
+ * thing to type and eleven is not, so keeping the typing would have meant
+ * keeping a round number the frame does not show — and the round number was
+ * the reason the two dollar figures on this screen could never disagree, which
+ * is the other half of what the frame is actually saying. See `QUOTE`.
+ */
+export const AMOUNT = String(FROM_BAL);
 
 /**
  * WHERE IT ENDS UP, which is not where it starts.
@@ -61,6 +74,45 @@ export const TO = 'NEAR';
  * screen has no frame of its own to quote.
  */
 export const SLIPPAGE = 0.005;
+
+/**
+ * THE RATE THE TRADE EXECUTES AT, WHICH IS NOT THE PRICE THE DOLLARS USE.
+ *
+ * The frame prints THREE figures that only make sense together:
+ *
+ *   6635.616976 USDT   ·   $6,636
+ *   3535.799    NEAR   ·   $6,612
+ *
+ * Twenty-four dollars go missing between the two fields, and for as long as
+ * this screen divided by NEAR's price they could not: one price for both sides
+ * makes the two dollar figures identical by construction, and a swap screen
+ * saying you get exactly what you put in is a swap screen with no spread in it.
+ *
+ * So there are two numbers, because there are two questions. `price` in the
+ * catalogue is the SPOT — what a NEAR is worth, and what both dollar figures
+ * are read off. This is the QUOTE — what this trade actually fills at, spread
+ * included. $6,636 in at spot, 3535.799 out at the quote, and those 3535.799
+ * NEAR are worth $6,612 back at spot again. The gap is the spread, and it is
+ * the only honest reason the second figure is smaller.
+ *
+ * IT IS DERIVED FROM `RECEIVE AT LEAST`, WHICH IS THE FRAME'S MOST PRECISE
+ * FIGURE. The review sheet prints five figures for one trade and four of them
+ * are roundings of the fifth:
+ *
+ *   6,635.61698 USDT     the balance, to five
+ *   3,535.79972 NEAR     what comes out, to five
+ *   3518.120719 NEAR     the same thing less 0.5%, to SIX
+ *   1.87669              the rate, to five
+ *   $6,636 / $6,612      both sides at spot, to none
+ *
+ * So the six-decimal one is the reading, and everything else falls out of it.
+ * Written as the division rather than pasted as a constant: a nine-digit
+ * number in this file is a number nobody can check, and this way the two
+ * figures in it are both on the frame.
+ */
+export const QUOTE: Record<string, number> = {
+  NEAR: FROM_BAL / (3518.120719 / (1 - SLIPPAGE)),
+};
 
 /** the settlement, read off `rec-Swap.MP4` */
 export const SWAP_STEPS = ['Finding best price', 'Executing trade', 'Trade complete'];
@@ -149,6 +201,8 @@ export type SV = {
 
   /** the destination picker */
   picker: boolean;
+  /** the review sheet, between the form and the settlement */
+  review: boolean;
   /** which row the picker has scrolled to; 0 is the top */
   at: number;
 
@@ -169,6 +223,7 @@ export const initial: SV = {
   to: START_TO,
   amount: '',
   picker: false,
+  review: false,
   at: 0,
   focus: 'amount',
   pressed: null,
@@ -185,13 +240,46 @@ export const initial: SV = {
 export const fromPrice = () => assetOf(FROM).price ?? 1;
 export const toPrice = (s: SV) => (s.to ? assetOf(s.to).price ?? 1 : 0);
 
-/** what the amount is worth, which is the only figure both sides agree on */
+/**
+ * what this trade fills at. Falls back to spot for the pairs this cut has no
+ * quote for — the resting USDT/ZEC opening frame is one of them, and a made-up
+ * spread on a pair with no frame behind it is a number pretending to be read.
+ */
+export const quoteOf = (s: SV) => (s.to ? QUOTE[s.to] ?? toPrice(s) : 0);
+
+/** what the amount is worth — at SPOT, which is what a dollar figure means */
 export const usd = (s: SV) => (Number(s.amount) || 0) * fromPrice();
-/** and what that buys, before the spread */
-export const out = (s: SV) => (s.to ? usd(s) / toPrice(s) : 0);
+/** and what that buys, AT THE QUOTE, which is where the spread lives */
+export const out = (s: SV) => (s.to ? usd(s) / quoteOf(s) : 0);
+/** what those come back to at spot — the smaller of the two dollar figures */
+export const outUsd = (s: SV) => out(s) * toPrice(s);
 export const least = (s: SV) => out(s) * (1 - SLIPPAGE);
-/** the rate row: one of the source in units of the destination */
-export const rate = (s: SV) => (s.to ? fromPrice() / toPrice(s) : 0);
+/**
+ * THE RATE ROW, AND IT IS QUOTED THE OTHER WAY ROUND.
+ *
+ * `Exchange rate — 1 NEAR = 1.87669 USDT`: one of the thing you are BUYING, in
+ * units of the thing you are spending. It used to be `1 USDT = 0.53 NEAR`,
+ * which is the same fact stated so that nobody can hold it — on a stablecoin
+ * pair the app's direction is a price a reader already knows how to read, and
+ * the inverse is a fraction of a coin per dollar.
+ */
+export const invRate = (s: SV) => (s.to ? quoteOf(s) / fromPrice() : 0);
+
+/**
+ * WHAT THE WALLET HOLDS OF A SYMBOL — the right-hand side of a field's sub-row.
+ *
+ * Both fields print a balance there, and the destination's is usually ZERO:
+ * `0 NEAR` under the amount you are about to receive is the app saying you do
+ * not have any yet, which is the whole reason you are on this screen. The field
+ * used to repeat the output amount there instead, which said nothing twice.
+ *
+ * The source's own figure is `FROM_BAL` rather than the holding's, because the
+ * swap screen prints six decimals where the assets screen truncates to four —
+ * see the note on `crypto()` in the account chapter, where the same frame
+ * disagrees with itself.
+ */
+export const balOf = (sym: string | null) =>
+  sym === FROM ? FROM_BAL : HOLDINGS.filter((h) => h.sym === sym).reduce((t, h) => t + h.qty, 0);
 
 /**
  * WHAT THE PRIMARY BUTTON SAYS, which is how the form reports itself. Three
@@ -202,15 +290,19 @@ export function cta(s: SV): { label: string; ok: boolean } {
   if (!(Number(s.amount) > 0)) return { label: 'Enter amount', ok: false };
   if (!s.to) return { label: 'Select a token', ok: false };
   if (Number(s.amount) > FROM_BAL) return { label: 'Insufficient balance', ok: false };
-  return { label: 'Review swap', ok: true };
+  /* `Review trade`, which is what the button says on the frame. It was
+     `Review swap` on a screen already titled Swap, above two fields whose
+     whole subject is the swap — a button repeating the noun three readers
+     have already met. */
+  return { label: 'Review trade', ok: true };
 }
 
 /* ---- the transitions -------------------------------------------------- */
 
 export type SVAction =
-  | 'focus' | 'key' | 'done'
+  | 'focus' | 'key' | 'max' | 'done'
   | 'picker' | 'closePicker' | 'scroll' | 'pick'
-  | 'confirm' | 'step';
+  | 'confirm' | 'closeReview' | 'swap' | 'step' | 'again';
 
 const digits = (cur: string, d: string) => {
   if (d === '⌫') return cur.slice(0, -1);
@@ -224,10 +316,27 @@ export const actions: Record<SVAction, Act<SV>> = {
     if (!s.focus || !d || s.picker || s.submitting) return null;
     return { amount: digits(s.amount, d), pressed: d, tap: null };
   },
+  /**
+   * THE BALANCE ON THE RIGHT OF THE SUB-ROW IS A CONTROL, and this is what it
+   * does: it puts the whole position in the field.
+   *
+   * It is the gesture the frame implies. `6635.616976` is the balance printed
+   * two inches to the right of it, to the same six decimals, and the reading
+   * that has someone typing eleven characters to arrive at their own balance
+   * exactly is not a reading, it is a demo that did not look at what it was
+   * copying. One tap, and it is also shorter than the typing it replaces —
+   * which is how scene one stayed at the 2,300ms `check:flows` has pinned.
+   */
+  max: (s) =>
+    (s.submitting || s.picker || s.review || s.amount === AMOUNT
+      ? null
+      : { amount: AMOUNT, focus: null, pressed: null, tap: 'max' }),
+
   /** the ✓ on the accessory bar — the app's real way out of a numeric field */
   done: (s) => (s.focus ? { focus: null, pressed: null, tap: null } : null),
 
-  picker: (s) => (s.picker || s.submitting ? null : { picker: true, at: 0, focus: null, tap: 'to' }),
+  picker: (s) =>
+    (s.picker || s.review || s.submitting ? null : { picker: true, at: 0, focus: null, tap: 'to' }),
   closePicker: (s) => (s.picker ? { picker: false, tap: null } : null),
   /**
    * The list moves as a whole rather than a row at a time. A demo that steps a
@@ -248,7 +357,24 @@ export const actions: Record<SVAction, Act<SV>> = {
     return { to: v, picker: false, at: 0, tap: 'pick:' + v };
   },
 
-  confirm: (s) => (s.submitting || !cta(s).ok ? null : { submitting: true, step: 0, focus: null, tap: 'confirm' }),
+  /**
+   * `REVIEW TRADE` REVIEWS THE TRADE. It used to submit it.
+   *
+   * The button said Review and then settled, which is the one thing a button
+   * named after a confirmation step must not do — on a screen whose subject is
+   * moving six and a half thousand dollars, the sheet between the form and the
+   * settlement is not ceremony, it is where the figures are stated at the
+   * precision the form rounds away.
+   */
+  confirm: (s) =>
+    (s.submitting || s.review || !cta(s).ok
+      ? null
+      : { review: true, focus: null, tap: 'confirm' }),
+  closeReview: (s) => (s.review && !s.submitting ? { review: false, tap: null } : null),
+
+  /** and the sheet's own button, which is the one that actually trades */
+  swap: (s) =>
+    (!s.review || s.submitting ? null : { review: false, submitting: true, step: 0, tap: 'swap' }),
   /**
    * THE CHECKLIST TICKS, AND STOPS WHEN THERE IS NOTHING LEFT TO TICK.
    *
@@ -262,4 +388,14 @@ export const actions: Record<SVAction, Act<SV>> = {
     if (s.step < SWAP_STEPS.length) return { step: s.step + 1 };
     return s.done ? null : { done: true, tap: null };
   },
+
+  /**
+   * `SWAP AGAIN`, which is the only thing on the settled frame.
+   *
+   * The script never fires it — the flow's outro loops back on its own — but a
+   * reader who has taken the wheel is looking at a button, and a button that
+   * does nothing is worse than no button. It puts the screen back where it
+   * started, which is what the label says.
+   */
+  again: (s) => (s.done ? { ...initial, tap: 'again' } : null),
 };
