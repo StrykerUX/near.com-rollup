@@ -17,7 +17,7 @@ import { STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction } from 
  * `pnpm check:flows` asserts the product, so a beat that grows cannot quietly
  * move the clip's length.
  *
- *   scene 0    2,300ms   the account, and the tab that leaves it
+ *   scene 0    1,320ms   the account, and the tab that leaves it
  *   scene 1    1,980ms   a form that already knows half of what it needs
  *   scene 2    4,220ms   the list, and how long it is
  *   scene 3    2,900ms   the quote
@@ -25,7 +25,7 @@ import { STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction } from 
  *   scene 5    5,400ms   one press, and Swap again
  *   outro        900ms   the account, which is also where it started
  *   ─────────────────
- *             19,880ms  ×1.25 = 24,850ms on screen
+ *             18,900ms  ×1.25 = 23,625ms on screen
  *
  * THE DEAD HOLDS HAVE COME OUT, and the clip is shorter by exactly what they
  * were: 1,960 between the list stopping and the row being pressed, and 320 in
@@ -70,19 +70,27 @@ const CHAPTERS: Chapter[] = [
 ];
 
 const STEPS: Step<SV, SVAction>[] = [
-  /* ---- scene 0 · 2,300ms ----------------------------------------------
-     THE ACCOUNT, AND THE TAB THAT LEAVES IT. Three seconds is the brief and
-     2,875 on screen is what this is; the frame has already been read twice by
-     anybody who scrolled the other two chapters, so what it owes here is not a
-     read, it is an ANSWER to the question of where the swap screen came from. */
+  /* ---- scene 0 · 1,320ms ----------------------------------------------
+     THE ACCOUNT, AND THE TAB THAT LEAVES IT. The frame is on screen for 1,125ms
+     and the whole scene for 1,650: it has already been read twice by anybody
+     who scrolled the other two chapters, and nothing on it moves, so what it
+     owes here is not a read but an ANSWER — where the swap screen came from. */
   {
     id: 'home', ch: 'acct',
     title: 'Swap is a tab on your account',
     note: 'Not a page you navigate to and not another app: the third item in the bar, from the same account screen the other chapters open on.',
     beats: [
-      { ms: 1400 },
+      /* 700, AND IT WAS 1,400. Nothing moves on this screen — no figure is
+         answering, no sheet is arriving, it is a frame the reader has met twice
+         already in the two chapters above it. What it owes is the ANSWER to
+         where the swap screen came from, and an answer does not need two
+         seconds. 875ms of it, and then the press. */
+      { ms: 700 },
       { ms: 200, set: { lit: 'tab:Swap' } },
-      { ms: 700, do: 'toSwap' },
+      /* and this 420 is spent on the SWAP screen, not this one — the beat holds
+         after its transition. It was 700 on top of scene 1's own 380, which is
+         the same pause twice with a scene boundary between them. */
+      { ms: 420, do: 'toSwap' },
     ],
   },
 
