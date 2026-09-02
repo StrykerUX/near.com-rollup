@@ -454,10 +454,15 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 .rollcta .offer{
   font-family:var(--font-display,inherit);font-weight:400;
   font-size:24px;line-height:1.24;letter-spacing:-.016em;
-  color:rgba(255,255,255,.95);text-transform:none;
+  /* PURE WHITE, THE WHOLE SENTENCE. It was .95 with the figure picked out in
+     copper, which is the field's own accent and reads as a highlighter over
+     the one line on the page that is an offer rather than a claim. The weight
+     still holds "20% of every fee" apart from the rest of it; nothing else
+     needs to. Same treatment in `.mtop .offer` — one sentence, one colour. */
+  color:#fff;text-transform:none;
   margin:0 0 clamp(16px,1.8vh,22px);max-width:26ch;
 }
-.rollcta .offer b{color:#F7BF92;font-weight:500}
+.rollcta .offer b{color:#fff;font-weight:500}
 
 /* --- the quote, on its own plate ---------------------------------------
    GLASS, AND GREY RATHER THAN COPPER. It was a warm plate — a copper gradient

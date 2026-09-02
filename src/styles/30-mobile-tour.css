@@ -84,9 +84,11 @@
     margin: 0; max-width: 22ch;
     font-family: var(--font-display, inherit); font-weight: 400;
     font-size: clamp(24px, 6.4vw, 34px); line-height: 1.18; letter-spacing: -.018em;
-    color: rgba(255, 255, 255, .96);
+    /* pure white, the whole sentence — see `.rollcta .offer` in 13-rollup.css,
+       which is the same words and now the same colour */
+    color: #fff;
   }
-  .mtop .offer b { color: #F7BF92; font-weight: 500 }
+  .mtop .offer b { color: #fff; font-weight: 500 }
   .mtop .btn { margin-top: clamp(22px, 3.4vh, 30px) }
   .mtop .friction,
   .mclose .friction {
