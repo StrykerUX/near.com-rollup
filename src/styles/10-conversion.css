@@ -174,7 +174,7 @@
 }
 .sdrail .lbl{
   font-family:var(--font-mono,var(--font-body));
-  font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  font-size:12px;letter-spacing:.13em;text-transform:uppercase;
   color:rgba(255,255,255,.82);
   opacity:0;transform:translateX(-6px);
   transition:opacity var(--dur) var(--ease-out),transform var(--dur) var(--ease-out);
