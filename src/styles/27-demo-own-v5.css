@@ -47,13 +47,15 @@
   font-size: 13px; color: rgba(255, 255, 255, .5); margin-top: 14px;
 }
 .pdev.own .owneye { width: 14px; height: 14px; opacity: .8 }
+/* the figure is the loudest thing on the screen, and the reference gives it
+   room on both sides rather than stacking it against the label */
 .pdev.own .owntotal {
-  flex: none; display: block; font-size: 32px; font-weight: 600; letter-spacing: -.03em;
-  margin-top: 2px; font-variant-numeric: tabular-nums;
+  flex: none; display: block; font-size: 34px; font-weight: 600; letter-spacing: -.03em;
+  margin-top: 4px; font-variant-numeric: tabular-nums;
 }
 
 .pdev.own .ownpair {
-  flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 18px;
+  flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0 22px;
 }
 .pdev.own .ownbtn {
   display: flex; align-items: center; justify-content: center; gap: 7px; height: 42px;
@@ -63,25 +65,37 @@
 
 /* ---- the balances card ------------------------------------------------- */
 
+/* EACH BALANCE IS ITS OWN CARD, not a row in a list.
+   They were hairline-separated rows sharing one fill, which packs three
+   balances into the space the reference gives one and makes the card read as a
+   table. In the reference the container is barely lighter than the page and
+   each balance sits INSIDE it as a lighter block with air around it — so the
+   separation is a gap and a change in tone rather than a rule, and each figure
+   gets a plate of its own to be the largest thing on.
+   THE CONTAINER GOES DARKER, NOT LIGHTER, and that took a second pass. Sitting
+   it a hair ABOVE the ground put it at ~#252525 against blocks at #262626 —
+   one shade apart, which is a difference that exists in the stylesheet and not
+   on the screen. Dropping it 25% toward black lands it at ~#181818 against the
+   same #262626: fourteen steps, and the blocks read as blocks.
+   Both fills still come from the palette — one is the ground darkened, the
+   other is `--btc-card`. No fourth colour was invented for this. */
 .pdev.own .owncard {
-  flex: none; border-radius: 18px; background: var(--btc-card); overflow: hidden;
+  flex: none; border-radius: 18px; padding: 6px 6px 8px;
+  background: rgba(0, 0, 0, .25);
+  display: flex; flex-direction: column; gap: 8px;
 }
 .pdev.own .owncardh {
-  display: block; padding: 13px 15px 4px; font-size: 13px; color: rgba(255, 255, 255, .5);
+  display: block; padding: 10px 10px 4px; font-size: 13px; color: rgba(255, 255, 255, .5);
 }
-/* TALLER THAN THEY WERE. The reference gives each balance its own block of
-   space rather than a list row: the label sits above a figure that is the
-   largest thing in the card, and the arrow rides the middle of all of it. */
 .pdev.own .ownrow {
-  display: flex; align-items: center; gap: 10px; padding: 16px 15px;
-  border-top: 1px solid rgba(255, 255, 255, .07);
+  display: flex; align-items: center; gap: 10px; padding: 16px 14px 18px;
+  border-radius: 14px; background: var(--btc-card);
 }
-.pdev.own .ownrow:first-of-type { border-top: 0 }
-.pdev.own .ownrowl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px }
+.pdev.own .ownrowl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px }
 .pdev.own .ownrowl em { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .62) }
-.pdev.own .ownrowl > b { font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums }
+.pdev.own .ownrowl > b { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums }
 .pdev.own .ownpills {
-  display: flex; align-items: center; gap: 6px; margin-top: 3px;
+  display: flex; align-items: center; gap: 6px; margin-top: 6px;
   font-size: 12px; color: rgba(255, 255, 255, .45);
 }
 .pdev.own .ownpills i { font-style: normal }
