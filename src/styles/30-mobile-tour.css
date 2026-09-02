@@ -221,7 +221,8 @@
     font-size: clamp(28px, 1.6vw + 22px, 46px);
     line-height: 1.08; letter-spacing: -.022em;
   }
-  .mclose h2 em { font-style: italic }
+  /* the emphasised run's face, size and weight are set once for every headline
+     in the tour — see `.side.l h2 em` in 13-rollup.css */
   .mclosebody {
     margin: 18px 0 0; max-width: 42ch;
     color: rgba(255, 255, 255, .82); font-size: 16px; line-height: 1.55;

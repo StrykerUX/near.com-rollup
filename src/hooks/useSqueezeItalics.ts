@@ -32,9 +32,21 @@ export function useSqueezeItalics() {
     };
 
     const run = () => {
-      const sx =
-        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--it-x')) || 1;
-      document.querySelectorAll<HTMLElement>('.display em, .h1 em').forEach((el) => squeeze(el, sx));
+      document.querySelectorAll<HTMLElement>('.display em, .h1 em').forEach((el) => {
+        /* OFF THE ELEMENT, NOT OFF THE ROOT. The compensation belongs to the
+           face being rendered, and not every emphasised run is Kepler any
+           more — the tour's headlines set theirs in Montreal, which must not
+           be squeezed, and say so by declaring `--it-x: 1` on themselves. Read
+           from the root, this gave those runs a -7% margin on both sides for a
+           transform that was never applied to them, and the word overlapped
+           its neighbours. */
+        const sx = parseFloat(getComputedStyle(el).getPropertyValue('--it-x')) || 1;
+        if (sx === 1) {
+          el.style.marginLeft = el.style.marginRight = '';
+          return;
+        }
+        squeeze(el, sx);
+      });
     };
 
     run();

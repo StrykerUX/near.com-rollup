@@ -66,6 +66,52 @@
   font-size:clamp(24px, 1.34vw + 18.28px, 40px);
   line-height:1.1;letter-spacing:-.022em;max-width:24ch;
 }
+
+/* --- THE EMPHASISED RUN IS MONTREAL NOW, NOT KEPLER ---------------------
+   "anywhere", "you're not using", "to the core": these were Kepler italic,
+   the page's display serif, set inside a Montreal headline. They are Montreal
+   Light, upright, at the headline's own size.
+
+   WHICH MEANS UNDOING THREE COMPENSATIONS, all of them in `04-type.css`'s
+   global `em` rule and all of them there BECAUSE the face was Kepler:
+
+     font-size:calc(89em/73)  Kepler's x-height runs small next to Montreal, so
+                              italic runs were set 1.22x to match it optically.
+                              Same face on both sides now, so 1em is the match —
+                              which is also what "the same font size as the rest
+                              of the title" means.
+     line-height:.9           there to stop that 1.22x from inflating the line
+                              box. Nothing to inflate it any more.
+     --it-x                   the squeeze. Kepler Condensed is still wider than
+                              this layout wanted, so `.display em,.h1 em` scale
+                              it to .86 and `useSqueezeItalics` gives back the
+                              width with negative margins. Montreal must not be
+                              distorted, and 1 is how this rule says so — the
+                              hook reads the value off the element, so setting
+                              it here switches off both halves at once.
+
+   letter-spacing inherits rather than keeping the global -.02em, so the run
+   tracks at the headline's own -.022em and the two halves of a sentence are
+   spaced alike.
+
+   THE WEIGHT IS 300 AND IT WILL RENDER AS 400 TODAY. PP Neue Montreal is
+   self-hosted and STATIC — one file per weight, and `public/fonts` has Book
+   (400) and Medium (500), no Light. A browser asked for 300 with no face below
+   400 to match will use the Book. The declaration is what was asked for and it
+   is what will start rendering the moment a Light cut is added to
+   `01-fonts.css`; nothing else has to change. */
+.side.l h2 em,
+.mchhead em,
+.permcopy h2 em,
+.mclose h2 em{
+  font-family:var(--font-display);
+  font-style:normal;
+  font-weight:300;
+  font-size:1em;
+  line-height:inherit;
+  letter-spacing:inherit;
+  --it-x:1;
+}
 .side.r p{max-width:42ch}
 
 /* --- co-brand eyebrow ---------------------------------------------------
