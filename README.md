@@ -14,6 +14,61 @@ pnpm typecheck
 
 ---
 
+## What changed in this pass
+
+A fidelity pass over the account and swap chapters, held against fresh
+screenshots of the real app rather than against the brief. Each entry links to
+the section that explains the reasoning; the short version is here.
+
+**`/demo/own-v5` — the account chapter**
+
+- The wallet is now **the recording's three holdings** — Tether and USD Coin on
+  two networks — in place of the brief's five. A deliberate trade, and it costs
+  the chapter its illustration. → [The wallet is the recording's, not the
+  brief's](#the-wallet-is-the-recordings-not-the-briefs)
+- A row is addressed by an **`id`**, because the app lists USD Coin twice and
+  two rows answering to `USDC` collide.
+- The home screen was rebuilt against the real one: the NEAR-mark avatar, the
+  eye on Total balance, an arrow instead of a chevron, and top spacing matched
+  to perps-v5 by measurement (23px and 23px).
+- **Cards are a fill plus a hairline**, which is what the app draws and what
+  these were missing entirely. Two spacing numbers came off the reference as a
+  fraction of screen width. → [The card
+  language](#the-card-language-is-a-fill-plus-a-hairline)
+- The **Earn pill** is on every row that has somewhere to earn, with its rate
+  imported from the Earn chapter. Its column could not be reserved, and that was
+  measured rather than preferred.
+- The action sheet got **four icons**, each already the app's mark for that verb.
+- The flow ran 20,025ms, was cut to 12,775 to fit a fixed dwell, and now runs
+  **14,400** — the 1,300 that came back all went to the opening frame.
+
+**`/demo/swap-v5` — the swap chapter**
+
+- **No back arrow.** Swap is a tab, not a pushed page, so the title moved to the
+  page and the corner holds the confidential lock. It also gained the tab bar it
+  never had. → [This screen has no back
+  arrow](#this-screen-has-no-back-arrow)
+- The form **opens on a pair** — Tether in, ZEC out — instead of on a blank
+  destination, which makes the picker a choice rather than a required step.
+- That change **surfaced a real bug**: the catalogue prices only the pairs it
+  quotes, the quoted pair used to be BTC/NEAR, and the form opened saying
+  `1 USDT = 1.00 ZEC` off a silent `?? 1` fallback.
+- The **picker has sections** now — `Your tokens` with figures and quantities,
+  the `All / RWA (Beta)` tabs, then `More tokens` — and its scroll offset is
+  summed from real heights rather than multiplied by one row height. → [The
+  picker is not one list](#the-picker-is-not-one-list-and-drawing-it-as-one-was-the-miss)
+- **NEAR sits ninth on purpose**, so eight coins go past on the way to it, and
+  the picker rests on your own wallet before it moves. 25,250 → **25,975**.
+
+**Everywhere**
+
+- **Twenty real brand marks** replace letter chips — twenty of the twenty-seven
+  assets in the picker, and every holding but the tokenised share. → [Assets](#assets)
+- `tools/check-flows.mjs` pins each clip's length, so both timing changes had to
+  be declared there before the build would pass.
+
+---
+
 ## What the page is
 
 588vh of scroll with a 100vh sticky child. Inside it, a four-card product tour
@@ -36,7 +91,10 @@ src/
   styles/
     01..13-*.css      the original stylesheet, split at its own banners
     14-refactor.css   the one rule the DOM-shuffle used to do imperatively
-    15-demo.css       the rebuilt app screens
+    15..23-*.css      the rebuilt app screens, v1 through v4
+    24-demo-app.css   `.pdev.app` — the shared language every v5 screen wears
+    25-home-app.css   the gutted plate that holds the real device on /home-v2
+    26..28-*.css      swap-v5 · own-v5 · earn-v5, each scoped to its own class
   lib/
     schedule.ts       THE STAGE SCHEDULE — band weights, scrubT, yForT, feel dials
     math.ts           the easing vocabulary
@@ -970,6 +1028,119 @@ to change — $5,000 at 20x is the $100,000 position the cut is for. And the two
 exits hang off the mark at 2:1 rather than off the frames' arbitrary
 $82,000 / $78,200, for the same reason `demo/perps/state.ts` already gives.
 
+## `/demo/own-v5` — the account, and what is in it
+
+The tour's second chapter and the one the page's headline is about. Three
+frames: the account home, the **Assets** screen behind its Crypto row, and the
+sheet a row opens with Swap / Send / Earn / Move to Main on it. Rebuilt off
+`rec-Everything you own + Swap screen.MP4` at one frame per second — the home
+was already known from `rec-perps.MP4`, but what sat behind that chevron had
+never been on film.
+
+### The wallet is the recording's, not the brief's
+
+Charlie's brief asks for five holdings — 0.75 BTC, 25,000 NEAR, 18,400 USDC,
+400 ZEC, 120 AAPL — and the wallet on film holds Tether and two lots of USD
+Coin. Both versions were built; the recording won, and the reasoning is worth
+keeping because it is a trade and not an obvious call.
+
+The chapter's job on the page is to look like the product, and a reader who has
+seen the app spots an invented portfolio faster than they read a headline. What
+it costs is the illustration: *"Everything you own, one screen"* is now three
+stablecoin rows, with no Bitcoin and no tokenised share. The five-row version is
+in `ownv5/state.ts`'s history with its quantities intact — including the note
+that the brief's list **is not sorted by value and cannot be**: 400 ZEC is
+$201,296, which would make it the largest position rather than the fourth, so
+two quantities had to move for the screen's own claim to be true.
+
+### A row is addressed by an `id`, not by its symbol
+
+The app lists USD Coin twice, once per network. Two rows answering to `USDC`
+open one sheet between them and collide as React keys, so `Holding` carries an
+`id` and the machine's guard, the taps and the sheet's lookup all use it. The
+network badge on the disc — Solana on one, Ethereum on the other — is the only
+thing on screen saying they are not a duplicate, which is why the app draws it.
+
+### The arithmetic closes, except one cent, and that one is the frame's
+
+The three rows sum to **$6,699.90**, which is the Confidential half the frame
+prints, and $64.95 of Main on top of it is its total. Nothing is tuned to make
+that land; it lands because the recording is one session, and it is the check
+that says the frames were read rather than approximated.
+
+The cent that does not fall out of it: the raw sum is 6764.8455, which rounds to
+**$6,764.85**, and the recording prints **$6,764.84** while printing $6,699.90
+for the confidential half of that same sum. No single rounding rule reaches both
+— for the total to give `.84` the half would have to give `.89` — so the app is
+not using one, and the quantity it shows is truncated too (`6635.6169 …`), which
+is probably where the precision went. Given a frame that disagrees with itself,
+`crypto()` truncates and says so at the definition. It is the difference between
+matching a screenshot and being a cent off in the largest figure on screen.
+
+### The card language is a fill plus a hairline
+
+Held against the real screen, the gap was structural rather than tonal. Every
+grouped thing in this app is a rounded card with a **1px line** a couple of
+dozen steps above its own fill, and that line does more of the work than the
+fill does: against a `#262626` plate on a `#202020` ground — six steps — the
+border is what actually draws the edge. These were fills with no line at all, so
+the sections read as regions of the page rather than as cards sitting on it.
+`--btc-edge` is that line, declared once, so the split, the list and the home
+card cannot drift apart.
+
+Two numbers came off the reference as a **fraction of the screen's width**, so
+the demo's narrower device would not distort them:
+
+| | reference | before | after |
+|---|---|---|---|
+| gap under the Main/Confidential split | 11.2% | 8.5% | 11.4% |
+| height of that split | 17.4% | 20.6% | 17.9% |
+
+That gap is the widest piece of air on the screen and the reason the two halves
+read as a header for the list rather than as its first row.
+
+**The container goes darker, not lighter, and that took a second pass.** Sitting
+it a hair *above* the ground put it at ~`#252525` against blocks at `#262626` —
+one shade apart, which is a difference that exists in the stylesheet and not on
+the screen. Dropping it 25% toward black lands it at ~`#181818`: fourteen steps,
+and the blocks read as blocks.
+
+### The Earn pill, and a column that could not be reserved
+
+The app puts an `Earn 5.8%` pill on any holding it has somewhere to put to work.
+All three carry one here for the same reason they do on film — every holding is
+a stablecoin and the Earn tab takes stablecoins — and the rate is **imported**
+from `earnv5/state.ts` rather than typed, because two screens quoting one rate
+at each other is exactly the pair that drifts.
+
+Reserving the pill's width on every row is the tidier idea: the figures line up
+whether or not a row earns. It was measured and it does not fit. The card is
+294px inside its padding; a reserved slot plus its gap costs 92 of them, and
+against a 34px mark and an 80px figure that leaves 62px for the name where
+`USD Coin` needs 66 and `40.00 AAPL · Ondo` needed 105. Reserving truncates
+content on every row to align two. Unreserved, three names sit whole on one line
+and only the row that has to truncates its quantity — exactly where the
+recording truncates it.
+
+### A chapter cannot be given more dwell on its own
+
+`W_REST` in `lib/schedule.ts` carries the comment **"THE DWELL DIAL. Identical
+for all four cards, by construction"** — so there is no way to buy this chapter
+more scroll that does not buy it for the other three and move the shipped page's
+composition with it. When it turned out to go by faster than its flow could tell
+its story, the flow got shorter instead: 20,025ms → **12,775**, same four
+gestures in the same order. What went was dead hold — 1,100ms off the opening
+frame, 1,200 off the list, 600 each off the sheet and the handoff, half the
+outro.
+
+**And 1,300 of it came back, all to the opening frame.** The trim was right
+about where the dead hold was and wrong about that one: 1,625ms on screen is a
+glance at four figures, not a read of them, and the account home is the frame
+the chapter's headline is making its claim about. It now sits level with the
+assets frame — 620ms to arrive plus 2,100 to sit — because both are frames whose
+whole job is to be looked at and they carry about the same amount of reading.
+**14,400ms**, and `tools/check-flows.mjs` pins it.
+
 ## `/demo/swap-v5` — the same device, doing something else
 
 The second screen in the app's own language, and the first proof that the
@@ -999,28 +1170,55 @@ in what order — and if the real list differs, `catalogue.ts` is the only file
 that changes.
 
 **Prices are only where they are needed.** A picker row shows a symbol and a
-name; nothing on it is priced. The only pair this cut quotes is the one it
-swaps, so BTC and NEAR carry a price and the other twenty-five do not — a table
-of twenty-seven prices nobody reads is twenty-seven numbers that can go stale
-and be wrong on screen.
+name; nothing on it is priced. Only the pairs this cut actually quotes carry one
+— the resting pair `USDT`/`ZEC` and the one it swaps into, `NEAR` — and the
+other twenty-four do not. A table of twenty-seven prices nobody reads is
+twenty-seven numbers that can go stale and be wrong on screen.
 
-**BTC's price is imported rather than repeated.** `tokens.ts` says $68,420.10
-and perps-v5 marks $79,567.50, which is two prices for one coin in one product
-— not tolerable on a page that can show both screens seconds apart. This screen
-quotes the mark, from the file that owns it. The older flows keep their own
-figures, which were read off their own recordings.
+**And that frugality had a bug in it.** The quoted pair used to be BTC/NEAR, so
+`fromPrice()` was hard-wired to the perps mark and ZEC had no price at all. The
+moment the form's resting pair became USDT into ZEC, it opened quoting
+`1 USDT = 1.00 ZEC` — the `?? 1` fallback, silently. Both are priced now and
+`fromPrice` reads the source's own price whatever the source is. A fallback that
+gives the right answer for the wrong reason is the one that breaks on the day
+you change something else.
 
-### Making a list feel long is not the same as it being long
+### The picker is not one list, and drawing it as one was the miss
 
-Twenty-seven rows and six fit. `s.at` is a row index, the track is translated by
-it, and a 620ms transition — slower than the device's own `--dur-slow`, because
-a list is heavy — does the travelling. The rail is drawn rather than native: a
+The app opens it on the wallet: **`Your tokens`** first, with a dollar figure and
+a quantity on each row, then an `All / RWA (Beta)` tab row, then `More tokens`
+and the catalogue. A flat twenty-seven-row list says the app has a lot of
+assets; this says the app knows which ones are yours.
+
+**Those three rows are the account chapter's own `HOLDINGS`, imported rather
+than retyped.** They are the same holdings the assets screen lists two faces
+earlier on the same scroll, and a picker quoting different quantities than the
+screen a reader just came from is the contradiction that only ever gets noticed
+by the person you were trying to convince.
+
+**The offset is computed, not multiplied.** Section headers and the tab row are
+different heights from the rows, so `at × ROW` stopped being true the moment the
+picker had sections. `pickOffset` sums the real heights and `PICK_H` is the one
+place they are written down. The rail is still drawn rather than native: a
 native scrollbar is the browser disagreeing with the phone about what a
 scrollbar looks like, on a screen whose whole claim is that it is a copy.
 
-**Three stops, not one glide.** A single continuous move reads as one fact. Down,
-further, and back up to the row it had already passed and wanted — which is what
-looking down a list and finding nothing better actually looks like.
+### Making a list feel long is not the same as it being long
+
+**Three stops, not one glide.** A single continuous move reads as one fact; three
+read as someone looking. A 620ms transition — slower than the device's own
+`--dur-slow`, because a list is heavy — does the travelling.
+
+**NEAR is deliberately ninth.** The catalogue's own order puts it third, one
+flick from the top, and a picker that finds what it wants immediately has not
+shown you anything. Eight coins go past on the way now, which is the argument
+the chapter is making.
+
+**And the picker rests before it moves.** At 620ms the track started travelling
+while the sheet was still arriving, so `Your tokens` went past unread — a wallet
+section nobody sees may as well not be there. 1,200 now, and the first stop is
+the `More tokens` header rather than the tab row it used to clip mid-height.
+20,200 → **20,780** authored, 25,250 → **25,975** on screen.
 
 ### `.fixed` is a Tailwind utility
 
@@ -1036,20 +1234,34 @@ utilities (`fixed`, `absolute`, `static`, `block`, `flex`, `grid`, `hidden`,
 `visible`, `border`, `container`, `transform`, …); run over every `className` in
 `src/components`, it found exactly one.
 
-### A chapter cannot be given more dwell on its own
+### This screen has no back arrow
 
-`W_REST` in `lib/schedule.ts` carries the comment **"THE DWELL DIAL. Identical
-for all four cards, by construction"** — so there is no way to buy the account
-chapter more scroll that does not buy it for the other three and move the
-shipped page's composition with it. When that chapter turned out to go by
-faster than its flow could tell its story, the flow got shorter instead:
-20,025ms → **12,775**, with the same four gestures in the same order. What went
-was dead hold — 1,100ms off the opening frame, 1,200 off the list, 600 each off
-the sheet and the handoff, half the outro. Every rest that remains is one a
-value or a screen needs to be seen landing.
+It was drawn as a pushed page — arrow, centred title, an action on the right —
+and it is not one. **Swap is a tab:** it is reached from the bar at the bottom,
+it is where you already are, and there is nothing behind it to go back to. So
+the title drops out of the bar and becomes a heading on the page, the way every
+other rooted screen in this app writes its name; the corner holds the one
+control that is actually there, the confidential lock; and the tab bar this
+screen never had sits under it, on Swap.
 
-It is the better fix in both places. On its own route the length cost nothing;
-on the page it was the difference between a story and the first third of one.
+The reference also carries a blue notification badge beside the lock. That is a
+count of something this demo does not have, so it is left out rather than
+invented.
+
+**No `You pay` / `You receive` labels.** The app does not write them: the field
+on top is what leaves, the field under the arrow is what arrives, and the arrow
+between them is the sentence. Two labels explaining an arrow is a form
+apologising for itself. The token chips are tinted in the token's own colour
+instead — **one pair of alphas** off `--tk` rather than a table of hand-picked
+tints, because twenty-seven hand-picked tints is twenty-seven chances to get one
+wrong and never look at it again.
+
+**The form opens on a pair, not on a blank.** The source is Tether because that
+is what the wallet holds — the account chapter ends on the Tether row's Swap
+action, and a form offering to spend a Bitcoin that is not in the assets list is
+two chapters contradicting each other on the same scroll. The destination opens
+on ZEC because the app holds the last pair, which makes the picker a *choice*
+rather than a required step. "Swap anything, anywhere" is a claim about choice.
 
 ## `/home-v2` — four chapters, four real screens
 
@@ -1387,6 +1599,13 @@ The original inlined everything as data URIs. They are now real files:
 - `public/fonts/` — PP Neue Montreal Book/Medium and Mono (woff2, self-hosted)
 - `public/img/` — the Rollup wordmark, the 3D copper mark, the field's rollmark
 - `public/logos/` — the marquee's brand marks
+- `public/logos/tokens/` — twenty token marks, the official full-colour files
+  from the near-intents asset set. **Served as `<img>`, never inlined:** every
+  file carries its own `<style>` block naming the same classes — `.st0` is
+  `#fff` in Bitcoin and `#00ec97` in NEAR — so inlined into one document those
+  rules are global, the last one parsed wins, and a picker showing twenty of
+  them repaints most of them the wrong colour. An `<img>` gets its own document
+  and the collision cannot happen.
 
 **Kepler Std is the one face that cannot be bundled.** It is licensed via Adobe
 Fonts, whose terms require the kit's stylesheet and forbid self-hosting the
