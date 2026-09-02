@@ -102,34 +102,40 @@ function Vaults({ d }: { d: Deck }) {
     <Enter k={`v${d.pass}`} className="ernpane">
       <p className="ernblurb">{BLURB}</p>
 
-      {/* the table's own headers, frame 0:02 */}
-      <div className="erncols"><i>{COLS[0]}</i><i>{COLS[1]}</i></div>
+      {/* THE TABLE IS A CARD, and its header is inside it. It was three loose
+          strips on the page — a header row with a rule under it and two rows
+          with rules under them, the last one drawing a line under nothing. The
+          frame gives them one container: a fill, a hairline, and dividers that
+          are the card's internal furniture rather than marks on the page. */}
+      <div className="erntable">
+        <div className="erncols"><i>{COLS[0]}</i><i>{COLS[1]}</i></div>
 
-      <div className="ernlist">
-        {VAULTS.map((v) => {
-          const open = d.can('openVault', v.id);
-          return (
-            <span className={'ernrow' + live(open)} key={v.id} {...press(open)}
-                  data-tap={'vault:' + v.id}
-                  data-lit={d.s.lit === 'vault:' + v.id ? '1' : undefined}>
-              <Dot a={USDC} size={30} />
-              <span className="ernrowt">
-                <b>{v.name}{v.promo ? <i className="ernpromo">Promo</i> : null}</b>
-                <em>TVL {v.tvl} · {v.apr}</em>
+        <div className="ernlist">
+          {VAULTS.map((v) => {
+            const open = d.can('openVault', v.id);
+            return (
+              <span className={'ernrow' + live(open)} key={v.id} {...press(open)}
+                    data-tap={'vault:' + v.id}
+                    data-lit={d.s.lit === 'vault:' + v.id ? '1' : undefined}>
+                <Dot a={USDC} size={30} />
+                <span className="ernrowt">
+                  <b>{v.name}{v.promo ? <i className="ernpromo">Promo</i> : null}</b>
+                  <em>TVL {v.tvl} · {v.apr}</em>
+                </span>
+                {/* THE ONE FIGURE THIS CHAPTER MOVES, so it is the one that
+                    travels. `/demo/perps-v5` eases every derived number it has
+                    for the reason its `Count` file gives: four figures changing
+                    in one frame is correct and unreadable, and the trip is what
+                    makes the link between the press and the answer visible at
+                    all. 960ms is the duration that cut gives a BALANCE. */}
+                <b className="ernbal">
+                  <Count value={Math.trunc(balanceOf(d.s, v))} prefix="$" ms={960} />
+                </b>
+                <Chev />
               </span>
-              {/* THE ONE FIGURE THIS CHAPTER MOVES, so it is the one that
-                  travels. `/demo/perps-v5` eases every derived number it has
-                  for the reason its `Count` file gives: four figures changing
-                  in one frame is correct and unreadable, and the trip is what
-                  makes the link between the press and the answer visible at
-                  all. 960ms is the duration that cut gives a BALANCE. */}
-              <b className="ernbal">
-                <Count value={Math.trunc(balanceOf(d.s, v))} prefix="$" ms={960} />
-              </b>
-              <Chev />
-            </span>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </Enter>
   );

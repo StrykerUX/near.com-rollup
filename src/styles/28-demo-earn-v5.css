@@ -32,8 +32,12 @@
 }
 .pdev.earn .ernsub { flex: none; font-size: 14px; color: rgba(255, 255, 255, .5) }
 
+/* THE TAB ROW GETS AIR ABOVE IT, which is most of what was wrong with this
+   screen: everything sat directly under everything else, so the title, the
+   subtitle, the tabs and the blurb read as one dense block instead of four
+   things. The frame gives the subtitle room to end before the tabs begin. */
 .pdev.earn .erntabs {
-  flex: none; display: flex; align-items: center; gap: 20px; height: 40px; margin-top: 12px;
+  flex: none; display: flex; align-items: center; gap: 22px; height: 40px; margin-top: 30px;
   border-bottom: 1px solid rgba(255, 255, 255, .1);
 }
 .pdev.earn .erntab {
@@ -49,23 +53,40 @@
 
 .pdev.earn .ernpane { flex: 1; min-height: 0; display: flex; flex-direction: column }
 .pdev.earn .ernblurb {
-  flex: none; margin: 14px 0 4px; font-size: 13px; line-height: 1.45;
+  flex: none; margin: 22px 0 0; font-size: 13px; line-height: 1.45;
   color: rgba(255, 255, 255, .5);
 }
 
-/* the table's own headers, and they are on screen in every frame */
+/* THE TABLE IS A CARD, header included.
+   It was three loose strips on the page: a header row with a rule under it and
+   two vault rows with rules under them — the last of which drew a line under
+   nothing at all, which is the tell. The frame gives them ONE container, and
+   the rules stop being marks on the page and become the card's own furniture.
+   It is `--btc-card` over `--btc-edge`, the same fill-plus-hairline every other
+   card in this app is built from, and `overflow: hidden` so a pressed row is
+   clipped to the corners rather than squaring them off. */
+.pdev.earn .erntable {
+  flex: none; margin-top: 20px; border-radius: 16px; overflow: hidden;
+  background: var(--btc-card); border: 1px solid var(--btc-edge);
+}
+
+/* the table's own headers, and they are on screen in every frame — inside the
+   card now, with the first divider under them */
 .pdev.earn .erncols {
-  flex: none; display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 2px 8px; border-bottom: 1px solid rgba(255, 255, 255, .08);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 15px 10px; border-bottom: 1px solid var(--btc-edge);
   font-size: 12px; color: rgba(255, 255, 255, .42);
 }
 .pdev.earn .erncols i { font-style: normal }
 
-.pdev.earn .ernlist { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column }
+.pdev.earn .ernlist { display: flex; flex-direction: column }
 .pdev.earn .ernrow {
-  flex: none; display: flex; align-items: center; gap: 11px; padding: 13px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  flex: none; display: flex; align-items: center; gap: 11px; padding: 13px 15px;
+  border-bottom: 1px solid var(--btc-edge);
 }
+/* the card's own edge is the last row's bottom — a divider there is a rule
+   under nothing */
+.pdev.earn .ernrow:last-child { border-bottom: none }
 .pdev.earn[data-motion] .ernrow { animation: drise 340ms var(--ease-out) both }
 .pdev.earn .ernrow:nth-child(2) { animation-delay: 60ms }
 .pdev.earn .ernrowt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px }
