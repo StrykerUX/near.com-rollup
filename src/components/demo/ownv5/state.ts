@@ -1,7 +1,5 @@
 import type { Act } from '@/components/stage/phone/flows/machine';
-import { MARK } from '@/components/demo/perpsv5/state';
-import { NEAR_PRICE } from '@/components/demo/swapv5/catalogue';
-import { STAKE_APY, vaultOf } from '@/components/demo/earnv5/state';
+import { vaultOf } from '@/components/demo/earnv5/state';
 
 /**
  * EVERYTHING YOU OWN — the figures and the machine
@@ -24,30 +22,19 @@ import { STAKE_APY, vaultOf } from '@/components/demo/earnv5/state';
 /* ---- the prices, and there is one of each --------------------------- */
 
 /**
- * ONE PRICE PER ASSET, IMPORTED WHERE ONE ALREADY EXISTS.
+ * TWO PRICES, BOTH OF THEM A DOLLAR.
  *
- * Bitcoin comes from `/demo/perps-v5`'s mark and NEAR from the swap
- * recording's own arithmetic, because those screens can be seconds apart from
- * this one on the same page and two prices for one coin is not a thing a
- * product does. Zcash is `lib/tokens.ts`'s.
+ * Everything in this wallet is dollar-pegged, so the row's dollar figure is its
+ * quantity and nothing here can go stale. The five-asset version of this screen
+ * needed Bitcoin's mark, NEAR's swap-recording price and a guess at Apple; none
+ * of that survives, and neither do the imports it needed.
  */
-export const PRICE: Record<string, number> = {
-  BTC: MARK,
-  NEAR: NEAR_PRICE,
-  USDC: 1,
-  ZEC: 503.24,
-  /**
-   * APPLE IS THE ONE PRICE NOBODY OBSERVED. There is no frame of a tokenised
-   * equity anywhere in the five recordings — the picker has an `RWA (Beta)`
-   * tab and the recording never opens it. $230 is a plausible figure for the
-   * share, chosen so the row lands where the brief puts it, and it is the
-   * single number on this screen that a reader could hold against reality and
-   * find stale. If the real screen ever gets filmed, this is the line to fix.
-   */
-  AAPL: 230,
-};
+export const PRICE: Record<string, number> = { USDT: 1, USDC: 1 };
 
 export type Holding = {
+  /** what a row is addressed by. NOT the symbol — the app lists USD Coin twice,
+      once per network, and two rows answering to `USDC` would open one sheet */
+  id: string;
   sym: string;
   name: string;
   /** the issuer, for anything that is not the asset itself */
@@ -63,44 +50,33 @@ export type Holding = {
 };
 
 /**
- * THE FIVE ROWS, AND TWO QUANTITIES THAT HAD TO MOVE.
+ * THE THREE ROWS THE RECORDING ACTUALLY HOLDS.
  *
- * The brief asks for five holdings "sorted by value: 0.75 BTC, 25,000 NEAR,
- * 18,400 USDC, 400 ZEC, 120 AAPL". With real prices that list is not sorted by
- * value and cannot be: 400 ZEC is $201,296, which would make it the LARGEST
- * position rather than the fourth, and 120 AAPL is $27,600, which is third
- * rather than fifth. For 400 ZEC to sit fourth, Zcash would have to trade under
- * $46; for 120 AAPL to sit fifth, Apple would have to trade under $125.
+ * THIS REPLACES THE BRIEF'S FIVE, AND THAT WAS A CALL RATHER THAN A READING.
+ * Charlie's brief asks for "0.75 BTC, 25,000 NEAR, 18,400 USDC, 400 ZEC, 120
+ * AAPL"; the wallet on film holds Tether and two lots of USD Coin. Asked which
+ * one this screen should be, the answer was the recording — the chapter's job
+ * on the page is to look like the product, and a reader who has seen the app
+ * spots an invented portfolio faster than they read a headline. What it costs
+ * is the illustration: "Everything you own" is now three stablecoin rows, with
+ * no Bitcoin and no tokenised share. If that trade is ever revisited, the
+ * five-row version is in this file's history, quantities and reasoning intact.
  *
- * So the order is kept — it is what the brief is actually specifying, and it is
- * what the app's own screen does — and the two quantities that make it false
- * were changed:
+ * THE FIGURES ARE THE FRAMES'. Quantities to four decimals, values, changes and
+ * both `USD Coin` rows — the app lists the same asset twice because it is held
+ * on two networks, which is why a row needs an `id` that its symbol cannot be.
  *
- *     0.75 BTC   $59,675.63      unchanged
- *   25,000 NEAR  $46,750.00      unchanged
- *   18,400 USDC  $18,400.00      unchanged
- *       30 ZEC   $15,097.20      was 400
- *       40 AAPL   $9,200.00      was 120
- *
- * A screen that claims to be sorted by value and is not is a bug a reader finds
- * before they find the feature. These are the two smallest edits that make the
- * claim true.
+ * AND THE ARITHMETIC CLOSES, which is the check that says these were read
+ * correctly rather than approximately: the three rows sum to $6,699.90, which
+ * is the Confidential half the frame prints, and $64.95 of Main on top of that
+ * is the total it prints. Nothing here is tuned to make that land; it lands
+ * because the recording is one session. The one cent that does not fall out of
+ * it is explained at `crypto()` — the frame disagrees with itself there.
  */
 export const HOLDINGS: Holding[] = [
-  { sym: 'BTC', name: 'Bitcoin', qty: 0.75, dp: 4, chg: '+0.42%', up: true, color: '#F7931A', ink: '#fff' },
-  { sym: 'NEAR', name: 'Near', qty: 25000, dp: 2, chg: '−1.74%', up: false, color: '#00EC97', ink: '#000' },
-  { sym: 'USDC', name: 'USD Coin', qty: 18400, dp: 2, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
-  { sym: 'ZEC', name: 'Zcash', qty: 30, dp: 4, chg: '+3.10%', up: true, color: '#F4B728', ink: '#000' },
-  /**
-   * THE ONE ROW WITH NO FRAME BEHIND IT. The picker in the recording carries an
-   * `RWA (Beta)` tab, so the app plainly holds real-world assets and plainly
-   * treats them as a separate class — but the tab is never opened, so how a
-   * tokenised share is drawn is not known. It is rendered as what it is: a
-   * token row, with the issuer on the line the other rows use for the network.
-   */
-  /* Apple's brand black on a dark list is a chip you cannot see, so the chip
-     takes the light grey half of the same palette and the dark ink with it. */
-  { sym: 'AAPL', name: 'Apple', by: 'Ondo', qty: 40, dp: 2, chg: '+0.86%', up: true, color: '#F5F5F7', ink: '#1D1D1F' },
+  { id: 'usdt', sym: 'USDT', name: 'Tether USD', qty: 6635.6169, dp: 4, chg: '+0.01%', up: true, color: '#26A17B', ink: '#fff' },
+  { id: 'usdc-a', sym: 'USDC', name: 'USD Coin', qty: 41.7234, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
+  { id: 'usdc-b', sym: 'USDC', name: 'USD Coin', qty: 22.5552, dp: 4, chg: '+0.00%', up: true, color: '#2775CA', ink: '#fff' },
 ];
 
 /** the Main half of the Assets header, frame 0:03 of both recordings */
@@ -111,10 +87,25 @@ export const EARN_BAL = 2347.81;
 
 /** what a row is worth */
 export const value = (h: Holding) => h.qty * (PRICE[h.sym] ?? 0);
-/** the confidential half, which is where the five holdings live */
+/** the confidential half, which is where the three holdings live */
 export const confidential = () => HOLDINGS.reduce((t, h) => t + value(h), 0);
-/** the Assets screen's headline, and the home's Crypto row */
-export const crypto = () => confidential() + MAIN_BAL;
+/**
+ * The Assets screen's headline, and the home's Crypto row.
+ *
+ * THE CENT IS TRUNCATED, NOT ROUNDED, AND THAT IS THE FRAME'S DOING. The three
+ * rows and the Main half come to 6764.8455, which rounds up to $6,764.85; the
+ * recording prints $6,764.84 while printing $6,699.90 for the confidential half
+ * of the same sum. Both cannot be reached by one rounding rule — for the total
+ * to round to .84 the half would have to print .89 — so the app is not using
+ * one, and the quantity it shows is truncated too (`6635.6169 …`), which is
+ * probably where the missing precision went.
+ *
+ * Given a frame that disagrees with itself, this reproduces the frame: the
+ * halves round and this one truncates. It is the difference between a demo that
+ * matches a screenshot and one that is a cent off in the largest figure on the
+ * screen, which is the kind of thing a reader checks.
+ */
+export const crypto = () => Math.floor((confidential() + MAIN_BAL) * 100) / 100;
 /** the home's headline is the sum of its three rows, always */
 export const total = () => crypto() + PERPS_BAL + EARN_BAL;
 
@@ -129,13 +120,13 @@ export const total = () => crypto() + PERPS_BAL + EARN_BAL;
  * the app rather than an omission — there is nothing in the Earn tab to put
  * them in, so a pill offering one would be the demo inventing a product.
  *
- * THE RATES ARE IMPORTED, NOT TYPED. They are the same two numbers the Earn
- * chapter prints four faces later — Taler's APR and the staking APY — and two
- * screens quoting one rate at each other is exactly the pair that drifts.
+ * THE RATE IS IMPORTED, NOT TYPED. It is Taler's APR, the same number the Earn
+ * chapter prints two faces later, and two screens quoting one rate at each
+ * other is exactly the pair that drifts.
  */
 export const EARNS: Record<string, string> = {
+  USDT: vaultOf('taler').apr.replace(/0%$/, '%'),
   USDC: vaultOf('taler').apr.replace(/0%$/, '%'),
-  NEAR: STAKE_APY,
 };
 
 export const ACTIONS = ['Swap', 'Send', 'Earn', 'Move to Main'] as const;
@@ -179,7 +170,7 @@ export const actions: Record<OWAction, Act<OW>> = {
 
   actions: (s, v) => {
     if (s.screen !== 'assets' || !v || s.acted) return null;
-    return HOLDINGS.some((h) => h.sym === v) ? { acted: v, tap: 'row:' + v } : null;
+    return HOLDINGS.some((h) => h.id === v) ? { acted: v, tap: 'row:' + v } : null;
   },
   closeSheet: (s) => (s.acted ? { acted: null, tap: null } : null),
 

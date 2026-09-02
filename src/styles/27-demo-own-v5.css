@@ -149,11 +149,11 @@
    two halves read as a header for the list rather than as its first row. This
    was 10px, which is not a gap, it is a seam. */
 .pdev.own .ownlist {
-  flex: none; margin-top: 40px; padding: 0 12px;
+  flex: none; margin-top: 40px; padding: 0 10px;
   border-radius: 18px; background: var(--btc-card); border: 1px solid var(--btc-edge);
 }
 .pdev.own .ownitem {
-  flex: none; display: flex; align-items: center; gap: 12px; padding: 13px 0;
+  flex: none; display: flex; align-items: center; gap: 10px; padding: 13px 0;
   border-bottom: 1px solid var(--btc-edge);
 }
 /* the rule between rows, not the rule under the list — the card's own border is
@@ -198,12 +198,13 @@
    is what makes a pill read as an offer rather than as another figure */
 .pdev.own .ownpill {
   display: flex; align-items: center; gap: 3px; font-style: normal;
-  padding: 5px 6px; border-radius: 999px;
+  padding: 5px 5px; border-radius: 999px;
   background: rgba(64, 132, 214, .16); border: 1px solid rgba(96, 160, 232, .34);
   color: #7FB6F2;
 }
-.pdev.own .ownpill b { font-size: 10.5px; font-weight: 600; white-space: nowrap }
+.pdev.own .ownpill b { font-size: 10px; font-weight: 600; white-space: nowrap }
 .pdev.own .ownpill svg { width: 10px; height: 10px; flex: none }
+.pdev.own .ownpill svg:last-child { width: 9px; height: 9px; opacity: .75 }
 
 /* the quantity is what gives when the pill takes its column, and truncating it
    is the app's own answer — the recording prints `6635.6169 …` for exactly this

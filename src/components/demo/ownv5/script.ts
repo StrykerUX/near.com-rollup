@@ -6,8 +6,8 @@ import { actions, initial, type OW, type OWAction } from './state';
  * ==================================================================
  * The brief, in four lines:
  *
- *   the home screen, with Crypto and stocks, Perps and Earn
- *   click Crypto and stocks: the total at the top, five rows under it
+ *   the home screen, with Crypto, Perps and Earn
+ *   click Crypto: the total at the top, the rows under it
  *   tap BTC, tap Swap
  *   loop back to the home screen
  *
@@ -57,15 +57,15 @@ const STEPS: Step<OW, OWAction>[] = [
   {
     id: 'home', ch: 'home',
     title: 'One account, three balances',
-    note: 'Crypto and stocks, perps and earn on one screen, and a total that is the sum of the three rows under it.',
+    note: 'Crypto, perps and earn on one screen, and a total that is the sum of the three rows under it.',
     beats: [{ ms: 1300 }],
   },
 
   /* ---- scene 2 · 2,720ms ---------------------------------------------- */
   {
     id: 'assets', ch: 'assets',
-    title: 'Five rows, sorted by value',
-    note: 'Bitcoin, NEAR, dollars, Zcash and a tokenised share — the last of them issued by Ondo, and in the same list as the rest.',
+    title: 'Every balance, itemised',
+    note: 'Tether and USD Coin on two networks, each with its quantity, its dollar value and somewhere to earn — and the three of them sum to the confidential half above.',
     beats: [
       { ms: 620, do: 'toAssets' },
       /* still the longest hold in the cut, on the frame the chapter's headline
@@ -81,7 +81,7 @@ const STEPS: Step<OW, OWAction>[] = [
     title: 'Every row is a menu',
     note: 'Swap, send, earn or move it out of the confidential balance — from the row, without leaving the list.',
     beats: [
-      { ms: 700, do: 'actions', arg: 'BTC' },
+      { ms: 700, do: 'actions', arg: 'usdt' },
       { ms: 1400 },
     ],
   },

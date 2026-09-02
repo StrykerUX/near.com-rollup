@@ -29,6 +29,8 @@ type Deck = GenericDeck<OW, OWAction>;
  */
 
 const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
+/** the distinct assets behind the rows, in the order they first appear */
+const SYMS = [...new Set(HOLDINGS.map((h) => h.sym))];
 
 export function Phone({ d }: { d: Deck }) {
   const { s } = d;
@@ -98,17 +100,22 @@ function Home({ d }: { d: Deck }) {
       <div className="owncard">
         <span className="owncardh">Balances</span>
 
-        {/* THE LABEL IS THE BRIEF'S, NOT THE FRAME'S. The recording reads
-            "Crypto", because the wallet it was filmed on holds none. This one
-            holds a tokenised share, and a row that says Crypto with an Apple
-            position under it would be the screen contradicting itself. */}
+        {/* THE LABEL IS THE FRAME'S AGAIN. It read "Crypto and stocks" for as
+            long as this wallet held a tokenised share — a row saying Crypto
+            with an Apple position under it contradicts itself. The share is
+            gone with the rest of the brief's five, so the recording's own word
+            is the accurate one again, and "and stocks" would now be the row
+            promising something the list does not have. */}
         <div className={'ownrow' + live(open)} {...press(open)} data-tap="crypto">
           <span className="ownrowl">
-            <em>Crypto and stocks</em>
+            <em>Crypto</em>
             <b>{usd(crypto())}</b>
             <span className="ownpills">
-              {HOLDINGS.slice(0, 3).map((h) => <Dot a={h} size={17} key={h.sym} />)}
-              <i>{HOLDINGS.slice(0, 3).map((h) => h.sym).join(', ')}</i>
+              {/* one chip per ASSET, not per row — the wallet holds USD Coin on
+                  two networks and a strip reading "USDC, USDC" is a duplicate,
+                  not a second holding */}
+              {SYMS.map((sym) => <Dot a={HOLDINGS.find((h) => h.sym === sym)!} size={17} key={sym} />)}
+              <i>{SYMS.join(', ')}</i>
             </span>
           </span>
           <Chev />
@@ -204,11 +211,11 @@ function Assets({ d }: { d: Deck }) {
         })}
       </div>
 
-      {/* five rows, and they are sorted by value — see HOLDINGS in state.ts for
-          the two quantities that had to move for that to be true */}
+      {/* the three rows the recording holds — see HOLDINGS in state.ts for why
+          these and not the brief's five */}
       <div className="ownlist">
         {HOLDINGS.map((h, i) => (
-          <Row h={h} d={d} key={h.sym} i={i} />
+          <Row h={h} d={d} key={h.id} i={i} />
         ))}
       </div>
     </Enter>
@@ -216,10 +223,10 @@ function Assets({ d }: { d: Deck }) {
 }
 
 function Row({ h, d, i }: { h: Holding; d: Deck; i: number }) {
-  const open = d.can('actions', h.sym);
+  const open = d.can('actions', h.id);
   const apy = EARNS[h.sym];
   return (
-    <span className={'ownitem' + live(open)} {...press(open)} data-tap={'row:' + h.sym}
+    <span className={'ownitem' + live(open)} {...press(open)} data-tap={'row:' + h.id}
           style={{ animationDelay: `${i * 45}ms` }}>
       <Dot a={h} size={34} />
       <span className="ownitemt">
@@ -234,10 +241,26 @@ function Row({ h, d, i }: { h: Holding; d: Deck; i: number }) {
           stylesheet for why the column is not reserved on the other three */}
       {apy ? (
         <span className="ownearn">
-          <i className="ownpill"><Bars /><b>Earn {apy}</b></i>
+          <i className="ownpill"><Bars /><b>Earn {apy}</b><PillChev /></i>
         </span>
       ) : null}
     </span>
+  );
+}
+
+/**
+ * lucide `chevron-right` (ISC), and A CHEVRON here where the balance rows take
+ * an arrow. The pill is not a destination, it is more of this row — which is
+ * the distinction `Chev` above is named for. It came back when the wallet did:
+ * the five-holding version printed $149,187.78 and could not spare the 12px,
+ * these three print $6,635.62 and can.
+ */
+function PillChev() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m9 18 6-6-6-6" />
+    </svg>
   );
 }
 
@@ -292,7 +315,7 @@ const ACT_ICON: Record<string, ReactNode> = {
 
 function ActionSheet({ d }: { d: Deck }) {
   const { s } = d;
-  const h = HOLDINGS.find((x) => x.sym === s.acted);
+  const h = HOLDINGS.find((x) => x.id === s.acted);
   const swap = d.can('swap');
 
   return (
