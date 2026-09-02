@@ -18,19 +18,22 @@ import { STOPS, SWAP_STEPS, TO, actions, initial, type SV, type SVAction } from 
  * move the clip's length.
  *
  *   scene 1    2,300ms   a form that already knows half of what it needs
- *   scene 2    6,180ms   the list, and how long it is
+ *   scene 2    4,220ms   the list, and how long it is
  *   scene 3    2,900ms   the quote
  *   scene 4    2,180ms   the review sheet
  *   scene 5    5,400ms   one press
  *   outro      4,000ms   the same frame again, for the loop
  *   ─────────────────
- *             22,960ms  ×1.25 = 28,700ms on screen
+ *             21,000ms  ×1.25 = 26,250ms on screen
  *
- * SCENE 2 SAID 5,600 HERE FOR TWO PASSES WHILE AUTHORING 6,180, and the
+ * SCENE 2 IS 1,960 SHORTER THAN IT WAS, and the clip is shorter by exactly
+ * that: the dead hold between the list stopping and the row being pressed did
+ * not move somewhere else, it went. 28,700 → 26,250.
+ *
+ * It also said 5,600 here for two passes while authoring 6,180, and the
  * assertion caught it the moment a new scene made somebody add the column up.
- * The 580 went in when the picker gained its rest-before-it-moves beat and the
- * header did not. Same lesson as the 3,300 below: a total in a comment is a
- * claim, and this one is the only file in the repo where a claim is checked.
+ * Same lesson as the 3,300 below: a total in a comment is a claim, and this is
+ * the only file in the repo where a claim is checked.
  *
  * The header above said 3,300 for scene 1 and 26,500 for the total on the
  * first pass, which is what the assertion is for: four digits at 160ms with a
@@ -101,14 +104,19 @@ const STEPS: Step<SV, SVAction>[] = [
          someone hunting for an answer, it is someone seeing what else there is
          on the way to a better one. */
       { ms: 820, do: 'scroll', arg: String(STOPS[2]) },
-      /* THE HOPS GOT CLOSER AND THE REST GOT LONGER, and the scene is the same
-         length. At 620ms of travel against 900/1100/1400 of beat the list spent
-         longer stopped than moving, which reads as three cuts rather than as
-         somebody scrolling. The travel is 380 now and the beats 680/700/820 —
-         move, settle, move, with the move the shorter half of the pair — and
-         everything those three beats gave up went here, onto the frame that has
-         NEAR on it. */
-      { ms: 2780 },
+      /* AND THEN IT PRESSES, rather than sitting on the answer for two and a
+         half seconds first. This beat was 2,780: 380 of travel and then 2,400
+         of a list that had stopped, with NEAR on screen and nothing happening
+         to it. It is 820 now — the travel, and 440 to see the row arrive — and
+         the 1,960 it gave up came out of the clip rather than moving somewhere
+         else in it. Nothing was cut: the same three stops, the same rest on the
+         quote after the pick.
+
+         At 620ms of travel against beats of 900/1100/1400 the list also spent
+         longer stopped than moving, which read as three cuts rather than as
+         somebody scrolling. The travel is 380 and the beats 680/700/820 — the
+         move is the shorter half of each move-settle pair. */
+      { ms: 820 },
     ],
   },
 

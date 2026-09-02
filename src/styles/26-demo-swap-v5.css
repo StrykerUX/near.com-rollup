@@ -300,13 +300,15 @@
 }
 /* the rail is drawn inside this wrap, so the rows are inset from it — a
    holding's figure running under a scrollbar reads as a clipping bug */
-/* A ROW THAT CAN BE CHOSEN IS SHAPED LIKE ONE. It was a flush 54px band with
-   no corners, so the press underneath it — `[data-lit]` in 24-demo-app.css —
-   painted a full-bleed rectangle across the sheet. The radius and the inset are
-   what make that fill read as the row lighting up rather than as a bar. */
+/* A ROW THAT CAN BE CHOSEN IS SHAPED LIKE ONE — the radius is what makes the
+   press read as the row lighting up rather than as a bar across the sheet.
+   IT DOES NOT REACH PAST ITS OWN COLUMN. It hung 8px into the left margin so
+   the fill would clear the mark, and `.swlistwrap` is `overflow: hidden`: the
+   highlight was clipped flat down its left edge, which is the one thing a
+   rounded rectangle must not be. */
 .pdev.swp .switem {
   flex: none; height: 54px; display: flex; align-items: center; gap: 12px;
-  padding: 0 14px 0 8px; margin-left: -8px; border-radius: 13px;
+  padding-right: 14px; border-radius: 13px;
   transition: background-color var(--dur) var(--ease-out),
               box-shadow var(--dur) var(--ease-out),
               scale var(--dur) var(--ease-out);
@@ -318,32 +320,32 @@
    `[data-lit]` in 24-demo-app.css paints 10% white, which is right for a
    balance row on the account screen — those rows have no colour of their own.
    A picker row does: `--tk` is the brand colour the token's PILL is already
-   tinted with, three lines up this file, so choosing NEAR lights the row NEAR's
-   green and choosing Bitcoin lights it orange. One idea, used twice, instead of
-   a second one that happens to be grey.
+   tinted with, so choosing NEAR lights the row NEAR's green and choosing
+   Bitcoin lights it orange. One idea used twice.
 
-   Three parts and each is doing something: a 12% fill so the row reads as
-   chosen, an inset hairline at 22% so it has an edge rather than a smear, and
-   `scale: .985` — the press the rest of this app already uses — so it goes
-   DOWN under the finger. Everything eases, so it lifts as cleanly as it lands. */
+   NO EDGE, AND THAT IS THE DISCREET PART. A 1px inset line turned the row into
+   a chip — an object stuck on the list rather than a row of it — and made every
+   pixel where it met the sheet an edge to look at. A fill with round corners
+   and nothing drawn round it is the whole effect, and it is enough because it
+   is coloured: the row does not need an outline to be found, it needs to be a
+   different colour from its neighbours for a fifth of a second.
+
+   A NEUTRAL FLOOR UNDER THE TINT, because eight of these twenty-seven brands
+   are nearly black — XRP is #23292F and Arbitrum #2D374B, and 11% of either
+   over this sheet is nothing at all. The floor is what every row gets; the tint
+   is what a coloured one gets on top of it. Same reason the token pills use one
+   pair of alphas rather than a hand-picked tint each.
+
+   And it goes down a hair — `scale: .99`, half what it was, for the same
+   reason the edge went: this is a row being chosen, not a button being mashed. */
 .pdev.swp [data-lit='1'].switem {
-  /* A NEUTRAL FLOOR UNDER THE TINT, because eight of these twenty-seven brands
-     are nearly black — XRP is #23292F and Arbitrum #2D374B, and 13% of either
-     over this sheet is nothing at all. The floor is what every row gets; the
-     tint is what a coloured one gets on top of it. Same reason the token pills
-     three rules up use one pair of alphas rather than a hand-picked tint each:
-     twenty-seven chances to get one wrong is not a palette, it is a list. */
-  background-color: rgba(255, 255, 255, .055);
+  background-color: rgba(255, 255, 255, .05);
   background-image: linear-gradient(
-    color-mix(in srgb, var(--tk, #fff) 13%, transparent),
-    color-mix(in srgb, var(--tk, #fff) 13%, transparent));
-  /* two edges for the same reason — the neutral one is under the coloured one
-     and shows through wherever the colour has nothing to give */
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, .09),
-    inset 0 0 0 1px color-mix(in srgb, var(--tk, #fff) 26%, transparent);
-  scale: .985;
+    color-mix(in srgb, var(--tk, #fff) 11%, transparent),
+    color-mix(in srgb, var(--tk, #fff) 11%, transparent));
+  scale: .99;
 }
+
 .pdev.swp .switem.own { height: 58px }
 
 /* a holding carries what you have of it, which is the whole reason `Your
