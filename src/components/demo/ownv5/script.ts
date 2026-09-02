@@ -20,13 +20,26 @@ import { actions, initial, type OW, type OWAction } from './state';
  * THE ARITHMETIC. Beats play at `PACE` (1.25) and `pnpm check:flows` asserts
  * the product.
  *
- *   scene 1    2,400ms   the account, and what is in it
- *   scene 2    4,020ms   the five rows
- *   scene 3    2,900ms   a row opens
- *   scene 4    2,700ms   Swap, and the handoff
- *   outro      4,000ms   the same frame again, for the loop
+ *   scene 1    1,300ms   the account, and what is in it
+ *   scene 2    2,720ms   the five rows
+ *   scene 3    2,100ms   a row opens
+ *   scene 4    2,100ms   Swap, and the handoff
+ *   outro      2,000ms   the same frame again, for the loop
  *   ─────────────────
- *             16,020ms  ×1.25 = 20,025ms on screen
+ *             10,220ms  ×1.25 = 12,775ms on screen
+ *
+ * IT WAS 20,025 AND THAT WAS TOO LONG FOR WHERE IT LIVES. On its own route the
+ * length costs nothing — a reader can watch it twice. On `/home-v2` it is one
+ * of four chapters in a scroll a reader is MOVING through, and `W_REST` in
+ * lib/schedule.ts is documented as identical for all four cards by
+ * construction: there is no way to buy this chapter more dwell that does not
+ * buy it for the other three and move the shipped page's composition with it.
+ *
+ * So the flow got shorter instead, and nothing was cut to do it — same four
+ * gestures, same order. What went is dead hold: 1,100ms off the opening frame,
+ * 1,200 off the list, 600 each off the sheet and the handoff, and half the
+ * outro. Every rest that remains is one a value or a screen needs to be seen
+ * landing, which is the only kind this family keeps.
  */
 
 const CHAPTERS: Chapter[] = [
@@ -37,7 +50,7 @@ const CHAPTERS: Chapter[] = [
 ];
 
 const STEPS: Step<OW, OWAction>[] = [
-  /* ---- scene 1 · 2,400ms ----------------------------------------------
+  /* ---- scene 1 · 1,300ms ----------------------------------------------
      One beat and nothing fires. The whole claim of this chapter is on screen
      already — three balances and a total that is their sum — so the first
      thing it does is let that be read. */
@@ -45,35 +58,35 @@ const STEPS: Step<OW, OWAction>[] = [
     id: 'home', ch: 'home',
     title: 'One account, three balances',
     note: 'Crypto and stocks, perps and earn on one screen, and a total that is the sum of the three rows under it.',
-    beats: [{ ms: 2400 }],
+    beats: [{ ms: 1300 }],
   },
 
-  /* ---- scene 2 · 4,020ms ---------------------------------------------- */
+  /* ---- scene 2 · 2,720ms ---------------------------------------------- */
   {
     id: 'assets', ch: 'assets',
     title: 'Five rows, sorted by value',
     note: 'Bitcoin, NEAR, dollars, Zcash and a tokenised share — the last of them issued by Ondo, and in the same list as the rest.',
     beats: [
       { ms: 620, do: 'toAssets' },
-      /* the longest hold in the cut, on the frame the chapter's headline is
-         about. Five rows is more reading than any other screen in this family
-         asks for, and it is the point. */
-      { ms: 3400 },
+      /* still the longest hold in the cut, on the frame the chapter's headline
+         is about. Five rows is more reading than any other screen in this
+         family asks for, and it keeps the most time of the four. */
+      { ms: 2100 },
     ],
   },
 
-  /* ---- scene 3 · 2,900ms ---------------------------------------------- */
+  /* ---- scene 3 · 2,100ms ---------------------------------------------- */
   {
     id: 'open', ch: 'open',
     title: 'Every row is a menu',
     note: 'Swap, send, earn or move it out of the confidential balance — from the row, without leaving the list.',
     beats: [
       { ms: 700, do: 'actions', arg: 'BTC' },
-      { ms: 2200 },
+      { ms: 1400 },
     ],
   },
 
-  /* ---- scene 4 · 2,700ms ----------------------------------------------
+  /* ---- scene 4 · 2,100ms ----------------------------------------------
      Where this chapter ends. `swap` does not navigate: the swap screen has its
      own headline in `Lockup.tsx` and is the next chapter's to tell. What this
      one hands over is the symbol, which is what `/demo/swap-v5` opens with
@@ -84,7 +97,7 @@ const STEPS: Step<OW, OWAction>[] = [
     note: 'Tapping Swap carries the asset with it, which is why the swap screen opens already knowing half of what it needs.',
     beats: [
       { ms: 700, do: 'swap' },
-      { ms: 2000 },
+      { ms: 1400 },
     ],
   },
 ];
@@ -96,7 +109,7 @@ export const ownV5Flow = buildFlow<OW, OWAction>({
   steps: STEPS,
   /* reduced motion gets the five rows: the only frame that is the headline */
   restStep: 'assets',
-  outro: 4000,
+  outro: 2000,
   anchor: {
     toAssets: 'assets',
     actions: 'open',

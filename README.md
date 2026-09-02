@@ -1036,6 +1036,21 @@ utilities (`fixed`, `absolute`, `static`, `block`, `flex`, `grid`, `hidden`,
 `visible`, `border`, `container`, `transform`, …); run over every `className` in
 `src/components`, it found exactly one.
 
+### A chapter cannot be given more dwell on its own
+
+`W_REST` in `lib/schedule.ts` carries the comment **"THE DWELL DIAL. Identical
+for all four cards, by construction"** — so there is no way to buy the account
+chapter more scroll that does not buy it for the other three and move the
+shipped page's composition with it. When that chapter turned out to go by
+faster than its flow could tell its story, the flow got shorter instead:
+20,025ms → **12,775**, with the same four gestures in the same order. What went
+was dead hold — 1,100ms off the opening frame, 1,200 off the list, 600 each off
+the sheet and the handoff, half the outro. Every rest that remains is one a
+value or a screen needs to be seen landing.
+
+It is the better fix in both places. On its own route the length cost nothing;
+on the page it was the difference between a story and the first third of one.
+
 ## `/home-v2` — four chapters, four real screens
 
 The page's own structure turned out to be the brief's. `Lockup.tsx` already

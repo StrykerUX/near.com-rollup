@@ -16,17 +16,37 @@
 
 /* ---- the account ------------------------------------------------------- */
 
-.pdev.own .ownhead { flex: none; display: flex; align-items: center; gap: 10px; height: 52px }
-.pdev.own .ownhead b { font-size: 17px; font-weight: 600 }
-.pdev.own .ownav {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--btc-up), #0B7A55);
+/* THE SAME TOP SPACING AS `/demo/perps-v5`. That device's chrome row is 62px
+   tall with 16 of padding above it, so its first control's top edge sits 22px
+   into the screen. This row was 52 with none, which put the avatar at 11 — a
+   difference nobody could name and everybody could see, on two screens that
+   are meant to be the same phone. Matched by the numbers, not by eye. */
+.pdev.own .ownhead {
+  flex: none; display: flex; align-items: center; gap: 10px;
+  height: 62px; padding-top: 16px;
 }
-.pdev.own .ownh { flex: none; display: block; font-size: 22px; font-weight: 600; padding: 14px 0 10px }
+.pdev.own .ownhead b { font-size: 17px; font-weight: 600 }
+/* a green ROUNDED SQUARE carrying the NEAR mark, not a circle and not a
+   gradient — the reference is a flat brand green with the logo knocked out */
+.pdev.own .ownav {
+  width: 34px; height: 34px; border-radius: 11px; flex: none;
+  display: grid; place-items: center;
+  background: var(--btc-up); color: #04140E;
+}
+.pdev.own .ownav svg { width: 17px; height: 17px; display: block }
+.pdev.own .ownscan {
+  margin-left: auto; width: 34px; height: 34px; border-radius: 11px;
+  display: grid; place-items: center;
+  background: var(--btc-card); color: rgba(255, 255, 255, .8);
+}
+.pdev.own .ownscan svg { width: 18px; height: 18px }
+.pdev.own .ownh { flex: none; display: block; font-size: 22px; font-weight: 600; padding: 30px 0 6px }
 
 .pdev.own .ownlab {
-  flex: none; display: block; font-size: 13px; color: rgba(255, 255, 255, .5); margin-top: 6px;
+  flex: none; display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: rgba(255, 255, 255, .5); margin-top: 14px;
 }
+.pdev.own .owneye { width: 14px; height: 14px; opacity: .8 }
 .pdev.own .owntotal {
   flex: none; display: block; font-size: 32px; font-weight: 600; letter-spacing: -.03em;
   margin-top: 2px; font-variant-numeric: tabular-nums;
@@ -49,21 +69,24 @@
 .pdev.own .owncardh {
   display: block; padding: 13px 15px 4px; font-size: 13px; color: rgba(255, 255, 255, .5);
 }
+/* TALLER THAN THEY WERE. The reference gives each balance its own block of
+   space rather than a list row: the label sits above a figure that is the
+   largest thing in the card, and the arrow rides the middle of all of it. */
 .pdev.own .ownrow {
-  display: flex; align-items: center; gap: 10px; padding: 12px 15px;
+  display: flex; align-items: center; gap: 10px; padding: 16px 15px;
   border-top: 1px solid rgba(255, 255, 255, .07);
 }
 .pdev.own .ownrow:first-of-type { border-top: 0 }
 .pdev.own .ownrowl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px }
 .pdev.own .ownrowl em { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .62) }
-.pdev.own .ownrowl > b { font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums }
+.pdev.own .ownrowl > b { font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums }
 .pdev.own .ownpills {
   display: flex; align-items: center; gap: 6px; margin-top: 3px;
   font-size: 12px; color: rgba(255, 255, 255, .45);
 }
 .pdev.own .ownpills i { font-style: normal }
 .pdev.own .ownpills i b { font-weight: 600; color: rgba(255, 255, 255, .72) }
-.pdev.own .ownchev { width: 18px; height: 18px; flex: none; color: rgba(255, 255, 255, .38) }
+.pdev.own .ownchev { width: 19px; height: 19px; flex: none; color: rgba(255, 255, 255, .55) }
 
 .pdev.own .ownup { color: #2FD48A }
 .pdev.own .owndown { color: #F0616B }
