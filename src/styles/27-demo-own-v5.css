@@ -87,9 +87,10 @@
 .pdev.own .owncardh {
   display: block; padding: 10px 10px 4px; font-size: 13px; color: rgba(255, 255, 255, .5);
 }
+/* the same fill-plus-hairline as the assets card — one card language, not two */
 .pdev.own .ownrow {
   display: flex; align-items: center; gap: 10px; padding: 16px 14px 18px;
-  border-radius: 14px; background: var(--btc-card);
+  border-radius: 14px; background: var(--btc-card); border: 1px solid var(--btc-edge);
 }
 .pdev.own .ownrowl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px }
 .pdev.own .ownrowl em { font-style: normal; font-size: 14px; color: rgba(255, 255, 255, .62) }
@@ -107,28 +108,57 @@
 
 /* ---- the assets screen ------------------------------------------------- */
 
+/* THE CARD LANGUAGE IS A FILL PLUS A HAIRLINE, not a fill alone.
+   Every grouped thing on this screen in the app is a rounded card with a 1px
+   line a couple of dozen steps above its own fill, and that line is doing more
+   of the work than the fill is: against a #262626 plate on a #202020 ground —
+   six steps — the border is what actually draws the edge. These were fills with
+   no line at all, which is why the sections read as regions of the page rather
+   than as cards sitting on it. `--btc-edge` is that line, once, so the split and
+   the list cannot drift apart. */
+.pdev.own { --btc-edge: rgba(255, 255, 255, .07) }
+
 /* THE TWO HALVES, and they are in every frame of this screen. Most of this
-   wallet is confidential and the header is where the app says so. */
+   wallet is confidential and the header is where the app says so.
+   The selected half is A PLATE, not a tint: in the app it is a rounded, bordered
+   block inset in the container with its own fill, so the choice reads as an
+   object lifted out of the pair. Tinting half a flush grid — what this was —
+   says the same thing in a way that looks like a rendering bug. The 4px of
+   padding is what lets the plate be inset rather than flush, so the container
+   can no longer clip with `overflow: hidden`; the plate's own radius handles
+   its corners. */
 .pdev.own .ownsplit {
-  flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 16px 0 6px;
-  border-radius: 14px; background: var(--btc-card); overflow: hidden;
+  flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 18px 0 0;
+  border-radius: 16px; background: var(--btc-card); border: 1px solid var(--btc-edge);
+  padding: 4px;
 }
 .pdev.own .ownhalf {
-  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 0;
-  transition: background-color var(--dur) var(--ease-out);
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 0 7px; border-radius: 12px; border: 1px solid transparent;
+  transition: background-color var(--dur) var(--ease-out),
+              border-color var(--dur) var(--ease-out);
 }
-.pdev.own .ownhalf.on { background: rgba(255, 255, 255, .07) }
+.pdev.own .ownhalf.on { background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .11) }
 .pdev.own .ownhalf i { font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .5) }
 .pdev.own .ownhalf b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums }
 
+/* THE LIST IS A CARD. It was five rows loose on the page, which is the one
+   thing the app never does with them. And the 30px above it is measured off the
+   reference, where the gap under the split is a little over a tenth of the
+   screen's width — the widest piece of air on the screen, and the reason the
+   two halves read as a header for the list rather than as its first row. This
+   was 10px, which is not a gap, it is a seam. */
 .pdev.own .ownlist {
-  flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column;
-  padding-top: 4px;
+  flex: none; margin-top: 40px; padding: 0 12px;
+  border-radius: 18px; background: var(--btc-card); border: 1px solid var(--btc-edge);
 }
 .pdev.own .ownitem {
-  flex: none; display: flex; align-items: center; gap: 12px; padding: 11px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  flex: none; display: flex; align-items: center; gap: 12px; padding: 13px 0;
+  border-bottom: 1px solid var(--btc-edge);
 }
+/* the rule between rows, not the rule under the list — the card's own border is
+   already there, and a hairline sitting on it reads as a doubled edge */
+.pdev.own .ownitem:last-child { border-bottom: 0 }
 /* the rows arrive one after another rather than as a block. Five is more
    reading than any other screen in this family asks for, and a staggered list
    is read top to bottom where a block arrives as one shape. */
