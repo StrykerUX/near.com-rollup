@@ -54,7 +54,7 @@ export function fireRipple(el: Element) {
  * moved into local scrims (.herotype and .side), not because the field stays
  * dim. The floor is a green-gray, never black.
  */
-/* THE FIELD IS GREEN AND LIGHT NOW — #17B963 at the dark end, #5EFAA7 at the
+/* THE FIELD IS GREEN AND LIGHT NOW — #16B862 at the dark end, #5EFAA7 at the
    light one, with four steps interpolated between them. It replaces a six-stop
    palette that ran from near-black through a copper highlight, which was a
    field for white type to sit on; this one is a field for #1F1F1F.
@@ -68,7 +68,7 @@ export function fireRipple(el: Element) {
    Eased toward the light end (t^0.82) rather than spaced evenly, because the
    shader spends most of its noise near the top of the ramp and a linear walk
    between two close greens reads as one flat colour. */
-const STOPS = ['#17B963', '#28C671', '#37D27F', '#45DE8D', '#52EC9A', '#5EFAA7'];
+const STOPS = ['#16B862', '#29CA74', '#38D783', '#45E38F', '#52EF9B', '#5EFAA7'];
 
 /** sRGB -> OKLab on the CPU, so the shader interpolates perceptually rather
  *  than muddying through sRGB. */

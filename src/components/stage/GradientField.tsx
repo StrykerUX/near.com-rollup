@@ -37,7 +37,7 @@ export function GradientField() {
       <div className="gcss" />
       {/* THE SHADER IS NOT DRAWN. `#gl` was the WebGL field and `.gcss` its
           fallback; the comp asks for a clean diagonal — solid #5EFAA7 through
-          the first half of the axis, easing to #17B963 in the lower right —
+          the first half of the axis, easing to #16B862 in the lower right —
           and a field made of organic noise cannot be that. It smudges the one
           thing the gradient is supposed to do.
 

@@ -105,9 +105,12 @@ export const CARDS: Card[] = [
     aside: (
       <p>
         Earn onchain yield from the same account you already hold assets in.{' '}
-        <strong style={{ fontWeight: 500, color: '#fff' }}>
-          Spend directly from a yield-earning deposit
-        </strong>{' '}
+        {/* NO INLINE STYLE. It carried `color:#fff`, which is a decision about
+            the field this sentence sits on — and an inline declaration is the
+            one thing a stylesheet cannot answer, so it stayed white after
+            every other word on the page turned to ink. Weight and colour are
+            both in CSS now: `.side p strong` in 07-stage.css. */}
+        <strong>Spend directly from a yield-earning deposit</strong>{' '}
         — no unwinding, no moving funds out.
       </p>
     ),

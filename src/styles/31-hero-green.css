@@ -88,6 +88,7 @@
 
 #stage .side p,
 #stage .mchbody { color: var(--hero-ink) }
+#stage .side p strong,
 #stage .mchbody strong { color: var(--hero-ink) }
 
 /* the closing plate is the same field, contracted — so it is the same ink. It
@@ -155,7 +156,12 @@
    a colour is the whole of it, so it stops being an image. */
 #stage .rollbrow .rule,
 #stage .mbrow .rule {
-  background: rgba(31, 31, 31, .28);
+  /* solid black, at full. It went in at 28% as a hairline between two
+     wordmarks, which is the usual weight for a divider and is not what this
+     one is: both marks either side of it are solid black artwork, and a rule
+     that fades between them reads as a rendering artefact rather than as part
+     of the lockup. */
+  background: #000;
   border-radius: 2px;
 }
 

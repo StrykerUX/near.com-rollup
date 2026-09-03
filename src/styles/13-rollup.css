@@ -472,7 +472,27 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 
 /* --- the cue was parked mid-frame between the two columns, pointing at
    nothing. Bottom edge, dimmer, out of the composition. */
-.scrollcue{bottom:16px;color:rgba(255,255,255,.34)}
+/* UNDER THE DEVICE, not centred on the page. It sat at the foot of the frame
+   in the middle of the viewport, which on this layout is the empty lane
+   between the copy column and the phone — a cue for a scroll, parked where
+   nothing is. `--cue-x` / `--cue-y` are the shell's centre and the device's
+   foot, measured in measureShell() because no stylesheet can name them: the
+   shell is in the lockup's right-hand grid column and its position falls out
+   of the column widths, the gap, the gutter and the 1220 cap together.
+
+   The fallbacks are the old centred position, so a frame before the first
+   measurement is the previous behaviour rather than a cue in the corner. */
+.scrollcue{
+  top:calc(var(--cue-y, 100%) + 18px);bottom:auto;
+  left:var(--cue-x, 50%);
+  color:rgba(255,255,255,.34);
+}
+/* IT FITS OR IT IS NOT THERE — see `--cue-fit` in measureShell. The cue is 61
+   tall and on a 900px window the device leaves 60px under it, so on short
+   frames there is nowhere honest to put it. It multiplies the recede rather
+   than replacing it, so the cue still fades out on scroll exactly as before
+   and this only ever takes it further towards zero. */
+.scrollcue{opacity:calc((1 - var(--cue-out)) * var(--cue-fit, 1))}
 @media(max-width:1080px){ .scrollcue{display:none} }
 
 /* --- the stack, restored. Must live after the v06.1/.2 desktop grid rule. */

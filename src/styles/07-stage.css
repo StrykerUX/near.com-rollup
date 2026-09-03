@@ -31,11 +31,12 @@
    is not drawn (see GradientField.tsx), so this is not a fallback any more —
    it is what every reader sees at every width.
 
-   The axis is the comp's: 135deg runs from the top-left corner to the
-   bottom-right one, #5EFAA7 held SOLID through the first half of it and easing
-   to #17B963 across the second. That 50% stop is the whole character of it —
-   the page is more light than dark, and the dark is a corner rather than a
-   half.
+   The axis is the comp's: 150deg runs from the top left down toward the bottom
+   right — steeper than a corner-to-corner 135, so the sweep falls down the
+   page rather than straight across it — with #5EFAA7 held SOLID through the
+   first half of it and easing to #16B862 across the second. That 50% stop is
+   the whole character of it: the page is more light than dark, and the dark is
+   a corner rather than a half.
 
    IT REPLACES SIX STACKED RADIALS, and the blur and scale that went with them.
    Those were how a field built out of overlapping lobes was made to read as
@@ -46,7 +47,7 @@
    brief names would not land where it says. */
 .gcss{
   position:absolute;inset:0;
-  background:linear-gradient(135deg, #5EFAA7 0%, #5EFAA7 50%, #17B963 100%);
+  background:linear-gradient(150deg, #5EFAA7 0%, #5EFAA7 50%, #16B862 100%);
 }
 .gshade{
   position:absolute;inset:0;pointer-events:none;
@@ -131,6 +132,9 @@
    stacks and .side.r is a fixed-height box; bumping the type there pushes the
    copy straight out of its own face. */
 .side p{color:rgba(255,255,255,.92);max-width:32ch;color:rgba(255,255,255,.94)}
+/* 500, not the browser's bold: this is an emphasised clause inside a paragraph,
+   not a heading. It was an inline style on the `<strong>` in lib/cards.tsx. */
+.side p strong,.mchbody strong{font-weight:500}
 @media(min-width:1081px){ .side p{font-size:1.1875rem;line-height:1.5} }
 
 /* the morphing card */

@@ -6,10 +6,23 @@
   display:flex;align-items:center;gap:var(--space-6);
   /* fixed at its final size — no resize on scroll, nothing to shift */
   height:62px;padding-inline:var(--gut);border-bottom:1px solid transparent;
+  /* 8px, AND IN BOTH STATES. It used to be 20 and only over the cream page,
+     where the bar has a fill of its own to blur behind. Over the stage the bar
+     is transparent, and a backdrop-filter needs no fill to work — it softens
+     whatever passes beneath, which is what keeps a headline or an interface
+     from running hard into "Sign in". One number for the header, so the two
+     states are the same bar in two colours rather than two bars. */
+  /* ONE DECLARATION, UNPREFIXED. Writing the pair — `backdrop-filter` then
+     `-webkit-backdrop-filter` — is the usual belt and braces and it does not
+     survive this build: Lightning CSS folds the two into one and keeps the
+     last, so what shipped was the `-webkit-` form alone. Unprefixed only, and
+     the minifier adds back whatever the targets need. Same trap as `translate`
+     beside `transform` in the step rail. */
+  backdrop-filter:blur(8px);
   transition:background var(--dur-slow) var(--ease-out),
              border-color var(--dur-slow) var(--ease-out),color var(--dur-slow) var(--ease-out);
 }
-.nav.on-light{background:rgba(243,242,239,.5);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom-color:var(--l-border);color:var(--l-fg)}
+.nav.on-light{background:rgba(243,242,239,.5);border-bottom-color:var(--l-border);color:var(--l-fg)}
 .brand{display:flex;align-items:center;flex:none}
 .brand svg{height:22px;width:auto}
 .navspacer{flex:1}

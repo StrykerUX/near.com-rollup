@@ -140,6 +140,49 @@ export function startStageEngine(): () => void {
        the real band between the nav and the card instead of a guessed one. */
     root.style.setProperty('--peek', slice.toFixed(1) + 'px');
     PEEKY = Math.max(0, innerHeight - slice - morphEl!.offsetTop);
+
+    /* ---- WHERE THE SCROLL CUE GOES --------------------------------------
+       Under the device, which is a position no stylesheet can name: the shell
+       sits in the lockup's right-hand grid column, so its centre depends on
+       the column widths, the gap, the gutter and the 1220 cap all at once.
+       Two numbers, measured where they are already being measured.
+
+       LAYOUT OFFSETS, NOT A RECT. `offsetLeft` / `offsetTop` ignore transforms,
+       and `.morph` is carrying one every frame — the peek alone would put the
+       cue several hundred pixels down the page on the first paint.
+
+       The device is centred on the shell and taller than it (766 * k against
+       the deck height the engine writes), so its foot is the shell's centre
+       plus half the device — not the shell's own bottom edge. */
+    const devEl = morphEl!.querySelector<HTMLElement>('.appdev');
+    if (devEl) {
+      /* WALK THE OFFSET CHAIN, do not read one link of it. `.scrollcue` is
+         positioned against the sticky and `.morph` is positioned against
+         `.lockup`, which is `max-width:1220px; margin-inline:auto` — so its own
+         left edge is a different number at every window width. Reading
+         `morph.offsetLeft` alone put the cue up to 190px off the device's
+         centre, and the error moved as the window did, which is exactly what a
+         missing link in an offset chain looks like. Same walk the peek slice
+         does for `.seg` a few lines up. */
+      let cx = morphEl!.offsetWidth / 2;
+      let cy = morphEl!.offsetHeight / 2 + devEl.offsetHeight / 2;
+      for (let n: HTMLElement | null = morphEl; n; n = n.offsetParent as HTMLElement | null) {
+        cx += n.offsetLeft;
+        cy += n.offsetTop;
+        if (n.classList.contains('stage-sticky')) break;
+      }
+      root.style.setProperty('--cue-x', cx.toFixed(1) + 'px');
+      root.style.setProperty('--cue-y', cy.toFixed(1) + 'px');
+      /* AND WHETHER IT FITS AT ALL. On a 900px window the device runs to 840
+         and the cue is 61 tall — word, gap, 34px bar — so there is no honest
+         room under it. Riding up over the device was the first answer and it
+         is worse than nothing: the cue is drawn in ink and the device is
+         black, so it does not ride over the phone, it disappears into it. A
+         cue for a gesture the reader can make anyway is the right thing to
+         drop when the frame is short. 79 = the cue's own height plus the air
+         under it. */
+      root.style.setProperty('--cue-fit', cy + 79 <= innerHeight ? '1' : '0');
+    }
   }
 
   /* ---- surfaces -------------------------------------------------------- */
