@@ -193,11 +193,24 @@
   transition:background-color var(--dur) var(--ease-out),border-color var(--dur) var(--ease-out);
 }
 /* OUT OF FLOW, so it cannot set the button's height — see the note above. It
-   is hover-only, so nothing is lost by taking it out: `translate` centres it
-   against the ring and leaves `transform` to the entrance, which is the one
-   the hover rule animates. */
+   is hover-only, so nothing is lost by taking it out.
+
+   CENTRED BY FLEX, AND NOT BY `translate`, WHICH IS A BUILD TRAP AND NOT A
+   PREFERENCE. This was `top:50%; translate:0 -50%` alongside the entrance's
+   `transform:translateX(-6px)`, which reads correctly and does not work:
+   Lightning CSS (Tailwind v4's minifier) downlevels the individual `translate`
+   property into `transform` for older targets, and in one rule the later
+   `transform` then wins outright. The shipped declaration was
+   `transform:translate(-6px)` with the vertical centring simply gone — the
+   label sat 9px below its ring. `translate` in a rule that also sets
+   `transform` is silently dropped; assume that anywhere in this build.
+
+   `top:0;bottom:0` makes the box the ring's own height and the flex centres
+   the text across it, overhanging evenly. No transform involved, so the
+   entrance keeps `transform` to itself. */
 .sdrail .lbl{
-  position:absolute;left:calc(100% + 12px);top:50%;translate:0 -50%;
+  position:absolute;left:calc(100% + 12px);top:0;bottom:0;
+  display:flex;align-items:center;
   font-family:var(--font-mono,var(--font-body));
   font-size:12px;letter-spacing:.13em;text-transform:uppercase;
   color:rgba(255,255,255,.82);
