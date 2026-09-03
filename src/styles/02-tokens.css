@@ -7,7 +7,13 @@
      MEDIUM at -2 tracking. ONLY italics stay Kepler (Condensed Display
      Italic, unchanged). --font-display-it is the serif chain below. */
   --font-display:"PP Neue Montreal","Helvetica Neue",Arial,sans-serif;
-  --font-display-it:"kepler-std-condensed-display","Kepler It","Kepler Local","Kepler Std","Kepler Sub",Georgia,"Times New Roman",serif;
+  /* IT IS THE SAME FAMILY NOW. This was the serif chain — Typekit's Kepler
+     first, four local cuts behind it, Source Serif as the substitute — and
+     nothing asks for a serif any more (see the `em` rule in 04-type.css). Kept
+     as a token, pointing at Montreal, so that anything still reading it gets
+     the face the page actually uses rather than a stack that resolves to
+     Georgia. */
+  --font-display-it:"PP Neue Montreal","Helvetica Neue",Arial,sans-serif;
   --font-body:"PP Neue Montreal","Helvetica Neue",Arial,sans-serif;
   --font-mono:"PP Neue Montreal Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   /* the near.com APP's own face, which is not the site's. Used by exactly one
@@ -16,17 +22,13 @@
      one place it is declared (01-fonts.css). */
   --font-app:"Figtree","Helvetica Neue",Arial,sans-serif;
 
-  /* ── GLOBAL KEPLER TYPE LAW (standing, applies to EVERY Kepler use) ──
-     roman  = Kepler Std MEDIUM Condensed Display, letter-spacing -2% (-.02em)
-     italic = Kepler Std Condensed Display ITALIC, letter-spacing -2% (-.02em)
-     Roman asks for 500 so any source that ships the Medium cut serves it.
-     Typekit's kepler-std-condensed-display ships 400/700 only, so on kit-only
-     machines 500 resolves to the 400 cut (no synthesis) until Medium is added
-     to the gtm1rhn web project. The local() chains lead with the Medium cut. */
+  /* ── THE TYPE LAW, WITH THE SERIF HALF RETIRED ──
+     Display roman is Montreal Medium at -2% tracking, and emphasis is Montreal
+     300 at the same tracking. The standing Kepler law that used to live here —
+     Medium Condensed Display roman, Condensed Display Italic for emphasis —
+     described a family the page no longer loads. `--w-roman` is the one number
+     left of it, and it is Montreal's. */
   --w-roman:500;
-  --w-italic:400;
-  /* Condensed is the narrowest width Kepler ships. This squeezes past it. */
-  --it-x:0.86;
   /* social-proof marquee: gap between quote cards, and travel speed in px/sec */
   --mgap:14px;
   --mspeed:42;

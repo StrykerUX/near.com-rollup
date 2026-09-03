@@ -67,50 +67,23 @@
   line-height:1.1;letter-spacing:-.022em;max-width:24ch;
 }
 
-/* --- THE EMPHASISED RUN IS MONTREAL NOW, NOT KEPLER ---------------------
-   "anywhere", "you're not using", "to the core": these were Kepler italic,
-   the page's display serif, set inside a Montreal headline. They are Montreal
-   Light, upright, at the headline's own size.
+/* --- THE EMPHASISED RUN, IN THE HEADLINES --------------------------------
+   "anywhere", "you're not using", "to the core" are Montreal Light and upright
+   like every other emphasised run on the page — that is the global `em` rule
+   in 04-type.css now, not something these headlines opt into.
 
-   WHICH MEANS UNDOING THREE COMPENSATIONS, all of them in `04-type.css`'s
-   global `em` rule and all of them there BECAUSE the face was Kepler:
-
-     font-size:calc(89em/73)  Kepler's x-height runs small next to Montreal, so
-                              italic runs were set 1.22x to match it optically.
-                              Same face on both sides now, so 1em is the match —
-                              which is also what "the same font size as the rest
-                              of the title" means.
-     line-height:.9           there to stop that 1.22x from inflating the line
-                              box. Nothing to inflate it any more.
-     --it-x                   the squeeze. Kepler Condensed is still wider than
-                              this layout wanted, so `.display em,.h1 em` scale
-                              it to .86 and `useSqueezeItalics` gives back the
-                              width with negative margins. Montreal must not be
-                              distorted, and 1 is how this rule says so — the
-                              hook reads the value off the element, so setting
-                              it here switches off both halves at once.
-
-   letter-spacing inherits rather than keeping the global -.02em, so the run
-   tracks at the headline's own -.022em and the two halves of a sentence are
-   spaced alike.
-
-   THE WEIGHT IS 300 AND IT WILL RENDER AS 400 TODAY. PP Neue Montreal is
-   self-hosted and STATIC — one file per weight, and `public/fonts` has Book
-   (400) and Medium (500), no Light. A browser asked for 300 with no face below
-   400 to match will use the Book. The declaration is what was asked for and it
-   is what will start rendering the moment a Light cut is added to
-   `01-fonts.css`; nothing else has to change. */
+   WHAT IS STILL LOCAL is the size and the leading. The global rule leaves an
+   em at 1em of whatever it sits in, which is right inside a paragraph; inside
+   a headline the run also has to take the headline's own line-height and
+   tracking rather than the body values it would otherwise inherit through the
+   inline-block. Three lines, and they are about these blocks specifically. */
 .side.l h2 em,
 .mchhead em,
 .permcopy h2 em,
 .mclose h2 em{
-  font-family:var(--font-display);
-  font-style:normal;
-  font-weight:300;
   font-size:1em;
   line-height:inherit;
   letter-spacing:inherit;
-  --it-x:1;
 }
 .side.r p{max-width:42ch}
 
@@ -468,7 +441,28 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 /* the nav flips to a light plate over the light zone, and a white outline
    disappears into it. Follow the plate. */
 .nav.on-light .btn-ghost{color:#0B0F0D;border-color:rgba(11,15,13,.34)}
-.nav.on-light .btn-ghost:hover{border-color:#0B0F0D;background:rgba(11,15,13,.06)}
+
+/* --- BOTH NAV CONTROLS ANSWER A POINTER ON THE LIGHT PLATE ---------------
+   Over the stage there is one control and it fills black on hover. Over the
+   cream page there are two, and they were the pair that did least: the ghost
+   took a 6% wash and the filled pill went a shade brighter with a green glow —
+   on cream, at a 62px bar with a backdrop filter behind it, neither reads as
+   an event.
+
+   THEY INVERT INSTEAD, each into the other's colours, which is one idea rather
+   than two effects:
+     Sign in         outline, dark type   ->  filled black, white type
+     Create account  filled green, black  ->  filled black, GREEN type
+
+   The green is `--near-green`, the pill's own resting fill, so the hover state
+   is built out of the two colours the button already has and introduces
+   nothing. `--tr-ui` animates background-color and color together, so both
+   arrive on one clock. */
+.nav.on-light .btn-ghost:hover{background:#000;border-color:#000;color:#fff}
+.nav.on-light .btn-primary:hover{
+  background:#000;color:var(--near-green);box-shadow:none;
+}
+.nav.on-light .btn-primary:active{background:#0B0F0D}
 
 /* --- the cue was parked mid-frame between the two columns, pointing at
    nothing. Bottom edge, dimmer, out of the composition. */

@@ -454,9 +454,13 @@ export function startStageEngine(): () => void {
       const op = 1 - sstep(R[0] + span * (w === HW.length - 1 ? 0.5 : 0.3), R[1], out);
       HW[w].style.opacity = op.toFixed(3);
       HW[w].style.filter = qblur(bl * 15);
+      /* no `scaleX(--it-x)` tail on an EM any more: the squeeze was Kepler's
+         and the token is gone. It had to come out rather than be left to
+         resolve to nothing — an unresolved var() invalidates the WHOLE
+         declaration, which would have taken the translate and the scale with
+         it and stopped the hero receding at all. */
       HW[w].style.transform =
-        'translate3d(0,' + (mv * 34).toFixed(1) + 'px,0) scale(' + (1 - mv * 0.16).toFixed(4) + ')' +
-        (HW[w].tagName === 'EM' ? ' scaleX(var(--it-x))' : '');
+        'translate3d(0,' + (mv * 34).toFixed(1) + 'px,0) scale(' + (1 - mv * 0.16).toFixed(4) + ')';
     }
     heroEl!.classList.toggle('live', out < 0.5);
     /* v04 mobile CTA gate. An IntersectionObserver on the hero never fires: the
@@ -528,8 +532,7 @@ export function startStageEngine(): () => void {
          it sits on. */
       PW[w].style.filter = w < 2 ? qblur(bl * 15) : 'none';
       PW[w].style.transform =
-        'translate3d(0,' + (mv * 34).toFixed(1) + 'px,0) scale(' + (1 - mv * 0.16).toFixed(4) + ')' +
-        (PW[w].tagName === 'EM' ? ' scaleX(var(--it-x))' : '');
+        'translate3d(0,' + (mv * 34).toFixed(1) + 'px,0) scale(' + (1 - mv * 0.16).toFixed(4) + ')';
     }
 
     /* nav theme follows the shrink clock, not the scroll event — otherwise it

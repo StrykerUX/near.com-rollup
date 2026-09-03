@@ -9,28 +9,37 @@
 .display{font-size:var(--fs-display);line-height:.98;letter-spacing:-.02em}
 .h1{font-size:var(--fs-h1);line-height:1.02;letter-spacing:-.02em}
 .h4{font-size:var(--fs-h4);line-height:1.16;letter-spacing:-.02em}
+/* THERE IS NO KEPLER ON THIS PAGE ANY MORE. Every emphasised run — the display
+   headlines, the closing plate, the light zone's CTA, the figures inside the
+   device — was Kepler Std Condensed Display Italic, the serif half of the v03
+   type law. All of it is Montreal at 300 now, upright, at the size of the text
+   it sits in.
+
+   WHICH REMOVES THREE COMPENSATIONS AND A HOOK, all of them here only because
+   the face was a different one:
+
+     font-size:calc(89em/73)  Kepler's x-height runs small beside Montreal, so
+                              italic runs were set 1.22x to match it optically.
+                              One family on both sides now, so 1em IS the match.
+     line-height:.9           there to stop that 1.22x inflating the line box.
+     scaleX(--it-x)           Kepler Condensed is still wider than this layout
+                              wanted, so italics were squeezed to .86 and
+                              `useSqueezeItalics` handed the width back as
+                              negative margins. Montreal must not be distorted,
+                              so both halves are gone — the hook, the token and
+                              the transform.
+     .kepler                  a class the font probe added when the real Kepler
+                              was installed locally, switching italics onto the
+                              condensed cut. Nothing to switch.
+
+   letter-spacing stays at the global -.02em, and `display:inline-block` stays
+   because the stage engine animates `.hw` and `.pw` runs with a transform, and
+   a transform does nothing on an inline box. */
 em{
-  font-family:var(--font-display-it);font-style:italic;font-weight:var(--w-italic);
+  font-family:var(--font-display);font-style:normal;font-weight:300;
   letter-spacing:-.02em;display:inline-block;transform-origin:50% 60%;
-  /* KEPLER ITALIC COMPENSATION (v03 type law): Kepler's x-height runs small
-     next to Montreal Medium, so italics in a mixed block are set LARGER —
-     the user's calibration is 89/73 against the roman (≈1.22×). Global for
-     every Kepler italic beside Montreal roman; do not fork per element. */
-  font-size:calc(89em / 73);
-  line-height:.9;   /* keeps the larger run from inflating the line box */
 }
-/* the squeeze. Origin must match .hw/.pw (50% 60%) — those override it on the
-   animated words, and a mismatch would compensate the wrong side. JS pairs each
-   italic with half the reclaimed width as a negative margin on BOTH sides, so
-   the line box collapses to the visual width and centred lines stay centred. */
-.display em,.h1 em{transform:scaleX(var(--it-x))}
 .nb{white-space:nowrap}
-/* Local-Kepler machines follow the same global law: Medium roman / regular
-   italic, tracking already -.02em from the base rules — no per-class forks. */
-.kepler{--w-roman:500; --w-italic:400}
-/* roman display is Montreal now (v03 type law) — the local-Kepler
-   condensed nudge only applies to the ITALIC runs that are still Kepler */
-.kepler em{font-stretch:condensed}
 .lead{font-size:var(--fs-body-lg);line-height:1.5;color:var(--fg-2);max-width:56ch}
 .caption{font-family:var(--font-mono);font-size:var(--fs-caption);color:var(--fg-3);line-height:1.45}
 .shell{max-width:var(--shell);margin-inline:auto;padding-inline:var(--gut)}

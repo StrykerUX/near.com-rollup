@@ -1,6 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { KeplerProbe } from '@/components/KeplerProbe';
-import { TYPEKIT_HREF, TypekitStylesheet } from '@/components/TypekitStylesheet';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -20,28 +18,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      {/* Kepler Std is licensed via Adobe Fonts. This IS the permitted way to
-          use it: their terms require the kit's stylesheet and forbid
-          self-hosting the files, so Kepler is the one face here that cannot be
-          bundled. It needs a network connection — offline, the stacks fall
-          through the local() chain to the embedded serif.
-
-          media="print" makes it non-render-blocking; TypekitStylesheet flips it
-          to "all" once it lands. The link is server-rendered rather than
-          injected so the fetch is in flight before `document.fonts.ready`
-          resolves — see that component for what breaks otherwise. */}
-      <head>
-        <link rel="preconnect" href="https://use.typekit.net" crossOrigin="" />
-        <link rel="stylesheet" href={TYPEKIT_HREF} media="print" />
-        <noscript>
-          <link rel="stylesheet" href={TYPEKIT_HREF} />
-        </noscript>
-      </head>
-      <body>
-        <TypekitStylesheet />
-        <KeplerProbe />
-        {children}
-      </body>
+      {/* NO <head> OF OUR OWN. It carried the Adobe Fonts kit for Kepler Std —
+          a preconnect, a stylesheet at media="print" and a noscript copy — plus
+          the component that flipped it to "all" once it landed. The page has no
+          Kepler in it any more (see the `em` rule in 04-type.css), so what is
+          left is a third-party font request on every visit for a family nothing
+          asks for. Every face the page uses is self-hosted in public/fonts. */}
+      <body>{children}</body>
     </html>
   );
 }

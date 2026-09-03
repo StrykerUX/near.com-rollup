@@ -122,8 +122,18 @@
   background: #000;
   color: #fff;
 }
+/* THE ARROW IS THE FIELD'S OWN GREEN. It marks the one control on the page
+   that goes somewhere, and it is the only piece of colour on a black pill —
+   which is what makes it read as a direction rather than as decoration. */
+#stage .btn-primary .arw,
+.mobcta .btn-primary .arw { color: #5EFAA7 }
+/* ON HOVER THE LABEL JOINS IT. The fill does not move — it is already the
+   darkest thing on the page and there is nowhere for it to go — so the whole
+   of the response is the word turning green under a pointer while the arrow
+   steps forward. `--tr-ui` already animates `color`, so the two are one
+   gesture on one clock. */
 #stage .btn-primary:hover,
-.mobcta .btn-primary:hover { background: #1F1F1F; box-shadow: none }
+.mobcta .btn-primary:hover { background: #000; color: #5EFAA7; box-shadow: none }
 #stage .btn-primary:active,
 .mobcta .btn-primary:active { background: #000 }
 
@@ -133,9 +143,14 @@
   color: var(--hero-ink);
   border-color: rgba(31, 31, 31, .5);
 }
+/* ON HOVER IT BECOMES THE OTHER BUTTON. It was an outline that darkened its
+   own border and took a 7% wash — the standard ghost hover, and on this field
+   it is barely an event. Filled black with white type is the same shape as
+   `Create account`, so pointing at it says what pressing it does. */
 .nav:not(.on-light) .btn-ghost:hover {
-  border-color: var(--hero-ink);
-  background: rgba(31, 31, 31, .07);
+  background: #000;
+  border-color: #000;
+  color: #fff;
 }
 .nav:not(.on-light) { color: var(--hero-ink) }
 
@@ -180,11 +195,19 @@
 }
 
 /* ---- THE STEP RAIL ----------------------------------------------------- */
-#stage .sdrail .sddot { border-color: rgba(31, 31, 31, .38) }
-#stage .sdrail button.done .sddot { border-color: rgba(31, 31, 31, .62) }
+/* BLACK AT REST, ALL FOUR. They went in as a ladder — .38 for a step ahead,
+   .62 for one behind, full for the one you are on — which is the usual way to
+   say "you are here" and reads on this field as three marks that have not
+   finished loading. Every ring is solid, and the current step is the one that
+   is FILLED. That is the whole distinction, and it is enough.
+
+   Hover no longer touches the mark either: the only thing pointing at a step
+   does is show its name. */
+#stage .sdrail .sddot,
+#stage .sdrail button.done .sddot,
+#stage .sdrail button:hover .sddot { border-color: #000 }
 /* the filled mark was near-green, which on this field is the field */
-#stage .sdrail button.now .sddot { background: var(--hero-ink); border-color: transparent }
-#stage .sdrail button:hover .sddot { border-color: var(--hero-ink) }
+#stage .sdrail button.now .sddot { background: #000; border-color: #000 }
 #stage .sdrail .lbl { color: var(--hero-ink); text-shadow: none }
 
 /* ---- THE QUOTE IS A WHITE CARD ----------------------------------------- */
