@@ -69,15 +69,24 @@
 }
 
 /* --- primary CTA hover --------------------------------------------------- */
-/* Instant flip to translucent white with black type. transition:none is the
-   point — no easing in either direction, so the state change lands on the
-   frame the pointer arrives. The wiping panel this replaced is gone entirely,
-   along with the overflow/isolation it needed.
+/* THE `transition:none` IS GONE, and it was the loudest half of the "hover
+   feels hit" problem. It was deliberate — an instant flip to translucent white,
+   landing on the frame the pointer arrives — and the flip it was written for no
+   longer happens anywhere on the home page: the green theme replaces this hover
+   on every primary button it draws (the stage, the nav, the fixed bar, the
+   closing plate). What was left was the timing without the effect, and because
+   `.btn:hover` outranks `.btn-primary`, the ARRIVAL still eased while the
+   RETURN snapped. One direction soft, the other cut, which is worse than either.
+
+   The white flip below still stands for any primary the theme does not reach,
+   and it now eases like every other button.
+
    The inset hairline matters more than it looks: over the light panel a .82
    white composites to roughly #FCFCFB, near enough to the ground that the pill
    would lose its silhouette and leave the label floating. The ring keeps the
-   shape readable on the gradient and on the light shell alike. */
-.btn-primary{position:relative;transition:none}
+   shape readable on the gradient and on the light shell alike.
+ */
+.btn-primary{position:relative}
 .btn-primary:hover,
 .btn-primary:focus-visible{
   background:rgba(255,255,255,.82);

@@ -435,7 +435,11 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
   background:none;color:#fff;
   border:1px solid rgba(255,255,255,.72);
   font-size:var(--fs-body-sm);padding:9px 22px;margin-right:18px;
-  transition:var(--tr-ui);
+  /* NO `transition` HERE. It carried `--tr-ui`, and being a later rule at the
+     same specificity as `.btn:hover` it beat the button's own pair — so Sign in
+     was the one control still crossfading on the expo curve at 240ms while
+     everything beside it used the soft one. `.btn` already says what a button's
+     transition is; this rule only ever needed the box. */
 }
 .nav .btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.10)}
 /* the nav flips to a light plate over the light zone, and a white outline
@@ -783,10 +787,26 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
   max-width:0;padding-inline:0;margin-left:0;border-inline-width:0;
   overflow:hidden;white-space:nowrap;
   opacity:0;pointer-events:none;
+  /* THE COLLAPSE, AND THEN THE BUTTON'S OWN. This rule replaces `transition`
+     outright, and it used to list four properties — the ones the collapse
+     animates. `.btn` sets `--tr-btn` and this overrode it, so the one control
+     on the page that never had a hover transition was this one: its fill and
+     its label changed on the frame the pointer arrived. Appending the token
+     rather than restating it means the two stay in step; the collapse keeps
+     `--dur-slow` and the expo curve, because that IS a movement. */
   transition:max-width var(--dur-slow) var(--ease-out),
              padding var(--dur-slow) var(--ease-out),
              margin var(--dur-slow) var(--ease-out),
-             opacity var(--dur-slow) var(--ease-out);
+             opacity var(--dur-slow) var(--ease-out),
+             var(--tr-btn);
+}
+.nav .btn-primary:hover,
+.nav .btn-primary:focus-visible{
+  transition:max-width var(--dur-slow) var(--ease-out),
+             padding var(--dur-slow) var(--ease-out),
+             margin var(--dur-slow) var(--ease-out),
+             opacity var(--dur-slow) var(--ease-out),
+             var(--tr-btn-in);
 }
 .nav.on-light .btn-primary{
   max-width:220px;padding-inline:22px;margin-left:22px;border-inline-width:1px;

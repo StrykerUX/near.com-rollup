@@ -54,9 +54,23 @@
     color            var(--dur-btn-out) var(--ease-soft),
     box-shadow       var(--dur-btn-out) var(--ease-soft),
     transform        var(--dur-press)   var(--ease-soft);
+  /* THE SAME LIST AT THE IN DURATION, WRITTEN OUT. The obvious way to do this
+     is `transition-duration` on `:hover` with five positional values — and it
+     is a trap, because a positional list is bound to whatever
+     `transition-property` resolves to ON THAT ELEMENT. The nav's own
+     `Create account` transitions EIGHT properties (four of them for the
+     collapse it does when the page turns cream), so five durations would be
+     repeated cyclically and land on the wrong ones. A whole second list has no
+     position to get wrong. */
+  --tr-btn-in:
+    background-color var(--dur-btn-in) var(--ease-soft),
+    border-color     var(--dur-btn-in) var(--ease-soft),
+    color            var(--dur-btn-in) var(--ease-soft),
+    box-shadow       var(--dur-btn-in) var(--ease-soft),
+    transform        var(--dur-press)  var(--ease-soft);
 }
 .btn:hover,
-.btn:focus-visible{transition-duration:var(--dur-btn-in),var(--dur-btn-in),var(--dur-btn-in),var(--dur-btn-in),var(--dur-press)}
+.btn:focus-visible{transition:var(--tr-btn-in)}
 /* the arrow travels on the same curve as the fill it sits on, so a button
    answers as one object rather than as a colour and a glyph on two clocks */
 .btn .arw{transition:transform var(--dur-btn-out) var(--ease-soft)}
