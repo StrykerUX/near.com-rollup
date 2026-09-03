@@ -18,6 +18,50 @@
   --dur-press:120ms;
 }
 
+/* --- 1b. buttons get their own curve, and this is why -------------------
+   The buttons were already transitioning — `.btn` has carried `--tr-ui` all
+   along — and they still read as a hard cut. `--ease-out` is
+   `cubic-bezier(.16,1,.3,1)`, an expo-out: at 240ms it is 90% of the way there
+   inside the first 55, and the remaining 185ms move almost nothing. On a
+   TRANSFORM that is exactly right — it is what makes the cards and the arrow
+   feel like they are being flicked into place. On a COLOUR there is no
+   momentum to sell, so all the eye gets is the jump, and the tail is invisible.
+
+   So the fills and the labels come off that curve. `--ease-soft` is an ordinary
+   ease-out that spends its time across the whole duration; nothing about it is
+   clever, and that is the point — a colour crossfade should be even.
+
+   IN IS FASTER THAN OUT, 200 against 420. Pointing at a control should feel
+   answered, so the arrival is brisk; taking the pointer away is not a decision
+   the reader is waiting on, so the state dissolves rather than snapping back.
+   The asymmetry is one line — `:hover` overrides the duration and inherits
+   everything else.
+
+   `box-shadow` joins the list. It was not in `--tr-ui` at all, so the green
+   pill's glow appeared and vanished instantly under a fill that was fading —
+   two halves of one button on two different clocks.
+
+   `transform` stays on the press duration: 120ms, because a press has to land
+   inside the same moment as the click. It is the one part of a button that
+   should never be soft. */
+:root{
+  --ease-soft:cubic-bezier(.22,.61,.36,1);
+  --dur-btn-in:200ms;
+  --dur-btn-out:420ms;
+  --tr-btn:
+    background-color var(--dur-btn-out) var(--ease-soft),
+    border-color     var(--dur-btn-out) var(--ease-soft),
+    color            var(--dur-btn-out) var(--ease-soft),
+    box-shadow       var(--dur-btn-out) var(--ease-soft),
+    transform        var(--dur-press)   var(--ease-soft);
+}
+.btn:hover,
+.btn:focus-visible{transition-duration:var(--dur-btn-in),var(--dur-btn-in),var(--dur-btn-in),var(--dur-btn-in),var(--dur-press)}
+/* the arrow travels on the same curve as the fill it sits on, so a button
+   answers as one object rather than as a colour and a glyph on two clocks */
+.btn .arw{transition:transform var(--dur-btn-out) var(--ease-soft)}
+.btn:hover .arw{transition-duration:var(--dur-btn-in)}
+
 /* --- 2. hover motion is pointer-gated -----------------------------------
    Touch fires a synthetic hover on tap and then STRANDS it: the card stays
    lifted, the arrow stays nudged, until something else is tapped. Colour-only

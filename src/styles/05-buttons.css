@@ -5,9 +5,10 @@
   display:inline-flex;align-items:center;gap:8px;font-family:var(--font-body);
   font-weight:500;font-size:var(--fs-body-sm);letter-spacing:-.005em;padding:9px 22px;line-height:1.25;
   border-radius:var(--radius-pill);border:1px solid transparent;
-  transition:var(--tr-ui);white-space:nowrap;
+  /* not `--tr-ui`: buttons have their own curve and their own in/out pair —
+     see the note in 12-motion.css for what was wrong with sharing one. */
+  transition:var(--tr-btn);white-space:nowrap;
 }
-.btn .arw{transition:transform var(--dur) var(--ease-out)}
 .btn:hover .arw{transform:translateX(3px)}
 .btn-primary{background:var(--near-green);color:#000}
 .btn-primary:hover{background:var(--green-300);box-shadow:var(--glow-green-sm)}

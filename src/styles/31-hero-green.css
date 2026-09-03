@@ -245,3 +245,44 @@
 #stage .scrollcue .bar {
   background: linear-gradient(180deg, var(--hero-ink), transparent);
 }
+
+/* =========================================================================
+   THE CLOSING CTA TAKES THE SAME FIELD
+   -------------------------------------------------------------------------
+   `.finalcta` is the light zone's last plate and it was built as the stage's
+   dark field in miniature: a #000 base, four soft blobs in `.ctagrad`, a
+   radial veil, two black corner vignettes and a diagonal wash in `::before`,
+   and two copper lights in `::after` — six layers, in the same order and at
+   the same strengths as `.grad` had them, which is exactly what its own note
+   says it is for.
+
+   It gets the hero's gradient instead: the same 150deg sweep, the same two
+   colours, the same 50% stop. One declaration replaces the six, because a
+   linear gradient has no seams to hide and no shader resolution to blur away —
+   which is the same reason `.gcss` lost its own stack.
+
+   AND THE TYPE FOLLOWS THE FIELD, which the brief does not have to say
+   twice: `.finalcta` sets `color:#fff` on the section, so the headline, the
+   supporting line and the emphasised run were all white — invisible on this
+   green. Ink, at full, like every other word on the page.
+   ========================================================================= */
+.finalcta {
+  background: linear-gradient(150deg, #5EFAA7 0%, #5EFAA7 50%, #16B862 100%);
+  color: var(--hero-ink);
+}
+/* the four blobs, the veil, the vignettes and the copper */
+.finalcta .ctagrad,
+.finalcta .ctaveil { background: none }
+.finalcta::before,
+.finalcta::after { background: none }
+.finalcta p { color: var(--hero-ink) }
+
+/* the ask is the same black pill with the same green arrow it is on the stage.
+   `--near-green` would put a green fill on a green field. */
+.finalcta .btn-primary {
+  background: #000;
+  color: #fff;
+}
+.finalcta .btn-primary .arw { color: #5EFAA7 }
+.finalcta .btn-primary:hover { background: #000; color: #5EFAA7; box-shadow: none }
+.finalcta .btn-primary:active { background: #000 }
