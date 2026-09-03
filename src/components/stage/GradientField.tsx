@@ -3,9 +3,9 @@
  *
  * Four layers, in paint order:
  *   .isomark   near.com's own mark, held in the top-right corner
- *   .gcss      a CSS radial-gradient stack — the fallback, and the paint-in
- *              before the shader compiles
- *   #gl        the WebGL field; the engine adds `.on` on its first frame
+ *   .gcss      the field itself: a single diagonal gradient. It was the
+ *              fallback under a WebGL canvas — see the note in the markup for
+ *              why the canvas is gone
  *   .gshade    the scrim the type is read against
  *
  * THE CORNER MARK WAS THE ROLLUP'S AND IS NOW near.com's. Same slot, same
@@ -35,7 +35,22 @@ export function GradientField() {
     <div className="grad">
       <div className="isomark" aria-hidden="true" />
       <div className="gcss" />
-      <canvas id="gl" aria-hidden="true" />
+      {/* THE SHADER IS NOT DRAWN. `#gl` was the WebGL field and `.gcss` its
+          fallback; the comp asks for a clean diagonal — solid #5EFAA7 through
+          the first half of the axis, easing to #17B963 in the lower right —
+          and a field made of organic noise cannot be that. It smudges the one
+          thing the gradient is supposed to do.
+
+          The canvas is simply absent rather than hidden, because the engine
+          already treats a missing one as "no field": `makeGradientField(null)`
+          returns null and the whole GL block — the rAF loop, the resize and
+          intersection observers, the shader compile — is behind `if (GL)`.
+          Hiding it with CSS would have left every one of those running to draw
+          something nobody can see. It is also already the narrow frame's
+          behaviour, so the two compositions now paint the same field.
+
+          gl/ is untouched and still imported by the engine: putting the canvas
+          back is this one line. */}
       <div className="gshade" />
     </div>
   );

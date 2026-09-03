@@ -54,16 +54,21 @@ export function fireRipple(el: Element) {
  * moved into local scrims (.herotype and .side), not because the field stays
  * dim. The floor is a green-gray, never black.
  */
-/* THE FIELD IS GREEN AND LIGHT NOW, and the ramp is the two supplied colours
-   with four steps interpolated between them — #01A44D at the dark end,
-   #5EFAA7 at the light one. It replaces a six-stop palette that ran from
-   near-black through a copper highlight, which was a field for white type to
-   sit on; this one is a field for #1F1F1F.
+/* THE FIELD IS GREEN AND LIGHT NOW — #17B963 at the dark end, #5EFAA7 at the
+   light one, with four steps interpolated between them. It replaces a six-stop
+   palette that ran from near-black through a copper highlight, which was a
+   field for white type to sit on; this one is a field for #1F1F1F.
+
+   NOTHING CURRENTLY DRAWS IT. The canvas is not rendered — the comp asks for a
+   clean diagonal and this shader's noise cannot be one, so `.gcss` carries the
+   field alone (see GradientField.tsx). The palette is kept in step with it
+   anyway, so that putting the canvas back is one line and not one line plus a
+   colour hunt.
 
    Eased toward the light end (t^0.82) rather than spaced evenly, because the
    shader spends most of its noise near the top of the ramp and a linear walk
    between two close greens reads as one flat colour. */
-const STOPS = ['#01A44D', '#1ABB65', '#2DCD77', '#3EDD88', '#4EEC98', '#5EFAA7'];
+const STOPS = ['#17B963', '#28C671', '#37D27F', '#45DE8D', '#52EC9A', '#5EFAA7'];
 
 /** sRGB -> OKLab on the CPU, so the shader interpolates perceptually rather
  *  than muddying through sRGB. */

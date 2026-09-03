@@ -21,14 +21,16 @@
    already cream and is untouched; the demo routes; and every colour inside the
    device.
 
-   ONE INK, FOUR STRENGTHS. #1F1F1F is the brief's colour and it is the only
-   one — everything below it is that ink at an opacity, so the hierarchy is a
-   single decision rather than four sampled greys:
-     1     headline, the offer, a name
-     .82   body copy
-     .62   supporting lines, eyebrows, the wordmark
-     .46   legal
-   ========================================================================= */
+   ONE INK, ONE STRENGTH. #1F1F1F, at full, on every word — headline, body,
+   eyebrow, wordmark, friction line, legal. It was built as four strengths of
+   the same ink (1 / .82 / .62 / .46) so that hierarchy came from one decision
+   rather than four sampled greys, which is the usual right answer and is not
+   the one asked for here: no text on this page is faded. Hierarchy is carried
+   by size and weight alone, which the comp is already doing.
+
+   The opacities that remain are on BORDERS and PLATES — a ring on the step
+   rail, the hairline round the quote card, the fixed bar's fill. Those are not
+   text. */
 
 /* ON `:root`, AND THAT IS NOT A DETAIL. It was declared on `#stage` — which
    reads correctly and quietly broke two rules: the nav and the fixed CTA bar
@@ -50,20 +52,19 @@
 
      .grad          a #02100C base under everything
      .gcss          held at .80 opacity over that base
-     #gl            filter: saturate(.80) brightness(.58)
      .grad::before  two black corner vignettes and a diagonal wash to .84
      .grad::after   a #1C4419 corner light — a very dark green
+
+   (a fifth, `#gl{filter:brightness(.58)}`, went with the canvas itself.)
 
    Every one of them is a background colour, which is what this change is
    about. They are not deleted at source: the whole stack is one decision — a
    dark frame — and it is either on or off. Off, and stated here in one place
-   next to the greens that replace it, is the version that can be read.
+   next to the gradient that replaces it, is the version that can be read.
 
-   `!important` on `.gcss` only, because the rules being answered use it too. */
-#stage .grad { background: #14B85F }
+   `!important` on `.gcss` only, because the rule being answered uses it too. */
+#stage .grad { background: #5EFAA7 }
 #stage .gcss { opacity: 1 !important }
-/* the shader draws the two greens now; there is nothing to correct */
-#stage #gl { filter: blur(clamp(12px, 1.62vw, 30px)) }
 /* the vignettes and the diagonal wash */
 #stage .grad::before { background: none }
 /* the corner light. The comp's upper right is the isologo on the field, not a
@@ -83,17 +84,17 @@
 /* near.com closes the headline and steps back from it in the comp — the same
    line, quieter, not a second colour */
 #stage .side h2 .wordmark,
-#stage .mchhead .wordmark { color: rgba(31, 31, 31, .62) }
+#stage .mchhead .wordmark { color: var(--hero-ink) }
 
 #stage .side p,
-#stage .mchbody { color: rgba(31, 31, 31, .82) }
+#stage .mchbody { color: var(--hero-ink) }
 #stage .mchbody strong { color: var(--hero-ink) }
 
 /* the closing plate is the same field, contracted — so it is the same ink. It
    was white type, which on the green it now clips down to is barely there. */
 #stage .permcopy h2,
 #stage .permcopy .wordmark { color: var(--hero-ink); text-shadow: none }
-#stage .permcopy p { color: rgba(31, 31, 31, .82) }
+#stage .permcopy p { color: var(--hero-ink) }
 
 /* ---- THE OFFER, THE ASK, THE SMALL PRINT ------------------------------- */
 #stage .rollcta .offer,
@@ -101,16 +102,16 @@
 #stage .mclose h2 { color: var(--hero-ink) }
 #stage .rollcta .offer b,
 #stage .mtop .offer b { color: var(--hero-ink) }
-#stage .mclosebody { color: rgba(31, 31, 31, .82) }
-#stage .friction { color: rgba(31, 31, 31, .62) }
+#stage .mclosebody { color: var(--hero-ink) }
+#stage .friction { color: var(--hero-ink) }
 #stage .perpsdisc,
-#stage .mdisc { color: rgba(31, 31, 31, .46) }
-#stage .perpsdisc b { color: rgba(31, 31, 31, .62) }
+#stage .mdisc { color: var(--hero-ink) }
+#stage .perpsdisc b { color: var(--hero-ink) }
 
 /* the chapter eyebrow on a narrow frame. Its number was `--near-green`, which
    is a green mark on a green field. */
 #stage .mchno b { color: var(--hero-ink) }
-#stage .mchno span { color: rgba(31, 31, 31, .62) }
+#stage .mchno span { color: var(--hero-ink) }
 
 /* ---- THE BUTTON IS BLACK ----------------------------------------------- */
 /* `.btn-primary` is the green pill everywhere else on the site, including the
@@ -169,7 +170,7 @@
     border-color: rgba(31, 31, 31, .10);
     box-shadow: 0 8px 34px rgba(1, 90, 44, .18);
   }
-  .mobcta span { color: rgba(31, 31, 31, .62) }
+  .mobcta span { color: var(--hero-ink) }
 }
 
 /* ---- THE STEP RAIL ----------------------------------------------------- */
@@ -178,7 +179,7 @@
 /* the filled mark was near-green, which on this field is the field */
 #stage .sdrail button.now .sddot { background: var(--hero-ink); border-color: transparent }
 #stage .sdrail button:hover .sddot { border-color: var(--hero-ink) }
-#stage .sdrail .lbl { color: rgba(31, 31, 31, .72); text-shadow: none }
+#stage .sdrail .lbl { color: var(--hero-ink); text-shadow: none }
 
 /* ---- THE QUOTE IS A WHITE CARD ----------------------------------------- */
 /* It was glass over a dark field: a translucent white fill, a white hairline
@@ -197,7 +198,7 @@
 #stage .side.r .rollquote .qwho b,
 #stage .mchbody .rollquote .qwho b { color: var(--hero-ink) }
 #stage .side.r .rollquote .qwho > span,
-#stage .mchbody .rollquote .qwho > span { color: rgba(31, 31, 31, .62) }
+#stage .mchbody .rollquote .qwho > span { color: var(--hero-ink) }
 /* the byline pinwheel is the flat, near-white cut, chosen for a dark plate.
    On paper it is the three-dimensional one — the same swap `.qband` already
    makes for the same reason. */
@@ -211,7 +212,7 @@
 
 /* the scroll cue is drawn on the field, under the hero — same ink, quietest
    strength, since it is an instruction and not a thing to read */
-#stage .scrollcue { color: rgba(31, 31, 31, .5) }
+#stage .scrollcue { color: var(--hero-ink) }
 #stage .scrollcue .bar {
-  background: linear-gradient(180deg, rgba(31, 31, 31, .55), transparent);
+  background: linear-gradient(180deg, var(--hero-ink), transparent);
 }
