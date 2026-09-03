@@ -86,15 +86,19 @@
   --ease-out:cubic-bezier(.16,1,.3,1);
   --dur:240ms; --dur-slow:480ms;
   --roll3d-src:url('/img/roll3d.webp');
-  --isologo-src:url('/img/isologo.png');
+  /* SVG, and vector for a reason: it is drawn at min(35vw,620px) on a desktop
+     and it is a flat two-tone shape, which is the one case where the file is
+     smaller AND sharper than the raster it replaces (1.4KB against 23). Its
+     paths are #00DC8D at full strength; `.isomark` sets the 25%. */
+  --isologo-src:url('/img/isologo.svg');
   /* THE HERO LOCKUP, AS SUPPLIED ART. The eyebrow used to be assembled: a near
      wordmark SVG, a CSS hairline, a 3D pinwheel and The Rollup's wordmark cut
      out of a copper gradient with a mask — four pieces tuned to look like one
      lockup. These are that lockup, drawn by whoever owns the brands. Two files,
      not four, because each supplied file already carries its mark AND its
      wordmark at the spacing they are meant to have. */
-  --nearlock-src:url('/img/nearlock.png');
-  --rolllock-src:url('/img/rolllock.png');
+  --nearlock-src:url('/img/near-logo.png');
+  --rolllock-src:url('/img/rollup-logo.png');
   --browrule-src:url('/img/browrule.png');
   /* THE ROLLUP'S MARK, FLAT AND NEARLY WHITE — the byline avatar on the quote
      plate. `--roll3d-src` is the same silhouette rendered in copper and three

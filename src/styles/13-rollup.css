@@ -631,7 +631,7 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 .rollbrow{gap:clamp(16px,1.6vw,24px);margin-bottom:clamp(22px,2.6vh,34px)}
 .rollbrow .nearw{
   display:block;flex:none;
-  height:clamp(24px,2vw,30px);aspect-ratio:476/117;
+  height:clamp(24px,2vw,30px);aspect-ratio:462/120;
   background:var(--nearlock-src) center/contain no-repeat;
 }
 .rollbrow .rolllock{

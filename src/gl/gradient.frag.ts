@@ -247,15 +247,24 @@ void main(){
 
   float g = ramp * 0.74 + f * 0.042 + (slow - 0.5) * 0.19 + prox * 0.13 + uSurge * 0.10
           + rip * 0.57;
-  g *= mix(0.76 + shr * 0.09, 1.0, edge);                 /* hold the centre down */
-  g *= 0.945;                                /* whole field down a step */
-  /* and the top of the curve down further. A ceiling clamp did nothing here:
-     the peak g in a normal frame sits well under it, so the cap never engaged
-     and a flat multiply moved the midtones while the highlight held. Shaping
-     the upper range is what actually reaches the bright zone. */
-  g *= 1.0 - 0.115 * smoothstep(0.24, 0.62, g);
+  /* ---- THE FIELD IS LIGHT NOW, AND THESE FOUR LINES WERE THE DARKNESS ----
+     Every constant below was tuned against a palette running from near-black
+     to a copper highlight, whose job was to be a ground for WHITE type. Read
+     in that order they held the centre down a quarter, took the whole field
+     down another step, shaved the top of the curve, and then capped g at
+     0.66 so the brightest stop was never reached at all. Against the two
+     supplied greens that adds up to a field which is neither of them.
 
-  g  = clamp(g, 0.0, 0.66 + edge * 0.26);   /* safety cap, rarely reached */
+     Retuned rather than deleted: the shaping is still doing real work — the
+     centre is still held slightly under the edges so the composition has a
+     middle, and the curve still eases near the top so the light end does not
+     flatten into one colour. It is just no longer subtracting three quarters
+     of the range. */
+  g *= mix(0.93 + shr * 0.04, 1.0, edge);                 /* hold the centre down */
+  g *= 0.995;
+  g *= 1.0 - 0.05 * smoothstep(0.30, 0.72, g);
+
+  g  = clamp(g, 0.0, 1.0);
 
   vec3 col = linearToSrgb(oklabToLinear(palette(g)));
 
@@ -274,13 +283,12 @@ void main(){
   float band2  = 0.5 + 0.5 * sin(f * 2.6 - 0.6);
   col += vec3(0.07, 0.17, 0.15) * 0.42 * pow(band2, 3.2) * (0.20 + edge * 0.58);
 
-  /* LEGIBILITY FLOOR. Light is allowed to travel into the middle — it just
-     arrives dimmer. This is a final multiply on the composed colour rather than
-     a limit on the field, so the shape and the motion are untouched and only
-     the luminance under the type comes down. Every headline on this page sits
-     in that zone; raise this toward 1.0 and white type starts to disappear
-     into the bright passes. */
-  col *= mix(0.89 - protP * 0.07 + shr * 0.07, 1.0, edge);
+  /* LEGIBILITY FLOOR, AND IT NOW POINTS THE OTHER WAY. It used to pull the
+     middle DOWN, because every headline sits in that zone and white type
+     disappears into a bright pass. The type is #1F1F1F now, so the risk it
+     guards against is the opposite one — dark type on a dark passage — and the
+     multiply is nearly out of the way. */
+  col *= mix(0.985 - protP * 0.02 + shr * 0.01, 1.0, edge);
 
   /* a touch lighter across the board — applied to the composed colour so the
      palette's relationships hold; pull this back down before raising any
@@ -293,14 +301,19 @@ void main(){
      ends — brighter mids without moving the floor or the highlights */
   col *= (vec3(1.0) + 0.60 * col * (vec3(1.0) - col));
 
-  /* weight the lower corners to black */
+  /* WEIGHT THE CORNERS — and it was "to black", at 74% and 55%, which is where
+     most of the darkness in the old field actually came from. On a green page
+     those two are a pair of soot marks in the lower left and upper right. Kept
+     at a tenth of their strength: enough that the corners still bank into the
+     deeper green the comp has there, nowhere near enough to read as a
+     vignette. */
   float corner = 1.0 - smoothstep(0.0, 1.15, length(vec2(uvV.x * ar, uvV.y) - vec2(-0.08, -0.06)));
   /* the vignette relaxes when the light mass travels into it — otherwise the
      lower-left weighting would swallow the follow the moment the cursor went
      there and the interaction would read as broken in one quadrant. */
-  col *= 1.0 - corner * (0.74 - prox * 0.36);
+  col *= 1.0 - corner * (0.10 - prox * 0.05);
   float br = 1.0 - smoothstep(0.0, 0.86, length(vec2(uv.x * ar, uv.y) - vec2(ar + 0.06, -0.10)));
-  col *= 1.0 - br * 0.55;
+  col *= 1.0 - br * 0.07;
 
   gl_FragColor = vec4(col, 1.0);
 }

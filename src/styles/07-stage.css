@@ -3,7 +3,11 @@
    ============================================================ */
 #stage{position:relative;height:588vh}   /* v05: 360 -> 460 smoothness -> 560 dwells -> 588 slower shrink */
 .stage-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
-.stage-black{position:absolute;inset:0;background:#000;opacity:calc(1 - var(--fade-light))}
+/* What shows OUTSIDE the field once the closing shrink has clipped it into a
+   plate. It was #000 — right when the field was near-black, a hole punched in
+   the page now that it is green. The light end of the ramp reads as the field
+   continuing past its own edge. */
+.stage-black{position:absolute;inset:0;background:#5EFAA7;opacity:calc(1 - var(--fade-light))}
 .grad{
   position:absolute;inset:0;background:#02100C;overflow:hidden;
   clip-path:inset(var(--ci-t) var(--ci-r) var(--ci-b) var(--ci-l) round var(--ci-rad));
@@ -22,16 +26,23 @@
    motion are JS-driven from the card loop; the drift runs on simTime — the
    same clock as the shader — so pointer activity accelerates the icons and
    the gradient together. */
-/* CSS fallback, and the paint-in before the shader compiles */
+/* CSS fallback, and the paint-in before the shader compiles. IT IS ALSO THE
+   WHOLE FIELD ON A NARROW FRAME, where the engine — and with it the shader —
+   never starts (see useStageEngine), so these stops are not a stand-in there:
+   they are what a phone sees.
+
+   Two colours, the supplied ones: #5EFAA7 lit through the upper middle and
+   #01A44D banked into the corners, which is the reading of the comp. The stack
+   it replaces ran from a near-black base through a copper highlight — a field
+   built for white type, where this one is built for #1F1F1F. */
 .gcss{position:absolute;inset:0;
   background:
-    radial-gradient(56% 74% at 102% 2%,  rgba(206,224,220,.98) 0%, rgba(206,224,220,0) 50%),
-    radial-gradient(52% 64% at 88% 22%,  rgba(86,232,212,.88) 0%, rgba(86,232,212,0) 54%),
-    radial-gradient(38% 56% at 64% 44%,  rgba(0,242,157,1) 0%, rgba(0,242,157,0) 54%),
-    radial-gradient(62% 58% at 40% 26%,  rgba(0,140,90,.7) 0%, rgba(0,140,90,0) 62%),
-    radial-gradient(54% 48% at 0% 0%,    rgba(132,156,164,.6) 0%, rgba(132,156,164,0) 62%),
-    radial-gradient(96% 82% at 6% 106%,  rgba(0,0,0,1) 0%, rgba(0,0,0,.82) 36%, rgba(0,0,0,0) 74%),
-    #02100C;
+    radial-gradient(58% 66% at 74% 10%,  rgba(94,250,167,.95) 0%, rgba(94,250,167,0) 62%),
+    radial-gradient(46% 58% at 26% 30%,  rgba(94,250,167,.72) 0%, rgba(94,250,167,0) 66%),
+    radial-gradient(70% 62% at 100% 96%, rgba(1,164,77,.92) 0%,  rgba(1,164,77,0) 68%),
+    radial-gradient(64% 60% at -6% 104%, rgba(1,164,77,.86) 0%,  rgba(1,164,77,0) 66%),
+    radial-gradient(52% 46% at 4% -6%,   rgba(1,164,77,.5) 0%,   rgba(1,164,77,0) 70%),
+    #34D98A;
   filter:blur(clamp(13px,1.75vw,33px));
   transform:scale(calc(1.16 + var(--surge) * .3));transition:transform 480ms var(--ease-out);
 }
@@ -41,8 +52,12 @@
      the master gradient (corner vignette, centre radial, hero scrim, side
      scrims) was removed 2026-08-07 at the user's direction. The gradient
      runs untouched to every edge except the top 16%. */
+  /* it was a dark wash, there so white nav type held its contrast against a
+     bright top edge. The nav reads in #1F1F1F now and the field is light, so
+     the same job is done by a *light* lift — and a black one would only be a
+     smudge across the top of a green page. */
   background:
-    linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.10) 8%, rgba(0,0,0,0) 16%);
+    linear-gradient(180deg, rgba(94,250,167,.42) 0%, rgba(94,250,167,.14) 9%, rgba(94,250,167,0) 18%);
 }
 
 /* hero */

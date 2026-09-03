@@ -1,0 +1,217 @@
+/* =========================================================================
+   THE STAGE TURNS GREEN — background and type colour, and nothing else
+   =========================================================================
+   The tour's field was near-black with a copper highlight and every word on it
+   was white. The supplied comp puts it on the two greens — #5EFAA7 lit through
+   the upper middle, #01A44D banked into the corners — with the type in
+   #1F1F1F. The field itself is changed at source (`.gcss` in 07-stage.css and
+   the shader's `STOPS` in gl/gradientField.ts); this file is the type and the
+   two surfaces that carry it.
+
+   WHY A FILE AND NOT FORTY EDITS. The colours being replaced do not sit
+   together: they are spread across four stylesheets, interleaved with the
+   PHONE's own colours, which do not change — the device stays dark, exactly as
+   it is in the comp, and it shares `07-stage.css` with the copy columns. A
+   sweep through those files by hand would have to tell `.side p` apart from
+   `.mrow .nm span` forty times and be right every time. Scoped to `#stage`,
+   `.mtour` and the two fixed elements that sit over them, this cannot reach
+   the device by accident, and it is one file to read, review or revert.
+
+   WHAT IS DELIBERATELY NOT HERE: the light zone below the tour, which was
+   already cream and is untouched; the demo routes; and every colour inside the
+   device.
+
+   ONE INK, FOUR STRENGTHS. #1F1F1F is the brief's colour and it is the only
+   one — everything below it is that ink at an opacity, so the hierarchy is a
+   single decision rather than four sampled greys:
+     1     headline, the offer, a name
+     .82   body copy
+     .62   supporting lines, eyebrows, the wordmark
+     .46   legal
+   ========================================================================= */
+
+/* ON `:root`, AND THAT IS NOT A DETAIL. It was declared on `#stage` — which
+   reads correctly and quietly broke two rules: the nav and the fixed CTA bar
+   are `position: fixed` OUTSIDE the stage, so `var(--hero-ink)` there resolved to
+   nothing, the declaration was dropped as invalid, and `color` fell back to
+   inheritance. "Sign in" kept its border (a literal) and lost its colour (the
+   variable), which is exactly the shape of that bug. A token used by anything
+   fixed has to be reachable from the document root. */
+:root { --hero-ink: #1F1F1F }
+
+/* =========================================================================
+   THE FIVE LAYERS THAT MADE THE FIELD DARK
+   -------------------------------------------------------------------------
+   Retuning `.gcss` and the shader's palette moved almost nothing, and this is
+   why: v06.1 and v06.3 in 13-rollup.css each took the field down another stop,
+   deliberately and with a note saying so — "this page is a frame around a
+   lockup and a phone, not a light show". Five layers, and together they are
+   most of the old background:
+
+     .grad          a #02100C base under everything
+     .gcss          held at .80 opacity over that base
+     #gl            filter: saturate(.80) brightness(.58)
+     .grad::before  two black corner vignettes and a diagonal wash to .84
+     .grad::after   a #1C4419 corner light — a very dark green
+
+   Every one of them is a background colour, which is what this change is
+   about. They are not deleted at source: the whole stack is one decision — a
+   dark frame — and it is either on or off. Off, and stated here in one place
+   next to the greens that replace it, is the version that can be read.
+
+   `!important` on `.gcss` only, because the rules being answered use it too. */
+#stage .grad { background: #14B85F }
+#stage .gcss { opacity: 1 !important }
+/* the shader draws the two greens now; there is nothing to correct */
+#stage #gl { filter: blur(clamp(12px, 1.62vw, 30px)) }
+/* the vignettes and the diagonal wash */
+#stage .grad::before { background: none }
+/* the corner light. The comp's upper right is the isologo on the field, not a
+   plate over it — which is what the note on `.grad::after` says it wanted all
+   along, and could not have while the corner carried its own dark green. */
+#stage .grad::after { background: none }
+
+/* ---- THE COPY COLUMNS, BOTH COMPOSITIONS ------------------------------- */
+#stage .side h2,
+#stage .mchhead {
+  color: var(--hero-ink);
+  /* the shadow was there to lift white type off a bright patch of field. Dark
+     type on a light field does not need lifting, and a black glow under it
+     reads as a print registration error. */
+  text-shadow: none;
+}
+/* near.com closes the headline and steps back from it in the comp — the same
+   line, quieter, not a second colour */
+#stage .side h2 .wordmark,
+#stage .mchhead .wordmark { color: rgba(31, 31, 31, .62) }
+
+#stage .side p,
+#stage .mchbody { color: rgba(31, 31, 31, .82) }
+#stage .mchbody strong { color: var(--hero-ink) }
+
+/* the closing plate is the same field, contracted — so it is the same ink. It
+   was white type, which on the green it now clips down to is barely there. */
+#stage .permcopy h2,
+#stage .permcopy .wordmark { color: var(--hero-ink); text-shadow: none }
+#stage .permcopy p { color: rgba(31, 31, 31, .82) }
+
+/* ---- THE OFFER, THE ASK, THE SMALL PRINT ------------------------------- */
+#stage .rollcta .offer,
+#stage .mtop .offer,
+#stage .mclose h2 { color: var(--hero-ink) }
+#stage .rollcta .offer b,
+#stage .mtop .offer b { color: var(--hero-ink) }
+#stage .mclosebody { color: rgba(31, 31, 31, .82) }
+#stage .friction { color: rgba(31, 31, 31, .62) }
+#stage .perpsdisc,
+#stage .mdisc { color: rgba(31, 31, 31, .46) }
+#stage .perpsdisc b { color: rgba(31, 31, 31, .62) }
+
+/* the chapter eyebrow on a narrow frame. Its number was `--near-green`, which
+   is a green mark on a green field. */
+#stage .mchno b { color: var(--hero-ink) }
+#stage .mchno span { color: rgba(31, 31, 31, .62) }
+
+/* ---- THE BUTTON IS BLACK ----------------------------------------------- */
+/* `.btn-primary` is the green pill everywhere else on the site, including the
+   light zone's closing CTA, so this is scoped rather than retuned at source. */
+#stage .btn-primary,
+.mobcta .btn-primary {
+  background: #000;
+  color: #fff;
+}
+#stage .btn-primary:hover,
+.mobcta .btn-primary:hover { background: #1F1F1F; box-shadow: none }
+#stage .btn-primary:active,
+.mobcta .btn-primary:active { background: #000 }
+
+/* Sign in, which is the only nav control while the stage owns the frame — the
+   ask beside it stays collapsed until the page turns cream. */
+.nav:not(.on-light) .btn-ghost {
+  color: var(--hero-ink);
+  border-color: rgba(31, 31, 31, .5);
+}
+.nav:not(.on-light) .btn-ghost:hover {
+  border-color: var(--hero-ink);
+  background: rgba(31, 31, 31, .07);
+}
+.nav:not(.on-light) { color: var(--hero-ink) }
+
+/* THE NAV'S OWN FOOTING, WHICH WAS BLACK. `30-mobile-tour.css` gives the bar a
+   gradient so headlines and interfaces passing under it do not collide with
+   "Sign in" — right, and it was `rgba(3,8,6,.88)`, which on a green page is a
+   band of soot across the top of the frame. Same job, same shape, made of the
+   light end of the field instead. */
+@media (max-width: 1080px) {
+  .nav:not(.on-light)::before {
+    background: linear-gradient(180deg, rgba(94, 250, 167, .92) 0%, rgba(94, 250, 167, .5) 58%, rgba(94, 250, 167, 0) 100%);
+  }
+}
+
+/* THE RULE BETWEEN THE TWO BRANDS is supplied artwork — a green hairline, cut
+   for a near-black field, and on this one it is the field. The comp draws it
+   as a plain dark line, which is what a rule between two black wordmarks is;
+   a colour is the whole of it, so it stops being an image. */
+#stage .rollbrow .rule,
+#stage .mbrow .rule {
+  background: rgba(31, 31, 31, .28);
+  border-radius: 2px;
+}
+
+/* THE FIXED BAR IS PAPER, NOT SMOKED GLASS. It was a dark translucent pill,
+   which is right over a dark field and wrong twice over a light one: it is a
+   black band across the bottom of a green page, and the ask inside it is now
+   black on black. White plate, black pill — the same pairing as the quote
+   card, and the button keeps being the one filled black shape on the screen. */
+@media (max-width: 1080px) {
+  .mobcta {
+    background: rgba(255, 255, 255, .82);
+    border-color: rgba(31, 31, 31, .10);
+    box-shadow: 0 8px 34px rgba(1, 90, 44, .18);
+  }
+  .mobcta span { color: rgba(31, 31, 31, .62) }
+}
+
+/* ---- THE STEP RAIL ----------------------------------------------------- */
+#stage .sdrail .sddot { border-color: rgba(31, 31, 31, .38) }
+#stage .sdrail button.done .sddot { border-color: rgba(31, 31, 31, .62) }
+/* the filled mark was near-green, which on this field is the field */
+#stage .sdrail button.now .sddot { background: var(--hero-ink); border-color: transparent }
+#stage .sdrail button:hover .sddot { border-color: var(--hero-ink) }
+#stage .sdrail .lbl { color: rgba(31, 31, 31, .72); text-shadow: none }
+
+/* ---- THE QUOTE IS A WHITE CARD ----------------------------------------- */
+/* It was glass over a dark field: a translucent white fill, a white hairline
+   and a backdrop blur, all of which exist to let a dark field through. On a
+   light one the same plate is a pale smudge, so the comp makes it paper. */
+#stage .side.r .rollquote,
+#stage .mchbody .rollquote {
+  background: #fff;
+  border-color: rgba(31, 31, 31, .08);
+  box-shadow: 0 18px 44px rgba(1, 90, 44, .12);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+#stage .side.r .rollquote p,
+#stage .mchbody .rollquote p { color: var(--hero-ink) }
+#stage .side.r .rollquote .qwho b,
+#stage .mchbody .rollquote .qwho b { color: var(--hero-ink) }
+#stage .side.r .rollquote .qwho > span,
+#stage .mchbody .rollquote .qwho > span { color: rgba(31, 31, 31, .62) }
+/* the byline pinwheel is the flat, near-white cut, chosen for a dark plate.
+   On paper it is the three-dimensional one — the same swap `.qband` already
+   makes for the same reason. */
+#stage .side.r .rollquote .rqmark,
+#stage .mchbody .rollquote .rqmark { background-image: var(--roll3d-src) }
+
+/* ---- THE MARK IN THE FIELD --------------------------------------------- */
+/* The artwork is #00DC8D at full strength (the export's baked-in 21% was
+   stripped, so the number the brief names lives here and only here). */
+#stage .isomark { opacity: .25 }
+
+/* the scroll cue is drawn on the field, under the hero — same ink, quietest
+   strength, since it is an instruction and not a thing to read */
+#stage .scrollcue { color: rgba(31, 31, 31, .5) }
+#stage .scrollcue .bar {
+  background: linear-gradient(180deg, rgba(31, 31, 31, .55), transparent);
+}
