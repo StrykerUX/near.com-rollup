@@ -140,13 +140,14 @@
 .sdrail{
   position:absolute;left:clamp(18px,2.6vw,42px);top:50%;
   transform:translateY(-50%);
-  /* 20 between the rings, so the centres sit 34 apart — two and a half
-     diameters. It was 32/46, which is over three diameters of empty gutter
-     between one mark and the next: at that pitch the eye reads four separate
-     dots that happen to be stacked, and has to be told they are a sequence.
-     Closing it to 34 is what makes the column one object. Any tighter and the
-     active label starts crowding the ring above it. */
-  display:flex;flex-direction:column;gap:20px;
+  /* 12 between the rings, so the centres sit 22 apart — a shade over two
+     diameters. It was 20/34, and before that 32/46, which is over three
+     diameters of empty gutter between one mark and the next: at that pitch the
+     eye reads four separate dots that happen to be stacked, and has to be told
+     they are a sequence. What held it at 34 was the label on the active step
+     crowding the ring above it — and that label is hover-only again (see
+     below), so the constraint went with it. */
+  display:flex;flex-direction:column;gap:12px;
   opacity:0;pointer-events:none;
   transition:opacity var(--dur-slow) var(--ease-out);
 }
@@ -160,30 +161,50 @@
   pointer-events:auto;
 }
 .stepdots.on .sdrail:hover{opacity:calc(1 - var(--shr, 0))}
+/* THE BUTTON IS THE RING AND NOTHING ELSE, which is what makes the gap above
+   mean what it says. With the label in flow the button was as tall as a 12px
+   line of type — 18px, not 10 — so `gap:12` put the rings 30 apart however
+   small they were drawn. The label is absolute now (below), so the button
+   measures its ring and the pitch is 10 + 12 = 22.
+
+   `::before` gives back the pointer target that costs: a 10px button is a
+   smaller thing to hit than a ring looks like it should be. Inset by exactly
+   half the gap top and bottom, so the four targets tile the column without
+   overlapping each other. */
 .sdrail button{
-  position:relative;display:flex;align-items:center;gap:14px;
+  position:relative;display:flex;align-items:center;
   padding:0;background:none;border:0;cursor:pointer;color:#fff;
 }
-/* A RING, AND IT IS 14px WHERE IT WAS 7.
+.sdrail button::before{content:'';position:absolute;inset:-6px -12px}
+/* A RING, AND IT IS 10px — 14 while it had to hold a permanent label beside
+   it, 7 before that. The rail is an orientation aid in a gutter, not a control
+   the eye should land on first, and at 14 with the labels gone it read as the
+   loudest thing in an empty column.
+
    `.dot` was the class, and `18-demo-perps.css` has one too — a padded, filled
    chip on the perps ticket, loaded after this file, which was turning these
    into 22x16 pills with a background nobody wrote. `.sddot` cannot collide with
    anything, which is the whole point of the prefix the rail's other classes
    already had. */
 .sdrail .sddot{
-  width:14px;height:14px;border-radius:50%;flex:none;box-sizing:border-box;
+  width:10px;height:10px;border-radius:50%;flex:none;box-sizing:border-box;
   background:transparent;
-  border:1.5px solid rgba(255,255,255,.34);
+  border:1.25px solid rgba(255,255,255,.34);
   transition:background-color var(--dur) var(--ease-out),border-color var(--dur) var(--ease-out);
 }
+/* OUT OF FLOW, so it cannot set the button's height — see the note above. It
+   is hover-only, so nothing is lost by taking it out: `translate` centres it
+   against the ring and leaves `transform` to the entrance, which is the one
+   the hover rule animates. */
 .sdrail .lbl{
+  position:absolute;left:calc(100% + 12px);top:50%;translate:0 -50%;
   font-family:var(--font-mono,var(--font-body));
   font-size:12px;letter-spacing:.13em;text-transform:uppercase;
   color:rgba(255,255,255,.82);
   opacity:0;transform:translateX(-6px);
   transition:opacity var(--dur) var(--ease-out),transform var(--dur) var(--ease-out);
   text-shadow:0 1px 14px rgba(0,0,0,.5);
-  white-space:nowrap;
+  white-space:nowrap;pointer-events:none;
 }
 /* A PASSED STEP IS A BRIGHTER RING, NOT A FILLED DISC. Filling it made a second
    solid mark in a column whose whole grammar is "one of these is filled and it
@@ -196,12 +217,16 @@
 .sdrail button.now .sddot{
   background:rgba(0,236,151,.92);border-color:transparent;
 }
-/* THE ACTIVE STEP IS LABELLED, ALWAYS. It was hover-only, because showing it
-   permanently once collided with the left edge of the card headline at 1440 —
-   with the rail at `clamp(18px,2.6vw,42px)` and a 14px mark, the word now ends
-   around 110px and the headline starts past 280. The note that forbade it is
-   older than the layout it was about. */
-.sdrail button.now .lbl{opacity:1;transform:none}
+/* NO STEP IS LABELLED UNTIL IT IS POINTED AT. The active one carried its name
+   permanently for a while — it fits, there is room for it at 1440 — but a word
+   sitting in the gutter beside the card is a second thing to read on a screen
+   whose whole job is the card, and it moved down the column as the tour
+   advanced. Which step you are on is already said by the one filled ring, and
+   said without words.
+
+   Hover and focus-visible both, so the names are a keyboard tab away and not
+   only a mouse away; `aria-current="step"` on the button is what says it to a
+   screen reader either way. */
 .stepdots button:hover .lbl,
 .stepdots button:focus-visible .lbl{opacity:1;transform:none}
 .sdrail button:hover .sddot{border-color:#fff}

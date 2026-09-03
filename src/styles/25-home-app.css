@@ -30,9 +30,9 @@
 .morph.appmorph {
   --k: 1;
   /* the surface goes, all of it. An opaque device inside a blurred plate is a
-     phone drawn inside a phone; the device carries its own bezel, border and
-     shadow, and 07-stage.css's halo was lighting a card that is no longer
-     there. */
+     phone drawn inside a phone; the device carries its own border and shadow
+     (its bezel is dropped further down this file), and 07-stage.css's halo was
+     lighting a card that is no longer there. */
   background: none;
   border: 0;
   box-shadow: none;
@@ -49,6 +49,26 @@
 /* the engine swaps the backdrop for a flat fill during a move (§3.48). There is
    no backdrop here, so there is nothing to swap and nothing to match. */
 .morph.appmorph.moving { background: none }
+
+/* ---- AND THE DEVICE LOSES ITS BEZEL ---------------------------------
+   `.pdev`'s shadow is two rings: `0 40px 90px -30px` is depth, and
+   `0 0 0 8px #0b0d10` is a black band drawn around all four edges to read as
+   the body of a phone. On `/demo/*-v5` that band is doing a job — the device
+   is one object on a page of controls and a rail, and the band is what says it
+   is a device. On the home page it is a picture frame: the object is already
+   the argument, it sits on the field with nothing around it to be told apart
+   from, and on a narrow frame it is a phone's body drawn on a phone.
+
+   So the band goes and the depth stays, in both compositions — `.appmorph` is
+   the wide one, `.mdev` the narrow one (30-mobile-tour.css). The screen's own
+   42px radius and its white hairline are untouched: they are the edge of the
+   screen, not a bezel around it. Nothing moves, because a box-shadow was never
+   in the layout.
+
+   SCOPED TO THE HOME PAGE'S TWO WRAPPERS, deliberately. `.pdev` is the same
+   element the twelve demo routes draw, and this is a decision about this page. */
+.appmorph .pdev,
+.mdev .pdev { box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .9) }
 
 /**
  * THE DEVICE IS CENTRED ON THE PLATE, not pinned to its top.

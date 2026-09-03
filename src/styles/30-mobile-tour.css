@@ -173,6 +173,9 @@
     margin: clamp(24px, 3.6vh, 34px) auto 0;
   }
 
+  /* the device's simulated bezel is dropped for both compositions at once —
+     see `.appmorph .pdev, .mdev .pdev` in 25-home-app.css */
+
   /* ---- THE QUOTE COMES HOME ------------------------------------------
      `.qband` exists because the stacked lockup could not fit a 383px plate
      under the phone without clipping the app card, so the testimonial was
