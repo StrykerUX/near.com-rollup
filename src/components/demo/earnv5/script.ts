@@ -1,5 +1,5 @@
 import { buildFlow, typing, type Chapter, type Step } from '@/components/demo/shell/flow';
-import { AMOUNT, INTO, STEPS, actions, initial, type EA, type EAAction } from './state';
+import { AMOUNT, INTO, SEND_AMT, STEPS, actions, initial, type EA, type EAAction } from './state';
 
 const type_ = (act: EAAction, chars: string, lead?: number, gap?: number) =>
   typing<EA, EAAction>(act, chars, lead, gap);
@@ -44,12 +44,20 @@ const type_ = (act: EAAction, chars: string, lead?: number, gap?: number) =>
  *   scene 4    4,400ms   one press, three rows, a reference id
  *   scene 5    1,600ms   closed, and the balance carries it
  *   scene 6    3,000ms   the other tab, and the stake behind it
+ *   scene 7    8,570ms   back to the account, and a thousand out of the vault
  *   outro      2,000ms   the same frame again, for the loop
  *   ─────────────────
- *             18,880ms  ×1.25 = 23,600ms on screen
+ *             27,450ms  ×1.25 = 34,313ms on screen
  *
  * SCENE 1 WAS 2,900 AND THE CLIP WAS 25,225. The 1,300 came out of a hold on a
  * screen the reader has already met three times; see the note on that scene.
+ *
+ * AND SCENE 7 IS NEW, WHICH MAKES THIS THE LONG CHAPTER: 34.3s against perps'
+ * 24.6 and swap's 23.6. It is also the only one telling two stories — money
+ * into a vault, and money out of it without the vault being closed — and the
+ * second is the one the recording this cut is named for was made to show. The
+ * length is a consequence of the ask, not an accident of the timings; every
+ * beat in that scene is the same size as its neighbours in the six above it.
  *
  * THE STAKING SCENE IS THE ONE THING HERE NO FRAME SHOWS. `Staking` has been
  * on the tab row since the first pass — it is in every frame of the recording —
@@ -64,6 +72,7 @@ const CHAPTERS: Chapter[] = [
   { id: 'in', name: 'Into one', blurb: '' },
   { id: 'sign', name: 'One press', blurb: '' },
   { id: 'stake', name: 'And the stake', blurb: '' },
+  { id: 'send', name: 'Spent, not withdrawn', blurb: '' },
 ];
 
 const STEPS_: Step<EA, EAAction>[] = [
@@ -181,6 +190,63 @@ const STEPS_: Step<EA, EAAction>[] = [
       { ms: 200, set: { lit: 'tab:staking' } },
       { ms: 700, do: 'tab', arg: 'staking' },
       { ms: 2100 },
+    ],
+  },
+
+  /* ---- scene 7 · 8,570ms ----------------------------------------------
+     AND THE SECOND HALF OF THE CHAPTER'S OWN SENTENCE.
+
+     The aside beside this chapter reads "Spend directly from a yield-earning
+     deposit — no unwinding, no moving funds out", and up to here the chapter
+     has only shown money going IN: a row, two vaults, a disclosure, a deposit,
+     a receipt. The recording it was cut from is called `rec-Earn + being able
+     to send:pay from your earn balance` and this is the half the title names.
+
+     READ OFF `ScreenRecording_09-02-2026 22-01-47_1.MP4` at two frames a
+     second: back to the account, `Send`, and then the row that matters — the
+     `Pay with` picker, which opens on a section headed **Your vaults** with the
+     Gauntlet position in it, above the wallet. That is the whole argument, and
+     the app makes it as a line item in an ordinary token picker rather than as
+     a claim.
+
+     WHAT IS DIFFERENT FROM THE CLIP, and why. The clip presses `Use max`,
+     which spends the position entire — 1.25526439 ZEC, six decimals of
+     somebody's own balance, which is not a figure anyone types and is exactly
+     what that button is for. This types a round thousand dollars of it and
+     leaves the rest earning, which is the truer version of the sentence: the
+     deposit is not being closed, it is being SPENT FROM. `Use max` stays drawn
+     and live and unused, the same call the vault sheet above already makes.
+
+     The destination is ZEC and the account holds ZEC, which is not a
+     contradiction: paying with a yield position rather than with the token you
+     hold is the choice being demonstrated. */
+  {
+    id: 'send', ch: 'send',
+    title: 'And you can spend it without closing it',
+    note: 'Send, and the Pay with picker opens on Your vaults — the Gauntlet position, above the wallet. A thousand dollars leaves the deposit without the deposit being unwound.',
+    beats: [
+      /* back to the account, and the press is on the button rather than a row */
+      { ms: 900, do: 'home' },
+      { ms: 220, set: { lit: 'send' } },
+      { ms: 700, do: 'toSend' },
+      /* the form, read once. ETH in the clip, BTC here — the wallet's largest
+         holding either way, and the default about to be changed. */
+      { ms: 900 },
+      { ms: 220, set: { lit: 'payPicker' } },
+      { ms: 780, do: 'payPicker' },
+      /* THE SHEET IS HELD BEFORE IT IS ANSWERED. `Your vaults` above `Your
+         tokens` is the one frame this scene exists for, and a picker that is
+         opened and immediately dismissed is a picker nobody read. */
+      { ms: 1100 },
+      { ms: 220, set: { lit: 'payPick:gauntlet' } },
+      { ms: 620, do: 'payPick', arg: 'gauntlet' },
+      /* the form again, now paying out of the vault, before anything is typed */
+      { ms: 560 },
+      ...type_('sendKey', SEND_AMT, 420, 150),
+      /* and the last frame holds: the amount, the dollars under it, and
+         `Gauntlet USDC` on the Pay with row. That is the sentence, and the
+         loop starts over from the account. */
+      { ms: 1180 },
     ],
   },
 ];

@@ -183,9 +183,57 @@ export const TAB_NAMES: Record<(typeof TABS)[number], string> = {
   vaults: 'Vaults', staking: 'Staking',
 };
 
+/**
+ * UNIVERSAL SEND — THE SCREEN THAT SPENDS THE YIELD
+ * ==================================================================
+ * READ OFF `ScreenRecording_09-02-2026 22-01-47_1.MP4` at two frames a second.
+ * That clip is the second half of this chapter's claim and the only recording
+ * of it: Send from the account home, a destination token, and then the row
+ * that matters — `Pay with`, whose picker opens on a section headed
+ * **Your vaults** with the Gauntlet position in it, above the wallet.
+ *
+ * WHICH IS THE WHOLE ARGUMENT, and it is one the vault sheet cannot make.
+ * "Spend directly from a yield-earning deposit — no unwinding, no moving funds
+ * out" is the aside beside this chapter; up to here the chapter has only shown
+ * money going IN. This is the frame where a deposit pays for something without
+ * being withdrawn first, and the app states it as a line item in a token
+ * picker, which is the most ordinary place it could possibly be.
+ *
+ * THE DESTINATION IS ZEC, AS IT IS IN THE CLIP — a token the account does not
+ * hold, paid for out of a USDC vault, on a screen whose subtitle is "Send any
+ * token to any network, pay with any asset you own". Sending USDC from a USDC
+ * vault would be the same sentence with the point taken out.
+ *
+ * THE AMOUNT IS TYPED AND THE CLIP PRESSES `Use max`. Max there is the whole
+ * position — 1.25526439 ZEC, six decimals of somebody's own balance, which is
+ * not a figure anyone enters and is why that button exists. This cut sends a
+ * round thousand dollars of it instead, which is a fraction and a thing you
+ * type, and leaves the rest earning: `Use max` is drawn and live and unused,
+ * exactly as it is on the vault sheet above.
+ */
+export const SEND_TOK = 'ZEC';
+export const SEND_NET = 'Zcash';
+/** $1,000 at the tour's own ZEC price, which is the perps chapter's mark */
+export const SEND_AMT = (1000 / PRICE.ZEC).toFixed(4);
+
 export type EA = {
   /** the chapter opens on the account, the way the recording does */
-  screen: 'home' | 'earn';
+  screen: 'home' | 'earn' | 'send';
+  /** the `Pay with` picker on the send screen */
+  payPicker: boolean;
+  /**
+   * WHICH BALANCE IS PAYING: a holding's id, or `gauntlet` for the vault.
+   *
+   * The clip's picker lists ETH and NEAR under `Your tokens` because that is
+   * the account it was recorded on. Ours is the tour's own — BTC, NEAR, AAPL,
+   * ZEC, USDC — and this screen reads `HOLDINGS` rather than a second copy of
+   * a wallet, for the same reason `AccountHome` is one component: it is one
+   * account across four chapters, and two of them disagreeing about what it
+   * holds is the thing this repo keeps catching.
+   */
+  payFrom: string;
+  /** what is being sent, in the destination token */
+  sendAmt: string;
   tab: (typeof TABS)[number];
   /** which vault's sheet is up */
   open: string | null;
@@ -209,6 +257,11 @@ export type EA = {
 
 export const initial: EA = {
   screen: 'home',
+  payPicker: false,
+  /* the clip's `Pay with` opens on ETH, the largest thing in that wallet. Ours
+     is BTC, and it is the default this scene then changes. */
+  payFrom: 'btc',
+  sendAmt: '',
   tab: 'vaults',
   open: null,
   side: 'deposit',
@@ -251,7 +304,10 @@ export type EAAction =
   | 'toEarn' | 'home'
   | 'tab' | 'openVault' | 'closeVault' | 'side'
   | 'focus' | 'key' | 'done' | 'max'
-  | 'confirm' | 'step' | 'close';
+  | 'confirm' | 'step' | 'close'
+  /* the send screen: in from the home button, the pay-with picker, the choice
+     it makes, and the digits */
+  | 'toSend' | 'payPicker' | 'payPick' | 'sendKey';
 
 const digits = (cur: string, d: string) => {
   if (d === '⌫') return cur.slice(0, -1);
@@ -267,6 +323,39 @@ export const actions: Record<EAAction, Act<EA>> = {
    */
   toEarn: (s) => (s.screen === 'home' ? { screen: 'earn', lit: null, tap: 'earn' } : null),
   home: (s) => (s.screen === 'earn' && !s.open ? { screen: 'home', lit: null, tap: 'home' } : null),
+
+  /* ---- Universal Send, and paying out of the vault -------------------- */
+  /**
+   * IN THROUGH THE `Send` BUTTON, which is the other half of the pair under
+   * the total and was drawn inert until this scene existed. The guard is the
+   * home screen rather than `!s.open`, because there is no sheet to be under
+   * on that screen.
+   */
+  toSend: (s) =>
+    (s.screen === 'home'
+      ? { screen: 'send', payFrom: 'btc', sendAmt: '', payPicker: false, lit: null, tap: 'send' }
+      : null),
+  payPicker: (s) =>
+    (s.screen === 'send' ? { payPicker: !s.payPicker, lit: null, tap: 'payPicker' } : null),
+  /**
+   * AND THE PICKER CLOSES ITSELF ON A CHOICE. A sheet that has been answered
+   * has nothing left to ask, and the clip's next frame after Gauntlet is the
+   * form with Gauntlet in it — there is no beat between them.
+   */
+  payPick: (s, v) =>
+    (s.payPicker && v
+      ? { payFrom: v, payPicker: false, lit: null, tap: 'payPick:' + v }
+      : null),
+  /**
+   * DIGITS INTO THE DESTINATION FIELD. Its own action rather than `key`:
+   * that one writes `amount`, which is the vault sheet's deposit, and a
+   * chapter that types into the wrong field would still typecheck and still
+   * animate. Two fields, two actions.
+   */
+  sendKey: (s, d) => {
+    if (s.screen !== 'send' || s.payPicker || !d) return null;
+    return { sendAmt: digits(s.sendAmt, d), pressed: d, tap: null };
+  },
 
   tab: (s, v) =>
     (s.screen !== 'earn' || s.tab === v || !v || s.open

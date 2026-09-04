@@ -237,3 +237,120 @@
   .pdev.earn[data-motion] .ernrow, .pdev.earn[data-motion] .ernsettle { animation: none }
   .pdev.earn .ernlive i { animation: none }
 }
+
+/* =========================================================================
+   UNIVERSAL SEND — the screen that spends the yield
+   -------------------------------------------------------------------------
+   Read off `ScreenRecording_09-02-2026 22-01-47_1.MP4` at two frames a second.
+   The shape is: a title and a one-line subtitle, three summary rows each with a
+   token dot, a label above a value and a chevron; then a bordered box carrying
+   the amount, its dollar value, a `Pay with` divider, and a row of source chip,
+   balance and `Use max`.
+
+   IT REUSES THE VAULT SHEET'S FIGURE RULES rather than restating them. The
+   amount is the same control at a different size — `--len` shrinks it as it
+   lengthens, for the same reason and with the same arithmetic — so the two
+   fields in this chapter cannot drift apart.
+   ========================================================================= */
+
+.pdev.earn .ernsend { padding-top: 4px }
+.pdev.earn .ernsendh { display: block; font-size: 21px; font-weight: 600; letter-spacing: -.02em }
+.pdev.earn .ernsendp {
+  margin: 5px 0 16px; font-size: 13px; line-height: 1.4;
+  color: rgba(255, 255, 255, .5); max-width: 30ch;
+}
+
+/* the three summary rows. Not controls on this cut — see the note in Phone.tsx
+   — so they carry no `.can` and no press state, only the shape of one. */
+.pdev.earn .ernsrow {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 13px; margin-bottom: 8px;
+  border-radius: 16px; background: rgba(255, 255, 255, .045);
+}
+/* THE DOT MUST NOT STRETCH. It is the first child of a flex row and it has no
+   `flex` of its own, so it took the row's cross-axis stretch and rendered as an
+   ellipse — a token mark drawn wider than it is tall, which is the one thing a
+   coin cannot be. `> :first-child` rather than a class, because the three rows
+   carry two different marks (a `Dot` and the recipient's blank) and both are
+   the same shape in the same slot. */
+.pdev.earn .ernsrow > :first-child { flex: none }
+.pdev.earn .ernsrow > span { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px }
+.pdev.earn .ernsrow i { font-style: normal; font-size: 11.5px; color: rgba(255, 255, 255, .45) }
+.pdev.earn .ernsrow b { font-size: 14.5px; font-weight: 600 }
+/* the recipient has no token, so it gets the wallet glyph the frame draws */
+.pdev.earn .ernswal {
+  width: 26px; height: 26px; flex: none; border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
+}
+.pdev.earn .ernschev { width: 17px; height: 17px; flex: none; color: rgba(255, 255, 255, .4) }
+
+/* ---- the amount, and what pays for it ---------------------------------- */
+.pdev.earn .ernsamt {
+  margin-top: 6px; padding: 20px 14px 14px;
+  border-radius: 18px; background: rgba(255, 255, 255, .045);
+  text-align: center;
+}
+.pdev.earn .ernsfig {
+  display: flex; align-items: baseline; justify-content: center; gap: 6px;
+  font-size: min(30px, calc(300px / var(--len, 2)));
+  font-weight: 600; letter-spacing: -.025em; font-variant-numeric: tabular-nums;
+}
+.pdev.earn .ernsfig em { font-style: normal; font-size: 17px; color: rgba(255, 255, 255, .45) }
+.pdev.earn .ernsusd {
+  display: block; margin-top: 3px; font-size: 13px; color: rgba(255, 255, 255, .45);
+  font-variant-numeric: tabular-nums;
+}
+
+/* `Pay with` is a divider with a word in it, which is what the frame draws:
+   a hairline across the box, interrupted by the label. */
+.pdev.earn .ernspayl {
+  display: flex; align-items: center; gap: 10px;
+  margin: 16px 0 11px; font-size: 12px; color: rgba(255, 255, 255, .45);
+}
+.pdev.earn .ernspayl::before,
+.pdev.earn .ernspayl::after {
+  content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, .1);
+}
+
+.pdev.earn .ernspay { display: flex; align-items: center; gap: 10px }
+/* the source chip is the one live control in this box */
+.pdev.earn .ernspick {
+  display: flex; align-items: center; gap: 6px; flex: none; max-width: 46%;
+  padding: 6px 8px 6px 6px; border-radius: 999px;
+  background: rgba(255, 255, 255, .07);
+  font-size: 13px; font-weight: 600;
+}
+.pdev.earn .ernspick b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.pdev.earn .ernspick .ernschev { width: 15px; height: 15px }
+.pdev.earn .ernspbal {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; text-align: left;
+}
+.pdev.earn .ernspbal i { font-style: normal; font-size: 11px; color: rgba(255, 255, 255, .45) }
+.pdev.earn .ernspbal b {
+  font-size: 12.5px; font-variant-numeric: tabular-nums;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pdev.earn .ernspmax {
+  flex: none; padding: 7px 12px; border-radius: 999px;
+  background: rgba(255, 255, 255, .1); font-size: 12.5px; font-weight: 600;
+}
+
+/* ---- the pay-with picker ----------------------------------------------- */
+.pdev.earn .ernpsheet { padding-bottom: 16px }
+.pdev.earn .ernph { display: block; font-size: 18px; font-weight: 600; margin: 10px 0 12px }
+.pdev.earn .ernpsec {
+  display: block; margin: 14px 0 6px; font-size: 12.5px; color: rgba(255, 255, 255, .45);
+}
+.pdev.earn .ernprow {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 10px; border-radius: 14px;
+}
+.pdev.earn .ernprowl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px }
+.pdev.earn .ernprowl b { font-size: 15px; font-weight: 600 }
+.pdev.earn .ernprowl i { font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45) }
+.pdev.earn .ernprowr { text-align: right; display: flex; flex-direction: column; gap: 1px }
+.pdev.earn .ernprowr b { font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums }
+.pdev.earn .ernprowr i {
+  font-style: normal; font-size: 12px; color: rgba(255, 255, 255, .45);
+  font-variant-numeric: tabular-nums;
+}

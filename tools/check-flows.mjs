@@ -217,7 +217,7 @@ for (const [name, m] of Object.entries(machines)) {
     readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
   );
   console.log('\n== the short cuts run the length they say they do');
-  for (const [name, limit] of [['perps-v5', LIMIT], ['swap-v5', 23625], ['own-v5', 14400], ['earn-v5', 23600]]) {
+  for (const [name, limit] of [['perps-v5', LIMIT], ['swap-v5', 23625], ['own-v5', 14400], ['earn-v5', 34313]]) {
     const m = machines[name];
     const authored = m.beats.reduce((t, b) => t + (b.ms ?? 0), 0) + (m.outro ?? 0);
     const real = Math.round(authored * PACE);

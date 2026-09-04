@@ -10,9 +10,12 @@ import { Dot } from '@/components/demo/app/Dot';
 import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
+import { HOLDINGS } from '@/components/demo/ownv5/state';
+import { PRICE } from '@/lib/prices';
 import {
-  BETA, BLURB, COLS, REFERENCE, STAKE_APY, STAKED_NEAR, STEPS, SUB, TABS, TAB_NAMES, TITLE,
-  VAULTS, available, balanceOf, cta, stakeUsd, vaultOf, type EA, type EAAction, type Vault,
+  BETA, BLURB, COLS, REFERENCE, SEND_NET, SEND_TOK, STAKE_APY, STAKED_NEAR, STEPS, SUB,
+  TABS, TAB_NAMES, TITLE, VAULTS, available, balanceOf, cta, stakeUsd, vaultOf,
+  type EA, type EAAction, type Vault,
 } from './state';
 
 type Deck = GenericDeck<EA, EAAction>;
@@ -51,8 +54,10 @@ export function Phone({ d }: { d: Deck }) {
     <div className="pdev app earn" data-motion="rich" data-tempo="fast" style={PALETTE_VARS}>
       <div className="pdview">
         {s.screen === 'home'
-          ? <AccountHome lit={s.lit} go={{ earn: d.can('toEarn') }} />
-          : <Earn d={d} />}
+          ? <AccountHome lit={s.lit} go={{ earn: d.can('toEarn'), send: d.can('toSend') }} />
+          : s.screen === 'send'
+            ? <Send d={d} />
+            : <Earn d={d} />}
       </div>
 
       {/* THE TAB BAR HAS NO EARN. Home / Assets / Swap / Perps / Menu is the
@@ -63,6 +68,7 @@ export function Phone({ d }: { d: Deck }) {
           would be the bar claiming you are somewhere you left. */}
       <Tabs on={s.screen === 'home' ? 'Home' : 'None'} />
       <VaultSheet d={d} />
+      <PaySheet d={d} />
     </div>
   );
 }
@@ -176,6 +182,175 @@ function Staking({ d }: { d: Deck }) {
 
 /* `Positions` was a third tab and a third pane, and no frame of any recording
    has either — see `TABS` in state.ts. Both are gone. */
+
+/* ---- Universal Send, and paying out of the vault ------------------------ */
+
+/** the vault, as a thing you can pay with */
+const PAY_VAULT = {
+  id: 'gauntlet', name: 'Gauntlet USDC', sub: 'Yield vault', sym: 'USDC',
+  a: USDC,
+};
+
+/** what a pay-with source is called and what it holds, in one place */
+function paySource(s: EA) {
+  if (s.payFrom === 'gauntlet') {
+    const bal = balanceOf(s, vaultOf('gauntlet'));
+    return { name: PAY_VAULT.name, a: USDC, bal: `~${fmt(bal, 2)} USDC`, usd: bal };
+  }
+  const h = HOLDINGS.find((x) => x.id === s.payFrom) ?? HOLDINGS[0];
+  return {
+    name: h.sym, a: { sym: h.sym, color: h.color, ink: h.ink },
+    bal: `${fmt(h.qty, h.dp)} ${h.sym}`, usd: h.qty * (PRICE[h.sym] ?? 0),
+  };
+}
+
+/**
+ * THE SCREEN THAT SPENDS THE YIELD.
+ *
+ * Read off `ScreenRecording_09-02-2026 22-01-47_1.MP4` at two frames a second:
+ * a title and a one-line subtitle, three summary rows (Token, Network,
+ * Recipient), the amount in the destination token with its dollar value under
+ * it, and then `Pay with` — a divider, a source chip, that source's balance,
+ * and `Use max`. The button below is `Enter amount` until there is one and
+ * `Review send` after, and it stays grey either way because no recipient has
+ * been chosen. That greyness is in the clip and it is kept: this chapter is
+ * about where the money comes FROM, and a live send button would invite a
+ * reader to wonder where it is going.
+ */
+function Send({ d }: { d: Deck }) {
+  const { s } = d;
+  const src = paySource(s);
+  const amt = Number(s.sendAmt || 0);
+  const pick = d.can('payPicker');
+
+  return (
+    <Enter k={`n${d.pass}`} className="ernsend">
+      <b className="ernsendh">Universal Send</b>
+      <p className="ernsendp">Send any token to any network, pay with any asset you own.</p>
+
+      {/* THREE ROWS, AND THEY ARE NOT CONTROLS ON THIS CUT. The clip opens the
+          token picker to get to ZEC; this scene arrives with the destination
+          already set, the way the swap chapter's form does, because the
+          gesture worth the beats here is the one underneath. */}
+      <div className="ernsrow">
+        <Dot a={{ sym: 'ZEC', color: '#F4B728', ink: '#000' }} size={26} />
+        <span><i>Token</i><b>{SEND_TOK}</b></span>
+        <ChevDown />
+      </div>
+      <div className="ernsrow">
+        <Dot a={{ sym: 'ZEC', color: '#F4B728', ink: '#000' }} size={26} />
+        <span><i>Network</i><b>{SEND_NET}</b></span>
+        <ChevDown />
+      </div>
+      <div className="ernsrow">
+        <span className="ernswal" aria-hidden="true" />
+        <span><i>Recipient</i><b>Select recipient</b></span>
+        <ChevDown />
+      </div>
+
+      <div className="ernsamt">
+        {/* the same field the vault sheet and the swap screen have, and for
+            the same reason: the figure is WRITTEN rather than counted, because
+            easing 0 up to a typed number scrambles every glyph at once. The
+            dollars underneath are counted, and wait for the writing to finish. */}
+        <span className="ernsfig" style={{ '--len': (s.sendAmt || '0').length } as React.CSSProperties}>
+          <b><Typed text={s.sendAmt || '0'} /></b>
+          <em>{SEND_TOK}</em>
+        </span>
+        <span className="ernsusd">
+          <Count value={amt * PRICE.ZEC} dp={amt ? 0 : 2} prefix="$"
+                 delay={writeMs(s.sendAmt || '0')} ms={780} />
+        </span>
+
+        <span className="ernspayl">Pay with</span>
+        <div className="ernspay">
+          <span className={'ernspick' + live(pick)} {...press(pick)}
+                data-tap="payPicker" data-lit={s.lit === 'payPicker' ? '1' : undefined}>
+            <Dot a={src.a} size={20} />
+            <b>{src.name}</b>
+            <ChevDown />
+          </span>
+          <span className="ernspbal"><i>Balance</i><b>{src.bal}</b></span>
+          {/* drawn, live, and unused — the same call the vault sheet makes */}
+          <span className="ernspmax">Use max</span>
+        </div>
+      </div>
+
+      <span className="bcta off">{s.sendAmt ? 'Review send' : 'Enter amount'}</span>
+    </Enter>
+  );
+}
+
+/**
+ * ONE ROW OF THE PICKER, AND IT IS DECLARED OUT HERE ON PURPOSE.
+ *
+ * It was a closure inside `PaySheet`, which reads well and is a bug: a
+ * component built during a render is a NEW type every render, so React unmounts
+ * and remounts the whole subtree each time and any state in it is thrown away.
+ * These rows are stateless, so the damage would have been a remount a frame
+ * rather than anything visible — which is exactly the kind of thing that stays
+ * in until something else grows state and starts flickering for no reason.
+ */
+function PayRow({ d, id, a, name, sub, right, sub2 }: {
+  d: Deck; id: string; a: { sym: string; color: string; ink: string };
+  name: string; sub: string; right: string; sub2: string;
+}) {
+  const on = d.can('payPick', id);
+  return (
+    <span className={'ernprow' + live(on)} {...press(on)} data-tap={'payPick:' + id}
+          data-lit={d.s.lit === 'payPick:' + id ? '1' : undefined}>
+      <Dot a={a} size={34} />
+      <span className="ernprowl"><b>{name}</b><i>{sub}</i></span>
+      <span className="ernprowr"><b>{right}</b><i>{sub2}</i></span>
+    </span>
+  );
+}
+
+/**
+ * THE PAY-WITH PICKER, AND THE ONE LINE THIS CHAPTER IS FOR.
+ *
+ * `Your vaults` is a section of a token picker, ABOVE the wallet, with the
+ * Gauntlet position in it carrying a dollar figure and a USDC equivalent. That
+ * is the whole of "spend directly from a yield-earning deposit — no unwinding,
+ * no moving funds out": the app does not offer to withdraw first, it offers
+ * the position as a thing you can pay with, in the most ordinary place it
+ * could possibly be.
+ */
+function PaySheet({ d }: { d: Deck }) {
+  const { s } = d;
+  const vaultBal = balanceOf(s, vaultOf('gauntlet'));
+
+  return (
+    <Layer open={s.payPicker} onScrim={d.can('payPicker')}>
+      <div className="dsheet ernpsheet">
+        <span className="dgrab" />
+        <b className="ernph">Select token</b>
+
+        <span className="ernpsec">Your vaults</span>
+        <PayRow d={d} id="gauntlet" a={USDC} name={PAY_VAULT.name} sub={PAY_VAULT.sub}
+                right={usd(vaultBal)} sub2={`~${fmt(vaultBal, 2)} USDC`} />
+
+        <span className="ernpsec">Your tokens</span>
+        {HOLDINGS.map((h) => (
+          <PayRow key={h.id} d={d} id={h.id} a={{ sym: h.sym, color: h.color, ink: h.ink }}
+                  name={h.sym} sub={h.name}
+                  right={usd(h.qty * (PRICE[h.sym] ?? 0))} sub2={fmt(h.qty, h.dp)} />
+        ))}
+      </div>
+    </Layer>
+  );
+}
+
+/** lucide `chevron-down` (ISC). The file's other `Chev` points RIGHT and marks
+    a row that goes somewhere; these three mark a field that opens a picker. */
+function ChevDown() {
+  return (
+    <svg className="ernschev" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
 
 /* ---- the vault's sheet ------------------------------------------------- */
 

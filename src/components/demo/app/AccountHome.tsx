@@ -46,7 +46,15 @@ const STRIP = SYMS.length > 3
   ? `${SYMS.slice(0, 3).join(', ')} +${SYMS.length - 3}`
   : SYMS.join(', ');
 
-export type HomeRow = 'crypto' | 'perps' | 'earn';
+/**
+ * WHAT ON THIS SCREEN CAN BE PRESSED.
+ *
+ * The three balance rows, and `send` — the second of the two buttons under the
+ * total. It was drawn and inert for as long as nothing led anywhere from it;
+ * the earn chapter's last scene goes through it into Universal Send, which is
+ * the screen that pays for a transfer out of a yield position.
+ */
+export type HomeRow = 'crypto' | 'perps' | 'earn' | 'send';
 
 export function AccountHome({ go, lit }: {
   /** what pressing a row does. A row with no entry is drawn and inert. */
@@ -112,7 +120,11 @@ export function AccountHome({ go, lit }: {
           </svg>
           Receive
         </span>
-        <span className="ownbtn">
+        {/* the one of the pair that leads somewhere. `live`/`press` and the
+            `data-lit` attribute are the same three the balance rows use, so a
+            press here reads exactly like a press on Earn. */}
+        <span className={'ownbtn' + live(go?.send ?? null)} {...press(go?.send ?? null)}
+              data-tap="send" data-lit={lit === 'send' ? '1' : undefined}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" />
