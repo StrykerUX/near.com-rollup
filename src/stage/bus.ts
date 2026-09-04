@@ -45,3 +45,41 @@ export function subscribeActiveFace(fn: (i: number) => void) {
     faceSubs.delete(fn);
   };
 }
+
+/* ------------------------------------------------------------------
+   WHICH TWO CARDS ARE MID-MOVE
+   `activeFace` above answers "which one owns the frame", and answers
+   -1 while a move is in flight. That was enough while the thing on
+   stage was a deck of four card faces, all of them in the DOM at
+   once: the engine could paint the outgoing and the incoming itself.
+
+   The device is React's, and only the chapter on stage is mounted —
+   so for the incoming screen to slide in OVER the outgoing one, React
+   has to know both indices for the length of the move. That is all
+   this publishes. The MOTION is not here: `fr` changes every frame and
+   travels as a custom property (see `--sw-*` in engine.ts), because
+   routing sixty re-renders a second through React to move one
+   translate would be the wrong tool twice.
+   ------------------------------------------------------------------ */
+
+export type CardMove = { from: number; to: number };
+
+let cardMove: CardMove | null = null;
+const moveSubs = new Set<(m: CardMove | null) => void>();
+
+export function setCardMove(m: CardMove | null) {
+  /* the engine calls this every frame; only a CHANGE is worth a render */
+  const same =
+    m === cardMove || (!!m && !!cardMove && m.from === cardMove.from && m.to === cardMove.to);
+  if (same) return;
+  cardMove = m;
+  moveSubs.forEach((fn) => fn(m));
+}
+
+export function subscribeCardMove(fn: (m: CardMove | null) => void) {
+  moveSubs.add(fn);
+  fn(cardMove);
+  return () => {
+    moveSubs.delete(fn);
+  };
+}

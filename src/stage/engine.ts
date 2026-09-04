@@ -7,7 +7,7 @@ import { NARROW_MQ } from '@/lib/breakpoints';
 import { clamp, easeShrink, lin, qblur, sm, sstep } from '@/lib/math';
 import { makeGradientField, fireRipple, stepRipple, RIP } from '@/gl/gradientField';
 import { makeVarWriter, sty } from './domCache';
-import { callCtaRearm, setActiveFace } from './bus';
+import { callCtaRearm, setActiveFace, setCardMove } from './bus';
 
 /**
  * THE STAGE ENGINE
@@ -277,6 +277,44 @@ export function startStageEngine(): () => void {
         sty(cf, 'pointerEvents', 'none');
       }
     }
+
+    /* ---- THE SCREEN CHANGE, FOR THE DEVICE ------------------------------
+       The loop above is the original card transition and it still reads
+       correctly, but on this route it paints NOTHING: `faces.card` is
+       `qsa('.cswap > .face')` and those nodes went away when the four-card
+       deck became one real device. The screen inside that device is React's,
+       so the change reaches it as a custom property instead of as inline
+       styles on nodes this file owns.
+
+       ONE NUMBER, AND IT IS A CROSSFADE. The card composition above also
+       SLIDES the incoming face a full screen height and lays a dark veil over
+       it; this route is opacity only, by decision. So the slide, the veil and
+       the outgoing face's 7% drift are deliberately NOT published — see the
+       note in 25-home-app.css for what the veil was for and why a fade has no
+       use for it. Do not add them back thinking the device drifted from the
+       deck: it was asked to.
+
+       AND IT STAYS SCRUBBED, which is the part worth protecting. `fr` comes
+       from `animPos`, which is `clamp(t - f, 0, 1)` off the scroll position, so
+       the fade tracks the reader's own scroll: back up and it runs backwards,
+       stop mid-way and it holds there. A CSS animation could do neither — see
+       the note on `animDir` further down for why the original refused to play
+       its reverse as a second animation.
+
+       `fr` RATHER THAN A CURVE, because the reader is the curve. Easing a
+       scrubbed value shapes the fade against scroll DISTANCE, which is not
+       what anybody is feeling; linear against `fr` means the fade is exactly
+       as fast as the wheel is.
+
+       At rest it is the resting frame: the incoming screen fully opaque. The
+       CSS carries the same value as its fallback, so a frame painted before
+       the engine's first pass is already correct. */
+    const swMoving = moving && !heroMove;
+    setVar('--sw-in-o', swMoving ? fr.toFixed(3) : '1');
+    /* React mounts the outgoing screen only while there is one. `a` is -1 on a
+       hero move, which is not a screen change and must not put two decks on
+       the page. */
+    setCardMove(swMoving && a >= 0 && b >= 0 ? { from: a, to: b } : null);
 
     (['left', 'right'] as const).forEach((gname) => {
       const grp = faces[gname];

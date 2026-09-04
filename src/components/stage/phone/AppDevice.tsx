@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { subscribeActiveFace } from '@/stage/bus';
+import { subscribeActiveFace, subscribeCardMove, type CardMove } from '@/stage/bus';
 import { useDeck } from '@/components/demo/shell/deck';
 
 import { Phone as PerpsPhone } from '@/components/demo/perpsv5/Phone';
@@ -68,15 +68,49 @@ export function AppDevice() {
   /* the last chapter the engine actually landed on; -1 (mid-move) is ignored */
   const [at, setAt] = useState(0);
   useEffect(() => subscribeActiveFace((i) => { if (i >= 0) setAt(i); }), []);
+  /* and the pair mid-move, which is null at rest — see `setCardMove` in bus.ts */
+  const [move, setMove] = useState<CardMove | null>(null);
+  useEffect(() => subscribeCardMove(setMove), []);
 
-  const Screen = SCREENS[at] ?? SCREENS[0];
+  /* WHO IS ARRIVING IS THE MOVE'S OWN ANSWER, not `at`. The engine publishes
+     -1 to `activeFace` for the length of a move, so `at` is still the chapter
+     being LEFT until the move lands. Reading `to` here is what lets the
+     incoming screen be on the page while it slides in; falling back to `at`
+     is the resting case. */
+  const to = move ? move.to : at;
+  const from = move ? move.from : -1;
+  const In = SCREENS[to] ?? SCREENS[0];
+  const Out = from >= 0 ? SCREENS[from] : null;
+
   return (
     <div className="appdev">
-      {/* keyed on the chapter so the incoming screen arrives rather than
-          replacing the outgoing one in place — the same reason `Enter` takes
-          a key everywhere else in this repo */}
-      <div className="appswap" key={at}>
-        <Screen />
+      {/* BOTH SCREENS ARE ON THE PAGE FOR THE LENGTH OF THE MOVE, and that is
+          the fix for a real defect rather than a flourish. With one screen and
+          a fade from `opacity: 0`, every ancestor up to `body` is transparent,
+          so the field showed through the whole device: measured at
+          (165,244,202) mid-fade against (32,32,32) at rest — a 7x jump in
+          brightness, which is the "white flash" this replaces. An outgoing
+          screen underneath is what there is to fade FROM.
+
+          IT COSTS TWO CLOCKS WHILE THE MOVE LASTS, and the move is scrubbed —
+          park the scroll halfway and both keep running. That is the honest
+          price of the transition, and it is bounded by one chapter. It also
+          means the arriving chapter's flow starts during the slide rather
+          than on landing; a normal scroll crosses in a few hundred ms and
+          every script's first beat is longer than that, so it lands still on
+          beat one. `useDeck` takes no `paused`, and adding one to a hook four
+          screens share was more surface than this is worth.
+
+          The keys are the chapter indices, so a screen is never reused for a
+          different chapter — the same reason `Enter` takes a key everywhere
+          else in this repo. */}
+      {Out ? (
+        <div className="appswap out" key={`o${from}`}>
+          <Out />
+        </div>
+      ) : null}
+      <div className="appswap in" key={to}>
+        <In />
       </div>
     </div>
   );

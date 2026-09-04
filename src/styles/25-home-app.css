@@ -86,6 +86,29 @@
   translate: -50% -50%;
   width: calc(352px * var(--k));
   height: calc(766px * var(--k));
+  /* THE FLOOR, AND IT IS WHAT MAKES THE SLIDE POSSIBLE AT ALL.
+     -------------------------------------------------------------------------
+     The original transition clears the OUTGOING screen by 55% of the move
+     (`outFr` is `lin(0.05, 0.55, fr)`) while the incoming one is still 45% of
+     a screen-height away from landing. On the card deck that was fine: behind
+     both faces sat `.cswap`, a plate with its own surface. This file took that
+     surface away on purpose — "an opaque device inside a blurred plate is a
+     phone drawn inside a phone" — so on this route the same move left the
+     uncovered band with nothing behind it, and the field showed through.
+
+     MEASURED, because that band is not obvious from reading the numbers: with
+     the field temporarily painted magenta, a resting frame had 0 see-through
+     pixels inside the screen and a frame at `in-y: 63%` had 3,897 of 7,193
+     sampled — 54% of the screen. The floor is `#000` because that is `.pdev`'s
+     own background, so what shows while a screen is on its way in is the
+     device's screen, dark, exactly as the plate used to read.
+
+     The radius is the screen's, scaled: `.pdev` is 352x766 with a 42px radius
+     and is scaled by `transform: scale(var(--k))`, and this box is that same
+     box already multiplied out. A square floor would put four black corners
+     outside the device's own silhouette. */
+  background: #000;
+  border-radius: calc(42px * var(--k));
 }
 
 /* THE CHAPTER'S SCREEN ARRIVES RATHER THAN REPLACING THE LAST ONE IN PLACE.
@@ -94,14 +117,63 @@
    frame would read as a glitch in a page whose every other change is a curve.
    Short, because the plate's own move is what a reader is watching and this is
    only the thing inside it catching up. */
-.appmorph .appswap {
-  position: absolute; inset: 0;
-  animation: appin 420ms var(--ease-out) both;
-}
-@keyframes appin { from { opacity: 0; transform: translate3d(0, 10px, 0) } }
+.appmorph .appswap { position: absolute; inset: 0 }
 
+/* ---- THE SCREEN CHANGE: A SCRUBBED CROSSFADE ---------------------------
+   IT WAS A 420ms `appin` FADE FROM `opacity: 0`, AND THAT WAS A BUG WEARING A
+   TRANSITION. `AppDevice` keyed the screen on the chapter, so React destroyed
+   the outgoing one on the same frame the incoming one mounted — one screen at a
+   time, fading up from nothing. Every ancestor of this element is
+   `background: transparent` all the way to `body`, so what showed through the
+   device for those 420ms was the field: measured at (165,244,202) mid-fade
+   against (32,32,32) at rest, a sevenfold jump in brightness. That is the
+   white flash it was reported as.
+
+   NOW THERE ARE TWO SCREENS AND ONE FADES OVER THE OTHER. `engine.ts` publishes
+   `--sw-in-o` off the same `fr` that drives every other thing on this stage, so
+   the fade is SCRUBBED: it tracks the wheel, runs backwards when the reader
+   scrolls back, and holds where it is if they stop. That is the property the
+   original card transition had and a CSS animation cannot.
+
+   OPACITY ONLY — NO SLIDE, NO VEIL, and this is a decision rather than an
+   omission. The card deck's version also slid the incoming face a full screen
+   height and laid a dark gradient over it at 0.55, fading to 0 at landing; that
+   veil existed for exactly one reason, which the original states plainly:
+   "darker, so the outgoing card doesn't read through". A fade has nothing to
+   mask — there is no object passing in front of another — so the veil would
+   only be a dip in brightness in the middle of the move. Both are gone on
+   purpose. Do not restore them as a fidelity fix.
+
+   THE OUTGOING SCREEN DOES NOT FADE, and that is what keeps the middle of the
+   crossfade from going dark. Two layers dissolving at once over a floor sum to
+   less than either — at the midpoint you would get roughly half the brightness
+   of both screens. Held opaque underneath, it is simply the backdrop the
+   incoming one arrives over, and the composite is a true crossfade at full
+   value from end to end.
+
+   THE FALLBACK IS THE RESTING FRAME, deliberately: a paint before the engine's
+   first pass — or on a narrow frame, where it refuses to start at all — lands
+   the incoming screen opaque. Nothing has to run for this to look right. */
+.appmorph .appswap.in {
+  z-index: 2;
+  opacity: var(--sw-in-o, 1);
+}
+.appmorph .appswap.out {
+  z-index: 1;
+  /* it is leaving; it must not eat a press on the way out */
+  pointer-events: none;
+}
+
+/* NOTHING TO DISABLE, AND THAT IS WHY THIS BLOCK IS SHORT. There is no
+   animation here to switch off — the fade is a scrubbed custom property, which
+   is a direct response to the reader's own input rather than motion played at
+   them. What this pins is the one state that would be wrong: `engine.ts` rounds
+   `t` under this preference, so a move can sit at position 0 where `--sw-in-o`
+   is 0. With the outgoing layer hidden as well, that would be an empty device.
+   Both pinned, the change is instant whatever the engine writes. */
 @media (prefers-reduced-motion: reduce) {
-  .appmorph .appswap { animation: none }
+  .appmorph .appswap.in { opacity: 1 }
+  .appmorph .appswap.out { display: none }
 }
 
 /* THE SAME LADDER AS 17-demo.css, and it has to stay the same: a device that
