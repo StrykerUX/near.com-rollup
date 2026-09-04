@@ -253,7 +253,16 @@
    fields in this chapter cannot drift apart.
    ========================================================================= */
 
-.pdev.earn .ernsend { padding-top: 4px }
+/* THE THIRD ROOM STARTS WHERE THE OTHER TWO DO. `.ernhead` above carries the
+   note: the Earn page and the Assets screen both begin their title 30px into
+   their own `.pdview`, because they are rooms in one app reached from one home
+   and a reader crosses between them in a single scroll. Universal Send is the
+   third, reached from the same screen by the button beside the one that opens
+   Assets, and it was starting at 4 — hard against the top edge, and 26px proud
+   of both its neighbours for no reason anybody chose. Same number, same
+   reason, and it is not a value to taste: it is the rule this file already
+   states. */
+.pdev.earn .ernsend { padding-top: 30px }
 .pdev.earn .ernsendh { display: block; font-size: 21px; font-weight: 600; letter-spacing: -.02em }
 .pdev.earn .ernsendp {
   margin: 5px 0 16px; font-size: 13px; line-height: 1.4;
