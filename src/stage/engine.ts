@@ -7,7 +7,7 @@ import { NARROW_MQ } from '@/lib/breakpoints';
 import { clamp, easeShrink, lin, qblur, sm, sstep } from '@/lib/math';
 import { makeGradientField, fireRipple, stepRipple, RIP } from '@/gl/gradientField';
 import { makeVarWriter, sty } from './domCache';
-import { callCtaRearm, setActiveFace, setCardMove } from './bus';
+import { callCtaRearm, setActiveFace, setShownFace } from './bus';
 
 /**
  * THE STAGE ENGINE
@@ -93,6 +93,8 @@ export function startStageEngine(): () => void {
   let pastStage = false, stageP = 0, stagePS = -1, scrubPrev = 0;
   let stageLive = 0, heroOut = 0, heroLast = -1;
   let animOn = false, animFrom = 0, animTo = 0, animDir = 1, animPos = 1;
+  /* the chapter the device currently has mounted; -1 until the first paint */
+  let shownIdx = -1;
   let booting = true;
 
   /* the shrink's live clip fractions, read by the GL loop */
@@ -281,40 +283,56 @@ export function startStageEngine(): () => void {
     /* ---- THE SCREEN CHANGE, FOR THE DEVICE ------------------------------
        The loop above is the original card transition and it still reads
        correctly, but on this route it paints NOTHING: `faces.card` is
-       `qsa('.cswap > .face')` and those nodes went away when the four-card
-       deck became one real device. The screen inside that device is React's,
-       so the change reaches it as a custom property instead of as inline
-       styles on nodes this file owns.
+       `qsa('.cswap > .face')` and those nodes went away when the four-card deck
+       became one real device. The screen inside that device is React's, so the
+       change reaches it as a custom property and a published index.
 
-       ONE NUMBER, AND IT IS A CROSSFADE. The card composition above also
-       SLIDES the incoming face a full screen height and lays a dark veil over
-       it; this route is opacity only, by decision. So the slide, the veil and
-       the outgoing face's 7% drift are deliberately NOT published — see the
-       note in 25-home-app.css for what the veil was for and why a fade has no
-       use for it. Do not add them back thinking the device drifted from the
-       deck: it was asked to.
+       ONE SCREEN, RELIEVED IN THE BLIND. It fades to the floor, the chapter
+       changes while nothing is visible, and it fades back up. That is a
+       deliberate choice over a crossfade, and it was made by measurement: with
+       two layers, the outgoing screen restarted its script the instant it began
+       to leave (a frame-to-frame delta of 17.8 against a median of 0.11), the
+       incoming one played its script while it was still a ghost (content moving
+       under the blend in 25% of sampled steps), and a flick past two boundaries
+       could swap screens with no transition at all. Every one of those is a
+       consequence of two live screens sharing a frame. One screen cannot have
+       them.
 
-       AND IT STAYS SCRUBBED, which is the part worth protecting. `fr` comes
-       from `animPos`, which is `clamp(t - f, 0, 1)` off the scroll position, so
-       the fade tracks the reader's own scroll: back up and it runs backwards,
-       stop mid-way and it holds there. A CSS animation could do neither — see
-       the note on `animDir` further down for why the original refused to play
-       its reverse as a second animation.
+       THE CURVE IS A V WITH A FLOOR IN IT, and the flat part is not styling.
+       React mounts asynchronously: the index below flips at the midpoint, and
+       the new screen needs a frame or two to exist before anything of it can be
+       seen. 0.42 to 0.58 is that window — at a normal scroll speed about 110ms
+       of full floor — so the relief happens where there is nothing to watch.
+       Outside it the ramps are linear against `fr`, which is scroll position,
+       so the fade is scrubbed like everything else here: back up and it runs
+       backwards, stop and it holds.
 
-       `fr` RATHER THAN A CURVE, because the reader is the curve. Easing a
-       scrubbed value shapes the fade against scroll DISTANCE, which is not
-       what anybody is feeling; linear against `fr` means the fade is exactly
-       as fast as the wheel is.
+       At rest it is 1. The CSS carries that as its fallback, so a frame painted
+       before the engine's first pass — or on a narrow frame, where it never
+       starts — is already correct. */
+    const swMoving = moving && !heroMove && a >= 0 && b >= 0;
+    const swO = swMoving ? (fr < 0.5 ? 1 - lin(0, 0.42, fr) : lin(0.58, 1, fr)) : 1;
+    setVar('--sw-o', swO.toFixed(3));
 
-       At rest it is the resting frame: the incoming screen fully opaque. The
-       CSS carries the same value as its fallback, so a frame painted before
-       the engine's first pass is already correct. */
-    const swMoving = moving && !heroMove;
-    setVar('--sw-in-o', swMoving ? fr.toFixed(3) : '1');
-    /* React mounts the outgoing screen only while there is one. `a` is -1 on a
-       hero move, which is not a screen change and must not put two decks on
-       the page. */
-    setCardMove(swMoving && a >= 0 && b >= 0 ? { from: a, to: b } : null);
+    /* THE INDEX ONLY MOVES WHILE THE SCREEN IS AT THE FLOOR, and this gate is
+       the difference between the relief being invisible and being a cut.
+
+       `fr` is the CURRENT move's progress, so "the card being left until the
+       midpoint, the card arriving after it" is only continuous while the move
+       itself is. Flick across two boundaries and the move jumps from (0,1) to
+       (1,2) — the index wants to change, but the new move's `fr` can already
+       be anywhere, so the pair (index, opacity) jumps together. Measured with
+       a 60fps recorder inside the page: the chapter changed at `--sw-o` up to
+       0.603, in six runs out of six. Plainly visible.
+
+       So the wanted index is computed every frame and ADOPTED only when there
+       is nothing on screen to see it happen. At rest it is adopted at once,
+       because at rest the opacity is 1 by definition and the resting card is
+       the truth — a reader who lands somewhere new without passing through a
+       fade gets a cut, and there is no fade to hide it in. */
+    const want = swMoving ? (fr < 0.5 ? a : b) : curIdx;
+    if (!swMoving || swO <= 0.02) shownIdx = want;
+    setShownFace(shownIdx);
 
     (['left', 'right'] as const).forEach((gname) => {
       const grp = faces[gname];
@@ -717,8 +735,8 @@ export function startStageEngine(): () => void {
 
          `SNAP_REACH` is 0.75, so this branch is the first quarter of a move:
          they travelled less than 25% of a step and then stopped. There is
-         nothing to finish there — a quarter of the way in, the crossfade is at
-         `--sw-in-o` 0.25 and the frame is two screens blended — so the honest
+         nothing to finish there — a quarter of the way in the screen is at
+         `--sw-o` 0.4 and falling, on its way to the floor — so the honest
          resolution is the boundary they just left. It is the SHORTER of the two
          moves by construction, and it is the only place this file moves against
          the direction of travel: at most a quarter of a step, to undo a nudge

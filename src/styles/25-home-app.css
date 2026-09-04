@@ -144,59 +144,45 @@
    only the thing inside it catching up. */
 .appmorph .appswap { position: absolute; inset: 0 }
 
-/* ---- THE SCREEN CHANGE: A SCRUBBED CROSSFADE ---------------------------
-   IT WAS A 420ms `appin` FADE FROM `opacity: 0`, AND THAT WAS A BUG WEARING A
-   TRANSITION. `AppDevice` keyed the screen on the chapter, so React destroyed
-   the outgoing one on the same frame the incoming one mounted — one screen at a
-   time, fading up from nothing. Every ancestor of this element is
-   `background: transparent` all the way to `body`, so what showed through the
-   device for those 420ms was the field: measured at (165,244,202) mid-fade
-   against (32,32,32) at rest, a sevenfold jump in brightness. That is the
-   white flash it was reported as.
+/* ---- THE SCREEN CHANGE: ONE SCREEN, RELIEVED IN THE BLIND --------------
+   It fades to the floor, the chapter changes while nothing is visible, and it
+   fades back up. `--sw-o` is the V, written every frame by `engine.ts` off the
+   same `fr` that drives everything else on this stage — so the fade is
+   SCRUBBED: it tracks the wheel, runs backwards when the reader scrolls back,
+   and holds where it is if they stop.
 
-   NOW THERE ARE TWO SCREENS AND ONE FADES OVER THE OTHER. `engine.ts` publishes
-   `--sw-in-o` off the same `fr` that drives every other thing on this stage, so
-   the fade is SCRUBBED: it tracks the wheel, runs backwards when the reader
-   scrolls back, and holds where it is if they stop. That is the property the
-   original card transition had and a CSS animation cannot.
+   IT WAS A CROSSFADE BETWEEN TWO LAYERS, AND EACH OF ITS DEFECTS CAME FROM
+   HAVING TWO. Measured, so the next person does not try it again expecting a
+   different result: the outgoing screen restarted its script the instant it
+   began to leave — a frame-to-frame delta of 17.8 against a median of 0.11,
+   the largest discontinuity in the whole move — because it was re-keyed and
+   React remounts on a new key. The incoming screen played its script while it
+   was still a ghost, with content moving under the blend in a quarter of the
+   sampled steps. And a flick past two boundaries could change screens with no
+   transition at all. None of the three is reachable with one screen.
 
-   OPACITY ONLY — NO SLIDE, NO VEIL, and this is a decision rather than an
-   omission. The card deck's version also slid the incoming face a full screen
-   height and laid a dark gradient over it at 0.55, fading to 0 at landing; that
-   veil existed for exactly one reason, which the original states plainly:
-   "darker, so the outgoing card doesn't read through". A fade has nothing to
-   mask — there is no object passing in front of another — so the veil would
-   only be a dip in brightness in the middle of the move. Both are gone on
-   purpose. Do not restore them as a fidelity fix.
-
-   THE OUTGOING SCREEN DOES NOT FADE, and that is what keeps the middle of the
-   crossfade from going dark. Two layers dissolving at once over a floor sum to
-   less than either — at the midpoint you would get roughly half the brightness
-   of both screens. Held opaque underneath, it is simply the backdrop the
-   incoming one arrives over, and the composite is a true crossfade at full
-   value from end to end.
+   THE FLOOR IS WHAT THE FADE FADES TO, and it is `.appdev`'s `#000` below —
+   the device's own screen colour. Without it every ancestor is transparent up
+   to `body` and the fade would go to the FIELD, which is the flash this page
+   had before any of this: (165,244,202) mid-fade against (32,32,32) at rest, a
+   sevenfold jump in brightness.
 
    THE FALLBACK IS THE RESTING FRAME, deliberately: a paint before the engine's
-   first pass — or on a narrow frame, where it refuses to start at all — lands
-   the incoming screen opaque. Nothing has to run for this to look right. */
-.appmorph .appswap.in {
-  z-index: 2;
-  opacity: var(--sw-in-o, 1);
-}
-.appmorph .appswap.out {
-  z-index: 1;
-  /* it is leaving; it must not eat a press on the way out */
-  pointer-events: none;
+   first pass — or on a narrow frame, where it never starts — lands the screen
+   opaque. Nothing has to run for this to look right. */
+.appmorph .appswap {
+  position: absolute;
+  inset: 0;
+  opacity: var(--sw-o, 1);
 }
 
 /* A SCREEN DOES NOT ARRIVE TWICE.
    -------------------------------------------------------------------------
    Each of these screens animates its own elements in when it mounts —
    `enterUp` on `.enter` children, `drise` on rows and panels — because until
-   the crossfade existed, a screen mounting WAS a chapter arriving. Now the
-   fade is the arrival, and the stagger played after it: measured on a flick,
-   the fade was done at 180ms and the elements went on rising for another
-   562ms. Two arrivals, the second one after the transition had ended.
+   this page put a fade in front of them, a screen mounting WAS a chapter
+   arriving. It is the fade now, and the stagger played after it: measured, the
+   fade was done at 180ms and the elements went on rising for another 562ms.
 
    A NEGATIVE DELAY, NOT `animation: none`, and the difference is the whole
    trick. `none` deletes the animation; restoring it later creates a fresh one
@@ -207,7 +193,7 @@
    plays nothing. `!important` because the authored staggers set this property
    themselves.
 
-   IT IS LIFTED, and it has to be: `InLayer` drops `noentry` at 1100ms so that
+   IT IS LIFTED, and it has to be: `Layer` drops `noentry` at 1100ms so that
    every element created after that — every later scene, every sheet, every
    loop pass — staggers the way it was written to. This suppresses one arrival,
    not the screen's motion. */
@@ -221,12 +207,11 @@
    animation here to switch off — the fade is a scrubbed custom property, which
    is a direct response to the reader's own input rather than motion played at
    them. What this pins is the one state that would be wrong: `engine.ts` rounds
-   `t` under this preference, so a move can sit at position 0 where `--sw-in-o`
-   is 0. With the outgoing layer hidden as well, that would be an empty device.
-   Both pinned, the change is instant whatever the engine writes. */
+   `t` under this preference, so a move can sit at a position where `--sw-o` is
+   0, and that would be an empty device. Pinned, the change is instant whatever
+   the engine writes. */
 @media (prefers-reduced-motion: reduce) {
-  .appmorph .appswap.in { opacity: 1 }
-  .appmorph .appswap.out { display: none }
+  .appmorph .appswap { opacity: 1 }
 }
 
 /* THE SAME LADDER AS 17-demo.css, and it has to stay the same: a device that

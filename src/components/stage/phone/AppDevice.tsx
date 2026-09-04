@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, type ReactNode } from 'react';
-import { subscribeActiveFace, subscribeCardMove, type CardMove } from '@/stage/bus';
+import { subscribeShownFace } from '@/stage/bus';
 import { useDeck } from '@/components/demo/shell/deck';
 
 import { Phone as PerpsPhone } from '@/components/demo/perpsv5/Phone';
@@ -65,53 +65,37 @@ export function ChapterScreen({ at }: { at: number }) {
 }
 
 export function AppDevice() {
-  /* the last chapter the engine actually landed on; -1 (mid-move) is ignored */
+  /**
+   * WHICH CHAPTER IS MOUNTED, AND IT IS NOT "THE ONE THAT LANDED".
+   *
+   * The engine publishes the index that is correct at this instant: the card
+   * being left until the fade has reached the floor, the card arriving after
+   * it (see `setShownFace`). So the swap happens at the bottom of the V, where
+   * the device shows nothing, and the reader never sees it happen.
+   *
+   * THERE IS ONE SCREEN, AND THAT IS THE FIX RATHER THAN A SIMPLIFICATION OF
+   * IT. This held two for a while — the outgoing one underneath, the incoming
+   * one fading over it — and every defect that came out of it was a
+   * consequence of two live screens sharing a frame: the outgoing restarted
+   * its script the moment it began to leave, because it was re-keyed from
+   * `to` to `o${from}` and React remounts on a new key; the incoming played
+   * its script while it was still a ghost; and a flick past two boundaries
+   * could swap with no transition. One screen cannot do any of those. It also
+   * gives the page back the invariant this file was written around — only the
+   * chapter on stage is mounted, so only one clock, one chart and one
+   * settlement are ever running.
+   *
+   * -1 is ignored: it means the engine has nothing to say yet.
+   */
   const [at, setAt] = useState(0);
-  useEffect(() => subscribeActiveFace((i) => { if (i >= 0) setAt(i); }), []);
-  /* and the pair mid-move, which is null at rest — see `setCardMove` in bus.ts */
-  const [move, setMove] = useState<CardMove | null>(null);
-  useEffect(() => subscribeCardMove(setMove), []);
+  useEffect(() => subscribeShownFace((i) => { if (i >= 0) setAt(i); }), []);
 
-  /* WHO IS ARRIVING IS THE MOVE'S OWN ANSWER, not `at`. The engine publishes
-     -1 to `activeFace` for the length of a move, so `at` is still the chapter
-     being LEFT until the move lands. Reading `to` here is what lets the
-     incoming screen be on the page while it slides in; falling back to `at`
-     is the resting case. */
-  const to = move ? move.to : at;
-  const from = move ? move.from : -1;
-  const In = SCREENS[to] ?? SCREENS[0];
-  const Out = from >= 0 ? SCREENS[from] : null;
-
+  const Screen = SCREENS[at] ?? SCREENS[0];
   return (
     <div className="appdev">
-      {/* BOTH SCREENS ARE ON THE PAGE FOR THE LENGTH OF THE MOVE, and that is
-          the fix for a real defect rather than a flourish. With one screen and
-          a fade from `opacity: 0`, every ancestor up to `body` is transparent,
-          so the field showed through the whole device: measured at
-          (165,244,202) mid-fade against (32,32,32) at rest — a 7x jump in
-          brightness, which is the "white flash" this replaces. An outgoing
-          screen underneath is what there is to fade FROM.
-
-          IT COSTS TWO CLOCKS WHILE THE MOVE LASTS, and the move is scrubbed —
-          park the scroll halfway and both keep running. That is the honest
-          price of the transition, and it is bounded by one chapter. It also
-          means the arriving chapter's flow starts during the slide rather
-          than on landing; a normal scroll crosses in a few hundred ms and
-          every script's first beat is longer than that, so it lands still on
-          beat one. `useDeck` takes no `paused`, and adding one to a hook four
-          screens share was more surface than this is worth.
-
-          The keys are the chapter indices, so a screen is never reused for a
-          different chapter — the same reason `Enter` takes a key everywhere
-          else in this repo. */}
-      {Out ? (
-        <div className="appswap out" key={`o${from}`}>
-          <Out />
-        </div>
-      ) : null}
-      <InLayer key={to}>
-        <In />
-      </InLayer>
+      <Layer key={at}>
+        <Screen />
+      </Layer>
     </div>
   );
 }
@@ -133,40 +117,36 @@ export function AppDevice() {
 const ARRIVE_MS = 1100;
 
 /**
- * THE INCOMING LAYER, WHICH DOES NOT LET ITS SCREEN ARRIVE TWICE.
+ * THE SCREEN, AND IT DOES NOT ARRIVE TWICE.
  *
- * The crossfade IS the arrival now, and the screens did not know that. Every
- * one of them animates its own elements in on mount — `enterUp` on `.enter`
- * children, `drise` on rows and panels — because until this changed, a screen
- * mounting WAS a chapter arriving and that stagger was the whole of it.
- *
- * Measured on a flick: the layer mounts at 60ms with `enterUp` x6 and `drise`
- * x3 starting, the fade is finished by 180ms, and the stagger runs on for
- * another 562ms. Two arrivals in a row, the second one after the transition
- * had visibly ended — which is the "intro animation" this fixes.
+ * Each of these screens animates its own elements in when it mounts, because
+ * until this page put a fade in front of them, a screen mounting WAS a chapter
+ * arriving and that stagger was the whole of it. It is the fade now. Measured
+ * before this: the fade finished at 180ms and the elements went on rising for
+ * another 562ms — two arrivals, the second one after the transition had ended.
  *
  * WHY A TIMER AND NOT A CLASS THAT STAYS. The stagger is not decoration: the
  * scripted screens re-key `Enter` on every scene, and `Enter`'s own note says
  * why — without it "every state after that snaps into place, which is the
  * thing that makes a scripted screen read as a slideshow". A permanent
- * suppression on this layer would kill those too. So it is lifted once the
- * arrival animations are past their end, and every element created after that
- * — every later scene — staggers normally.
+ * suppression would kill those too. So it is lifted once the arrival
+ * animations are past their end, and every element created after that — every
+ * later scene — staggers normally.
  *
- * WHY IT IS SAFE TO LIFT AT ALL is the part worth being careful about. The CSS
- * suppresses with a large negative `animation-delay`, not with
- * `animation: none`: `none` DELETES the animation, so restoring it creates a
- * fresh one that plays from the top — the same bug moved 1.1 seconds later. A
- * negative delay leaves the animation in place and already past its end, and
- * at the lift it is still past it. See the rule in 25-home-app.css.
+ * WHY IT IS SAFE TO LIFT is the part worth being careful about. The CSS
+ * suppresses with a large negative `animation-delay`, not `animation: none`:
+ * `none` DELETES the animation, so restoring it creates a fresh one that plays
+ * from the top — the same bug moved 1.1 seconds later. A negative delay leaves
+ * the animation in place and already past its end, and at the lift it is still
+ * past it. See the rule in 25-home-app.css.
  */
-function InLayer({ children }: { children: ReactNode }) {
+function Layer({ children }: { children: ReactNode }) {
   const [settled, setSettled] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setSettled(true), ARRIVE_MS);
     return () => clearTimeout(t);
   }, []);
-  return <div className={'appswap in' + (settled ? '' : ' noentry')}>{children}</div>;
+  return <div className={'appswap' + (settled ? '' : ' noentry')}>{children}</div>;
 }
 
 /* Four one-line components, because a hook cannot be called conditionally and
