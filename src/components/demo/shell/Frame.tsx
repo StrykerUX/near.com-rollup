@@ -172,9 +172,35 @@ export function StatusBar({ time = '12:03' }: { time?: string }) {
 
 export type TabName = 'Home' | 'Assets' | 'Swap' | 'Perps' | 'Menu';
 
+/**
+ * `fl` MARKS THE SHAPES THE ACTIVE TAB FILLS — see `.dtab[aria-current] .fl` in
+ * 17-demo.css, which washes them with 22% green. Only a closed shape can carry
+ * it; Swap is an open arrow and has never had one.
+ */
 const TAB_ICONS: Record<TabName, ReactNode> = {
   Home: <path className="fl" d="M12 4.6l7.4 5.9V18a1.9 1.9 0 0 1-1.9 1.9H6.5A1.9 1.9 0 0 1 4.6 18v-7.5z" />,
-  Assets: <rect className="fl" x="4.4" y="6.4" width="15.2" height="11.2" rx="2.6" />,
+  /* ASSETS IS LUCIDE'S WALLET (ISC) — `lucide-static`, icon `wallet-minimal`,
+     the same two paths the Earn chapter's recipient row draws, so the app has
+     ONE wallet mark rather than two things that mean the same thing.
+
+     WHAT IT REPLACES was a bare `<rect rx="2.6">` drawn here, and a rounded
+     rectangle is not a wallet — it is a card, or a database, or a note. The
+     `wallet-minimal` cut is the one that keeps the eyelet, which is the detail
+     that still reads at 21px.
+
+     AND IT CARRIES NO `fl`, which is a real trade rather than an oversight: the
+     body is an OPEN path — it ends running back along the top edge — so a fill
+     would close it across the opening and paint a wedge through the middle. The
+     active tab still reads as active, because `.dtab[aria-current]` turns the
+     whole icon green; what it loses is the fill wash behind it. Swap has always
+     looked like that. If the wash matters more than the mark, lucide's
+     `wallet-cards` is the fillable one — a rect with two lines over it. */
+  Assets: (
+    <>
+      <path d="M17 14h.01" />
+      <path d="M7 7h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14" />
+    </>
+  ),
   Swap: <path d="M7 9.4h9l-2.4-2.4M17 14.6H8l2.4 2.4" />,
   Perps: <><path d="M8.2 4.8v2.4M12 4.2v3M15.8 5.4v2.4" /><rect className="fl" x="6.9" y="7.2" width="2.6" height="9.6" rx="1.1" /><rect className="fl" x="14.5" y="7.8" width="2.6" height="7.2" rx="1.1" /></>,
   Menu: <><rect className="fl" x="4.5" y="4.5" width="6.2" height="6.2" rx="1.9" /><rect className="fl" x="13.3" y="4.5" width="6.2" height="6.2" rx="1.9" /><rect className="fl" x="4.5" y="13.3" width="6.2" height="6.2" rx="1.9" /><rect className="fl" x="13.3" y="13.3" width="6.2" height="6.2" rx="1.9" /></>,
