@@ -68,9 +68,11 @@
    SCOPED TO THE HOME PAGE'S TWO WRAPPERS, deliberately. `.pdev` is the same
    element the twelve demo routes draw, and this is a decision about this page.
 
-   SCOPED, deliberately. */
-.appmorph .pdev,
+   AND ON THE WIDE ONE THE DEPTH IS NOT ON `.pdev` AT ALL — see `.appdev`
+   below. The narrow tour keeps it here: it has one device per section and
+   nothing ever stacks. */
 .mdev .pdev { box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .9) }
+.appmorph .pdev { box-shadow: none }
 
 /**
  * THE DEVICE IS CENTRED ON THE PLATE, not pinned to its top.
@@ -111,6 +113,27 @@
      outside the device's own silhouette. */
   background: #000;
   border-radius: calc(42px * var(--k));
+  /* THE DEPTH BELONGS TO THE CARRIER, NOT TO THE SCREEN.
+     -------------------------------------------------------------------------
+     It was on `.pdev`, and `.pdev` is the thing there are TWO of during a
+     crossfade — so both drew the same `0 40px 90px -30px` and the shadows
+     summed. Measured in the band 6 to 70px under the device: it lost 20% of its
+     luminance mid-move and its darkest point went from 85 to 47, then snapped
+     back when the outgoing screen unmounted. A shadow that darkens and recovers
+     on every chapter change is the smudge that reads as dirt.
+
+     Here there is exactly one of it however many screens are stacked, and it
+     never fades, because this element neither mounts nor changes opacity.
+
+     THE LENGTHS ARE MULTIPLIED OUT BY `--k` because they used to be scaled for
+     free. On `.pdev` the shadow sat inside `transform: scale(var(--k))`, and a
+     transform scales a box-shadow along with everything else; this box is the
+     already-multiplied one, so at `--k: .64` an unscaled 90px blur would render
+     half again as large as it used to. Same numbers, same appearance, at every
+     step of the ladder at the bottom of this file. */
+  box-shadow:
+    0 calc(40px * var(--k)) calc(90px * var(--k)) calc(-30px * var(--k))
+    rgba(0, 0, 0, .9);
 }
 
 /* THE CHAPTER'S SCREEN ARRIVES RATHER THAN REPLACING THE LAST ONE IN PLACE.
