@@ -704,16 +704,51 @@ export function startStageEngine(): () => void {
     const tv = scrubT(stageP);
     /* the hero and the shrink own their own ends */
     if (tv <= -1 + 0.02 || tv >= N - 1 - 0.02) return;
-    /* NEVER MOVE AGAINST THE USER. Rounding to nearest — even biased — pulls
-       someone who nudged down from card 1 to t=1.13 back UP to card 1, undoing
-       their own input. So: only ever settle to the boundary AHEAD of them, and
-       only if it is within reach. A small deliberate nudge is left alone; a
-       scroll that clearly meant to reach the next card gets finished for them.
-       Consequence: a dead band ~0.25 past each boundary where you can park. */
+    /* SETTLE TO THE BOUNDARY AHEAD OF THEM, not to the nearest one. Rounding to
+       nearest pulls someone who nudged down from card 1 to t=1.13 back UP to
+       card 1, undoing their own input; the direction of travel is the reader's
+       stated intent and it gets honoured. A scroll that clearly meant to reach
+       the next card is finished for them. */
     let near = snapDir > 0 ? Math.ceil(tv) : Math.floor(tv);
+    if (Math.abs(near - tv) > SNAP_REACH) {
+      /* AND IF THEY BARELY ENTERED THE MOVE, PUT THEM BACK — which is the case
+         this used to give up on, and the reason a reader could be left standing
+         inside a transition.
+
+         `SNAP_REACH` is 0.75, so this branch is the first quarter of a move:
+         they travelled less than 25% of a step and then stopped. There is
+         nothing to finish there — a quarter of the way in, the crossfade is at
+         `--sw-in-o` 0.25 and the frame is two screens blended — so the honest
+         resolution is the boundary they just left. It is the SHORTER of the two
+         moves by construction, and it is the only place this file moves against
+         the direction of travel: at most a quarter of a step, to undo a nudge
+         that resolved to nothing.
+
+         IT GOES TO THE NEAR EDGE OF THE REST BAND, NOT TO ITS START, and that
+         distinction is the whole difference between a correction and a lurch.
+         `yForT` of an integer resolves to where a card's rest band BEGINS —
+         its own note says it "hands the reader the whole dwell rather than the
+         tail of it", which is exactly right for the forward snap below and
+         exactly wrong here. The rest band is ~395px; sending someone who
+         travelled 3% into a move back to the start of it is a 400px reversal
+         to undo a nudge worth twenty. Measured on the first card, where the
+         band starts at the top of the stage, it threw the reader from 420 back
+         to 0.
+
+         So the target is the LAST scroll position that still reads as this
+         card: one pixel before its move begins. `yForT(near + ε)` is the first
+         pixel of the move — the -1 steps back inside the band, where `scrubT`
+         returns the integer and only one screen is mounted. */
+      near = snapDir > 0 ? Math.floor(tv) : Math.ceil(tv);
+      near = clamp(near, 0, N - 1);
+      const yBack = yForT(near + 1e-4, stage!) - 1;
+      if (Math.abs(yBack - window.scrollY) < 2) return;
+      snapUntil = t + 900;
+      snapGo(yBack);
+      return;
+    }
     const gap = Math.abs(near - tv);
     if (gap < 0.02) return;         /* already settled */
-    if (gap > SNAP_REACH) return;   /* parked on purpose, leave them */
     near = clamp(near, 0, N - 1);
     const y = yForT(near, stage!);
     if (Math.abs(y - window.scrollY) < 2) return;
