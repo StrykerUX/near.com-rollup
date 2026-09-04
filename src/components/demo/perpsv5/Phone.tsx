@@ -309,7 +309,9 @@ function Market({ d }: { d: Deck }) {
         <Icon d={CHART_KIND} className="bkind" />
       </div>
 
-      {s.book.length ? <PositionBar d={d} /> : null}
+      {/* it draws nothing until there is a position in THIS market — the test
+          lives inside it, next to the reason */}
+      <PositionBar d={d} />
 
       {/**
         * ONE SLOT, TWO ROWS, AND THE BOOK DECIDES WHICH.
@@ -344,23 +346,44 @@ function Market({ d }: { d: Deck }) {
 }
 
 /**
- * THE BAR UNDER THE CHART, which is the app's summary of what you are in. It
- * shows the FIRST position rather than a net of the book: netting two longs
+ * THE BAR UNDER THE CHART, which is the app's summary of what you are in — IN
+ * THIS MARKET. It shows the position in `PAIR` and nothing else, and if there
+ * is none it is not drawn.
+ *
+ * IT USED TO SHOW `book[0]`, and on this cut book[0] is the ZEC long the
+ * chapter opens holding. So the bar sat directly under a Bitcoin chart,
+ * against a Bitcoin price, reporting a Zcash position's P&L — and the same
+ * figure appeared again in the card below it, where it belongs and where it is
+ * labelled ZEC. Two lines saying +$122.20 with only one of them saying what it
+ * was about.
+ *
+ * The screen is deliberately holding one asset while watching another (see
+ * `OPEN_SYM` in state.ts), and the rest of the file already respects that:
+ * `atFor` prices a foreign position against its own mark so it does not move
+ * when Bitcoin ticks, and the chart's entry lines are filtered to `PAIR`. This
+ * was the one place that was not.
+ *
+ * The index matters as much as the position: `data-pnl` is looked up against
+ * the book by number, so a hardcoded 0 here would have kept animating the ZEC
+ * line under a bar showing Bitcoin's.
+ *
+ * It still shows ONE position rather than a net of the book: netting two longs
  * into one line is what a risk engine does and not what this screen does, and
  * the reference frame is unambiguous that the bar names a side and a leverage.
  */
 function PositionBar({ d }: { d: Deck }) {
   const { s } = d;
-  const p = s.book[0];
-  if (!p) return null;
+  const i = s.book.findIndex((x) => x.sym === PAIR);
+  if (i < 0) return null;
+  const p = s.book[i];
   const open = d.can('posOpen');
   return (
     <div className="bposbar">
       <div className={'bposh' + live(open)} {...press(open)} data-tap="posbar">
         <span className="bposl">Position: <b className={p.side}>{p.side === 'long' ? 'Long' : 'Short'} {p.lev}x</b></span>
         <span className="bposp">
-          <b data-pnl="0">{signed(pnl(p, atFor(p, MARK)))}</b>
-          <i data-pnlp="0" className="bpct">{signedPct(pnlPct(p, atFor(p, MARK)))}</i>
+          <b data-pnl={i}>{signed(pnl(p, atFor(p, MARK)))}</b>
+          <i data-pnlp={i} className="bpct">{signedPct(pnlPct(p, atFor(p, MARK)))}</i>
         </span>
         <Icon d={CHEV} className={'bcv bposc' + (s.posOpen ? ' on' : '')} />
       </div>

@@ -75,7 +75,15 @@ export const VAULTS: Vault[] = [
      * Gauntlet is a risk firm that has set parameters for onchain lending since
      * 2020, its USDC vault is curated on Morpho and runs on Ethereum, its 30-day
      * APY is 6.00% (6.35% over 24h), and Morpho curators charge a performance
-     * fee on yield — Gauntlet's is 15%.
+     * fee on yield.
+     *
+     * TWO OF THE FEES ARE THE CLIENT'S NUMBERS, NOT THE RESEARCH'S. The
+     * performance fee was written here as 15% and the withdrawal fee as 0.05%;
+     * they are 7% and 0.06%, given directly. Which is the whole reason the note
+     * above exists: this is the one vault in the cut whose disclosure was never
+     * on screen, so every figure in it was a best reading until somebody who
+     * knows the vault said otherwise. Taler's numbers below are NOT changed —
+     * those were read off the recording.
      *
      * THE RATE IS THE CURRENT ONE, NOT THE FRAME'S 4.52%. The reference
      * screenshot of the app's own Assets screen carries an `Earn 6%` pill, so
@@ -89,8 +97,8 @@ export const VAULTS: Vault[] = [
     apy: '6.00%', tvlFull: '$432,921,004',
     fees: [
       ['Deposit fee', 'Variable, up to 0.01%'],
-      ['Withdrawal fee', 'Fixed, 0.05%'],
-      ['Performance fee', '15% of yield earned'],
+      ['Withdrawal fee', 'Fixed, 0.06%'],
+      ['Performance fee', '7% of yield earned'],
     ],
   },
   {
