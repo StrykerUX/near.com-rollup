@@ -66,7 +66,9 @@
    in the layout.
 
    SCOPED TO THE HOME PAGE'S TWO WRAPPERS, deliberately. `.pdev` is the same
-   element the twelve demo routes draw, and this is a decision about this page. */
+   element the twelve demo routes draw, and this is a decision about this page.
+
+   SCOPED, deliberately. */
 .appmorph .pdev,
 .mdev .pdev { box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .9) }
 
@@ -162,6 +164,34 @@
   z-index: 1;
   /* it is leaving; it must not eat a press on the way out */
   pointer-events: none;
+}
+
+/* A SCREEN DOES NOT ARRIVE TWICE.
+   -------------------------------------------------------------------------
+   Each of these screens animates its own elements in when it mounts —
+   `enterUp` on `.enter` children, `drise` on rows and panels — because until
+   the crossfade existed, a screen mounting WAS a chapter arriving. Now the
+   fade is the arrival, and the stagger played after it: measured on a flick,
+   the fade was done at 180ms and the elements went on rising for another
+   562ms. Two arrivals, the second one after the transition had ended.
+
+   A NEGATIVE DELAY, NOT `animation: none`, and the difference is the whole
+   trick. `none` deletes the animation; restoring it later creates a fresh one
+   that plays from the top, which would move this bug 1.1 seconds later rather
+   than fix it. A delay of -1200ms leaves the animation in place with its clock
+   already past the end — every arrival here finishes by 810ms — so the element
+   simply renders at rest, and at the lift it is still past the end and still
+   plays nothing. `!important` because the authored staggers set this property
+   themselves.
+
+   IT IS LIFTED, and it has to be: `InLayer` drops `noentry` at 1100ms so that
+   every element created after that — every later scene, every sheet, every
+   loop pass — staggers the way it was written to. This suppresses one arrival,
+   not the screen's motion. */
+.appmorph .appswap.noentry .enter > *,
+.appmorph .appswap.noentry .enter-one,
+.appmorph .appswap.noentry [data-motion] * {
+  animation-delay: -1200ms !important;
 }
 
 /* NOTHING TO DISABLE, AND THAT IS WHY THIS BLOCK IS SHORT. There is no

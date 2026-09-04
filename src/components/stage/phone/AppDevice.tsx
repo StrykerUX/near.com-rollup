@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { subscribeActiveFace, subscribeCardMove, type CardMove } from '@/stage/bus';
 import { useDeck } from '@/components/demo/shell/deck';
 
@@ -109,11 +109,64 @@ export function AppDevice() {
           <Out />
         </div>
       ) : null}
-      <div className="appswap in" key={to}>
+      <InLayer key={to}>
         <In />
-      </div>
+      </InLayer>
     </div>
   );
+}
+
+/**
+ * HOW LONG A SCREEN IS STILL "ARRIVING" AFTER IT MOUNTS.
+ *
+ * It is the longest arrival animation any of these screens has, plus room:
+ * `.enter > *` is `enterUp` at 560ms inside `.pdev.app` with a stagger that
+ * reaches 250ms, so 810ms is the ceiling. `drise` — the other arrival family,
+ * on `.pdview > *`, `.ernrow`, `.bposact` and the rest — tops out at 460ms.
+ *
+ * THE MARGIN IS NOT DECORATION. The suppression is lifted at this mark, and
+ * lifting it early would restart whatever had not finished: an animation's
+ * clock runs from the element's creation, so at the lift its current time is
+ * `elapsed - delay`, and that has to be past `duration` for nothing to play.
+ * At 1100ms the worst case is 1100 - 250 = 850 against 810.
+ */
+const ARRIVE_MS = 1100;
+
+/**
+ * THE INCOMING LAYER, WHICH DOES NOT LET ITS SCREEN ARRIVE TWICE.
+ *
+ * The crossfade IS the arrival now, and the screens did not know that. Every
+ * one of them animates its own elements in on mount — `enterUp` on `.enter`
+ * children, `drise` on rows and panels — because until this changed, a screen
+ * mounting WAS a chapter arriving and that stagger was the whole of it.
+ *
+ * Measured on a flick: the layer mounts at 60ms with `enterUp` x6 and `drise`
+ * x3 starting, the fade is finished by 180ms, and the stagger runs on for
+ * another 562ms. Two arrivals in a row, the second one after the transition
+ * had visibly ended — which is the "intro animation" this fixes.
+ *
+ * WHY A TIMER AND NOT A CLASS THAT STAYS. The stagger is not decoration: the
+ * scripted screens re-key `Enter` on every scene, and `Enter`'s own note says
+ * why — without it "every state after that snaps into place, which is the
+ * thing that makes a scripted screen read as a slideshow". A permanent
+ * suppression on this layer would kill those too. So it is lifted once the
+ * arrival animations are past their end, and every element created after that
+ * — every later scene — staggers normally.
+ *
+ * WHY IT IS SAFE TO LIFT AT ALL is the part worth being careful about. The CSS
+ * suppresses with a large negative `animation-delay`, not with
+ * `animation: none`: `none` DELETES the animation, so restoring it creates a
+ * fresh one that plays from the top — the same bug moved 1.1 seconds later. A
+ * negative delay leaves the animation in place and already past its end, and
+ * at the lift it is still past it. See the rule in 25-home-app.css.
+ */
+function InLayer({ children }: { children: ReactNode }) {
+  const [settled, setSettled] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSettled(true), ARRIVE_MS);
+    return () => clearTimeout(t);
+  }, []);
+  return <div className={'appswap in' + (settled ? '' : ' noentry')}>{children}</div>;
 }
 
 /* Four one-line components, because a hook cannot be called conditionally and
