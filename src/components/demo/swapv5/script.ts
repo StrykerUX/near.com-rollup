@@ -125,11 +125,11 @@ const STEPS: Step<SV, SVAction>[] = [
     ],
   },
 
-  /* ---- scene 2 · 5,600ms ----------------------------------------------
+  /* ---- scene 2 · 4,220ms ----------------------------------------------
      The list is the point of this scene and its length is the only thing it
-     has to say, so it is given the most time of the four. Three stops rather
-     than one glide: one continuous move reads as one fact, and what a reader
-     should come away with is that there was more every time they looked. */
+     has to say, so it is given the most time of the four. TWO stops, not
+     three: down into the catalogue and back, which is the shape a thumb makes.
+     See `STOPS` in state.ts for why three read as three cuts. */
   {
     id: 'list', ch: 'list',
     title: 'Everything, and it keeps going',
@@ -139,27 +139,24 @@ const STEPS: Step<SV, SVAction>[] = [
          sheet was still arriving, so `Your tokens` — the wallet the reader saw
          two faces ago, with the same three quantities — went past unread. */
       { ms: 1200, do: 'picker' },
-      { ms: 680, do: 'scroll', arg: String(STOPS[0]) },
-      { ms: 700, do: 'scroll', arg: String(STOPS[1]) },
-      /* and on until the row it came for comes into view. It travels one way:
-         the destination the form opened with is already valid, so this is not
-         someone hunting for an answer, it is someone seeing what else there is
-         on the way to a better one. */
-      /* and back to the top, where it turns out the account already held it */
-      { ms: 820, do: 'scroll', arg: String(STOPS[2]) },
-      /* AND THEN IT PRESSES, rather than sitting on the answer for two and a
-         half seconds first. This beat was 2,780: 380 of travel and then 2,400
-         of a list that had stopped, with NEAR on screen and nothing happening
-         to it. It is 820 now — the travel, and 440 to see the row arrive — and
-         the 1,960 it gave up came out of the clip rather than moving somewhere
-         else in it. Nothing was cut: the same three stops, the same rest on the
-         quote after the pick.
+      /* DOWN, ONCE, into the catalogue. 1,000 against 620ms of travel: the
+         move is still the shorter half of the move-settle pair, which is what
+         keeps it reading as somebody scrolling rather than as a cut, and the
+         380 left over is the list coming to rest under its own weight. */
+      { ms: 1000, do: 'scroll', arg: String(STOPS[0]) },
+      /* and back to the top, where it turns out the account already held it.
+         Longer than the way down — a flick back is the same gesture but the
+         reader now knows what they are returning to, so the settle is what
+         they are watching. */
+      { ms: 1120, do: 'scroll', arg: String(STOPS[1]) },
+      /* AND THEN IT PRESSES, rather than sitting on the answer. The beat is
+         the last of the travel plus long enough to see ZEC arrive at the top.
 
-         At 620ms of travel against beats of 900/1100/1400 the list also spent
-         longer stopped than moving, which read as three cuts rather than as
-         somebody scrolling. The travel is 380 and the beats 680/700/820 — the
-         move is the shorter half of each move-settle pair. */
-      { ms: 820 },
+         THE SCENE'S LENGTH DID NOT MOVE: 1,200 + 1,000 + 1,120 + 900 is the
+         4,220 that 1,200 + 680 + 700 + 820 + 820 was. One fewer stop bought
+         longer moves, not a shorter clip — `check:flows` reads the same
+         18,900ms. */
+      { ms: 900 },
     ],
   },
 

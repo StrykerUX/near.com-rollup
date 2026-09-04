@@ -301,16 +301,24 @@
 }
 
 .pdev.swp .swlistwrap { flex: 1; min-height: 0; overflow: hidden; position: relative }
-/* HOW A FINGER MOVES A LIST, which is not how `--ease-out` moves anything.
-   `ease-out` leaves at full speed and slows: correct for a thing that was
-   PUSHED, wrong for a thing somebody is dragging, because a list that is still
-   does not reach its top speed in the first frame. This curve has a soft head,
-   a quick middle and a long tail — the flick and the settle — and it is 100ms
-   shorter than what it replaces, so the travel is both faster and calmer. The
-   three stops then read as move · settle · move rather than as three cuts. */
+/* HOW A FLICK MOVES A LIST. `--ease-out` leaves at full speed and slows evenly,
+   which is a thing being PUSHED; a list that has been thrown has most of its
+   distance behind it early and then a long, slowing tail carrying the weight.
+   Measured off the running page at 620ms: half the travel is gone in the first
+   100ms and the last 10px take about 300 — which is the shape, and it is the
+   tail that reads as momentum rather than as a cut.
+
+   620ms, AND IT WAS 380. The curve was right and the duration belonged to a
+   different script: three short hops of 266px and 198px, where the list now
+   makes one move of 410 and one back. Travelling twice the distance in the
+   same time is the jump the shorter version was trying not to be, and at 380
+   the tail — the part that reads as weight — was over before the eye had
+   caught up with the head. The stops are two now (see `STOPS` in
+   swapv5/state.ts); this is the other half of that change and neither works
+   without the other. */
 .pdev.swp .swlist {
   display: flex; flex-direction: column;
-  transition: transform 380ms cubic-bezier(.32, .72, 0, 1);
+  transition: transform 620ms cubic-bezier(.32, .72, 0, 1);
 }
 /* the rail is drawn inside this wrap, so the rows are inset from it — a
    holding's figure running under a scrollbar reads as a clipping bug */

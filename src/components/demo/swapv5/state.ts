@@ -158,14 +158,29 @@ export const PICK_TOTAL = pickOffset(PICK_ROWS.length);
  * NEAR, from a wallet that held no NEAR; now the list is long, the reader sees
  * that it is long, and the answer was in their own five the whole time.
  *
- * Three stops rather than one glide: the eye reads one continuous move as one
- * fact, and three read as someone looking. The first is 5 rather than 0 so the
- * picker RESTS on `Your tokens` before it moves — a wallet section nobody sees
- * is a wallet section that may as well not be there. `check:flows` walks these
- * as ordinary beats; that ZEC is actually on screen at the last one is checked
- * against the rendered device rather than against this file.
+ * TWO STOPS, AND IT WAS THREE. `[5, 9, 0]` rested on the wallet, stepped into
+ * the catalogue, then came home — three moves, and on screen they read as
+ * three cuts rather than as one person scrolling. Each was short (266px, then
+ * 198), each was over in 380ms, and the eye had barely started following one
+ * before the next began.
+ *
+ * One move down and one move back is the same argument in the shape a thumb
+ * actually makes: a flick, a look, and a flick back. It goes to 8 rather than
+ * 9 so the `More tokens` heading lands at the top — the reader is not just
+ * further down a list, they are in a different and much longer section of it,
+ * which is the fact this scene exists to deliver. And the wallet is still
+ * rested on: it is what the sheet OPENS on, held for the 1,200ms before
+ * anything moves, so it no longer needs a stop of its own to be seen.
+ *
+ * The travel itself is 620ms now against 380 — see `.swlist` in
+ * 26-demo-swap-v5.css. A longer list travelled in one go has to take longer,
+ * or "smoother" just means the same jump with fewer of them.
+ *
+ * `check:flows` walks these as ordinary beats; that ZEC is actually on screen
+ * at the last one is checked against the rendered device rather than against
+ * this file.
  */
-export const STOPS = [5, 9, 0];
+export const STOPS = [8, 0];
 
 export type SV = {
   /**
