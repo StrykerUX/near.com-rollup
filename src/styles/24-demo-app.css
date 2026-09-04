@@ -101,7 +101,17 @@
   font-weight: 700; letter-spacing: -.02em; overflow: hidden;
 }
 /* artwork brings its own disc, so it covers the chip rather than sitting
-   inside it — the same rule `.tok .tokimg` keeps one level up */
+   inside it — the same rule `.tok .tokimg` keeps one level up.
+
+   `height: 100%` HERE IS INERT, and knowing that matters before the next
+   non-square file arrives. `.swdot` above is a centred grid, and inside one a
+   percentage block size on an `<img>` does not resolve — the height comes from
+   the file's own ratio instead. Every mark in the set is square except Apple's,
+   so for twenty of them the ratio and this rule agree and nobody could tell.
+   Apple's is 1280x1573 and came out 34x41.78 in a 34px chip, sliced by the
+   round clip. It is inset in pixels by the components now (`bare` in
+   lib/tokens.ts); the declaration is left as it is because it is what the
+   square files want and rewriting it would suggest it does more than it does. */
 .pdev.app .swimg { width: 100%; height: 100%; display: block }
 .pdev.app .swsvg { width: 58%; height: 58%; display: block }
 

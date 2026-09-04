@@ -29,7 +29,7 @@ export function TokenDot({ token, size = 20 }: { token: Token; size?: number }) 
            one case next/image's layout machinery buys nothing for. */
         // eslint-disable-next-line @next/next/no-img-element
         <img className="tokimg" src={glyph.img} alt="" width={size} height={size} aria-hidden="true"
-             style={glyph.spin ? { transform: `rotate(${glyph.spin}deg)` } : undefined} />
+             style={imgBox(glyph, size)} />
       ) : glyph ? (
         <svg viewBox="0 0 600 600" fill={token.ink} aria-hidden="true">
           {'d' in glyph ? <path d={glyph.d} /> : <polygon points={glyph.points} />}
@@ -39,4 +39,28 @@ export function TokenDot({ token, size = 20 }: { token: Token; size?: number }) 
       )}
     </span>
   );
+}
+
+/**
+ * As `Dot`'s own `imgBox`, at this file's fraction: `60%` is what
+ * `.tok svg` gets in 07-stage.css for a glyph with no disc of its own.
+ *
+ * `borderRadius: 0` is the one addition. `.tok .tokimg` rounds the image to
+ * 50% because artwork here normally IS the disc; on an inset silhouette that
+ * same rule would clip the mark into a circle and undo the point of insetting
+ * it. See the note on `bare` in lib/tokens.ts.
+ */
+function imgBox(glyph: { spin?: number; bare?: true }, size: number): React.CSSProperties | undefined {
+  if (!glyph.spin && !glyph.bare) return undefined;
+  return {
+    ...(glyph.spin ? { transform: `rotate(${glyph.spin}deg)` } : null),
+    ...(glyph.bare
+      ? {
+          width: `${size * 0.6}px`,
+          height: `${size * 0.6}px`,
+          objectFit: 'contain' as const,
+          borderRadius: 0,
+        }
+      : null),
+  };
 }

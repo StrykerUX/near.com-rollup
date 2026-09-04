@@ -55,7 +55,29 @@ export type TokenGlyph =
    * symbol in the DOM, which neither component emits. Declared once here, both
    * honour it and so does anything added later.
    */
-  | { img: string; spin?: number };
+  /**
+   * `bare` MARKS A SILHOUETTE RATHER THAN A DISC, and it exists because one
+   * file in this set is not the shape the others are.
+   *
+   * Everything else here is a disc that fills its own square, so the chip can
+   * let it bleed to the edge — `.swimg` and `.tokimg` size it at 100%. Apple's
+   * mark is a black silhouette on nothing, and its canvas is 1280x1573, so
+   * bleeding it to the edge of a round chip slices the leaf off the top, the
+   * base off the bottom and the shoulders off both sides.
+   *
+   * IT CANNOT BE FIXED IN THE STYLESHEET, and that is measured rather than
+   * assumed. `.swdot` is `display:grid;place-items:center`, and inside it a
+   * percentage BLOCK size on an `<img>` does not apply — the height falls back
+   * to the intrinsic ratio. Reproduced in isolation: the same markup gives a
+   * square file 34x34 and this one 34x41.78 in a 34px chip. Every other mark
+   * is square, so `height:100%` never being honoured has been invisible.
+   *
+   * So a bare mark is inset in PIXELS by the two components that draw these
+   * chips, each using the fraction its own stylesheet already gives a glyph
+   * with no disc — 58% in `Dot`, 60% in `TokenDot`. The fact lives here; the
+   * number stays next to the presentation it belongs to.
+   */
+  | { img: string; spin?: number; bare?: true };
 
 export const TOK_ICONS: Record<string, TokenGlyph> = {
   /**
@@ -124,6 +146,11 @@ export const TOK_ICONS: Record<string, TokenGlyph> = {
   /* THE ONE SHARE IN THE SET, and the only mark drawn in black. Every other
      file here is a disc that covers its own square in the brand's colour; the
      Apple mark is a silhouette on nothing, so the chip's own `color` has to be
-     the white it stands on. See `aapl` in ownv5/state.ts. */
-  AAPL: { img: '/logos/tokens/aapl.webp' },
+     the white it stands on. See `aapl` in ownv5/state.ts.
+
+     AND THE ONLY ONE THAT IS NOT SQUARE — 1280x1573, with the ink touching all
+     four edges of the canvas. `bare` is what keeps it inside the chip instead
+     of being cropped by it; see the note on the type above for why the round
+     clip was eating it and why no stylesheet could have stopped that. */
+  AAPL: { img: '/logos/tokens/aapl.webp', bare: true },
 };

@@ -35,7 +35,7 @@ export function Dot({ a, size = 30 }: { a: Chip; size?: number }) {
       {art && 'img' in art ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img className="swimg" src={art.img} alt="" width={size} height={size} aria-hidden="true"
-             style={art.spin ? { transform: `rotate(${art.spin}deg)` } : undefined} />
+             style={imgBox(art, size)} />
       ) : art && 'd' in art ? (
         <svg className="swsvg" viewBox="0 0 600 600" fill={a.ink} aria-hidden="true"><path d={art.d} /></svg>
       ) : art && 'points' in art ? (
@@ -45,4 +45,27 @@ export function Dot({ a, size = 30 }: { a: Chip; size?: number }) {
       )}
     </span>
   );
+}
+
+/**
+ * The inline box a file-backed mark needs, and nothing when it needs none.
+ *
+ * `58%` is `.swsvg`'s own number in 24-demo-app.css — the size this chip gives
+ * a glyph that does not bring a disc — and it is applied in PIXELS rather than
+ * as a percentage because a percentage block size does not resolve on an
+ * `<img>` inside `.swdot`'s centred grid. `lib/tokens.ts` has the measurement.
+ *
+ * The box is square and `contain` fits the artwork inside it, so a mark that
+ * is taller than it is wide keeps its proportions. At 58% the box's own corners
+ * sit 0.41 of the chip from its centre against a radius of 0.5, so the round
+ * clip cannot reach even those.
+ */
+function imgBox(art: { spin?: number; bare?: true }, size: number): React.CSSProperties | undefined {
+  if (!art.spin && !art.bare) return undefined;
+  return {
+    ...(art.spin ? { transform: `rotate(${art.spin}deg)` } : null),
+    ...(art.bare
+      ? { width: `${size * 0.58}px`, height: `${size * 0.58}px`, objectFit: 'contain' as const }
+      : null),
+  };
 }
