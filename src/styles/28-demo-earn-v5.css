@@ -289,8 +289,11 @@
 /* the recipient has no token, so it gets the wallet glyph the frame draws */
 .pdev.earn .ernswal {
   width: 26px; height: 26px; flex: none; border-radius: 50%;
+  display: grid; place-items: center;
   background: rgba(255, 255, 255, .12);
+  color: rgba(255, 255, 255, .82);
 }
+.pdev.earn .ernswali { width: 15px; height: 15px; display: block }
 .pdev.earn .ernschev { width: 17px; height: 17px; flex: none; color: rgba(255, 255, 255, .4) }
 
 /* ---- the amount, and what pays for it ---------------------------------- */

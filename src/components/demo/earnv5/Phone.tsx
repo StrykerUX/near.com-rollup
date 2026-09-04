@@ -243,7 +243,7 @@ function Send({ d }: { d: Deck }) {
         <ChevDown />
       </div>
       <div className="ernsrow">
-        <span className="ernswal" aria-hidden="true" />
+        <span className="ernswal" aria-hidden="true"><Wallet /></span>
         <span><i>Recipient</i><b>Select recipient</b></span>
         <ChevDown />
       </div>
@@ -338,6 +338,34 @@ function PaySheet({ d }: { d: Deck }) {
         ))}
       </div>
     </Layer>
+  );
+}
+
+/**
+ * THE RECIPIENT'S MARK — a wallet, where the other two rows carry a token.
+ *
+ * Traced off the same clip at 13.5s, blown up: a FILLED wallet, not an
+ * outline, with a flap laid across the top left and an eyelet on the right.
+ * The other glyphs in this chapter are lucide strokes, and this one is not,
+ * because the frame it comes from is not: the row it sits in is the only one
+ * whose left mark is not a coin, and the app draws it as a solid the way it
+ * draws the coins as solids.
+ *
+ * The eyelet is a HOLE and not a dark dot: `fillRule="evenodd"` cuts it out of
+ * the body, so whatever the circle behind it is — and it is a translucent
+ * white on a background that has changed twice this month — shows through it.
+ * A dot painted in the container's colour would have had to be repainted every
+ * time that colour moved.
+ */
+function Wallet() {
+  return (
+    <svg className="ernswali" viewBox="0 0 24 24" fill="currentColor"
+         fillRule="evenodd" clipRule="evenodd" aria-hidden="true">
+      {/* the flap, tucked behind the body's top edge */}
+      <path d="M7.6 7.4 14.1 4.7a1.6 1.6 0 0 1 2.2 1.5v1.2Z" />
+      {/* the body, with the eyelet cut out of it */}
+      <path d="M6 7.9h12a3 3 0 0 1 3 3v6.2a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-6.2a3 3 0 0 1 3-3Zm11.35 5.05a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Z" />
+    </svg>
   );
 }
 
