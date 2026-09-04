@@ -1,0 +1,259 @@
+/* =========================================================================
+   THE CURTAIN — a chart that draws itself, then gets out of the way
+   -------------------------------------------------------------------------
+   Nine candles over two seconds on the hero's own gradient, and no JavaScript
+   anywhere in it. See `components/Splash.tsx` for what it is for and why the
+   candles are markup rather than the canvas the device already has.
+
+   THE WHOLE FILE IS DECLARATIVE ON PURPOSE. A curtain that needs a script to
+   leave is a curtain that can trap a reader, and the failure is total: an
+   invisible sheet over the whole page with the nav and every CTA behind it.
+   Everything below either animates on its own or is never shown at all.
+   ========================================================================= */
+
+/* ---- 1. THE SHEET ---------------------------------------------------------
+   z-index 1000 against a ceiling of 90. `.nav` is the highest thing the page
+   declares (06-nav.css:5) and `.mobcta` is 80 (11-grid.css:138), so 1000 is
+   not a magic number so much as an obvious one — but it IS required rather
+   than decorative: `.light` is `position:relative;z-index:6` (08-light.css:7),
+   which makes it a stacking participant, so being later in the DOM would not
+   have been enough on its own.
+
+   THE HEIGHT IS COPIED FROM `.stage-sticky`, TWICE, and that is the one thing
+   in this file that cannot be simplified. The field behind the curtain is
+   `height:100vh` on a wide frame (07-stage.css:5) and `100dvh` below 1080
+   (30-mobile-tour.css:46). `vh` and `dvh` are the same number on a desktop and
+   are NOT the same on a phone with a URL bar, and since the curtain's job is
+   to be pixel-identical to the field it covers, a mismatch would show up as a
+   seam along the bottom edge at the exact moment the curtain fades. `inset:0`
+   would have been shorter and would have picked a viewport of its own.
+
+   1080 IS `NARROW_MAX` (lib/breakpoints.ts) — the copy that file's comment
+   warns about. Change it there and it has to change here too. */
+.splash {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 100vh;
+  z-index: 1000;
+  /* the literal from 07-stage.css:50, not a token: this page's greens have
+     never been tokens (02-tokens.css declares none of them, and the theme's
+     only token is --hero-ink), so a token invented here would be the only one
+     and the other four sites would still disagree with it. */
+  background: linear-gradient(150deg, #5EFAA7 0%, #5EFAA7 50%, #16B862 100%);
+  display: grid;
+  place-items: center;
+  /* TWO ANIMATIONS, AND THE SECOND ONE IS THE SAFETY, because the resting
+     state has to be UNCLICKABLE. An `opacity:0` sheet still swallows every
+     click on the page underneath it, so a curtain whose exit ended at zero
+     opacity would leave an invisible lid over the nav and every CTA — and it
+     would do that permanently, on a page where nothing ever removes it.
+
+     THE PARK IS A TRANSFORM, AND `step-start` IS WHY IT IS RELIABLE. This was
+     written first as `spgone 1ms linear 1999ms forwards` ending in
+     `visibility:hidden`, on the reasoning that a discrete property flips at
+     the midpoint of its interval, so a 1ms interval at the end is effectively
+     the end. That was wrong twice over, and measurably so — it failed 10 out
+     of 10 loads:
+
+       · `visibility` is NOT plain discrete. It has a special rule: when one
+         endpoint is `visible`, `visible` is used for the whole interval and
+         only the exact endpoint is `hidden`. There is no midpoint flip to
+         lean on. `display` is special-cased the same way, so it is no escape.
+       · that exact endpoint is not reachable. Chrome keeps these times in
+         SECONDS, so the progress at the end computes as
+         (2.0 - 1.999) / 0.001, and in binary floating point that is
+         0.9999999999998899, not 1. A 1ms duration is the worst possible
+         choice because it divides the subtraction error by the smallest
+         number available, amplifying it to 1e-13 relative.
+
+     So the guarantee is carried by `transform`, which interpolates
+     CONTINUOUSLY — at progress 0.9999999999998899 a -100% translate is off by
+     nine thousandths of a pixel, which is no difference at all. And
+     `step-start` removes the endpoint question entirely: its output is 1
+     across the whole interval, not at the end of it, so from 1940ms onward
+     both declarations below are simply in force. `visibility:hidden` rides
+     along as a bonus — it stops the sheet painting — but nothing depends on
+     it landing. */
+  animation:
+    spfade 380ms var(--ease-soft) 1560ms forwards,
+    sppark  60ms step-start       1940ms forwards;
+}
+@keyframes spfade { to { opacity: 0 } }
+@keyframes sppark { to { visibility: hidden; transform: translateY(-100%) } }
+
+@media (max-width: 1080px) { .splash { height: 100dvh } }
+
+/* ONCE PER SESSION. The inline script in `layout.tsx` sets the attribute; this
+   hides the curtain when it finds it. The DIRECTION is the load-bearing part:
+   the script marks what has been SEEN and CSS hides it, so a reader with no
+   JavaScript — or a private window, where `sessionStorage` throws — gets the
+   curtain and it leaves on its own. Written the other way round, with CSS
+   hiding by default and a script revealing, the same reader would get a page
+   that works but a feature that never runs; written this way the worst case is
+   that they see it twice. */
+html[data-splash="seen"] .splash { display: none }
+
+/* NOT SHOWN AT ALL UNDER REDUCED MOTION. `09-responsive.css:204` already
+   forces `animation-duration:.01ms !important` on everything, so the curtain
+   would jump to its end state and effectively never appear — this rule is the
+   same outcome said out loud, rather than inherited from a global !important
+   in another file that a future edit could narrow. */
+@media (prefers-reduced-motion: reduce) { .splash { display: none } }
+
+/* ---- 2. THE GROUP ---------------------------------------------------------
+   One width for the chart and the eyebrow together, so the two stay the same
+   measure at every frame size and there is no breakpoint to keep in sync.
+   `min()` and an `aspect-ratio` do the whole job the media queries would. */
+.splashin {
+  width: min(420px, 78vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(22px, 4vh, 34px);
+  /* THE LIFT ON THE WAY OUT, AND ONLY THE LIFT. A chart that rises slightly
+     as it goes reads as arriving into the page rather than being switched
+     off. `--ease-out` and not `--ease-soft`: 12-motion.css:30 assigns the
+     expo curve to transforms and the soft one to colour, and this is a
+     transform.
+
+     THE OPACITY IS NOT HERE, and that is a correction rather than an
+     omission. This rule carried `opacity: 0` as well at first, which looked
+     right and measured wrong: nested opacities MULTIPLY, so the candles'
+     effective alpha was the sheet's curve times this one — two stacked
+     expo-outs. Measured, that put them at 0.082 ninety milliseconds in and
+     0.0036 at a hundred and ninety, so a 380ms fade was really a ~100ms
+     blink after a 1.3s build.
+
+     One fade, and it lives on the sheet. That works because the sheet's own
+     fade is invisible — it is the same gradient as the hero underneath it —
+     so the sheet's alpha is, in effect, the candles' alpha, and they now
+     leave on the single soft curve the sheet is given. */
+  animation: spout 380ms var(--ease-out) 1560ms both;
+}
+@keyframes spout { to { transform: scale(1.04) } }
+
+/* 2.5:1. Wide enough that nine candles are a series rather than a cluster,
+   short enough that it does not become the page. */
+.spchart { position: relative; width: 100%; aspect-ratio: 420 / 168 }
+
+/* ON A NARROW FRAME THE CHART GETS MORE OF BOTH. At 390 the group came out
+   304 x 202 inside an 844-tall viewport, which left the eyebrow reading
+   heavier than the animation it was introducing — the brand louder than the
+   argument. There is no shortage of height on a phone, so the chart takes a
+   squarer box and the group takes the 86vw bound `.morph` already uses at this
+   width (25-home-app.css:120) rather than 78. The eyebrow keeps the tour's own
+   sizes, so the mark is the same object either side of the fade. */
+@media (max-width: 700px) {
+  .splashin { width: min(420px, 86vw) }
+  .spchart { aspect-ratio: 420 / 205 }
+}
+
+/* ---- 3. ONE CANDLE --------------------------------------------------------
+   The element IS the wick's box — low at the bottom, high at the top — which
+   is what makes `transform-origin` mean something: scaling this from `bottom`
+   grows the candle out of its own low, not out of the floor of the chart. The
+   body is drawn inside it as a fraction of the wick, so the two can never
+   drift apart.
+
+   `@keyframes cue` (07-stage.css:94) is the precedent — the scroll cue's 1px
+   bar growing on `scaleY` with a switched `transform-origin`. It is the only
+   other place in the page that does this, and mechanically it is a wick. */
+.spc {
+  position: absolute;
+  bottom: var(--wb);
+  height: var(--wh);
+  left: calc(var(--i) * (100% / 9));
+  width: calc(100% / 9);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  /* 130ms, NOT THE HOUSE 45ms. The 45ms stagger (12-motion.css:141-148) is for
+     a group arriving as one gesture — eight testimonial cards that should feel
+     simultaneous but not synchronised. Here each candle is a beat: the reader
+     is meant to watch the series advance left to right, and nine candles at
+     45ms would resolve in 405ms and read as a single flicker. */
+  animation: spgrow 300ms var(--ease-out) calc(var(--i) * 130ms) both;
+}
+@keyframes spgrow { to { transform: scaleY(1) } }
+
+/* the wick: 1px, centred. `Chart.tsx:806` snaps its centre to a half pixel so
+   a 1px stroke lands on one device pixel instead of two grey ones; a
+   left/right pair of 50% offsets is the CSS way to the same place. */
+.spc::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 0; bottom: 0;
+  width: 1px;
+  margin-left: -.5px;
+  background: var(--hero-ink);
+}
+
+/* the body: 62% of the column slot, which is `cw * 0.62` from Chart.tsx:806
+   carried over verbatim. `max()` guards the doji case the same way that file's
+   `Math.max(1, …)` does — a candle that opens where it closes still has to be
+   a mark rather than nothing. */
+.spc::after {
+  content: '';
+  position: absolute;
+  left: 19%;
+  width: 62%;
+  bottom: var(--bb);
+  height: max(2px, var(--bh));
+  background: var(--hero-ink);
+}
+
+/* ---- 4. THE TWO DOWN CANDLES ---------------------------------------------
+   HOLLOW, NOT RED. The device draws its losses in `#E5484D`
+   (demo/app/palette.ts), and that colour was picked for a `#0A0A0A` panel; on
+   this field it would be the only warm thing on the page. 31-hero-green.css:24
+   is explicit that this composition has one ink at one strength and that
+   hierarchy comes from size and weight — so the distinction is drawn the way
+   a trading platform draws it when it only has one colour to spend: filled for
+   up, outlined for down. Same ink, different weight.
+
+   AND THEY GROW DOWNWARD. This is the detail that separates a chart from a bar
+   chart: a losing candle falls away from its open. It costs one line. */
+.spc.dn { transform-origin: top }
+.spc.dn::after {
+  background: none;
+  border: 1.5px solid var(--hero-ink);
+}
+
+/* ---- 5. THE EYEBROW -------------------------------------------------------
+   The heights are the narrow tour's (30-mobile-tour.css:68-83) rather than the
+   hero's clamped ones: the curtain is one centred column at every width, which
+   is the shape the narrow composition already solved.
+
+   THE RULE CARRIES ITS OWN COLOUR, and this is a real trap rather than a
+   preference. `31-hero-green.css:172` is what turns the divider into solid
+   black for this theme, and it is scoped `#stage .rollbrow .rule` — the
+   curtain is not inside `#stage`, so without the line below it would fall
+   through to `--browrule-src`, a PNG hairline cut for a near-black field, and
+   the request for it would go out during the curtain. */
+/* THE MARKS ARE BACKGROUND IMAGES, so they are not discovered until this
+   stylesheet is parsed, and `rollup-logo.png` is 95KB. `layout.tsx` preloads
+   both from the HTML to start those requests earlier; this fade is the belt
+   for when they still arrive late — a brow that eases in over 400ms hides a
+   couple of hundred milliseconds of lateness, where one that was simply
+   present would pop. */
+.spbrow {
+  display: flex; align-items: center; gap: 15px;
+  animation: spbrowin 400ms var(--ease-soft) 200ms both;
+}
+@keyframes spbrowin { from { opacity: 0 } }
+.spbrow .nearw {
+  display: block; flex: none;
+  height: 24px; aspect-ratio: 462 / 120;
+  background: var(--nearlock-src) center / contain no-repeat;
+}
+.spbrow .rule {
+  flex: none; width: 3px; height: 28px;
+  background: #000; border-radius: 2px;
+}
+.spbrow .rolllock {
+  display: block; flex: none;
+  height: 40px; aspect-ratio: 759 / 232;
+  background: var(--rolllock-src) center / contain no-repeat;
+  /* the same copper glow the mark carries in the hero and the tour, so it is
+     the same object lit by the same field */
+  filter: drop-shadow(0 5px 20px rgba(226, 150, 96, .30));
+}
