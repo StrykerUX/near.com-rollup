@@ -68,6 +68,8 @@ export type DemoFlow<S, A extends string> = {
   steps: Step<S, A>[];
   /** the beat index each step starts at */
   starts: number[];
+  /** the beat the FIRST pass opens on; -1 is the top, like every pass after */
+  openAt: number;
   /** the state at a given beat index — the pure function the page rides */
   frameAt: (i: number) => S;
   /** which step a beat index belongs to */
@@ -92,6 +94,23 @@ export type FlowSpec<S, A extends string> = {
    * beat left would be the worst kind of bug — it would still work.
    */
   anchor?: Record<string, string>;
+  /**
+   * THE STEP THE FIRST PASS OPENS ON, and only the first.
+   *
+   * A flow's opening scene is usually its own establishing shot, and on a page
+   * that plays four of them in a row that shot can be a scene the reader has
+   * just watched. Swap opens on the account screen — deliberately, to answer
+   * where the swap screen came from — and the chapter directly above it is the
+   * account. Arriving at chapter three to be shown chapter two is the cost.
+   *
+   * So the first pass can start further in. Every pass after it runs from the
+   * top, which is what keeps the answer: a reader who stays gets the whole
+   * script, a reader who scrolls past gets the screen the chapter is named for.
+   * By step id and not by beat index, for the reason `anchor` gives above.
+   *
+   * Omit it and the flow opens at the top, which is what every other one does.
+   */
+  openAt?: string;
   /** the step whose entrance reduced motion gets: the most informative frame */
   restStep: string;
   /** how long the finished screen holds before the loop starts over */
@@ -156,6 +175,7 @@ export function buildFlow<S, A extends string>(spec: FlowSpec<S, A>): DemoFlow<S
 
   return {
     machine, chapters: spec.chapters, steps: spec.steps, starts, frameAt, stepOf,
+    openAt: spec.openAt === undefined ? -1 : starts[index(spec.openAt)],
     target: spec.target,
   };
 }

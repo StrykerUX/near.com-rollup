@@ -28,30 +28,24 @@ const FLOWS = 'src/components/stage/phone/flows';
 const DEMO = 'src/components/demo';
 const SHELL = 'src/components/demo/shell';
 /* [source file, name it is written out under] */
+/* FOUR MACHINES, WHERE THERE WERE SEVENTEEN. The site was twenty routes and
+   every one of them had a script worth walking; it is one route now, and what
+   is left is the four chapters the tour actually plays. Every other entry in
+   this list pointed at a file that no longer exists, which is what broke this
+   checker the moment the routes came out. */
 const MODULES = [
   [`${FLOWS}/machine.ts`, 'machine'],
   /* the tour's price table. Its own module because putting it in the account
      chapter made an import cycle — see the note in the file. */
   ['src/lib/prices.ts', 'prices'],
   [`${SHELL}/flow.ts`, 'flow'],
-  [`${FLOWS}/perps.ts`, 'perps'],
-  [`${FLOWS}/swap.ts`, 'swap'],
-  [`${FLOWS}/earn.ts`, 'earn'],
-  [`${FLOWS}/account.ts`, 'account'],
-  /* the standalone /demo/perps machine — same contract, its own arc */
-  [`${DEMO}/perps/state.ts`, 'perps-state'],
-  [`${DEMO}/perps/script.ts`, 'perps-script'],
-  [`${DEMO}/perpsv2/script.ts`, 'perpsv2-script'],
-  [`${DEMO}/perpsv3/script.ts`, 'perpsv3-script'],
-  [`${DEMO}/perpsv4/script.ts`, 'perpsv4-script'],
-  /* the short cut, which is its OWN machine rather than a re-grouping
-     of the one above it — a different entry price, a book that starts with a
-     position on it, and no passkey. Walked for exactly that reason. */
+  /* the perps chapter — its own machine rather than a re-grouping of an older
+     one: a different entry price, a book that starts with a position on it,
+     and no passkey. */
   [`${DEMO}/perpsv5/state.ts`, 'perpsv5-state'],
   [`${DEMO}/perpsv5/script.ts`, 'perpsv5-script'],
-  /* the swap short cut — its own machine again, and for the same reason: the
-     long swap bakes in three screens, a confidential/main split and a vault
-     deposit running beside it. This one is a single form. */
+  /* the swap chapter — a single form, and a catalogue long enough to be the
+     point of one of its scenes */
   [`${DEMO}/swapv5/catalogue.ts`, 'swapv5-catalogue'],
   [`${DEMO}/swapv5/state.ts`, 'swapv5-state'],
   [`${DEMO}/swapv5/script.ts`, 'swapv5-script'],
@@ -60,22 +54,6 @@ const MODULES = [
   [`${DEMO}/ownv5/script.ts`, 'ownv5-script'],
   [`${DEMO}/earnv5/state.ts`, 'earnv5-state'],
   [`${DEMO}/earnv5/script.ts`, 'earnv5-script'],
-  [`${DEMO}/swap/state.ts`, 'swap-state'],
-  [`${DEMO}/swap/script.ts`, 'swap-script'],
-  [`${DEMO}/earn/state.ts`, 'earn-state'],
-  [`${DEMO}/earn/script.ts`, 'earn-script'],
-  [`${DEMO}/condeposit/state.ts`, 'condeposit-state'],
-  [`${DEMO}/condeposit/script.ts`, 'condeposit-script'],
-  [`${DEMO}/consend/state.ts`, 'consend-state'],
-  [`${DEMO}/consend/script.ts`, 'consend-script'],
-  /* the marketing cuts. Each one is the same machine as the flow above it,
-     re-grouped into eight or so moments — which is exactly why they are worth
-     walking: a re-cut that dropped or reordered a beat would still typecheck,
-     still build, and refuse silently on the third screen. */
-  [`${DEMO}/swapv4/script.ts`, 'swapv4-script'],
-  [`${DEMO}/earnv4/script.ts`, 'earnv4-script'],
-  [`${DEMO}/condepositv4/script.ts`, 'condepositv4-script'],
-  [`${DEMO}/consendv4/script.ts`, 'consendv4-script'],
 ];
 
 /* The flow files are types plus plain data — no JSX, no bundler features — so
@@ -111,26 +89,10 @@ const load = (f) => import(pathToFileURL(join(dir, `${f}.mjs`)).href);
 
 const { applyBeat, stateAt } = await load('machine');
 const machines = {
-  perps: (await load('perps')).perps,
-  swap: (await load('swap')).swap,
-  earn: (await load('earn')).earn,
-  account: (await load('account')).account,
-  'demo/perps': (await load('perps-script')).perpsFlow.machine,
-  'demo/perps-v2': (await load('perpsv2-script')).perpsV2Flow.machine,
-  'demo/perps-v3': (await load('perpsv3-script')).perpsV3Flow.machine,
-  'demo/perps-v4': (await load('perpsv4-script')).perpsV4Flow.machine,
-  'demo/perps-v5': (await load('perpsv5-script')).perpsV5Flow.machine,
-  'demo/swap-v5': (await load('swapv5-script')).swapV5Flow.machine,
-  'demo/own-v5': (await load('ownv5-script')).ownV5Flow.machine,
-  'demo/earn-v5': (await load('earnv5-script')).earnV5Flow.machine,
-  'demo/swap': (await load('swap-script')).swapFlow.machine,
-  'demo/earn': (await load('earn-script')).earnFlow.machine,
-  'demo/confidential-deposit': (await load('condeposit-script')).conDepositFlow.machine,
-  'demo/confidential-send': (await load('consend-script')).conSendFlow.machine,
-  'demo/swap-v4': (await load('swapv4-script')).swapV4Flow.machine,
-  'demo/earn-v4': (await load('earnv4-script')).earnV4Flow.machine,
-  'demo/confidential-deposit-v4': (await load('condepositv4-script')).conDepositV4Flow.machine,
-  'demo/confidential-send-v4': (await load('consendv4-script')).conSendV4Flow.machine,
+  'perps-v5': (await load('perpsv5-script')).perpsV5Flow.machine,
+  'swap-v5': (await load('swapv5-script')).swapV5Flow.machine,
+  'own-v5': (await load('ownv5-script')).ownV5Flow.machine,
+  'earn-v5': (await load('earnv5-script')).earnV5Flow.machine,
 };
 
 let fail = 0;
@@ -191,88 +153,36 @@ for (const [name, m] of Object.entries(machines)) {
 }
 
 /* ==========================================================================
-   4 · A MARKETING CUT IS THE SAME FLOW, RE-GROUPED
+   4 · (RETIRED) THE MARKETING CUTS PLAYED THE SAME BEATS AS THEIR FLOWS
    --------------------------------------------------------------------------
-   Each v4 is the same machine as the flow it was cut from, with the steps
-   merged into eight or so moments. That means its beats must be the SAME
-   beats, in the SAME order — a cut is where the step boundaries fall, not a
-   different set of gestures. A re-cut that quietly dropped a beat, or typed a
-   different figure, or pressed two things in the other order would still
-   typecheck and still build, and would refuse on some screen halfway through
-   where nobody is looking for the cause.
-   Only beats that DO something are compared: a cut is free to hold longer,
-   and free to add a silent beat at the end to hold on its last frame.
+   This walked four pairs — a long flow and the v4 re-cut of it — and asserted
+   that the cut re-grouped beats without changing them, because a re-cut that
+   dropped or reordered one would still typecheck, still build, and refuse
+   silently on the third screen. It was a good assertion about a shape the site
+   no longer has: both halves of all four pairs went with the demo routes. The
+   number is left in the sequence so the checks below keep the ids they have
+   always had in the log.
    ========================================================================== */
-{
-  const PAIRS = [
-    ['demo/swap', 'demo/swap-v4'],
-    ['demo/earn', 'demo/earn-v4'],
-    ['demo/confidential-deposit', 'demo/confidential-deposit-v4'],
-    ['demo/confidential-send', 'demo/confidential-send-v4'],
-  ];
-  const gestures = (m) => m.beats.filter((b) => b.do).map((b) => b.do + (b.arg === undefined ? '' : `:${b.arg}`));
-  console.log('\n== marketing cuts play the same beats as the flows they are cut from');
-  for (const [base, cut] of PAIRS) {
-    const a = gestures(machines[base]);
-    const b = gestures(machines[cut]);
-    const i = a.findIndex((x, n) => x !== b[n]);
-    if (a.length !== b.length || i !== -1) {
-      const at = i === -1 ? Math.min(a.length, b.length) : i;
-      bad(cut, `beat ${at + 1} of ${base} is "${a[at] ?? '(end)'}" but the cut plays `
-        + `"${b[at] ?? '(end)'}" — a cut re-groups beats, it does not change them`);
-    } else {
-      console.log(`   ${cut}: ${a.length} gestures, ${machines[cut].beats.length} beats, `
-        + `${machines[base].beats.length} in ${base} — same gestures, ${machines[cut].beats.length - a.length} holds`);
-    }
-  }
-}
+
 
 /* ==========================================================================
-   5 · THE TAKE PROFIT FILLS ON THE FRAME THE MARKET REACHES IT
+   5 · (RETIRED) THE TAKE PROFIT FILLED ON THE FRAME THE MARKET REACHED IT
    --------------------------------------------------------------------------
-   Three numbers in three files have to agree: the chart's climb length
+   Three numbers in three files had to agree: the chart's climb length
    (RAMP_CANDLES x CANDLE_MS, in real milliseconds), the deck's PACE, and the
-   beat that closes the position. They drifted once already — the beat was
-   written in real milliseconds, the deck played it at PACE, and the order
-   filled 5.6 seconds after the market had traded through the line it was
-   supposed to have closed at. Nothing about that is visible to a type checker
-   and it looks almost right on screen, which is the worst way for it to fail.
-   ========================================================================== */
-{
-  const chart = readFileSync('src/components/stage/phone/ui/Chart.tsx', 'utf8');
-  const CANDLE_MS = Number(chart.match(/const CANDLE_MS = (\d+);/)[1]);
-  const RAMP_N = chart.match(/const RAMP = \[([\s\S]*?)\];/)[1]
-    .split(',').filter((x) => /-?\d/.test(x)).length;
-  const PACE = Number(
-    readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
-  );
-  /* the climb, in the units a beat is written in */
-  const climb = (RAMP_N * CANDLE_MS) / PACE;
-  console.log(`\n== take profit timing — climb is ${RAMP_N} x ${CANDLE_MS}ms, ${climb}ms of script time`);
+   beat that closed the position. They drifted once — the beat was written in
+   real milliseconds, the deck played it at PACE, and the order filled 5.6
+   seconds after the market had traded through the line it was supposed to have
+   closed at. Nothing about that was visible to a type checker.
 
-  for (const name of ['demo/perps-v3', 'demo/perps-v4']) {
-    const m = machines[name];
-    let st = { ...m.initial };
-    let t = 0, openedAt = null, filledAt = null;
-    for (const b of m.beats) {
-      t += b.ms ?? 0;
-      if (b.do) {
-        const patch = m.actions[b.do]?.(st, b.arg);
-        if (patch) st = { ...st, ...patch };
-      }
-      if (openedAt === null && st.pos) openedAt = t;
-      if (filledAt === null && st.filled) filledAt = t;
-    }
-    if (openedAt === null) { bad(name, 'no position is ever opened'); continue; }
-    if (filledAt === null) { bad(name, 'the take profit never fills'); continue; }
-    const gap = filledAt - openedAt;
-    if (gap !== climb)
-      bad(name, `fills ${gap}ms after the open, but the climb is ${climb}ms — `
-        + (gap > climb ? 'the market trades past the line before the order closes'
-                       : 'the order closes before the market gets there'));
-    else console.log(`   ${name}: opens at ${openedAt}ms, fills at ${filledAt}ms — on the frame`);
-  }
-}
+   It walked `/demo/perps-v3` and `/demo/perps-v4`, and both are gone. The
+   perps chapter that survives does not open a position against a climbing
+   chart — it sets up a trade and stops — so the assertion has no subject
+   rather than a new one. If a chapter ever fills an order off the chart again,
+   this is the check to bring back, and the failure it caught is in the
+   paragraph above.
+   ========================================================================== */
+
 
 /* ==========================================================================
    6 · THE SHORT CUT RUNS THE LENGTH IT SAYS IT DOES
@@ -307,7 +217,7 @@ for (const [name, m] of Object.entries(machines)) {
     readFileSync('src/components/demo/shell/deck.ts', 'utf8').match(/const PACE = ([\d.]+);/)[1],
   );
   console.log('\n== the short cuts run the length they say they do');
-  for (const [name, limit] of [['demo/perps-v5', LIMIT], ['demo/swap-v5', 23625], ['demo/own-v5', 14400], ['demo/earn-v5', 25225]]) {
+  for (const [name, limit] of [['perps-v5', LIMIT], ['swap-v5', 23625], ['own-v5', 14400], ['earn-v5', 25225]]) {
     const m = machines[name];
     const authored = m.beats.reduce((t, b) => t + (b.ms ?? 0), 0) + (m.outro ?? 0);
     const real = Math.round(authored * PACE);

@@ -89,7 +89,16 @@ export function useDeck<S, A extends string>(flow: DemoFlow<S, A>): Deck<S, A> {
      obvious-looking `cur.current = view`) would throw that remainder away on
      every unrelated re-render and restart the beat's timer from zero. There is
      exactly one writer of this ref: the code below. */
-  const [view, setView] = useState<Cur<S>>(() => ({ s: { ...m.initial }, i: -1, t: 0, pass: 0 }));
+  /* THE FIRST PASS MAY OPEN FURTHER IN — see `openAt` in flow.ts. It is only
+     the opening frame that moves: the loop below still restarts at -1, so pass
+     two onwards is the whole script. `frameAt` is the same pure function
+     `seek()` uses, so an opened-late flow is in exactly the state it would be
+     in if it had played the skipped beats. */
+  const [view, setView] = useState<Cur<S>>(() =>
+    flow.openAt < 0
+      ? { s: { ...m.initial }, i: -1, t: 0, pass: 0 }
+      : { s: flow.frameAt(flow.openAt), i: flow.openAt, t: 0, pass: 0 },
+  );
   /* the press counter and the control it landed on. A ref, because the clock
      writes them on the frame a beat turns over and React only needs them on
      the render that follows. */

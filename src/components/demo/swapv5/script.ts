@@ -228,6 +228,19 @@ export const swapV5Flow = buildFlow<SV, SVAction>({
   actions,
   chapters: CHAPTERS,
   steps: STEPS,
+  /* THE FIRST PASS OPENS ON THE FORM, not on the account.
+     Scene 0 exists to answer where the swap screen came from — Swap is a tab on
+     the account, not a page you navigate to — and that answer is worth keeping.
+     What it cannot do is be the FIRST thing this chapter shows, because the
+     chapter directly above it is the account: scrolling from 02 to 03 landed on
+     the screen just left behind, and the tour looked like it had not advanced.
+
+     So the establishing shot moves to pass two. Arrive at the chapter and the
+     swap form is already up, which is what the chapter is named for; stay
+     through one loop and the account, the tab and the press are all still
+     there. Nothing is deleted and no beat is retimed — `check:flows` reads the
+     same 18,900ms it did before. */
+  openAt: 'amount',
   /* reduced motion gets the frame with the quote on it: the only one that
      shows both what was asked for and what it buys */
   restStep: 'quote',
