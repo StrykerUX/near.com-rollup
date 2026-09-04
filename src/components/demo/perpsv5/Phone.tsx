@@ -114,7 +114,7 @@ export function Phone({ d }: { d: Deck }) {
           `.blist` are both `flex: 1`, so the chart gets some air and the list
           finally has room to show that a SECOND position arrived, which is the
           frame the whole clip is spent earning. */}
-      <Chrome d={d} />
+      <Chrome />
       <div className="pdview">
         <Market d={d} />
       </div>
@@ -128,17 +128,20 @@ export function Phone({ d }: { d: Deck }) {
 /* ---- the chrome -------------------------------------------------------- */
 
 /**
- * The row above the pair. In the reference frame it holds a back chevron, a
- * notification badge and a wallet — and nothing that says what the account is
- * worth, because in the app that lives a tap away behind the wallet.
+ * The row above the pair: a back chevron and a wallet, and nothing that says
+ * what the account is worth — which is what the reference frame does, because
+ * in the app the balance lives a tap away behind that wallet.
  *
- * The balance chip is the one addition, and it is deliberate: the cut opens on
- * a position that has $6,000 of margin posted against it, and "what is left"
- * is the figure that makes the second trade legible before the ticket is even
- * open. Putting it in the corner is the cheapest place to say it — the ticket
- * says it again, in the app's own words, four hundred milliseconds later.
+ * IT CARRIED AN "AVAILABLE" CHIP AND NO LONGER DOES. The argument for it was
+ * that the cut opens on a position with $6,000 of margin posted, so "what is
+ * left" made the second trade legible early. The argument against it won: the
+ * ticket states the same figure in the app's own words four hundred
+ * milliseconds later, so the chip was the number twice, and it was the one
+ * thing on this row that the real app does not draw. A screen whose whole
+ * claim is that it looks like the app cannot afford an invention in its
+ * chrome. `avail()` is unchanged and still feeds the ticket's line.
  */
-function Chrome({ d }: { d: Deck }) {
+function Chrome() {
   return (
     <div className="bchrome">
       <span className="bback" aria-hidden="true">
@@ -146,11 +149,6 @@ function Chrome({ d }: { d: Deck }) {
              strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 5.5L8 12l6.5 6.5" /></svg>
       </span>
       <span className="bspace" />
-      {/* the figure travels, because it is about to be spent */}
-      <span className="bbal">
-        <i>Available</i>
-        <Count className="bbalv" value={avail(d.s)} dp={2} prefix="$" ms={960} />
-      </span>
       {/* THE WALLET, FROM LUCIDE (ISC) — `lucide-static@1.38.0`, icon `wallet`,
           inlined rather than depended on. It is one 24-grid path pair and the
           repo already keeps its icons this way (`phone/icons.tsx`, `TAB_ICONS`
