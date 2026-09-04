@@ -1,8 +1,12 @@
 # near.com × THE ROLLUP
 
 A refactor of the single-file `nearcom-rollup-v03.html` build (v08 rollup) onto
-Next.js 16 (App Router) + React 19 + Tailwind v4, with the WebGL gradient field
-and the scroll-scrub sequence ported intact and GSAP driving the light zone.
+Next.js 16 (App Router) + React 19 + Tailwind v4, with the scroll-scrub sequence
+ported intact and GSAP driving the light zone.
+
+**One route.** `/` is the whole site. It was twenty — the home page, two more
+modes of it, a card-deck drawing of it, and a gallery of sixteen demo screens —
+and the tour's four chapters are what survived of them.
 
 ```
 pnpm install
@@ -10,11 +14,80 @@ pnpm dev        # http://localhost:3000
 pnpm build
 pnpm lint
 pnpm typecheck
+pnpm check:flows   # walks the four scripts: reachability, and clip lengths
 ```
 
 ---
 
 ## What changed in this pass
+
+The page turns green, the tour gets a second composition for narrow frames, and
+the repo loses everything that was not on the one route.
+
+**The field is a gradient, and the shader is not drawn**
+
+- `linear-gradient(150deg, #5EFAA7 0%, #5EFAA7 50%, #16B862 100%)` — solid
+  through the first half of the axis, easing to the dark green in the lower
+  right. Six stacked radials, a blur and a `scale(1.16)` went with it; the
+  scale mattered, because 1.16 moves the 50% stop 8% out of frame.
+- The WebGL canvas is **absent, not hidden**. `makeGradientField(null)` returns
+  null and the whole GL block is behind `if (GL)`, so nothing runs. `gl/` is
+  untouched and still imported: putting the canvas back is one line.
+  → [The field is one gradient now](#the-field-is-one-gradient-now)
+- Five layers of deliberate darkness came off with it — a `#02100C` base,
+  `.gcss` at .80, `brightness(.58)` on the shader, two black corner vignettes
+  and a `#1C4419` corner light. All five are stated in one place rather than
+  deleted at source, because they are one decision.
+
+**The type is `#1F1F1F`, at full, everywhere**
+
+- No text on the page is faded. It was built as four strengths of one ink and
+  the brief asked for one; size and weight carry the hierarchy.
+- **Kepler is gone.** Every emphasised run is Montreal 300, upright — which
+  took three compensations and two hooks with it, all of them there because the
+  face was a serif. The page now makes **no third-party font request at all**,
+  where it made two. → [Kepler comes off the page](#kepler-comes-off-the-page)
+
+**The narrow frame is a different composition, not a squeezed one**
+
+- Four ordinary sections — eyebrow, headline, device, copy. Nothing sticky,
+  nothing scrubbed, no snap, no scroll-driven timeline, no observer picking a
+  chapter. The device is **301px wide at 390** where the stacked lockup had it
+  at 142. → [The narrow tour](#the-narrow-tour--four-sections-and-no-trick)
+- The stage engine **does not run there at all**, and `PhoneShell` is not
+  mounted: `display:none` does not stop a clock.
+
+**The tour**
+
+- **Swap and Earn open on their own screen.** Both scripts open on the account
+  home, deliberately — it is the answer to where the screen came from — and the
+  chapter directly above them is the account. `openAt` moves that establishing
+  shot to pass two. → [A chapter can open late](#a-chapter-can-open-late)
+- **Earn gets a seventh scene**, and it is the half the recording it is cut from
+  is named for: back to the account, `Send`, and a `Pay with` picker that opens
+  on **Your vaults**. A thousand dollars leaves the deposit without the deposit
+  being closed. → [Spending the yield](#spending-the-yield)
+- The perps position bar named the wrong market — it read `book[0]`, which is
+  the ZEC long, under a Bitcoin chart.
+- The swap picker scrolls **twice** instead of three times, at 620ms instead of
+  380.
+
+**Everywhere**
+
+- Buttons get their own curve. They were already transitioning and still read
+  as a cut: `--ease-out` is an expo that is 90% done in the first 55ms of its
+  240. → [Why the buttons still felt hit](#why-the-buttons-still-felt-hit)
+- Three separate rules were overriding `transition` on buttons, one of them to
+  `none`.
+
+---
+
+## The pass before this one
+
+> The `/demo/*` headings below were routes when this was written and are not
+> any more — those four screens are the tour's four chapters now, reached by
+> scrolling `/`. Everything else in this section is current: the five prices,
+> the wallet, and every figure that is arithmetic on them.
 
 Client feedback across all four chapters of the tour, and one wallet underneath
 them. Every figure on every screen is now arithmetic on five prices read on
@@ -81,12 +154,21 @@ recording shows, because the app's own rows carry an `Earn 6%` pill.
 
 ## What the page is
 
-588vh of scroll with a 100vh sticky child. Inside it, a four-card product tour
-(Perps → Account → Swap → Earn) whose whole composition is a **pure function of
-scroll position**, closing into a plate that contracts into the light zone.
+**Two compositions of one tour**, and exactly one of them is ever rendered.
 
-Behind all of it, a fullscreen fragment shader: fbm → domain warping → an OKLab
-palette, paced by pointer activity and never by scroll.
+Above 1080px: 588vh of scroll with a 100vh sticky child, holding a four-chapter
+product tour (Perps → Account → Swap → Earn) whose whole composition is a
+**pure function of scroll position**, closing into a plate that contracts into
+the light zone.
+
+At 1080 and below: four ordinary sections in normal flow. Nothing sticky,
+nothing scrubbed. `useNarrow` decides, and it decides in React rather than in
+CSS for one reason — `display:none` does not unmount a component, stop a timer
+or pause a canvas, and the wide composition runs a demo flow on its own clock.
+
+Behind both, the field: a single 150deg gradient between the two greens. There
+is a fullscreen fragment shader in `gl/` — fbm → domain warping → an OKLab
+palette — and it is not currently drawn; see below.
 
 ---
 
@@ -95,43 +177,56 @@ palette, paced by pointer activity and never by scroll.
 ```
 src/
   app/
-    layout.tsx        <head>, the Kepler kit link, metadata
-    page.tsx          nav · stage · quote band · light zone
+    layout.tsx        metadata and <body>. No <head> of its own any more —
+                      it carried the Adobe Fonts kit for Kepler
+    page.tsx          the one route
     globals.css       Tailwind + the ported stylesheet, in order
   styles/
     01..13-*.css      the original stylesheet, split at its own banners
     14-refactor.css   the one rule the DOM-shuffle used to do imperatively
-    15..23-*.css      the rebuilt app screens, v1 through v4
-    24-demo-app.css   `.pdev.app` — the shared language every v5 screen wears
-    25-home-app.css   the gutted plate that holds the real device — the deck
-                      `/`, `/guided` and `/live` all run
-    26..28-*.css      swap-v5 · own-v5 · earn-v5, each scoped to its own class
-    29-account-home.css  the home two of those chapters open on, `.pdev.app`
+    15-demo.css       mostly dead: eight selectors of it still render
+    16-modes.css      a fifth of what it was. `.can` is not a mode — the flow's
+                      own guard writes it, and all four screens read it
+    17-demo.css       `.pdev` itself lives here, so it stays
+    24-demo-app.css   `.pdev.app` — the shared language every screen wears
+    25-home-app.css   the gutted plate that holds the real device
+    26..28-*.css      swap · own · earn, each scoped to its own class
+    29-account-home.css  the home three chapters open on, `.pdev.app`
+    30-mobile-tour.css   the narrow composition, top to bottom
+    31-hero-green.css    the green theme: the field's five dark layers off,
+                      and one ink at one strength
   lib/
     schedule.ts       THE STAGE SCHEDULE — band weights, scrubT, yForT, feel dials
+    breakpoints.ts    1080, in the one place three files can read it
     math.ts           the easing vocabulary
-    prices.ts         THE TOUR'S FIVE PRICES, once — every figure on every v5
+    prices.ts         THE TOUR'S FIVE PRICES, once — every figure on every
                       screen is arithmetic on this table
-    tokens.ts         the swap screen's token set, and the v1–v4 flows' prices
-    quotes.ts         the marquee's testimonials
-    format.ts         en-US figure formatting
+    cards.tsx         the four chapters' copy, once, for both compositions
+    tokens.ts · quotes.ts · format.ts
   gl/
     gradient.vert.ts  fullscreen triangle
-    gradient.frag.ts  the field
+    gradient.frag.ts  the field — compiled, not currently drawn
     gradientField.ts  compile, uniforms, draw, the CTA ripple state
   stage/
-    engine.ts         the scrub, the snap, the shrink, the paint
+    engine.ts         the scrub, the snap, the shrink, the paint.
+                      Refuses to start below 1080
     domCache.ts       write-if-changed for style and custom properties
     bus.ts            the two slots where the engine reaches React state
-  hooks/              useStageEngine · useReveal · useCtaContract ·
-                      useKeplerProbe · useSqueezeItalics
+  hooks/              useStageEngine · useNarrow · useReveal ·
+                      useCtaContract · useReducedMotion
   components/
-    stage/            Stage · Hero · Lockup · StepDots · GradientField
-    stage/phone/      the demo app: four looping screens + chrome
-    stage/phone/ui/   Sheet · Keypad · ProgressList · Chart · Ticker · Enter
-    stage/phone/flows/ the scripts, and the player that runs them
+    stage/            Stage · Hero · Lockup · StepDots · GradientField ·
+                      MobileTour · NarrowChrome · QuoteBand
+    stage/phone/      PhoneShell (one branch now) · AppDevice · the flow machine
+    stage/phone/ui/   Chart · ProgressList · Enter · tap
+    demo/perpsv5|ownv5|swapv5|earnv5/   the four chapters: Phone, script, state
+    demo/shell/       flow · deck · Frame · Count · Typed
+    demo/app/         AccountHome — one account, shared by three chapters
     light/            marquee · security · faq · final CTA · footer
     marks/            vector marks lifted verbatim
+tools/
+  check-flows.mjs     walks the four scripts headlessly: every state reachable,
+                      and every clip the length its comment claims
 ```
 
 ---
@@ -191,11 +286,28 @@ invalidates the engine's cached child lists. A breakpoint does not.
 
 ---
 
-## `/demo/*` — the five recordings, rebuilt
+## `/demo/*` — the five recordings, rebuilt *(the routes are gone; the screens are not)*
 
-Five routes that are not part of the composed page. `/` is a scrolling argument
-with a phone in it; `/demo/*` is the app, at size, with the argument written
-beside it. `/demo` indexes them.
+> **Read this section as history, and read it for the screens.** The sixteen
+> `/demo/*` routes and the gallery that indexed them were deleted, along with
+> `/home-v2`, `/guided` and `/live`. What went with them: the marketing re-cuts
+> (v2, v3, v4), the pointing hand, the spotlight, the camera, the card-deck
+> viewport and its four faces, and about eleven thousand lines.
+>
+> **The four v5 screens did not go.** They ARE the tour's four chapters —
+> `AppDevice` imports `perpsv5`, `ownv5`, `swapv5` and `earnv5` and renders them
+> inside the device on the home page — so everything below about how those
+> screens are built, what is read off a frame and what is not, and why each
+> figure is the figure it is, is current. Only the URLs are gone.
+>
+> Everything below about v1 through v4 is a record of decisions, not of code.
+> It is kept because most of what those passes learned is why the v5 screens
+> look the way they do — and because a repo that deletes the reasoning along
+> with the code has to learn it twice.
+
+Five routes that were not part of the composed page. `/` is a scrolling argument
+with a phone in it; `/demo/*` was the app, at size, with the argument written
+beside it. `/demo` indexed them.
 
 | Route | Recording | Steps | What it shows |
 |---|---|---|---|
@@ -1071,7 +1183,7 @@ to change — $5,000 at 20x is the $100,000 position the cut is for. And the two
 exits hang off the mark at 2:1 rather than off the frames' arbitrary
 $82,000 / $78,200, for the same reason `demo/perps/state.ts` already gives.
 
-## `/demo/own-v5` — the account, and what is in it
+## The account chapter — `demo/ownv5`, and what is in it
 
 The tour's second chapter and the one the page's headline is about. Three
 frames: the account home, the **Assets** screen behind its Crypto row, and the
@@ -1184,7 +1296,7 @@ assets frame — 620ms to arrive plus 2,100 to sit — because both are frames w
 whole job is to be looked at and they carry about the same amount of reading.
 **14,400ms**, and `tools/check-flows.mjs` pins it.
 
-## `/demo/swap-v5` — the same device, doing something else
+## The swap chapter — `demo/swapv5`, the same device doing something else
 
 The second screen in the app's own language, and the first proof that the
 language is one. `.pdev.app` carries the face, the palette, the tempo, the
@@ -1341,7 +1453,7 @@ holds. It used to end nine rows down on NEAR, from a wallet that held no NEAR.
 The list is still long, the reader still sees that it is long, and the answer was
 in their own five the whole time.
 
-## `/demo/earn-v5` — the yield, and the account it lives in
+## The earn chapter — `demo/earnv5`, the yield and the account it lives in
 
 The tour's fourth chapter. It opens on the same `AccountHome` the other two open
 on, presses the **Earn** balance — the third row of the card — and lands on the
@@ -1436,15 +1548,19 @@ all four faces in the plate at 348×696.
 
 ## The plate gives up and holds the real device
 
-The screen `/demo/perps-v5` runs, unchanged, standing in the home page's room:
-its gradient field, its lockup, its quote, its scroll, its light zone. Not a
-version of that screen — the same `<Phone>` file, the same `useDeck`, the same
-flow, the same 352 × 766. Anything fixed there is fixed here by construction.
+`demo/perpsv5/Phone.tsx` runs, unchanged, standing in the home page's room: its
+gradient field, its lockup, its quote, its scroll, its light zone. Not a version
+of that screen — the same file, the same `useDeck`, the same flow, the same
+352 × 766. It had a route of its own once (`/demo/perps-v5`) and the route is
+what went; the screen is the chapter.
 
-`flows/deck.tsx` carries the choice, a context beside `flows/mode.tsx` and for
-the same reason: it is made at the page and consumed four levels down, and
-threading it through Site → Stage → Lockup → PhoneShell would put a parameter on
-three components with no opinion about it.
+**The choice this section was written about is gone.** `flows/deck.tsx` carried
+it — a context, made at the page and consumed four levels down — because
+`/home-v2` drew these chapters as a four-card deck and `/` drew them as the real
+device. With that route deleted there is one drawing, `PhoneShell` has one
+branch, and the prop that selected between them is not threaded through Site →
+Stage → Lockup at all. The argument for a context over a prop chain still
+stands; there is simply nothing left to choose.
 
 ### The first attempt was a rebuild, and that was the mistake
 
@@ -1483,7 +1599,16 @@ the composition is laid out around. Centred, it overhangs evenly and the plate's
 height stops mattering, which is what it should do on a route with no cards in
 it.
 
-## Three versions of the same app
+## Three versions of the same app *(retired)*
+
+> `/guided` and `/live` are gone, and `ModeSwitch` with them. The site is one
+> route. What follows is why the three existed and what each was for — worth
+> keeping, because the machinery that made them possible is still here: a flow
+> is a script over a state machine, and the machine never knew which mode was
+> driving it. `.can` in `16-modes.css` is the surviving half, and it was never
+> about modes at all — see the note in that file.
+
+### The three, and what each was for
 
 There are three routes. They are the same page, the same four screens and the
 same state machines — only the driver behind the phone changes.
@@ -1538,7 +1663,19 @@ While the reader has the wheel, a pill rides over the tab bar: *you have the
 wheel — resuming shortly*. A resume that is not announced reads as the screen
 overriding you rather than waiting for you.
 
-## The demo screens
+## The demo screens *(the card deck is retired)*
+
+> The four-face viewport this section describes — one chrome, one tab bar, and
+> `PerpsFace` / `AccountFace` / `SwapFace` / `EarnFace` sliding inside it — was
+> only ever reachable from `/home-v2`, and went with that route. `PhoneShell`
+> has one branch now and it holds the real device.
+>
+> The section stays because the argument in it is the reason the deck lost:
+> `.cswap` gives 547px and the device lays out 763, so fitting the real screen
+> into the plate meant dropping the chrome, the time axis and the ticket's
+> sheet — a different screen wearing the same palette.
+
+### What the deck was
 
 The four screens inside the phone shell are rebuilt against the real near.com
 app — recordings of Perps, Swap, Earn and Universal Send.
@@ -1690,6 +1827,261 @@ buttons.
 
 ---
 
+## The field is one gradient now
+
+The comp puts the tour on two greens: `#5EFAA7` lit through the upper left,
+`#16B862` banked into the lower right. One declaration says it —
+`linear-gradient(150deg, #5EFAA7 0%, #5EFAA7 50%, #16B862 100%)` — and that 50%
+stop is the whole character of the page: it is more light than dark, and the
+dark is a corner rather than a half.
+
+**Retuning the palette moved almost nothing, and finding out why took a
+measurement.** The old field was not a colour, it was six layers, each added
+deliberately by an earlier pass with a note saying so:
+
+| Layer | What it was |
+|---|---|
+| `.grad` | a `#02100C` base under everything |
+| `.gcss` | six stacked radials, held at `.80` opacity over that base |
+| `#gl` | `filter: saturate(.80) brightness(.58)` |
+| `.grad::before` | two black corner vignettes and a diagonal wash to `.84` |
+| `.grad::after` | a `#1C4419` corner light — a very dark green |
+| the shader itself | two vignettes at 74% and 55%, and a cap holding `g` at 0.66 so the brightest stop was never reached |
+
+All of them are background colours, which is what the change was about. They
+are switched off in `31-hero-green.css` rather than deleted at source, because
+the whole stack is one decision — a dark frame — and it is either on or off.
+
+**The blur and the scale went with the radials, and the scale mattered.** They
+existed to make a field built out of overlapping lobes read as one surface:
+`blur(33px)` melted the seams and `scale(1.16)` pushed the soft edges the blur
+left off the frame. A linear gradient has neither problem — and 1.16 moves the
+50% stop 8% out of frame in both directions, so the one number the brief names
+would not have landed where it says.
+
+### And the shader is not drawn
+
+Its whole contribution is organic noise, and noise is the one thing a clean
+diagonal cannot survive. The canvas is **absent rather than hidden**, because
+the engine already treats a missing one as "no field": `makeGradientField(null)`
+returns null and the rAF loop, both observers and the shader compile are all
+behind `if (GL)`. Hiding it in CSS would have left every one of those running to
+draw something nobody can see.
+
+`gl/` is untouched and still imported, and its palette is kept in step with the
+gradient, so putting the canvas back is one line and not one line plus a colour
+hunt.
+
+---
+
+## Kepler comes off the page
+
+Every emphasised run — the display headlines, the closing plate, the light
+zone's CTA — was Kepler Std Condensed Display Italic, the serif half of the v03
+type law. All of it is Montreal 300 now, upright, at the size of the text it
+sits in.
+
+**Three compensations and two hooks went with it, and all five existed only
+because the face was a different one:**
+
+- `font-size: calc(89em/73)` — Kepler's x-height runs small beside Montreal, so
+  italic runs were set 1.22× to match it optically. One family on both sides
+  now, so 1em **is** the match.
+- `line-height: .9` — there to stop that 1.22× inflating the line box.
+- `scaleX(--it-x)` — Kepler Condensed is wider than this layout wanted, so
+  italics were squeezed to .86 and `useSqueezeItalics` handed the width back as
+  negative margins on a ResizeObserver. Token, transform and hook are gone.
+- `.kepler` and the canvas probe that added it — it switched italics onto the
+  condensed cut when the real family was installed locally.
+
+The engine's `scaleX(var(--it-x))` tail had to come **out** rather than be left
+to resolve to nothing: an unresolved `var()` invalidates the whole declaration,
+which would have taken the hero's translate and scale with it and stopped the
+recede entirely.
+
+**The page now makes no third-party font request at all**, where it made two.
+Kepler is licensed through Adobe Fonts and could not be self-hosted, so it came
+with a kit stylesheet, a preconnect, a `noscript` copy and a component to flip
+the link from `media="print"`; the local() chains behind it came with five
+`@font-face` blocks, and the Source Serif substitute behind those was a runtime
+fetch off jsDelivr. Measured on load: zero offsite requests.
+
+---
+
+## The narrow tour — four sections, and no trick
+
+The wide composition is three columns changing around a device that stays put,
+and the sticky is what buys that: co-presence. At 390px there is none to buy,
+and the arithmetic says so:
+
+> the device lays out 352 × 766. A phone is 390 × 844. Those are the **same
+> shape** — 2.176 against 2.164 — so a device that is readable on a phone is the
+> whole phone, with nothing left over for words.
+
+Every version that tried to keep them on screen together paid for it out of the
+device. The stacked lockup split the frame 48/52, which put `--k` at 0.40: a
+142px-wide device, and because the scale is a `transform`, 12px interface type
+rendering at **4.8px**. Not one price, ticker or balance row could be read, on
+the page whose entire argument is the demo.
+
+So this composition does not simulate co-presence. Four ordinary sections —
+eyebrow, headline, device, copy — and the reader scrolls through them the way
+they scroll through anything. The device is 301 × 654 at 390px and 334 × 728 at
+430.
+
+**What it costs** is the trick: a phone holding still while the world changes
+around it is genuinely good, and it is gone here. **What it buys** is a device
+twice the size, nothing ever drawn on top of anything, no feature newer than
+`dvh`, and a document that reads top to bottom for a screen reader.
+
+### Two things that are React decisions, not CSS ones
+
+`display:none` does not unmount a component, stop a timer or pause a canvas.
+Both of these would otherwise be stylesheet work:
+
+- **`PhoneShell` is not mounted** below 1080. It runs a demo flow on its own
+  clock; hidden behind a media query it would keep running one.
+- **The stage engine does not start.** `useStageEngine(!narrow)` plus a guard
+  inside `startStageEngine`, because the hook cannot know the viewport until
+  after the first client render — and one commit is enough to compile a shader
+  and take a WebGL context.
+
+Each section mounts its own screen on an `IntersectionObserver` and drops it on
+the way out, so at most two of the four flows ever run.
+
+### And a token that is not reachable is silently dropped
+
+`--hero-ink` is declared on `:root`. It was on `#stage` — which reads correctly
+and quietly broke two rules: the nav and the fixed CTA bar are `position: fixed`
+**outside** the stage, so `var(--hero-ink)` there resolved to nothing, the
+declaration was dropped as invalid, and `color` fell back to inheritance. "Sign
+in" kept its border (a literal) and lost its colour (the variable), which is
+exactly the shape of that bug.
+
+---
+
+## A chapter can open late
+
+Swap and Earn both open on the account home. That is deliberate and their notes
+say why — Swap is a *tab* on your account and Earn is a *row* on it, not
+separate apps — but it cannot be the first thing those chapters show, because
+the chapter directly above them **is** the account. Scrolling from 02 to 03
+landed on the screen just left behind, and the tour looked like it had not
+advanced.
+
+`openAt` names a step the **first pass** opens on. The loop still restarts at
+-1, so a reader who stays gets the whole script and a reader who scrolls past
+gets the screen the chapter is named for. By step id and not by beat index, for
+the same reason `anchor` is: indices shift every time a step gains a keystroke,
+and an anchor that drifted one beat left would still work, which is the worst
+kind of bug. `frameAt` is the same pure function `seek()` uses, so an
+opened-late flow is in exactly the state it would be in had it played the
+skipped beats.
+
+Measured: the swap form is up 250ms after the chapter mounts, and the account
+comes back 20s in.
+
+**The other two chapters need nothing**, and it is worth writing down which and
+why. `check:flows` prints what each script visits: perps is `market` — it opens
+on its own screen already — and own is `home → assets`, which opens on the
+account because the account **is** its screen. "Everything you own, one screen"
+showing you the one screen is not the same bug.
+
+---
+
+## Spending the yield
+
+The aside beside the earn chapter reads *"Spend directly from a yield-earning
+deposit — no unwinding, no moving funds out"*, and for four passes the chapter
+only showed money going **in**: a row, two vaults, a disclosure, a deposit, a
+receipt. The recording it is cut from is called `rec-Earn + being able to
+send:pay from your earn balance` and scene 7 is the half the title names.
+
+Read off `ScreenRecording_09-02-2026 22-01-47_1.MP4` at two frames a second:
+back to the account, `Send`, and then the row that matters — the **`Pay with`**
+picker, which opens on a section headed **Your vaults** with the Gauntlet
+position in it, above the wallet. That is the whole argument, and the app makes
+it as a line item in an ordinary token picker rather than as a claim. The scene
+holds that sheet for 1,100ms before answering it: a picker opened and
+immediately dismissed is a picker nobody read.
+
+**Two departures from the clip, both deliberate.** It presses `Use max`, which
+spends the position entire — 1.25526439 ZEC, six decimals of somebody's own
+balance, which is what that button is for and not a figure anyone types. This
+types a round thousand dollars and leaves the rest earning, which is the truer
+version of the sentence: the deposit is not being closed, it is being spent
+from. And the picker lists **our** wallet rather than the clip's, because
+`AccountHome` is one component across three chapters and two of them disagreeing
+about what the account holds is the failure this repo keeps catching.
+
+`sendKey` is its own action rather than reusing `key`: that one writes `amount`,
+which is the vault sheet's deposit field, and a chapter typing into the wrong
+field would still typecheck and still animate.
+
+The chapter is 34.3s now against perps' 24.6. It is the only one telling two
+stories, and `check:flows` asserts the new total.
+
+---
+
+## Why the buttons still felt hit
+
+They were already transitioning — `.btn` had carried `--tr-ui` all along — and
+they still read as a hard cut. The curve is the reason: `--ease-out` is
+`cubic-bezier(.16,1,.3,1)`, an expo-out that is **90% of the way there inside
+the first 55ms** of its 240, with the remaining 185 moving almost nothing. On a
+transform that is exactly right — it is what makes the cards and the arrow feel
+flicked into place. On a colour there is no momentum to sell, so all the eye
+gets is the jump and the tail is invisible.
+
+Fills and labels come off that curve onto `--ease-soft`, an ordinary ease-out
+that spends its time across the whole duration. **In is faster than out**, 200
+against 420: pointing at a control should feel answered, and taking the pointer
+away is not a decision anyone is waiting on, so the state dissolves rather than
+snapping back.
+
+### Three rules were overriding it, one of them to `none`
+
+Finding them took going after a button that still cut:
+
+- **`.btn-primary { transition: none }`** in `11-grid.css`, and it was
+  deliberate — it belonged to an instant flip to translucent white. The green
+  theme replaces that hover on every primary the page draws, so what was left
+  was the timing without the effect. And because `.btn:hover` outranks
+  `.btn-primary`, the **arrival** still eased while the **return** snapped. One
+  direction soft and the other cut is worse than either.
+- **`.nav .btn-ghost { transition: var(--tr-ui) }`** put Sign in back on the
+  expo curve — a later rule at the same specificity as `.btn:hover`, so it won.
+- **`.nav .btn-primary`** replaced the list with the four properties of its
+  collapse, so the one control that never had a hover transition at all was the
+  nav's own ask.
+
+**The in/out pair is two whole lists, not a `transition-duration` override.**
+Positional durations bind to whatever `transition-property` resolves to on the
+element, and that nav button transitions eight properties — five durations
+would have been repeated cyclically onto the wrong ones.
+
+---
+
+## Two build traps worth knowing
+
+Both cost a debugging pass, and both look correct in the source.
+
+**`translate` beside `transform` in one rule is silently dropped.** Lightning
+CSS (Tailwind v4's minifier) downlevels the individual `translate` property into
+`transform`, and within one rule the later `transform` then wins outright. The
+step rail's hover label was centred with `top:50%; translate:0 -50%` alongside
+an entrance's `transform:translateX(-6px)`; what shipped was the transform
+alone, with the vertical centring simply gone, and every label sat 9px below its
+ring. Centre with flex instead, and keep `transform` for one thing.
+
+**A prefixed pair collapses to the last one.** Writing `backdrop-filter` and
+then `-webkit-backdrop-filter` is the usual belt and braces; the two are folded
+into one and the last is kept, so what shipped was the `-webkit-` form alone and
+Chrome computed `none`. Declare unprefixed only — the minifier adds back
+whatever the targets need.
+
+---
+
 ## Deliberate divergences from the original
 
 A state-level diff across 14 scroll positions — every CSS variable, every card
@@ -1733,11 +2125,15 @@ a layout constant is a trap for whoever restores that band.)
 The original inlined everything as data URIs. They are now real files:
 
 - `public/fonts/` — PP Neue Montreal Book/Medium and Mono (woff2, self-hosted)
-- `public/img/` — the Rollup wordmark, the 3D copper mark, and `isologo.png`,
-  near.com's own mark, which holds the field's top-right corner. It replaced
-  `rollmark.png` there: that slot carried the Rollup's pinwheel as a silhouette
-  cut out of a copper gradient, and the Rollup's mark still stands in the lockup
-  in three dimensions and at full strength, which is the right place for it.
+- `public/img/` — `near-logo.png` and `rollup-logo.png`, the two supplied
+  lockups the eyebrow is made of, and `isologo.svg`, near.com's own mark, which
+  holds the field's top-right corner at `#00DC8D` and 25%. The isologo is
+  **vector**: it is a flat two-tone shape drawn at up to 620px, which is the one
+  case where the file is both smaller and sharper than the raster it replaced
+  (1.4KB against 23). Its export baked 21% into all six paths; that was stripped,
+  so the number the brief names lives in one place — `31-hero-green.css`.
+  The superseded `nearlock.png`, `rolllock.png` and `isologo.png` are still in
+  the directory and no longer referenced.
 - `public/logos/` — the marquee's brand marks
 - `public/logos/tokens/` — twenty-two marks. Twenty are the official
   full-colour SVGs from the near-intents asset set; `usdt.webp` is Tether's own
@@ -1751,10 +2147,11 @@ The original inlined everything as data URIs. They are now real files:
   them repaints most of them the wrong colour. An `<img>` gets its own document
   and the collision cannot happen.
 
-**Kepler Std is the one face that cannot be bundled.** It is licensed via Adobe
+**Every face is now self-hosted, and the page makes no third-party font
+request.** Kepler Std was the one that could not be bundled — licensed via Adobe
 Fonts, whose terms require the kit's stylesheet and forbid self-hosting the
-files. It therefore needs a network connection; offline, the stacks fall through
-the `local()` chain to the embedded serif and the page still holds together.
+files — and it is no longer used at all; see
+[Kepler comes off the page](#kepler-comes-off-the-page).
 
 ---
 
@@ -1776,15 +2173,25 @@ Nearly every dial is in `src/lib/schedule.ts`:
 pair. Change one without the other and the last trigger runs off the end of the
 sticky.
 
-The demo phone has two of its own, in `phone/flows/mode.tsx`:
+`#stage { height: auto }` below 1080 — the narrow composition is as tall as its
+own four sections and none of the above applies to it.
 
-- `PACE` — a per-mode multiplier on every beat. Demo is `1.4`. Stretching the
-  beats **alone** would only make a fast animation wait longer between jumps,
-  which is worse than either, so the entrances stretch with them under
-  `.morph[data-mode="demo"]` in `16-modes.css`.
-- `IDLE_MS` — how long guided waits after a gesture before resuming. `4600`:
-  long enough to finish a thought, short enough that a card left alone always
-  heals back into the demo.
+The demo phone has two of its own, in `demo/shell/deck.ts`:
+
+- `PACE` — a multiplier on every beat, `1.25`. `check:flows` asserts the
+  product, so a beat that grows cannot quietly move a clip's length.
+- `IDLE_MS` — how long the script waits after a gesture before resuming. It is
+  vestigial now that there is one mode and nothing takes a pointer, and it is
+  kept because the machinery under it is what made three modes possible.
+
+And the buttons have their own pair, in `12-motion.css`:
+
+- `--dur-btn-in` / `--dur-btn-out` — 200 and 420. Arrival is brisk because
+  pointing at a control should feel answered; the return is slower because it is
+  not a decision anyone is waiting on.
+- `--ease-soft` — an ordinary ease-out. **Not `--ease-out`**, which is an expo
+  and correct only for transforms; see
+  [Why the buttons still felt hit](#why-the-buttons-still-felt-hit).
 
 ---
 
@@ -1792,8 +2199,20 @@ The demo phone has two of its own, in `phone/flows/mode.tsx`:
 
 Carried over from the original, unchanged:
 
-- **QUOTE** — the Robbie Klages quote in `Lockup.tsx` is placeholder copy, not
-  said by him and not approved by The Rollup.
+- **QUOTE** — the Robbie Klages quote in `lib/cards.tsx` is placeholder copy,
+  not said by him and not approved by The Rollup. It is rendered by both
+  compositions from that one array.
 - **LEGAL** — the jurisdiction note's wording and its list are unapproved.
 - **FEE / AUDIT / UTM** — no fee line, no audit link, and every CTA shares one
   `href`; add per-surface UTM to read them apart.
+- **GAUNTLET'S DISCLOSURE** — the one vault sheet no recording ever opens. Its
+  copy is researched rather than filmed, and two of its figures have already
+  been corrected by the client (0.06% withdrawal, 7% performance). Treat the
+  rest of that sheet as a best reading. Taler's numbers ARE filmed — frames
+  0:06 to 0:15 — and its `0.05%` withdrawal fee is a coincidence of the two
+  vaults, not a second instance of the same mistake.
+- **A MONTREAL LIGHT CUT** — emphasis is declared at `font-weight: 300` and
+  renders as 400. `public/fonts` carries Book and Medium only, and Montreal is
+  a static family: a browser asked for 300 with nothing below 400 uses the Book.
+  Drop a Light woff2 in and add its `@font-face` to `01-fonts.css`; nothing else
+  changes.
