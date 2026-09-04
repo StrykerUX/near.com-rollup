@@ -153,6 +153,25 @@ export const earnsOn = (sym: string) =>
    balances. There is one now. */
 export const ACTIONS = ['Swap', 'Send', 'Earn'] as const;
 
+/**
+ * THE ROWS ONE HOLDING'S SHEET ACTUALLY GETS.
+ *
+ * The sheet used to render all three for every asset, which put the screen at
+ * odds with itself: the list gives Bitcoin no "Earn" pill — `earnsOn` says
+ * there is nowhere to put it to work — and then its own sheet offered to Earn
+ * it anyway. One of the two was inventing a product, and it was the sheet.
+ *
+ * So Earn is gated by the SAME predicate that draws the pill, rather than by a
+ * second list that would have to be kept in step with the first. Swap and Send
+ * are unconditional, because anything you hold can be swapped or sent.
+ *
+ * In practice this shows on Bitcoin, since `script.ts` opens that row and no
+ * other; USD Coin is the one holding here with a vault behind it, so it is the
+ * one whose sheet still has three rows.
+ */
+export const actionsFor = (sym: string) =>
+  ACTIONS.filter((a) => a !== 'Earn' || earnsOn(sym) !== undefined);
+
 export type OW = {
   screen: 'home' | 'assets';
   /** which row's actions sheet is up */

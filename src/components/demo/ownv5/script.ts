@@ -98,7 +98,7 @@ const STEPS: Step<OW, OWAction>[] = [
   {
     id: 'open', ch: 'open',
     title: 'Every row is a menu',
-    note: 'Swap, send, earn or move it out of the confidential balance — from the row, without leaving the list.',
+    note: 'Swap it or send it from the row, without leaving the list — and no offer to earn on an asset with nowhere to earn.',
     beats: [
       { ms: 700, do: 'actions', arg: 'btc' },
       { ms: 1200 },

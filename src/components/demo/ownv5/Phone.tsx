@@ -9,7 +9,7 @@ import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import {
-  ACTIONS, HOLDINGS, crypto, earnsOn, value,
+  HOLDINGS, actionsFor, crypto, earnsOn, value,
   type OW, type OWAction, type Holding,
 } from './state';
 
@@ -23,7 +23,8 @@ type Deck = GenericDeck<OW, OWAction>;
  *
  *   the account home        frame 0:00 — total, Receive/Send, three balances
  *   the assets screen       frames 0:01–0:08 — total, Main/Confidential, rows
- *   a row's actions sheet   frame 0:09 — Swap, Send, Earn
+ *   a row's actions sheet   frame 0:09 — Swap, Send, and Earn only where
+ *                           there is somewhere to earn (see `actionsFor`)
  *
  * `.pdev.app` carries the face, the palette, the tempo, the chrome and the
  * sheet mechanics, so this file draws only what is actually an account.
@@ -218,7 +219,7 @@ function ActionSheet({ d }: { d: Deck }) {
               </span>
             </div>
 
-            {ACTIONS.map((a) => {
+            {actionsFor(h.sym).map((a) => {
               const first = a === 'Swap';
               const fn = first ? swap : null;
               return (
