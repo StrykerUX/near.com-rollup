@@ -297,7 +297,25 @@
    carry two different marks (a `Dot` and the recipient's blank) and both are
    the same shape in the same slot. */
 .pdev.earn .ernsrow > :first-child { flex: none }
-.pdev.earn .ernsrow > span { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px }
+/* THE TEXT COLUMN IS NAMED, and it has to be. This was `> span`, meaning "the
+   middle one", and it was not: BOTH marks in the first slot are spans too — the
+   recipient's `.ernswal` and, on the other two rows, the `Dot`'s `.swdot`. So
+   this rule swept them up, and it WON, because `.pdev.earn .ernsrow > span`
+   carries an element selector that `.pdev.earn .ernswal` cannot match on
+   specificity: (0,3,1) against (0,3,0), and the later rule loses.
+
+   WHAT THAT DID to the recipient's wallet is worth writing down, because the
+   symptom looked like broken artwork rather than a layout bug. The mark became
+   `display:flex; flex-direction:column`, so `place-items:center` only centred
+   it across the column — the CROSS axis — while the main axis fell to
+   `justify-content: flex-start` and pinned the 16px glyph to the top of its
+   26px circle. Measured: 4.27px above centre, which is exactly half the
+   difference. The two token rows hid the same bug, because their artwork fills
+   its circle exactly and an image with nowhere to move cannot look off-centre.
+
+   `> :first-child { flex: none }` above still holds the marks; this only stops
+   claiming to be them. */
+.pdev.earn .ernstxt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px }
 .pdev.earn .ernsrow i { font-style: normal; font-size: 11.5px; color: rgba(255, 255, 255, .45) }
 .pdev.earn .ernsrow b { font-size: 14.5px; font-weight: 600 }
 /* the recipient has no token, so it gets the wallet glyph the frame draws */

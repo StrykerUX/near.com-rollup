@@ -263,17 +263,17 @@ function Send({ d }: { d: Deck }) {
           gesture worth the beats here is the one underneath. */}
       <div className="ernsrow">
         <Dot a={{ sym: 'ZEC', color: '#F4B728', ink: '#000' }} size={26} />
-        <span><i>Token</i><b>{SEND_TOK}</b></span>
+        <span className="ernstxt"><i>Token</i><b>{SEND_TOK}</b></span>
         <ChevDown />
       </div>
       <div className="ernsrow">
         <Dot a={{ sym: 'ZEC', color: '#F4B728', ink: '#000' }} size={26} />
-        <span><i>Network</i><b>{SEND_NET}</b></span>
+        <span className="ernstxt"><i>Network</i><b>{SEND_NET}</b></span>
         <ChevDown />
       </div>
       <div className="ernsrow">
         <span className="ernswal" aria-hidden="true"><Wallet /></span>
-        <span><i>Recipient</i><b>Select recipient</b></span>
+        <span className="ernstxt"><i>Recipient</i><b>Select recipient</b></span>
         <ChevDown />
       </div>
 
