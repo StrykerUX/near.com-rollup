@@ -38,7 +38,7 @@ const type_ = (act: EAAction, chars: string, lead?: number, gap?: number) =>
  *
  * THE ARITHMETIC. Beats play at `PACE` (1.25); `check:flows` asserts it.
  *
- *   scene 1    2,900ms   the account, and the row that goes to the yield
+ *   scene 1    1,600ms   the account, and the row that goes to the yield
  *   scene 2    3,180ms   two vaults, their rates, and what you already hold
  *   scene 3    3,100ms   the disclosure, and fifteen thousand typed into it
  *   scene 4    4,400ms   one press, three rows, a reference id
@@ -46,7 +46,10 @@ const type_ = (act: EAAction, chars: string, lead?: number, gap?: number) =>
  *   scene 6    3,000ms   the other tab, and the stake behind it
  *   outro      2,000ms   the same frame again, for the loop
  *   ─────────────────
- *             20,180ms  ×1.25 = 25,225ms on screen
+ *             18,880ms  ×1.25 = 23,600ms on screen
+ *
+ * SCENE 1 WAS 2,900 AND THE CLIP WAS 25,225. The 1,300 came out of a hold on a
+ * screen the reader has already met three times; see the note on that scene.
  *
  * THE STAKING SCENE IS THE ONE THING HERE NO FRAME SHOWS. `Staking` has been
  * on the tab row since the first pass — it is in every frame of the recording —
@@ -64,16 +67,29 @@ const CHAPTERS: Chapter[] = [
 ];
 
 const STEPS_: Step<EA, EAAction>[] = [
-  /* ---- scene 1 · 2,900ms ----------------------------------------------
-     The account home, held long enough to be read, and then the press. The
-     220ms comes out of the hold rather than being added to it: the recording
-     lights the row for about that and the vaults are on the next frame. */
+  /* ---- scene 1 · 1,600ms ----------------------------------------------
+     The account home, and then the press. The 220ms comes out of the hold
+     rather than being added to it: the recording lights the row for about that
+     and the vaults are on the next frame.
+
+     THE HOLD IS 700 AND IT WAS 2,000. Nothing on this screen moves — no figure
+     is answering, no sheet is arriving — and by the time a reader reaches this
+     chapter they have met the account home three times: it is chapter 02 in
+     full, it is where the swap chapter's loop returns to, and it is here. What
+     this frame owes is not a read but an ANSWER: where the earn page came
+     from, which is a row on the account with an arrow on it. An answer does not
+     need two seconds, and swap's own opening scene settled at exactly this
+     number for exactly this reason.
+
+     The 1,300 comes OFF the clip rather than moving into another scene. A beat
+     that is doing nothing is not a beat to spend elsewhere — the same call the
+     swap cut made when it took 1,960 out of its list scene. */
   {
     id: 'home', ch: 'acct',
     title: 'Earn is a row on your account',
     note: 'Not a tab and not another app: the third balance on the account home, with the blended rate it is already paying, and an arrow that goes somewhere.',
     beats: [
-      { ms: 2000 },
+      { ms: 700 },
       { ms: 220, set: { lit: 'earn' } },
       { ms: 680, do: 'toEarn' },
     ],
