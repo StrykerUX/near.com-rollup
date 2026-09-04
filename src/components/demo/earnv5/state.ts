@@ -150,16 +150,28 @@ export const AMOUNT = String(DEPOSIT);
 export const INTO = 'gauntlet';
 
 /**
- * THE STAKE, AND ITS RATE IS THE APP'S OWN.
+ * THE STAKING TAB, WHICH IS OBSERVED NOW RATHER THAN DESIGNED.
  *
- * 3.33% comes from the reference screenshot's sidebar — `Join NEAR@3.33, earn
- * rewards` — and not from the market, which pays 4.4% to 4.9% depending on the
- * validator. Where the app and the market disagree the app wins, the same call
- * NEAR's price gets in `lib/prices.ts`.
+ * IT USED TO BE ONE CARD AND AN INVENTED RATE. No frame of any recording
+ * opened this tab, so the pane was composed here from a single line of a
+ * sidebar in a screenshot of a DIFFERENT screen — `Join NEAR@3.33, earn
+ * rewards` — and it showed one NEAR position with an "Accruing" chip and a
+ * 30px headline figure. A screenshot of the tab itself exists now, and it is
+ * not that: it is the same two-container table the Vaults tab uses, with an
+ * `Asset` / `Balance` header and a row per stakeable network.
  *
- * WHAT IS NOT OBSERVED IS THE SCREEN. No frame of any recording opens the
- * Staking tab; the reference for it is that one line of a sidebar. So the pane
- * is DESIGNED here rather than copied, and this is the note that says so.
+ * SO THE RATES ARE THE APP'S, AND THEY ARE APR. 3.33% was never on this
+ * screen; the tab reads 4.56% for NEAR, and it labels every rate APR, which is
+ * what the blurb above the table says it is doing. The two rows at zero are
+ * the app offering networks the account has nothing staked on — they are not
+ * padding, they are the reason the header says `Asset` rather than `NEAR`.
+ *
+ * THE BALANCE IS STILL THE TOUR'S, AND DELIBERATELY. The screenshot's account
+ * holds 1,980.76 NEAR; this one stakes 20,000, and that figure is load-bearing
+ * elsewhere — `ownv5/state.ts` builds `EARN_BAL` as `8650 + 3240 + 20000 *
+ * 1.84`, written out rather than imported, so changing it here would desync
+ * the Account chapter's Earn row and the home's total with nothing to catch
+ * it. The layout is the reference's; the money is this account's.
  *
  * THE STAKE IS NOT A SLICE OF THE ASSETS LIST. Earn is its own account: the
  * assets screen shows all 25,000 NEAR and this stakes 20,000 on top of it,
@@ -167,8 +179,40 @@ export const INTO = 'gauntlet';
  * home's total puts the three together.
  */
 export const STAKED_NEAR = 20000;
-export const STAKE_APY = '3.33%';
+
+export const STAKE_BLURB =
+  'Stake assets to help secure their networks and earn rewards, shown as APR.';
+/** this table's own column headers, and the reason there are three rows */
+export const STAKE_COLS = ['Asset', 'Balance'] as const;
+
+export type Stake = {
+  sym: string;
+  apr: string;
+  qty: number;
+  dp: number;
+  /** the disc under the artwork, for the frame before the file decodes */
+  color: string;
+  ink: string;
+};
+
+/**
+ * THE COLOURS ARE SAMPLED FROM THE FILES, not taken from `lib/tokens.ts`.
+ * That table is not a reliable source for this: it paints USD Coin `#00EC97`,
+ * which is why `Phone.tsx` has carried its own USDC chip all along, and it
+ * gives Solana `#F2F2F1` while `sol.svg`'s disc is an unfilled `<circle>` —
+ * black. A near-white disc would flash white for one frame under a black mark.
+ * These three are each file's own disc: near.svg #00ec97, eth.svg #374e8c,
+ * sol.svg's default black.
+ */
+export const STAKES: Stake[] = [
+  { sym: 'NEAR', apr: '4.56%', qty: STAKED_NEAR, dp: 0, color: '#00EC97', ink: '#000' },
+  { sym: 'ETH', apr: '2.91%', qty: 0, dp: 0, color: '#374E8C', ink: '#fff' },
+  { sym: 'SOL', apr: '6.35%', qty: 0, dp: 0, color: '#000', ink: '#fff' },
+];
+
 export const stakeUsd = () => STAKED_NEAR * PRICE.NEAR;
+/** what one row is worth, so the fiat line is derived rather than typed */
+export const stakeValue = (st: Stake) => st.qty * (PRICE[st.sym] ?? 0);
 
 /**
  * THERE ARE TWO TABS, AND THERE WAS A THIRD.

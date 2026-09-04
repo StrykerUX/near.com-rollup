@@ -4,7 +4,9 @@
    The Vaults half is quoted from `rec-Earn + being able to send:pay from your
    earn balance.MP4`: the Beta badge, the subtitle, the paragraph, the table's
    own column headers, the `TVL … · rate` line under each name, and the whole
-   of Taler's sheet. The Staking pane is the brief's — see `STAKED_NEAR`.
+   of Taler's sheet. The Staking pane is quoted too now — it has a screenshot
+   of its own, and it turned out to be this same table with `Asset` / `Balance`
+   over it, so both tabs share one set of classes. See `STAKES` in state.ts.
 
    THE ACCOUNT HOME THIS CHAPTER OPENS ON IS NOT HERE. It is the same screen
    `/demo/own-v5` opens on, and it lives in 29-account-home.css scoped to
@@ -102,7 +104,10 @@
    under nothing */
 .pdev.earn .ernrow:last-child { border-bottom: none }
 .pdev.earn[data-motion] .ernrow { animation: drise 340ms var(--ease-out) both }
+/* two rows on the Vaults tab, three on Staking — the third step is for the
+   Solana row, and 60ms is the step both tables share */
 .pdev.earn .ernrow:nth-child(2) { animation-delay: 60ms }
+.pdev.earn .ernrow:nth-child(3) { animation-delay: 120ms }
 .pdev.earn .ernrowt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px }
 .pdev.earn .ernrowt b {
   display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600;
@@ -118,7 +123,32 @@
 }
 .pdev.earn .ernbal {
   margin-left: auto; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums;
+  /* right-aligned for the STAKING rows, where a fiat line sits under the
+     figure and is the wider of the two. On a vault row there is one child and
+     the box is its width, so this changes nothing there. */
+  text-align: right;
 }
+/* what a stake is worth, under what it is. Same 12px grey as the APR on the
+   other side of the row, so the two sub-lines read as one tier. */
+.pdev.earn .ernbal em {
+  display: block; margin-top: 2px;
+  font-style: normal; font-size: 12px; font-weight: 400;
+  color: rgba(255, 255, 255, .45);
+}
+
+/* A NETWORK WITH NOTHING STAKED ON IT, DIMMED RATHER THAN OMITTED.
+   -------------------------------------------------------------------------
+   The frame lists Ethereum and Solana at zero, and that is the point of the
+   tab: the header says `Asset`, not `NEAR`, because staking is something the
+   app offers on several networks and this account has used one of them. Drop
+   the empty rows and the screen claims NEAR is the only thing you can stake.
+
+   The dimming is the frame's own: the symbol falls to the grey the APR under
+   it already uses, so a row with nothing in it reads as available rather than
+   as disabled. The mark keeps its full colour — it is the brand, not a state. */
+.pdev.earn .ernzero .ernrowt b,
+.pdev.earn .ernzero .ernbal { color: rgba(255, 255, 255, .5); font-weight: 500 }
+.pdev.earn .ernzero .ernrowt em { color: rgba(255, 255, 255, .3) }
 /* THE ARROW STANDS OFF FROM THE FIGURE by more than the row's own gap — 22
    against 18. They are not one column: the figure is the row's answer and the
    arrow is what the row does. It was 28 for one pass, which is what the frame
@@ -131,29 +161,14 @@
 }
 
 /* ---- the stake --------------------------------------------------------- */
-
-.pdev.earn .ernstake {
-  flex: none; margin-top: 6px; padding: 16px; border-radius: 16px; background: var(--btc-card);
-}
-.pdev.earn .ernstakeh { display: flex; align-items: center; gap: 11px }
-.pdev.earn .ernlive {
-  margin-left: auto; display: flex; align-items: center; gap: 6px;
-  font-size: 12px; color: var(--btc-up);
-}
-.pdev.earn .ernlive i {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--btc-up);
-  animation: ernpulse 1.8s ease-in-out infinite;
-}
-@keyframes ernpulse { 50% { opacity: .3 } }
-.pdev.earn .ernstakev {
-  display: block; margin-top: 16px; font-size: 30px; font-weight: 600; letter-spacing: -.025em;
-  font-variant-numeric: tabular-nums;
-}
-.pdev.earn .ernstakev em { font-style: normal; font-size: 17px; color: rgba(255, 255, 255, .45) }
-.pdev.earn .ernstakeu {
-  display: block; margin-top: 2px; font-size: 14px; color: rgba(255, 255, 255, .45);
-  font-variant-numeric: tabular-nums;
-}
+/* THE STAKING PANE'S OWN CLASSES ARE GONE, all seven of them. It was a single
+   card — `.ernstake` with a 30px `.ernstakev` figure, a `.ernstakeu` dollar
+   line and a pulsing `.ernlive` "Accruing" chip — composed here because no
+   recording had opened that tab. It has a screenshot now, and what it shows is
+   the table above: the pane renders `.erntable` / `.erncols` / `.ernlist` like
+   the Vaults tab, so there is one table in this file instead of two things that
+   looked alike. `@keyframes ernpulse` went with the chip that used it.
+   See `STAKES` in state.ts. */
 
 /* ---- the vault's sheet ------------------------------------------------- */
 
@@ -235,7 +250,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pdev.earn[data-motion] .ernrow, .pdev.earn[data-motion] .ernsettle { animation: none }
-  .pdev.earn .ernlive i { animation: none }
 }
 
 /* =========================================================================

@@ -13,9 +13,9 @@ import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import { HOLDINGS } from '@/components/demo/ownv5/state';
 import { PRICE } from '@/lib/prices';
 import {
-  BETA, BLURB, COLS, REFERENCE, SEND_NET, SEND_TOK, STAKE_APY, STAKED_NEAR, STEPS, SUB,
-  TABS, TAB_NAMES, TITLE, VAULTS, available, balanceOf, cta, stakeUsd, vaultOf,
-  type EA, type EAAction, type Vault,
+  BETA, BLURB, COLS, REFERENCE, SEND_NET, SEND_TOK, STAKES, STAKE_BLURB, STAKE_COLS,
+  STEPS, SUB, TABS, TAB_NAMES, TITLE, VAULTS, available, balanceOf, cta, stakeValue,
+  vaultOf, type EA, type EAAction, type Vault,
 } from './state';
 
 type Deck = GenericDeck<EA, EAAction>;
@@ -32,7 +32,8 @@ type Deck = GenericDeck<EA, EAAction>;
  * on — `demo/app/AccountHome.tsx`, one component, because it is one account.
  * That chapter presses Crypto; this one presses the Earn balance.
  *
- * The Staking pane is the brief's — see `STAKED_NEAR` in state.ts. This cut
+ * The Staking pane has a screenshot of its own now — see `STAKES` in state.ts,
+ * which records what it replaced and why the balance stayed. This cut
  * does not go there; the tab is drawn because it is on film.
  */
 
@@ -46,7 +47,6 @@ const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
  * `Math.trunc` outside, `dp={0}` inside.
  */
 const USDC = { sym: 'USDC', color: '#2775CA', ink: '#fff' };
-const NEAR = { sym: 'NEAR', color: '#00EC97', ink: '#000' };
 
 export function Phone({ d }: { d: Deck }) {
   const { s } = d;
@@ -160,21 +160,50 @@ function Chev() {
 
 /* ---- 2 · the stake ----------------------------------------------------- */
 
+/**
+ * THE STAKING TAB, AND IT IS THE VAULTS TABLE AGAIN.
+ *
+ * It was one card with a 30px headline figure and an "Accruing" chip, composed
+ * here because no recording opened this tab. The screenshot of it that exists
+ * now shows the SAME construction the Vaults tab already has — a dark tray
+ * holding a lighter plate, with the column labels on the tray and inset to the
+ * columns they name — so this renders `.erntable` / `.erncols` / `.ernlist`
+ * rather than a second set of classes that would drift from the first.
+ *
+ * WHAT IS NEW IS THE TWO-LINE BALANCE AND THE ZERO ROWS. A vault row answers
+ * with one figure; a stake answers with an amount and what it is worth, and a
+ * network the account has nothing on answers with a plain `0 SOL` and no fiat
+ * line under it. `ernzero` is what greys those two rows down — see the note in
+ * 28-demo-earn-v5.css for why they are dimmed rather than omitted.
+ *
+ * NOTHING HERE IS PRESSABLE. The chevrons are the app's own and they are drawn
+ * because the frame draws them, but this chapter's only gesture is the deposit
+ * on the Vaults tab; a row that lit up under a press that goes nowhere would
+ * promise a screen this cut does not have.
+ */
 function Staking({ d }: { d: Deck }) {
   return (
     <Enter k={`s${d.pass}`} className="ernpane">
-      <p className="ernblurb">
-        Stake NEAR to help secure the network. Rewards accrue every epoch and
-        compound into the same position.
-      </p>
-      <div className="ernstake">
-        <div className="ernstakeh">
-          <Dot a={NEAR} size={34} />
-          <span className="ernrowt"><b>NEAR</b><em>Staked · {STAKE_APY} APY</em></span>
-          <span className="ernlive"><i />Accruing</span>
+      <p className="ernblurb">{STAKE_BLURB}</p>
+
+      <div className="erntable">
+        <div className="erncols"><i>{STAKE_COLS[0]}</i><i>{STAKE_COLS[1]}</i></div>
+
+        <div className="ernlist">
+          {STAKES.map((st) => (
+            <span className={'ernrow' + (st.qty ? '' : ' ernzero')} key={st.sym}>
+              <Dot a={st} size={30} />
+              <span className="ernrowt"><b>{st.sym}</b><em>{st.apr} APR</em></span>
+              <b className="ernbal">
+                {fmt(st.qty, st.dp)} {st.sym}
+                {/* no cents, and no line at all on a row worth nothing — the
+                    same call the vault rows make with `Math.trunc` */}
+                {st.qty ? <em>{usd(Math.trunc(stakeValue(st)), 0)}</em> : null}
+              </b>
+              <Chev />
+            </span>
+          ))}
         </div>
-        <b className="ernstakev">{fmt(STAKED_NEAR, 0)} <em>NEAR</em></b>
-        <span className="ernstakeu">{usd(stakeUsd())}</span>
       </div>
     </Enter>
   );
