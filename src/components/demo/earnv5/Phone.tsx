@@ -344,27 +344,26 @@ function PaySheet({ d }: { d: Deck }) {
 /**
  * THE RECIPIENT'S MARK — a wallet, where the other two rows carry a token.
  *
- * Traced off the same clip at 13.5s, blown up: a FILLED wallet, not an
- * outline, with a flap laid across the top left and an eyelet on the right.
- * The other glyphs in this chapter are lucide strokes, and this one is not,
- * because the frame it comes from is not: the row it sits in is the only one
- * whose left mark is not a coin, and the app draws it as a solid the way it
- * draws the coins as solids.
+ * lucide `wallet-minimal` (ISC, lucide-static v1.40.0), copied verbatim, which
+ * is what the two chevrons in this file already are. It replaces a filled
+ * wallet traced by hand off the clip at 13.5s — the frame's own glyph is a
+ * solid, and hand-drawing one to match it put a shape in here that no library
+ * could be checked against. `wallet-minimal` rather than `wallet`: it is the
+ * one with the eyelet, which is the detail that reads at 15px, and `wallet`'s
+ * extra tongue does not survive being drawn that small.
  *
- * The eyelet is a HOLE and not a dark dot: `fillRule="evenodd"` cuts it out of
- * the body, so whatever the circle behind it is — and it is a translucent
- * white on a background that has changed twice this month — shows through it.
- * A dot painted in the container's colour would have had to be repainted every
- * time that colour moved.
+ * STROKE, THEREFORE, AND NOT A FILL. That is the visible trade: the app draws
+ * this mark solid and this one is a 2px outline. It is also the only mark in
+ * this chapter that is NOT a token, so an outline is the honest way for it to
+ * differ — and it now matches the chevrons beside it rather than the coins
+ * above it.
  */
 function Wallet() {
   return (
-    <svg className="ernswali" viewBox="0 0 24 24" fill="currentColor"
-         fillRule="evenodd" clipRule="evenodd" aria-hidden="true">
-      {/* the flap, tucked behind the body's top edge */}
-      <path d="M7.6 7.4 14.1 4.7a1.6 1.6 0 0 1 2.2 1.5v1.2Z" />
-      {/* the body, with the eyelet cut out of it */}
-      <path d="M6 7.9h12a3 3 0 0 1 3 3v6.2a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-6.2a3 3 0 0 1 3-3Zm11.35 5.05a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Z" />
+    <svg className="ernswali" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M17 14h.01" />
+      <path d="M7 7h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14" />
     </svg>
   );
 }

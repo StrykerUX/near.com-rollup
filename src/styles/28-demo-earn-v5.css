@@ -293,7 +293,10 @@
   background: rgba(255, 255, 255, .12);
   color: rgba(255, 255, 255, .82);
 }
-.pdev.earn .ernswali { width: 15px; height: 15px; display: block }
+/* 16, where the filled version sat at 15: an outline needs a little more room
+   than a solid to read as the same size, because its weight is on the edge
+   rather than through the middle. */
+.pdev.earn .ernswali { width: 16px; height: 16px; display: block }
 .pdev.earn .ernschev { width: 17px; height: 17px; flex: none; color: rgba(255, 255, 255, .4) }
 
 /* ---- the amount, and what pays for it ---------------------------------- */
