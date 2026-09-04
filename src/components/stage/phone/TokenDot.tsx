@@ -28,7 +28,8 @@ export function TokenDot({ token, size = 20 }: { token: Token; size?: number }) 
            small square that never changes size between renders, which is the
            one case next/image's layout machinery buys nothing for. */
         // eslint-disable-next-line @next/next/no-img-element
-        <img className="tokimg" src={glyph.img} alt="" width={size} height={size} aria-hidden="true" />
+        <img className="tokimg" src={glyph.img} alt="" width={size} height={size} aria-hidden="true"
+             style={glyph.spin ? { transform: `rotate(${glyph.spin}deg)` } : undefined} />
       ) : glyph ? (
         <svg viewBox="0 0 600 600" fill={token.ink} aria-hidden="true">
           {'d' in glyph ? <path d={glyph.d} /> : <polygon points={glyph.points} />}

@@ -38,7 +38,24 @@ export const findToken = (sym: string) => TOKENS.find((t) => t.sym === sym)!;
  * token dot where available; every other token keeps its letter chip. Add more
  * by dropping a shape in here keyed by symbol.
  */
-export type TokenGlyph = { d: string } | { points: string } | { img: string };
+export type TokenGlyph =
+  | { d: string }
+  | { points: string }
+  /**
+   * `spin` TILTS THE ARTWORK IN PLACE, in degrees, and only file-backed marks
+   * can carry it — which is not a limitation so much as the only case that
+   * works. Every file in this set is a centred disc that fills its own square,
+   * so rotating one about its centre leaves the silhouette exactly where it
+   * was and turns only the mark inside it. A traced `d` path or a letter has
+   * no disc of its own, so there would be nothing holding its shape still.
+   *
+   * It lives here rather than in CSS because there are two components drawing
+   * these chips — `demo/app/Dot` and `stage/phone/TokenDot` — and a rule in a
+   * stylesheet would have to name both class families and would need the
+   * symbol in the DOM, which neither component emits. Declared once here, both
+   * honour it and so does anything added later.
+   */
+  | { img: string; spin?: number };
 
 export const TOK_ICONS: Record<string, TokenGlyph> = {
   /**
@@ -62,7 +79,13 @@ export const TOK_ICONS: Record<string, TokenGlyph> = {
    * letter where the real mark exists is a worse lie than a letter where none
    * does — nobody mistakes a `D` on gold, and everybody knows the ₿.
    */
-  BTC: { img: '/logos/tokens/btc.svg' },
+  /* TILTED 15 DEGREES, ON PURPOSE AND EVERYWHERE. The file is untouched — the
+     rotation is applied at render, so a re-copy from the near-intents set
+     cannot silently undo it, which editing the SVG would have allowed.
+     The disc is `cx=301.2 cy=299.8 r=299.9` on a 600 grid: centred to within
+     a pixel and full-bleed, so at a 30px chip the off-centre rotation moves
+     the disc by 0.06px and only the mark reads as turned. */
+  BTC: { img: '/logos/tokens/btc.svg', spin: 15 },
   ETH: { img: '/logos/tokens/eth.svg' },
   /* SUPPLIED ARTWORK RATHER THAN A REDRAW — one of three webp files here, with
      Zcash and the Apple share. The file it replaces was a #377e61 disc — a

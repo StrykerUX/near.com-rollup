@@ -34,7 +34,8 @@ export function Dot({ a, size = 30 }: { a: Chip; size?: number }) {
     >
       {art && 'img' in art ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img className="swimg" src={art.img} alt="" width={size} height={size} aria-hidden="true" />
+        <img className="swimg" src={art.img} alt="" width={size} height={size} aria-hidden="true"
+             style={art.spin ? { transform: `rotate(${art.spin}deg)` } : undefined} />
       ) : art && 'd' in art ? (
         <svg className="swsvg" viewBox="0 0 600 600" fill={a.ink} aria-hidden="true"><path d={art.d} /></svg>
       ) : art && 'points' in art ? (
