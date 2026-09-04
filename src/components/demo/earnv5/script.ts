@@ -192,6 +192,19 @@ export const earnV5Flow = buildFlow<EA, EAAction>({
   steps: STEPS_,
   /* reduced motion gets the frame the chapter is about: the vault's whole
      disclosure with the lot already in the field */
+  /* THE FIRST PASS OPENS ON THE VAULTS, not on the account.
+     Same call as the swap chapter, for the same reason and against the same
+     screen: scene 1 answers where the earn page came from — Earn is a ROW on
+     your account, not another app — and that answer is worth keeping, but it
+     cannot be the first thing this chapter shows. By the time a reader scrolls
+     here they have met the account home three times. Arriving at the earn
+     chapter to be shown the account is the tour appearing not to advance.
+
+     So the establishing shot moves to pass two, and the two changes to this
+     scene work on different readers: the 700ms hold is for whoever stays
+     through a loop, and this is for whoever scrolls in. Nothing is deleted and
+     no beat is retimed — check:flows reads the same 18,880ms. */
+  openAt: 'page',
   restStep: 'in',
   outro: 2000,
   anchor: {
