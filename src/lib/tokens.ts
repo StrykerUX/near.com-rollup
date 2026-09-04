@@ -64,17 +64,29 @@ export const TOK_ICONS: Record<string, TokenGlyph> = {
    */
   BTC: { img: '/logos/tokens/btc.svg' },
   ETH: { img: '/logos/tokens/eth.svg' },
-  /* THE ONLY WEBP IN THE SET, and it is the supplied artwork rather than a
-     redraw. The file it replaces was a #377e61 disc — a duller green than the
-     `#26A17B` the catalogue paints behind it, so the mark and the chip under it
-     disagreed on what colour Tether is in every frame of every screen. */
+  /* SUPPLIED ARTWORK RATHER THAN A REDRAW — one of three webp files here, with
+     Zcash and the Apple share. The file it replaces was a #377e61 disc — a
+     duller green than the `#26A17B` the catalogue paints behind it, so the mark
+     and the chip under it disagreed on what colour Tether is in every frame of
+     every screen. */
   USDT: { img: '/logos/tokens/usdt.webp' },
   NEAR: { img: '/logos/tokens/near.svg' },
   XRP: { img: '/logos/tokens/xrp.svg' },
   USDC: { img: '/logos/tokens/usdc.svg' },
   SOL: { img: '/logos/tokens/sol.svg' },
   BNB: { img: '/logos/tokens/bnb.svg' },
-  ZEC: { img: '/logos/tokens/zec.svg' },
+  /* SUPPLIED ARTWORK, AND IT REPLACES AN SVG THAT DREW A HALO. The file here
+     before was the near-intents export, and that one is two stacked circles:
+     a white disc at r=599.5 with the yellow at r=252.8 laid inside it. On the
+     app's near-black panels that white annulus read as a ring of light around
+     the token — a rendering artefact, not a mark. Zcash's own 2024 logo is a
+     single full-bleed disc, so there is no ring to leak.
+
+     It measures as the shape this chip wants: the disc spans the full 1280
+     with zero inset and the corners are transparent, and its yellow is
+     (243,183,36) — `#F4B728` after compression, which is exactly what
+     `token.color` paints underneath for the frame before it decodes. */
+  ZEC: { img: '/logos/tokens/zec.webp' },
   DOGE: { img: '/logos/tokens/doge.svg' },
   ADA: { img: '/logos/tokens/ada.svg' },
   TRX: { img: '/logos/tokens/trx.svg' },
