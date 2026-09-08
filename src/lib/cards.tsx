@@ -47,7 +47,18 @@ export const CARDS: Card[] = [
       <>
         Trade where the liquidity is.<br />
         Hedge where your assets are.<br />
-        <span className="wordmark">near.com</span>
+        {/* THE THIRD LINE IS THE WHOLE SENTENCE NOW, and all of it takes
+            `.wordmark`. That class was written when the line was the bare
+            domain — 13-rollup.css:720 calls it "near.com READS AS A URL" — and
+            it does two things: the lighter weight and the tighter tracking.
+            Both still apply to what the line has become. Splitting it, with
+            `near.com` light and the clause after the colon at the headline's
+            own Medium, would put the emphasis on the explanation and read the
+            sentence backwards; the first two lines are the claim and this one
+            steps back from them, which is the job it already had. */}
+        <span className="wordmark">
+          near.com: the only onchain account you need.
+        </span>
       </>
     ),
     aside: (
@@ -74,15 +85,20 @@ export const CARDS: Card[] = [
     headClass: ' stack',
     head: (
       <>
-        Everything you own,<br />one screen<br />
-        <span className="wordmark">near.com</span>
+        {/* THE near.com LINE IS GONE FROM THIS ONE. It closed three of the four
+            chapters as a signature; supplied copy keeps it on the opening card
+            only, where it is the claim being made, and drops it here where it
+            was repetition. The break stays: it is where the line wants to turn
+            in this column, not part of the sentence. */}
+        Everything you own,<br />one screen
       </>
     ),
     aside: (
       <p>
-        Fully confidential swaps, transfers, deposits, and withdrawals. Trade
-        perps, earn yield, and hold RWAs across 30+ chains, all from one
-        account, your assets in your control. The way crypto should work.
+        Crypto, perps, stocks, bonds, metals, and yield in one confidential
+        account. Trade, earn, and move assets across 30+ chains without
+        exposing who you are, all from a single balance. The way crypto should
+        work.
       </p>
     ),
   },
@@ -92,9 +108,9 @@ export const CARDS: Card[] = [
     head: <>Swap anything, <em>anywhere</em></>,
     aside: (
       <p>
-        Cross-chain paths you can&rsquo;t get anywhere else. Optimized routing
-        in seconds, under a cent per swap. You define the outcome, NEAR
-        handles the route.
+        Buy ZEC with USDC, AAPL with BTC, and other cross-chain paths you
+        can&rsquo;t get anywhere else. Powered by NEAR Intents, place your order
+        and let market makers compete to fill it at the best price in seconds.
       </p>
     ),
   },
@@ -102,16 +118,17 @@ export const CARDS: Card[] = [
     id: 'earn',
     face: 3,
     head: <>Earn on what<br /><em>you&rsquo;re not using</em></>,
+    /* NO `<strong>` IN THIS ONE ANY MORE. The old copy emphasised its own
+       middle clause — "spend directly from a yield-earning deposit" — and the
+       supplied replacement marks nothing. Choosing a phrase to bold here would
+       be writing, not typesetting. `.side p strong` still has a user in the
+       offer line, so the rule is not orphaned. */
     aside: (
       <p>
-        Earn onchain yield from the same account you already hold assets in.{' '}
-        {/* NO INLINE STYLE. It carried `color:#fff`, which is a decision about
-            the field this sentence sits on — and an inline declaration is the
-            one thing a stylesheet cannot answer, so it stayed white after
-            every other word on the page turned to ink. Weight and colour are
-            both in CSS now: `.side p strong` in 07-stage.css. */}
-        <strong>Spend directly from a yield-earning deposit</strong>{' '}
-        — no unwinding, no moving funds out.
+        Put your assets to work in professionally managed vaults and staking
+        strategies, without locking them up. Your yield-earning USDC stays
+        ready to trade, move, or spend just like regular USDC. Earn and spend
+        from the same balance, no unwinding required.
       </p>
     ),
   },
@@ -128,7 +145,7 @@ export const CARDS: Card[] = [
  */
 export const OFFER = (
   <p className="offer">
-    Rollup traders keep <b>20% of every fee</b>, back in stablecoins.
+    Rollup traders keep <b>20% of every fee</b> back in NEAR tokens.
   </p>
 );
 
@@ -156,6 +173,6 @@ export const PERPS_NOTE = (
  */
 export const PERM_WORDS = ['Permissionless', 'to the core'] as const;
 export const PERM_BODY =
-  'Your account, your signature, your assets. near.com is decentralized by ' +
-  'design. Transact across 30+ chains, no gatekeepers between you, your ' +
-  'peers, and your crypto.';
+  'Sign in with a passkey or any wallet you already use: NEAR, Solana, EVM, ' +
+  'and more. No email, no KYC, no application. Just connect and start moving ' +
+  'across 30+ chains.';
