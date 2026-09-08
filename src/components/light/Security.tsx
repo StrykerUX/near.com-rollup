@@ -4,22 +4,22 @@ const BOXES = [
   {
     Art: BattleTestedArt,
     title: <>Battle-tested infrastructure</>,
-    body: 'near.com runs on NEAR Protocol, live for over five years with 100% mainnet uptime.',
+    body: 'near.com runs on NEAR Protocol, live for over 5 years with 100% mainnet uptime.',
   },
   {
     Art: PasskeySigningArt,
     title: <>Passkey signing</>,
-    body: 'Sign in and approve transactions with a passkey. No seed phrase to write down, nothing to lose.',
+    body: 'Sign in and approve transactions with a passkey. No seed phrase to write down.',
   },
   {
     Art: VolumeArt,
-    title: <><span className="sfig" style={{ color: 'var(--l-fg)' }}>$25B+</span> in volume</>,
+    title: <><span className="sfig" style={{ color: 'var(--l-fg)' }}>$25+ billion</span> in volume</>,
     body: 'Traders have moved over $25 billion through NEAR Intents, the settlement layer near.com runs on.',
   },
   {
     Art: QuantumReadyArt,
     title: <>Quantum-ready</>,
-    body: "Your account is protected by post-quantum signing, built to withstand attacks that don't exist yet.",
+    body: 'Your account is protected by post-quantum signing, built to withstand quantum attacks.',
   },
 ];
 
