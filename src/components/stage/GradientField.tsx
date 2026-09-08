@@ -3,9 +3,10 @@
  *
  * Four layers, in paint order:
  *   .isomark   near.com's own mark, held in the top-right corner
- *   .gcss      the field itself: a single diagonal gradient. It was the
- *              fallback under a WebGL canvas — see the note in the markup for
- *              why the canvas is gone
+ *   .gcss      the field itself: the night skyline. It was a diagonal gradient,
+ *              and before that the fallback under a WebGL canvas — see the note
+ *              in the markup for why the canvas is gone
+ *   .gblur     the same photograph, blurred, masked in from the middle down
  *   .gshade    the scrim the type is read against
  *
  * THE CORNER MARK WAS THE ROLLUP'S AND IS NOW near.com's. Same slot, same
@@ -51,6 +52,22 @@ export function GradientField() {
 
           gl/ is untouched and still imported by the engine: putting the canvas
           back is this one line. */}
+      {/* THE BLUR IS A LAYER, NOT A FILTER ON THE FIELD. CSS has no blur with a
+          variable radius: `backdrop-filter` masked by a gradient varies the
+          OPACITY of a uniformly blurred layer, which composites sharp and
+          blurred copies of the same windows over each other and ghosts. The
+          honest version is two plates of the same photograph — this one is
+          pre-blurred, at 640px because a 48px blur has already destroyed
+          everything a larger plate would carry, which is why it costs 3KB.
+
+          THE MASK IS ON THIS ELEMENT AND THE PICTURE IS ON ITS `::before`, and
+          that split is the whole reason it is built this way. The blur is here
+          so the copy can be read, so its edge belongs to the SCREEN; the
+          photograph belongs to the field. The day the field parallaxes, the
+          `::before` and `.gcss` take the same translate and the mask does not
+          move — the soft band stays under the words instead of sliding up the
+          frame with the city. Masking the moving element would put it back. */}
+      <div className="gblur" aria-hidden="true" />
       <div className="gshade" />
     </div>
   );

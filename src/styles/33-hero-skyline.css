@@ -46,7 +46,79 @@
 }
 
 /* =========================================================================
-   THE OVERLAY — black, .30 at the top and .70 at the foot
+   THE BLUR — sharp across the sky, soft under the words
+   -------------------------------------------------------------------------
+   A SECOND PLATE, NOT A FILTER. CSS cannot blur with a radius that varies
+   across an element, and the two ways of faking it both fail here:
+
+     · `backdrop-filter: blur()` under a gradient mask varies the OPACITY of a
+       uniformly blurred layer. Halfway down the mask you are looking at 50% of
+       a sharp photograph over 50% of a blurred one — the lit windows ghost,
+       doubled and offset. On a night skyline it is the most visible possible
+       subject for that artefact.
+     · the technique that DOES work — six or eight stacked `backdrop-filter`
+       layers, each doubling the radius under an overlapping mask, so the blur
+       accumulates — costs six to eight composited backdrop filters per frame,
+       on a page that is already scrubbing a 588vh sticky with a device
+       animating over it.
+
+   Two plates of the same photograph cost one extra texture and nothing per
+   frame. The blurred one is 640px wide: a 48px blur has already thrown away
+   everything a larger plate could carry, so it lands at 3KB — cheaper than the
+   mask it is drawn through would have been to composite.
+
+   THE MASK IS ON THIS ELEMENT AND THE PICTURE IS ON ITS `::before`. That split
+   costs one pseudo-element and buys the parallax: the blur exists so the copy
+   can be read, so its edge belongs to the SCREEN, while the photograph belongs
+   to the field. When the field moves, `::before` and `.gcss` take the same
+   translate and the mask stays where it is. Put the mask on the element that
+   moves and the soft band slides up the frame with the city, which is the
+   whole failure this is built to avoid.
+
+   THE STOPS ARE AN EASE, NOT A RAMP. 35% to 75% is the transition the comp
+   wants — sky and the top of the tower clean, the headline, the quote plate
+   and the ask all sitting on the soft half. A bare two-stop gradient
+   interpolates the MIX linearly and leaves a visible edge where it starts;
+   the intermediate stops bend it into an ease-in-out so the blur arrives
+   without an announcement.
+
+   Z-INDEX 1 PUTS IT OVER `.gcss` AND UNDER `.gshade` (2). It ties with
+   `.isomark`, which is also 1, and wins on document order — correct, and the
+   same thing GradientField.tsx says about the mark belonging to the field
+   rather than sitting on top of it.
+   ========================================================================= */
+#stage .gblur {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  -webkit-mask-image: linear-gradient(180deg,
+    transparent 35%,
+    rgba(0, 0, 0, .10) 45%,
+    rgba(0, 0, 0, .35) 55%,
+    rgba(0, 0, 0, .65) 65%,
+    rgba(0, 0, 0, .90) 71%,
+    #000 75%);
+  mask-image: linear-gradient(180deg,
+    transparent 35%,
+    rgba(0, 0, 0, .10) 45%,
+    rgba(0, 0, 0, .35) 55%,
+    rgba(0, 0, 0, .65) 65%,
+    rgba(0, 0, 0, .90) 71%,
+    #000 75%);
+}
+/* `center bottom / cover` TO THE LETTER, because it has to be the same crop as
+   the sharp plate — the two are the same photograph and any disagreement shows
+   up as the city sliding sideways as the mask brings the second one in. The
+   blurred plate is cut to 640x357, which is 2400x1339 to within a fifth of a
+   pixel, so `cover` resolves both to the same rectangle. */
+#stage .gblur::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url('/img/skyline-blur.webp') center bottom / cover no-repeat;
+}
+
+/* =========================================================================
+   THE OVERLAY — black, .20 at the top and .50 at the foot
    -------------------------------------------------------------------------
    IT GOES ON `.gshade`, WHICH IS THE LAYER THAT EXISTS FOR THIS. 07-stage.css
    keeps that element for exactly one job — "the scrim the type is read
@@ -54,12 +126,19 @@
    than deleted because the shrink's clip-path and the corner light are still
    addressed through it. This is that job, back.
 
-   THE DIRECTION IS THE PHOTOGRAPH'S. `180deg` runs top to bottom, so `.30`
-   is the first stop and `.70` the last: lightest across the sky and heaviest
-   over the city. That is the right way round twice over — the lit windows in
-   the lower half are what the copy column and the fixed bar have to be read
-   against, and the sky is already the darkest part of the picture, so an even
-   wash would crush the top and leave the bottom still busy.
+   THE DIRECTION IS THE PHOTOGRAPH'S. `180deg` runs top to bottom, so the
+   lighter stop is first: lightest across the sky and heaviest over the city.
+   That is the right way round twice over — the lit windows in the lower half
+   are what the copy column and the fixed bar have to be read against, and the
+   sky is already the darkest part of the picture, so an even wash would crush
+   the top and leave the bottom still busy.
+
+   .20 AND .50, DOWN FROM .30 AND .70. Those were set when this was the only
+   thing separating the type from the photograph. The blur above now does the
+   larger half of that job — and it does it better, because it removes the
+   DETAIL the type is competing with rather than lowering its contrast — so
+   holding the scrim at full strength on top of it stopped reading as a night
+   sky and started reading as a black panel with a picture faintly behind it.
 
    Z-INDEX 2, AND THAT IS A FIX RATHER THAN A NUMBER. `.gshade` had no z-index
    and `.isomark` declares `z-index: 1` (13-rollup.css:211), so the mark was
@@ -70,7 +149,7 @@
    device are unaffected: `.herotype` is 3 and `.lockup` is 4. */
 #stage .gshade {
   z-index: 2;
-  background: linear-gradient(180deg, rgba(0, 0, 0, .30) 0%, rgba(0, 0, 0, .70) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, .20) 0%, rgba(0, 0, 0, .50) 100%);
 }
 
 /* WHAT SHOWS OUTSIDE THE FIELD once the closing shrink has clipped it into a
@@ -92,28 +171,71 @@
    would still animate and nobody would see it. This is the field's colour
    decision, not a type change, so it belongs with the field.
    ========================================================================= */
-/* THE CURTAIN TAKES THE OVERLAY TOO, stacked in its own shorthand rather than
-   given a layer: `.splash` has no `.gshade` to fill in, and a pseudo-element
-   would have to be positioned and then stacked back under `.splashin`. A
-   background list does it with nothing to keep in sync — the gradient is first
-   because CSS paints these front to back.
+/* THE CURTAIN REBUILDS THE STAGE'S THREE LAYERS OUT OF WHAT IT HAS: the
+   photograph on the element, the blur on `::before`, the scrim on `::after`.
 
-   IT IS NOT DECORATION HERE, it is the seam. 32-splash.css's whole argument is
-   that the sheet's fade is invisible because it is pixel-identical to the
-   field beneath it; a curtain carrying the photograph WITHOUT the scrim would
-   lighten by 30-70% at the moment it goes. */
+   THE ORDER IS THE POINT, AND IT COST A BUG TO LEARN. This was first written
+   with the scrim stacked into the element's own `background` list, which is
+   shorter and puts it in the WRONG PLACE twice: a background layer paints
+   under every pseudo-element, so the blur landed on top of the black instead
+   of under it, and when the `::after` below was added to fix that, the page
+   was carrying two scrims and was darker than the hero by the whole gradient.
+   On the stage the order is `.gcss` / `.gblur` / `.gshade`, black last, and
+   the curtain has to be that or nothing.
+
+   NONE OF THIS IS DECORATION. 32-splash.css's whole argument is that the
+   sheet's fade is invisible because it is pixel-identical to the field
+   beneath it, so every number here is copied rather than approximated — a
+   curtain that is a few percent light flashes at the exact moment it goes. */
 .splash {
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, .30) 0%, rgba(0, 0, 0, .70) 100%),
-    #0A0D11 url('/img/skyline.webp') center bottom / cover no-repeat;
+  background: #0A0D11 url('/img/skyline.webp') center bottom / cover no-repeat;
 }
 @media (max-width: 1080px) {
-  .splash {
-    background:
-      linear-gradient(180deg, rgba(0, 0, 0, .30) 0%, rgba(0, 0, 0, .70) 100%),
-      #0A0D11 url('/img/skyline-sm.webp') center bottom / cover no-repeat;
-  }
+  .splash { background-image: url('/img/skyline-sm.webp') }
 }
+
+/* THE CURTAIN'S BLUR IS A PSEUDO-ELEMENT, because a mask cannot be applied to
+   one layer of a background list — it applies to the element. The stops are
+   the hero's, verbatim.
+
+   NO `::before` / `::after` COLLISION: 32-splash.css draws the candles and
+   their wicks on `.spc`, the chart's children, and puts nothing on `.splash`
+   itself. This is the first thing on it.
+
+   `.splashin` IS LIFTED OVER IT, and it needs to be said rather than assumed.
+   The group carries `animation: spout` ending in a `transform`, which makes it
+   a stacking context that would paint after an absolutely-positioned `::before`
+   on document order alone — but only while it keeps that animation. An
+   explicit `z-index` means the chart cannot end up behind the field because
+   somebody simplified the exit. */
+.splash::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: url('/img/skyline-blur.webp') center bottom / cover no-repeat;
+  -webkit-mask-image: linear-gradient(180deg,
+    transparent 35%,
+    rgba(0, 0, 0, .10) 45%,
+    rgba(0, 0, 0, .35) 55%,
+    rgba(0, 0, 0, .65) 65%,
+    rgba(0, 0, 0, .90) 71%,
+    #000 75%);
+  mask-image: linear-gradient(180deg,
+    transparent 35%,
+    rgba(0, 0, 0, .10) 45%,
+    rgba(0, 0, 0, .35) 55%,
+    rgba(0, 0, 0, .65) 65%,
+    rgba(0, 0, 0, .90) 71%,
+    #000 75%);
+}
+/* THE SCRIM, LAST, exactly as `.gshade` is last on the stage. */
+.splash::after {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .20) 0%, rgba(0, 0, 0, .50) 100%);
+}
+.splashin { position: relative; z-index: 1 }
 /* the candles are drawn in `--hero-ink`, which the section below re-points to
    the site's light foreground — so the wicks and the filled bodies follow on
    their own. The HOLLOW down candles do not: 32-splash.css:— writes their
