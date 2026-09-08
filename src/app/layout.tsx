@@ -69,11 +69,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           a logo should be a WebP or an SVG; that is a separate change.) */}
       <head>
         <InlineScript html={GATE} />
-        {/* THE LIGHT CUTS, not the PNGs. 33-hero-skyline.css re-points the two
-            tokens to WebP wordmarks tinted for a dark field, and every surface
-            that draws them — the curtain, the hero, the narrow tour — is that
-            field. Preloading the black PNGs would fetch 100KB nobody paints. */}
-        <link rel="preload" as="image" href="/img/rollup-logo-light.webp" />
+        {/* THE DARK-FIELD CUTS, not the PNGs. 33-hero-skyline.css re-points the
+            two tokens — The Rollup's own silver artwork and a near.com wordmark
+            re-coloured to `--fg` — and every surface that draws them (the
+            curtain, the hero, the narrow tour) is that field. Preloading the
+            black PNGs would fetch 100KB nobody paints. */}
+        <link rel="preload" as="image" href="/img/rollup-logo-silver.webp" />
         <link rel="preload" as="image" href="/img/near-logo-light.webp" />
         {/* THE FIELD ITSELF, for the same reason and more so: it is the largest
             thing on the first screen and it is a CSS `background-image` on

@@ -251,7 +251,7 @@ html[data-splash="seen"] .splash { display: none }
 }
 .spbrow .rolllock {
   display: block; flex: none;
-  height: 40px; aspect-ratio: 759 / 232;
+  height: 40px; aspect-ratio: 1525 / 326;
   background: var(--rolllock-src) center / contain no-repeat;
   /* the same copper glow the mark carries in the hero and the tour, so it is
      the same object lit by the same field */

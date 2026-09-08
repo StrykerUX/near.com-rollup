@@ -654,7 +654,11 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 }
 .rollbrow .rolllock{
   display:block;flex:none;
-  height:clamp(40px,3.4vw,52px);aspect-ratio:759/232;
+  /* 1525/326 IS THE SUPPLIED FILE'S OWN RATIO, measured after its transparent
+     margin is cropped off. It replaces 759/232 — the old export was a
+     proportionally larger pinwheel against a shorter wordmark, so a box cut
+     for it letterboxes this one and the mark stops meeting the type. */
+  height:clamp(40px,3.4vw,52px);aspect-ratio:1525/326;
   background:var(--rolllock-src) center/contain no-repeat;
   /* the copper glow the 3D mark used to carry, kept: it is what makes the
      pinwheel an object lit by the same field rather than a sticker */

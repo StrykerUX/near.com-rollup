@@ -76,7 +76,7 @@
   }
   .mbrow .rolllock {
     display: block; flex: none;
-    height: 40px; aspect-ratio: 759/232;
+    height: 40px; aspect-ratio: 1525/326;
     background: var(--rolllock-src) center/contain no-repeat;
     filter: drop-shadow(0 5px 20px rgba(226, 150, 96, .30));
   }

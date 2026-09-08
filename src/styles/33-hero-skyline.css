@@ -120,19 +120,25 @@
 #stage .sdrail .lbl { text-shadow: 0 1px 12px rgba(0, 0, 0, .55) }
 
 /* ---- THE TWO WORDMARKS ------------------------------------------------- */
-/* THE SUPPLIED ART IS CUT FOR PAPER. `near-logo.png` is a solid black wordmark
+/* THE SHIPPED ART IS CUT FOR PAPER. `near-logo.png` is a solid black wordmark
    and `rollup-logo.png` is a chrome pinwheel next to a solid black one; on the
    green they were the right decision and on this sky they are two holes.
 
-   TINTED FILES, NOT A CSS `filter`. `invert(1)` would do the near mark exactly
-   — it is one flat colour — and would ruin The Rollup's, whose pinwheel is a
-   photographic chrome render that comes back as a negative. The light cuts
-   below are the same files with only the WORDMARK's pixels re-coloured to
-   `--fg`; the pinwheel is untouched, which is what the comp shows.
+   THE ROLLUP IS SUPPLIED ARTWORK, NOT A DERIVATIVE. This is the brand's own
+   silver cut — the pinwheel and the wordmark rendered as one chrome object —
+   which is the file for a dark field and the one the comp shows. It replaces
+   the version that was reached for first: the black export with only the
+   wordmark's pixels re-coloured, which matched the ink but left a lettering
+   that was flat beside a pinwheel that was not.
 
-   THEY ARE WEBP, AND THAT IS THE OTHER HALF OF THE WIN: 95KB + 5KB of PNG
-   becomes 24KB + 3KB, on the two files layout.tsx preloads because they are
-   the first thing the curtain draws.
+   near.com IS still re-coloured, because there is nothing to supply: that mark
+   is one flat colour, so the light cut is the same file at `--fg`. A CSS
+   `invert(1)` would have done it and is not used, because the same rule would
+   then be tempting on The Rollup's, where it returns a photographic negative.
+
+   BOTH ARE WEBP, WHICH IS THE OTHER HALF OF THE WIN on the two files layout
+   .tsx preloads because they are the first thing the curtain draws: 5KB of PNG
+   becomes 3KB, and The Rollup's 328KB source lands at 35KB.
 
    SCOPED, NOT SWAPPED AT SOURCE. 13-rollup.css, 30-mobile-tour.css and
    32-splash.css all read these tokens, and all three surfaces are dark — but
@@ -140,7 +146,21 @@
    commit every future surface to the dark cut as well. */
 #stage, .mtour, .splash {
   --nearlock-src: url('/img/near-logo-light.webp');
-  --rolllock-src: url('/img/rollup-logo-light.webp');
+  --rolllock-src: url('/img/rollup-logo-silver.webp');
+}
+
+/* THE COPPER GLOW COMES OFF. 13-rollup.css:660 and the two files that copy it
+   put `drop-shadow(0 5px 20px rgba(226,150,96,.30))` under the mark, and its
+   note says why: it is what made the pinwheel an object lit by the same field
+   rather than a sticker. That field was the copper-lit near-black of the tour,
+   and the mark it was lighting was a copper render. This one is cold chrome on
+   a blue-black sky, and a warm glow under it reads as a second light source
+   the photograph does not have. Same job, neutral: a plain shadow that seats
+   the object without tinting it. */
+#stage .rollbrow .rolllock,
+#stage .mbrow .rolllock,
+.splash .spbrow .rolllock {
+  filter: drop-shadow(0 6px 22px rgba(0, 0, 0, .55));
 }
 
 /* THE RULE BETWEEN THEM. 31 made it solid #000 to match two black wordmarks;
