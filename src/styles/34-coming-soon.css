@@ -1,0 +1,150 @@
+/* =========================================================================
+   THE HOLDING PAGE
+   -------------------------------------------------------------------------
+   The tour's field with the lockup on it and one line of type. See
+   `components/ComingSoon.tsx` for what it is and how it comes back off.
+
+   EVERY VALUE IN THE FIELD IS A TOKEN FROM 33-hero-skyline.css. Not one of the
+   plates, stops or opacities is written again here — the whole argument for
+   naming them was that a third surface was about to be built and a third copy
+   of the mask is a third place to forget.
+   ========================================================================= */
+
+.soon {
+  position: relative;
+  /* `dvh`, and it is the only unit that is right on a phone. The page is one
+     centred group in a full frame and nothing scrolls, so a `vh` that counts
+     the URL bar would push the lockup below the fold on exactly the devices
+     this page is most likely to be opened on. The stage carries the same
+     distinction across a media query (32-splash.css); there is no second case
+     here, so there is no query. */
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: clamp(32px, 8vh, 80px) var(--gut);
+  background: var(--sky-base) var(--sky-plate) center bottom / cover no-repeat;
+  overflow: hidden;
+}
+@media (max-width: 1080px) {
+  .soon { background-image: var(--sky-plate-sm) }
+}
+
+/* ---- THE FIELD'S OTHER TWO LAYERS -------------------------------------- */
+/* A REAL ELEMENT, NOT TWO PSEUDO-ELEMENTS ON `.soon`. The curtain had to use
+   `::before` and `::after` because it is one div the layout owns; this page
+   owns its own markup, so the layers are declared rather than smuggled in, and
+   `.soonin` sits above them on document order without needing a z-index to
+   argue about. */
+.soonfield {
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+
+/* THE MASK IS HERE AND THE PICTURE IS ON THE `::before`, the same split the
+   stage makes and for the same stated reason — the blur's edge belongs to the
+   screen, the photograph to the field. Nothing on this page moves, so nothing
+   here depends on it; it is written this way because the composition should be
+   one shape to learn rather than two that happen to look alike. */
+.soonblur {
+  position: absolute; inset: 0;
+  -webkit-mask-image: var(--sky-mask);
+  mask-image: var(--sky-mask);
+}
+.soonblur::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--sky-blur) center bottom / cover no-repeat;
+}
+
+/* last, exactly as `.gshade` is last on the stage */
+.soonscrim {
+  position: absolute; inset: 0;
+  background: var(--sky-scrim);
+}
+
+/* ---- THE GROUP --------------------------------------------------------- */
+.soonin {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(26px, 5vh, 44px);
+  text-align: center;
+}
+
+/* THE LOCKUP IS THE TOUR'S, DOWN TO THE FILES. `.rolllock`, `.rule` and
+   `.nearw` are the class names `13-rollup.css` and `30-mobile-tour.css` style
+   inside `.rollbrow` / `.mbrow`, and those rules are scoped to their own
+   parents — so the geometry is restated here and the ARTWORK is not. The two
+   `--*lock-src` tokens are re-pointed to the dark-field cuts by
+   33-hero-skyline.css on `#stage, .mtour, .splash`, and this page is none of
+   those, so it claims them the same way.
+
+   THE RATIOS ARE THE SUPPLIED FILES' OWN: 1525/326 for The Rollup after its
+   transparent margin is cropped, 462/120 for near.com. Change a file and all
+   four places that draw it have to move together. */
+.soon {
+  --nearlock-src: url('/img/near-logo-light.webp');
+  --rolllock-src: url('/img/rollup-logo-silver.webp');
+}
+.soonbrow {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 26px);
+}
+.soonbrow .rolllock {
+  display: block; flex: none;
+  height: clamp(44px, 6vw, 76px); aspect-ratio: 1525/326;
+  background: var(--rolllock-src) center/contain no-repeat;
+  /* the neutral shadow the mark carries on the stage — cold chrome on a
+     blue-black sky wants seating, not the copper glow of the old lockup */
+  filter: drop-shadow(0 6px 22px rgba(0, 0, 0, .55));
+}
+.soonbrow .rule {
+  flex: none;
+  width: 3px; height: clamp(32px, 4.4vw, 56px);
+  background: rgba(255, 255, 255, .55);
+  border-radius: 2px;
+}
+.soonbrow .nearw {
+  display: block; flex: none;
+  height: clamp(26px, 3.5vw, 44px); aspect-ratio: 462/120;
+  background: var(--nearlock-src) center/contain no-repeat;
+}
+
+/* ---- THE LINE ---------------------------------------------------------- */
+/* THE MONO FACE AND THE TRACKING ARE THE PAGE'S OWN EYEBROW STYLE — the same
+   treatment `.scrollcue` and the quote byline take (07-stage.css, 13-rollup
+   .css). A holding page has one line on it, and setting that line as a display
+   headline would make a promise the page cannot keep; set as a label it reads
+   as a state, which is what it is.
+
+   `--fg-2` AND NOT `--fg`. The marks are the subject and this is the caption
+   under them. It is the one place on this composition where the site's second
+   strength earns its keep. */
+.soonword {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+/* ---- THE CURTAIN STAYS DOWN -------------------------------------------- */
+/* `<Splash />` is rendered by the layout, so it plays on every route. On the
+   tour that is the point; in front of THIS page it is two seconds of a chart
+   drawing itself before it lifts to reveal the same two marks it was already
+   showing, on the same field, at the same size.
+
+   `:has()` RATHER THAN A PROP THROUGH THE LAYOUT. `app/layout.tsx` is a server
+   component and the curtain sits above `{children}`, so making it conditional
+   means either reading the pathname there — which it cannot do without
+   middleware — or turning the layout into a client component to learn one
+   boolean. A structural selector asks the same question in the stylesheet that
+   already owns the curtain's appearance.
+
+   IT FAILS SAFE. If `:has()` is not supported the selector is dropped and the
+   reader gets the curtain: two seconds, then this page. The failure is a
+   redundant animation, not a blank screen. */
+body:has(.soon) .splash { display: none }

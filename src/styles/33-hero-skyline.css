@@ -20,14 +20,46 @@
    the sky is what gets cut.
    ========================================================================= */
 
+/* =========================================================================
+   THE FIELD AS FIVE VALUES
+   -------------------------------------------------------------------------
+   THREE SURFACES DRAW THIS FIELD AND NONE OF THEM MAY DISAGREE: the stage, the
+   curtain that has to be pixel-identical to it, and the holding page. The mask
+   was already written out twice before the third arrived, which is the point
+   at which a copied literal stops being clearer than a name and starts being a
+   thing that gets edited in two places out of three.
+
+   THEY LIVE ON `:root` and not on a shared class, because two of the three
+   users are pseudo-elements and one is a `mask-image` — none of which a class
+   can be handed to. 02-tokens.css is untouched: these belong to one
+   composition, and the site's own token file should not learn about it.
+   ========================================================================= */
+:root {
+  --sky-plate: url('/img/skyline.webp');
+  --sky-plate-sm: url('/img/skyline-sm.webp');
+  --sky-blur: url('/img/skyline-blur.webp');
+  /* the picture's own sky, sampled from its top edge — the colour under the
+     photograph for the frame before the WebP decodes, and anywhere `cover`
+     cannot reach */
+  --sky-base: #0A0D11;
+  --sky-mask: linear-gradient(180deg,
+    transparent 35%,
+    rgba(0, 0, 0, .10) 45%,
+    rgba(0, 0, 0, .35) 55%,
+    rgba(0, 0, 0, .65) 65%,
+    rgba(0, 0, 0, .90) 71%,
+    #000 75%);
+  --sky-scrim: linear-gradient(180deg, rgba(0, 0, 0, .20) 0%, rgba(0, 0, 0, .50) 100%);
+}
+
 /* THE BASE UNDER THE PHOTOGRAPH is the picture's own sky, sampled from its top
    edge. It shows for one frame before the WebP decodes, and again anywhere
    `cover` cannot reach; either way the reader never sees the green through it.
    31 set this to #5EFAA7 for exactly the same reason in reverse. */
-#stage .grad { background: #0A0D11 }
+#stage .grad { background: var(--sky-base) }
 
 #stage .gcss {
-  background: #0A0D11 url('/img/skyline.webp') center bottom / cover no-repeat;
+  background: var(--sky-base) var(--sky-plate) center bottom / cover no-repeat;
 }
 
 /* THE SMALL PLATE ON A SMALL FRAME. 1280x714 at 62KB against 2400x1339 at
@@ -41,7 +73,7 @@
    it, so this stays a media query. */
 @media (max-width: 1080px) {
   #stage .gcss {
-    background-image: url('/img/skyline-sm.webp');
+    background-image: var(--sky-plate-sm);
   }
 }
 
@@ -91,20 +123,8 @@
   position: absolute; inset: 0;
   pointer-events: none;
   z-index: 1;
-  -webkit-mask-image: linear-gradient(180deg,
-    transparent 35%,
-    rgba(0, 0, 0, .10) 45%,
-    rgba(0, 0, 0, .35) 55%,
-    rgba(0, 0, 0, .65) 65%,
-    rgba(0, 0, 0, .90) 71%,
-    #000 75%);
-  mask-image: linear-gradient(180deg,
-    transparent 35%,
-    rgba(0, 0, 0, .10) 45%,
-    rgba(0, 0, 0, .35) 55%,
-    rgba(0, 0, 0, .65) 65%,
-    rgba(0, 0, 0, .90) 71%,
-    #000 75%);
+  -webkit-mask-image: var(--sky-mask);
+  mask-image: var(--sky-mask);
 }
 /* `center bottom / cover` TO THE LETTER, because it has to be the same crop as
    the sharp plate — the two are the same photograph and any disagreement shows
@@ -114,7 +134,7 @@
 #stage .gblur::before {
   content: '';
   position: absolute; inset: 0;
-  background: url('/img/skyline-blur.webp') center bottom / cover no-repeat;
+  background: var(--sky-blur) center bottom / cover no-repeat;
 }
 
 /* =========================================================================
@@ -149,14 +169,14 @@
    device are unaffected: `.herotype` is 3 and `.lockup` is 4. */
 #stage .gshade {
   z-index: 2;
-  background: linear-gradient(180deg, rgba(0, 0, 0, .20) 0%, rgba(0, 0, 0, .50) 100%);
+  background: var(--sky-scrim);
 }
 
 /* WHAT SHOWS OUTSIDE THE FIELD once the closing shrink has clipped it into a
    plate (07-stage.css:10). It was #000, then #5EFAA7 to match the green; it is
    the photograph's sky now, for the same reason — the page continuing past the
    plate's edge rather than a hole punched in it. */
-.stage-black { background: #0A0D11 }
+.stage-black { background: var(--sky-base) }
 
 /* =========================================================================
    THE CURTAIN FOLLOWS THE FIELD
@@ -188,10 +208,10 @@
    beneath it, so every number here is copied rather than approximated — a
    curtain that is a few percent light flashes at the exact moment it goes. */
 .splash {
-  background: #0A0D11 url('/img/skyline.webp') center bottom / cover no-repeat;
+  background: var(--sky-base) var(--sky-plate) center bottom / cover no-repeat;
 }
 @media (max-width: 1080px) {
-  .splash { background-image: url('/img/skyline-sm.webp') }
+  .splash { background-image: var(--sky-plate-sm) }
 }
 
 /* THE CURTAIN'S BLUR IS A PSEUDO-ELEMENT, because a mask cannot be applied to
@@ -212,28 +232,16 @@
   content: '';
   position: absolute; inset: 0;
   pointer-events: none;
-  background: url('/img/skyline-blur.webp') center bottom / cover no-repeat;
-  -webkit-mask-image: linear-gradient(180deg,
-    transparent 35%,
-    rgba(0, 0, 0, .10) 45%,
-    rgba(0, 0, 0, .35) 55%,
-    rgba(0, 0, 0, .65) 65%,
-    rgba(0, 0, 0, .90) 71%,
-    #000 75%);
-  mask-image: linear-gradient(180deg,
-    transparent 35%,
-    rgba(0, 0, 0, .10) 45%,
-    rgba(0, 0, 0, .35) 55%,
-    rgba(0, 0, 0, .65) 65%,
-    rgba(0, 0, 0, .90) 71%,
-    #000 75%);
+  background: var(--sky-blur) center bottom / cover no-repeat;
+  -webkit-mask-image: var(--sky-mask);
+  mask-image: var(--sky-mask);
 }
 /* THE SCRIM, LAST, exactly as `.gshade` is last on the stage. */
 .splash::after {
   content: '';
   position: absolute; inset: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(0, 0, 0, .20) 0%, rgba(0, 0, 0, .50) 100%);
+  background: var(--sky-scrim);
 }
 .splashin { position: relative; z-index: 1 }
 /* the candles are drawn in `--hero-ink`, which the section below re-points to
