@@ -68,10 +68,12 @@ export function MobileTour() {
           incentive, then the tour: the order `13-rollup.css` already chose for
           the stacked lockup, kept. */}
       <header className="mtop">
-        <div className="mbrow" aria-label="near.com and The Rollup">
-          <span className="nearw" role="img" aria-label="near.com" />
-          <span className="rule" aria-hidden="true" />
+        {/* The Rollup first — see the note on `.rollbrow` in Lockup.tsx. The
+            two compositions are the same lockup and must not disagree. */}
+        <div className="mbrow" aria-label="The Rollup and near.com">
           <span className="rolllock" role="img" aria-label="The Rollup" />
+          <span className="rule" aria-hidden="true" />
+          <span className="nearw" role="img" aria-label="near.com" />
         </div>
         {OFFER}
         <a className="btn btn-primary btn-lg" href={LOGIN}>

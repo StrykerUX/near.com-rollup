@@ -21,10 +21,16 @@ export function Lockup() {
           contains each brand's mark and wordmark at the spacing they belong
           in, so the assembly is gone and what is left is two lockups and the
           rule between them. */}
-      <div className="rollbrow" aria-label="near.com and The Rollup">
-        <span className="nearw" role="img" aria-label="near.com" />
-        <span className="rule" aria-hidden="true" />
+      {/* THE ROLLUP LEADS. It was near.com first, which is the order a
+          near.com page would normally take; the comp puts the host brand in
+          front of it, and that is the argument — this is The Rollup's audience
+          arriving on a co-branded page, so the mark they came for reads first
+          and near.com is what it opens onto. The `aria-label` follows the
+          visual order, because a screen reader is reading the same lockup. */}
+      <div className="rollbrow" aria-label="The Rollup and near.com">
         <span className="rolllock" role="img" aria-label="The Rollup" />
+        <span className="rule" aria-hidden="true" />
+        <span className="nearw" role="img" aria-label="near.com" />
       </div>
 
       {/* Below 1080px the layout stacks brow / head / offer / phone / body /

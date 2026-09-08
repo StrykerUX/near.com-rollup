@@ -1,0 +1,294 @@
+/* =========================================================================
+   THE FIELD IS A PHOTOGRAPH — the skyline replaces the green sweep
+   =========================================================================
+   31-hero-green.css turned the stage into two greens; the new comp puts the
+   same composition on a night skyline. Only the FIELD changes here — the
+   surfaces, the ink and the controls are still whatever 31 left them, which is
+   why this is a file after it rather than a rewrite of it.
+
+   ONE LAYER CARRIES THE PICTURE, AND IT IS `.gcss`. That element already is
+   the field: 07-stage.css declares the gradient on it, 31 forces it to full
+   opacity, and it sits inside `.grad`, so the closing shrink's `clip-path`
+   crops the photograph exactly as it cropped the gradient. Painting the image
+   on `.grad` itself would put it OUTSIDE the layer the isomark and the scrim
+   are stacked against, and the corner mark would fall behind it.
+
+   `center bottom`, NOT `center`. The plate is 2400x1339 and the stage is a
+   full-viewport box that is taller than that ratio on most frames, so `cover`
+   has to throw away either sky or city. The city is the subject — the comp
+   holds the towers along the bottom edge — so the crop is anchored there and
+   the sky is what gets cut.
+   ========================================================================= */
+
+/* THE BASE UNDER THE PHOTOGRAPH is the picture's own sky, sampled from its top
+   edge. It shows for one frame before the WebP decodes, and again anywhere
+   `cover` cannot reach; either way the reader never sees the green through it.
+   31 set this to #5EFAA7 for exactly the same reason in reverse. */
+#stage .grad { background: #0A0D11 }
+
+#stage .gcss {
+  background: #0A0D11 url('/img/skyline.webp') center bottom / cover no-repeat;
+}
+
+/* THE SMALL PLATE ON A SMALL FRAME. 1280x714 at 62KB against 2400x1339 at
+   162KB — the same picture, and below 1080 the wide one is being downsampled
+   by more than half before it is drawn. 1080 is `NARROW_MAX` (lib/breakpoints
+   .ts), the same seam 30-mobile-tour.css and 32-splash.css are cut on.
+
+   A `<picture>` with a `srcset` would let the browser pick per device pixel
+   ratio, which is the better tool and needs the field to be an <img> — the
+   field is a background because the shrink clips it and the scrim stacks over
+   it, so this stays a media query. */
+@media (max-width: 1080px) {
+  #stage .gcss {
+    background-image: url('/img/skyline-sm.webp');
+  }
+}
+
+/* WHAT SHOWS OUTSIDE THE FIELD once the closing shrink has clipped it into a
+   plate (07-stage.css:10). It was #000, then #5EFAA7 to match the green; it is
+   the photograph's sky now, for the same reason — the page continuing past the
+   plate's edge rather than a hole punched in it. */
+.stage-black { background: #0A0D11 }
+
+/* =========================================================================
+   THE CURTAIN FOLLOWS THE FIELD
+   -------------------------------------------------------------------------
+   32-splash.css copies the hero's gradient literally, and its own note says
+   why: the sheet's fade is invisible because it is the same surface as the
+   page underneath it. Left green, it would be a green flash that resolves to a
+   night skyline — the one thing that file is built to avoid.
+
+   THE CANDLES GO WHITE WITH IT. They are drawn in `--hero-ink` (#1F1F1F),
+   which was chosen against the green and is very close to this sky; the chart
+   would still animate and nobody would see it. This is the field's colour
+   decision, not a type change, so it belongs with the field.
+   ========================================================================= */
+.splash {
+  background: #0A0D11 url('/img/skyline.webp') center bottom / cover no-repeat;
+}
+@media (max-width: 1080px) {
+  .splash { background-image: url('/img/skyline-sm.webp') }
+}
+/* the candles are drawn in `--hero-ink`, which the section below re-points to
+   the site's light foreground — so the wicks and the filled bodies follow on
+   their own. The HOLLOW down candles do not: 32-splash.css:— writes their
+   border as a literal. */
+.splash .spc.dn::after { border-color: var(--fg) }
+/* the rule between the two marks is solid black in 32-splash.css, cut for the
+   green. Two pale wordmarks on a dark sky want a pale divider. */
+.splash .spbrow .rule { background: rgba(255, 255, 255, .55) }
+
+/* =========================================================================
+   THE INK TURNS BACK — one token, and then the six things that are not it
+   =========================================================================
+   31-hero-green.css declared `--hero-ink: #1F1F1F` and put it on every word on
+   the stage; the field is a night sky now and that ink is the sky. It becomes
+   the site's own light foreground, `--fg` (#F2F2F1) — which is what
+   02-tokens.css already calls "the type colour on a dark surface" and what the
+   demo device, the nav and the tour used before the page turned green.
+
+   NOT `#fff`. The page has never used pure white for type: `--fg` is a warm
+   near-white that sits a half stop under the phone's own highlights, so the
+   copy does not out-glare the interface it is describing.
+
+   ONE DECLARATION DOES MOST OF THIS. 31 routes headline, body, wordmark, the
+   closing plate, the offer, the friction line, the legal, the chapter eyebrow,
+   the step rail's labels, the scroll cue, the nav and the fixed bar's label
+   through the token, so they all follow from here. What is below is only the
+   things 31 wrote as literals, because a literal cannot be re-pointed.
+   ========================================================================= */
+:root { --hero-ink: var(--fg) }
+
+/* THE CLOSING CTA KEEPS THE DARK INK, because it keeps the green. 31 gave
+   `.finalcta` the hero's gradient and the hero's ink together, as one
+   decision; only half of that decision is being reversed here — the skyline is
+   the STAGE's field, and the light zone's last plate is still the two greens.
+   Re-declaring the token inside that section is the whole fix: everything
+   under it inherits, and nothing above it is touched. */
+.finalcta { --hero-ink: #1F1F1F }
+
+/* THE HEADLINES GET THEIR SHADOW BACK. 07-stage.css:112 carries
+   `0 2px 40px rgba(0,0,0,.28)` under `.side h2` and 31 removed it — correctly,
+   since a black glow under black type on a light field is a printing error.
+   Light type over a PHOTOGRAPH needs it again, and for the original reason:
+   the crop puts lit windows behind the copy column, and a headline crossing
+   one loses its counters without it. */
+#stage .side h2,
+#stage .mchhead { text-shadow: 0 2px 40px rgba(0, 0, 0, .45) }
+#stage .permcopy h2 { text-shadow: 0 2px 40px rgba(0, 0, 0, .45) }
+#stage .sdrail .lbl { text-shadow: 0 1px 12px rgba(0, 0, 0, .55) }
+
+/* ---- THE TWO WORDMARKS ------------------------------------------------- */
+/* THE SUPPLIED ART IS CUT FOR PAPER. `near-logo.png` is a solid black wordmark
+   and `rollup-logo.png` is a chrome pinwheel next to a solid black one; on the
+   green they were the right decision and on this sky they are two holes.
+
+   TINTED FILES, NOT A CSS `filter`. `invert(1)` would do the near mark exactly
+   — it is one flat colour — and would ruin The Rollup's, whose pinwheel is a
+   photographic chrome render that comes back as a negative. The light cuts
+   below are the same files with only the WORDMARK's pixels re-coloured to
+   `--fg`; the pinwheel is untouched, which is what the comp shows.
+
+   THEY ARE WEBP, AND THAT IS THE OTHER HALF OF THE WIN: 95KB + 5KB of PNG
+   becomes 24KB + 3KB, on the two files layout.tsx preloads because they are
+   the first thing the curtain draws.
+
+   SCOPED, NOT SWAPPED AT SOURCE. 13-rollup.css, 30-mobile-tour.css and
+   32-splash.css all read these tokens, and all three surfaces are dark — but
+   the tokens are the site's, and re-pointing them in 02-tokens.css would
+   commit every future surface to the dark cut as well. */
+#stage, .mtour, .splash {
+  --nearlock-src: url('/img/near-logo-light.webp');
+  --rolllock-src: url('/img/rollup-logo-light.webp');
+}
+
+/* THE RULE BETWEEN THEM. 31 made it solid #000 to match two black wordmarks;
+   two pale ones want a pale divider, and at the same full-strength weight —
+   31's note about a faded rule reading as a rendering artefact holds either
+   way round. */
+#stage .rollbrow .rule,
+#stage .mbrow .rule { background: rgba(255, 255, 255, .55) }
+
+/* the copper glow under the pinwheel (13-rollup.css:660) was lighting an
+   object on a dark field, which is what it is on again. Left alone. */
+
+/* ---- THE ASK ----------------------------------------------------------- */
+/* 31 made `Create account` a black pill with a green arrow, on the argument
+   that it was the one filled black shape on a light page. Every part of that
+   argument is now false: on this field a black pill is the darkest thing
+   inside the darkest quarter of the frame, and it disappears.
+
+   THE COMP DRAWS IT AS AN OUTLINE OVER THE PHOTOGRAPH — a dark translucent
+   fill so the skyline reads through it, a pale hairline that gives it its
+   shape, and the label and arrow both in the page's ink. The fill is the
+   picture's own sky rather than black: over the lit lower third it stays a
+   pane of the same night rather than a slab.
+
+   AND THE ARROW STOPS BEING GREEN. It was the only colour on a black pill,
+   which made it a direction; on a pill that is now defined by its edge it
+   would be the only saturated thing on the screen, competing with the phone's
+   own green — which is the one place the page wants green to mean something. */
+#stage .btn-primary,
+.mobcta .btn-primary {
+  background: rgba(10, 13, 17, .55);
+  /* `border-color`, not the shorthand: `.btn` already reserves the ring with
+     `1px solid transparent` (05-buttons.css:7), so colouring it in costs no
+     width and the pill does not grow 2px against every other button. */
+  border-color: var(--border-strong);
+  color: var(--fg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+#stage .btn-primary .arw,
+.mobcta .btn-primary .arw { color: var(--fg) }
+/* ON HOVER IT FILLS. The rest state is an edge, so the response is the shape
+   becoming solid — the green the arrow gave up, carrying the whole control
+   instead of one glyph of it, with the page's own black back as the label. */
+#stage .btn-primary:hover,
+.mobcta .btn-primary:hover {
+  background: var(--near-green);
+  border-color: var(--near-green);
+  color: var(--near-black);
+  box-shadow: var(--glow-green-sm);
+}
+#stage .btn-primary:hover .arw,
+.mobcta .btn-primary:hover .arw { color: var(--near-black) }
+#stage .btn-primary:active,
+.mobcta .btn-primary:active { background: var(--green-500); border-color: var(--green-500) }
+
+/* Sign in — the same pair, one rank down: it is an outline at rest either way,
+   so only the two colours move. */
+.nav:not(.on-light) .btn-ghost {
+  color: var(--fg);
+  border-color: var(--border-strong);
+}
+/* it still becomes the other button on hover, which is 31's decision and a
+   good one — the two controls just both live on a dark page now. */
+.nav:not(.on-light) .btn-ghost:hover {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--near-black);
+}
+
+/* THE NAV'S FOOTING. 30-mobile-tour.css gives the bar a gradient so headlines
+   passing under it do not collide with "Sign in"; 31 rebuilt it out of the
+   light green. Same job, same shape, made of the sky. */
+@media (max-width: 1080px) {
+  .nav:not(.on-light)::before {
+    background: linear-gradient(180deg, rgba(10, 13, 17, .92) 0%, rgba(10, 13, 17, .5) 58%, rgba(10, 13, 17, 0) 100%);
+  }
+}
+
+/* THE FIXED BAR IS GLASS AGAIN. 31 made it paper — a white plate round a black
+   pill — because the page under it was green. The pill is an outline now and
+   the page is a photograph, so the plate goes back to being a pane of it. */
+@media (max-width: 1080px) {
+  .mobcta {
+    background: rgba(10, 13, 17, .62);
+    border-color: var(--border);
+    box-shadow: 0 8px 34px rgba(0, 0, 0, .45);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+  .mobcta span { color: var(--fg) }
+}
+
+/* ---- THE STEP RAIL ----------------------------------------------------- */
+/* 31's rule stands unchanged and only its colour moves: every ring solid, the
+   current step the one that is FILLED. */
+#stage .sdrail .sddot,
+#stage .sdrail button.done .sddot,
+#stage .sdrail button:hover .sddot { border-color: var(--fg) }
+#stage .sdrail button.now .sddot { background: var(--fg); border-color: var(--fg) }
+
+/* ---- THE QUOTE IS GLASS AGAIN ------------------------------------------ */
+/* It was built as a translucent plate with a hairline and a backdrop blur —
+   layers that exist to let a dark field through — and 31 made it paper because
+   there was no dark field left to let through. There is again, and this one is
+   a photograph, which is the case glass was actually invented for: the skyline
+   carries on behind the words instead of stopping at a white rectangle. */
+#stage .side.r .rollquote,
+#stage .mchbody .rollquote {
+  background: rgba(255, 255, 255, .07);
+  border-color: var(--border);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .38);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+/* the body of the quote takes the ink; the attribution steps back a stop,
+   which it can now that the plate is not carrying 31's one-strength law */
+#stage .side.r .rollquote p,
+#stage .mchbody .rollquote p { color: var(--fg) }
+#stage .side.r .rollquote .qwho b,
+#stage .mchbody .rollquote .qwho b { color: var(--fg) }
+#stage .side.r .rollquote .qwho > span,
+#stage .mchbody .rollquote .qwho > span { color: var(--fg-3) }
+/* THE BYLINE PINWHEEL GOES BACK TO THE FLAT CUT. 31 swapped it to the copper
+   3D render for the same reason it made the plate paper. `--rollflat-src` is
+   the near-white silhouette, and 02-tokens.css says in as many words that it
+   exists for the dark plate — where the copper object read as a second lit
+   thing inside a card that is meant to be glass. */
+#stage .side.r .rollquote .rqmark,
+#stage .mchbody .rollquote .rqmark { background-image: var(--rollflat-src) }
+
+/* ---- THE MARK IN THE FIELD --------------------------------------------- */
+/* .25 OF A GREEN PINWHEEL IS A LOGO; THIS IS WEATHER. At a quarter strength
+   over the flat green it was a watermark in an empty corner. Over the
+   photograph it is a green object the size of a third of the frame sitting on
+   a night sky, and it is the loudest thing on the page — the comp's upper
+   right is sky.
+
+   It is dimmed rather than deleted so the corner keeps a trace of the brand
+   and the element stays where GradientField.tsx documents it. If the comp is
+   read strictly, the next step is `display:none`, and that is a one-line
+   change from here. */
+#stage .isomark { opacity: .05 }
+
+/* the scroll cue's own bar was rebuilt out of the ink by 31 and follows the
+   token; nothing to do. */
+
+/* ---- THE CURTAIN'S CANDLES -------------------------------------------- */
+/* the explicit #fff above the ink section is now what the token would give
+   anyway — kept, because the two down candles' BORDER is a literal in
+   32-splash.css and the pair should be stated together. */

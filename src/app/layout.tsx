@@ -69,8 +69,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           a logo should be a WebP or an SVG; that is a separate change.) */}
       <head>
         <InlineScript html={GATE} />
-        <link rel="preload" as="image" href="/img/rollup-logo.png" />
-        <link rel="preload" as="image" href="/img/near-logo.png" />
+        {/* THE LIGHT CUTS, not the PNGs. 33-hero-skyline.css re-points the two
+            tokens to WebP wordmarks tinted for a dark field, and every surface
+            that draws them — the curtain, the hero, the narrow tour — is that
+            field. Preloading the black PNGs would fetch 100KB nobody paints. */}
+        <link rel="preload" as="image" href="/img/rollup-logo-light.webp" />
+        <link rel="preload" as="image" href="/img/near-logo-light.webp" />
+        {/* THE FIELD ITSELF, for the same reason and more so: it is the largest
+            thing on the first screen and it is a CSS `background-image` on
+            `.gcss`, so it is not discovered until 33-hero-skyline.css has been
+            fetched and parsed. `imageSrcSet`/`imageSizes` is how a preload
+            picks the same plate the media query will — without them the
+            browser would eagerly fetch the wide one on a phone and then load
+            the small one as well. 1080px is NARROW_MAX, the seam the
+            stylesheet cuts on. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/img/skyline.webp"
+          imageSrcSet="/img/skyline-sm.webp 1280w, /img/skyline.webp 2400w"
+          imageSizes="(max-width: 1080px) 1280px, 2400px"
+        />
       </head>
       <body>
         {/* FIRST, BEFORE THE CONTENT IT COVERS. The stacking is settled by

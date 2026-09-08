@@ -109,10 +109,14 @@ export function Splash() {
             (MobileTour.tsx:71-75), so the marks cannot drift into a third
             version of themselves. The rule needs its own colour here — see
             the note in the stylesheet. */}
+        {/* The Rollup first, matching the hero the curtain lifts onto — see
+            the note on `.rollbrow` in stage/Lockup.tsx. The eyebrow is the one
+            object that survives the fade, so an order that disagreed with the
+            page underneath would read as the lockup rebuilding itself. */}
         <div className="spbrow">
-          <span className="nearw" />
-          <span className="rule" />
           <span className="rolllock" />
+          <span className="rule" />
+          <span className="nearw" />
         </div>
       </div>
     </div>
