@@ -45,6 +45,34 @@
   }
 }
 
+/* =========================================================================
+   THE OVERLAY — black, .30 at the top and .70 at the foot
+   -------------------------------------------------------------------------
+   IT GOES ON `.gshade`, WHICH IS THE LAYER THAT EXISTS FOR THIS. 07-stage.css
+   keeps that element for exactly one job — "the scrim the type is read
+   against" — and its own note says it was emptied to `background:none` rather
+   than deleted because the shrink's clip-path and the corner light are still
+   addressed through it. This is that job, back.
+
+   THE DIRECTION IS THE PHOTOGRAPH'S. `180deg` runs top to bottom, so `.30`
+   is the first stop and `.70` the last: lightest across the sky and heaviest
+   over the city. That is the right way round twice over — the lit windows in
+   the lower half are what the copy column and the fixed bar have to be read
+   against, and the sky is already the darkest part of the picture, so an even
+   wash would crush the top and leave the bottom still busy.
+
+   Z-INDEX 2, AND THAT IS A FIX RATHER THAN A NUMBER. `.gshade` had no z-index
+   and `.isomark` declares `z-index: 1` (13-rollup.css:211), so the mark was
+   painting OVER the scrim — which is the opposite of what GradientField.tsx
+   documents ("under the scrim, so the same darkening the type is read against
+   passes over it and it belongs to the field"). At .05 the difference is not
+   visible; it would be the moment anyone turns that back up. The copy and the
+   device are unaffected: `.herotype` is 3 and `.lockup` is 4. */
+#stage .gshade {
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .30) 0%, rgba(0, 0, 0, .70) 100%);
+}
+
 /* WHAT SHOWS OUTSIDE THE FIELD once the closing shrink has clipped it into a
    plate (07-stage.css:10). It was #000, then #5EFAA7 to match the green; it is
    the photograph's sky now, for the same reason — the page continuing past the
@@ -64,11 +92,27 @@
    would still animate and nobody would see it. This is the field's colour
    decision, not a type change, so it belongs with the field.
    ========================================================================= */
+/* THE CURTAIN TAKES THE OVERLAY TOO, stacked in its own shorthand rather than
+   given a layer: `.splash` has no `.gshade` to fill in, and a pseudo-element
+   would have to be positioned and then stacked back under `.splashin`. A
+   background list does it with nothing to keep in sync — the gradient is first
+   because CSS paints these front to back.
+
+   IT IS NOT DECORATION HERE, it is the seam. 32-splash.css's whole argument is
+   that the sheet's fade is invisible because it is pixel-identical to the
+   field beneath it; a curtain carrying the photograph WITHOUT the scrim would
+   lighten by 30-70% at the moment it goes. */
 .splash {
-  background: #0A0D11 url('/img/skyline.webp') center bottom / cover no-repeat;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, .30) 0%, rgba(0, 0, 0, .70) 100%),
+    #0A0D11 url('/img/skyline.webp') center bottom / cover no-repeat;
 }
 @media (max-width: 1080px) {
-  .splash { background-image: url('/img/skyline-sm.webp') }
+  .splash {
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, .30) 0%, rgba(0, 0, 0, .70) 100%),
+      #0A0D11 url('/img/skyline-sm.webp') center bottom / cover no-repeat;
+  }
 }
 /* the candles are drawn in `--hero-ink`, which the section below re-points to
    the site's light foreground — so the wicks and the filled bodies follow on
