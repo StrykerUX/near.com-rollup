@@ -1,0 +1,76 @@
+/* =========================================================================
+   THE PROSE WRAPS PRETTY
+   -------------------------------------------------------------------------
+   `text-wrap: pretty` asks the browser to look at the whole paragraph before
+   it commits to a break, instead of filling greedily line by line. What it
+   buys, in order of how often it matters here:
+
+     · NO ORPHAN. A last line carrying one short word — "required.", "work.",
+       "seconds." — is the single most visible flaw in a body column this
+       narrow, and every one of the five chapters is now long enough to produce
+       one. The supplied copy made this worth doing: the old asides were three
+       lines and the new ones run to six.
+     · fewer very short lines anywhere in the block, since the cost of a bad
+       break is now measured across the paragraph rather than at the point it
+       happens.
+
+   IT IS NOT `balance`, AND THE DIFFERENCE IS THE POINT. `balance` equalises
+   line lengths across the whole block and is capped at a handful of lines in
+   every engine that ships it — right for a two-line headline, wrong for a
+   six-line paragraph, where it would either do nothing or square off a column
+   that is meant to read as running text.
+
+   THE HEADLINES ARE DELIBERATELY NOT HERE. Every break in them is an explicit
+   `<br />` in `lib/cards.tsx`, so there is almost nothing left for a wrap
+   algorithm to decide. The one exception is the hero's third line, which does
+   wrap on its own — and that one wants `balance`, not `pretty`. It is a
+   separate decision and not this one.
+
+   UNSUPPORTED MEANS UNCHANGED. Firefox and older Safari drop the declaration
+   and lay the paragraph out greedily, exactly as they do today. There is no
+   fallback to write and nothing to feature-detect.
+   ========================================================================= */
+
+/* ---- THE FIVE CHAPTERS' BODY COPY -------------------------------------- */
+/* both compositions: `.side p` is the wide lockup's column, `.mchbody p` the
+   narrow tour's. They render the same strings from `lib/cards.tsx`. */
+#stage .side p,
+#stage .mchbody p {
+  text-wrap: pretty;
+}
+
+/* ---- THE QUOTE --------------------------------------------------------- */
+/* It is prose in a column narrower than any of them, which makes it the most
+   likely of the lot to strand a word — and it sits on a plate, where a short
+   last line reads as a mistake in the plate rather than in the text. */
+#stage .side.r .rollquote p,
+#stage .mchbody .rollquote p {
+  text-wrap: pretty;
+}
+
+/* ---- THE CLOSING PLATE ------------------------------------------------- */
+/* centred, which is the layout an orphan hurts most: a single trailing word
+   sits alone in the middle of the measure with air either side of it. */
+#stage .permcopy p,
+#stage .mclosebody {
+  text-wrap: pretty;
+}
+
+/* ---- THE OFFER AND THE ASK -------------------------------------------- */
+/* Two lines each, so `pretty` has one decision to make in them — and it is
+   the decision that matters: "back in NEAR tokens." must not break, and
+   "Ready in seconds." must not leave "seconds." on its own. */
+#stage .rollcta .offer,
+#stage .mtop .offer,
+#stage .friction {
+  text-wrap: pretty;
+}
+
+/* ---- THE JURISDICTION NOTE -------------------------------------------- */
+/* The legal text is unchanged, as asked — this is how it BREAKS, not what it
+   says. Set in mono at the foot of the frame, it is the one block on the page
+   where a stranded word looks like a rendering fault rather than typography. */
+#stage .perpsdisc,
+#stage .mdisc {
+  text-wrap: pretty;
+}
