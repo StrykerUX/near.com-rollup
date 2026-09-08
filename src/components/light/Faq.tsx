@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 const ITEMS: { q: string; a: React.ReactNode }[] = [
   {
     q: 'What is near.com?',
-    a: 'One account for onchain finance. Swap, trade perps, earn yield and hold assets across 30+ networks without moving funds between apps or bridging by hand.',
+    a: 'near.com is one account for all of crypto: trade perps, buy tokenized stocks and RWAs, earn yield, and swap nearly any asset across 30+ chains, confidentially.',
   },
   {
     q: 'How do I create an account?',
@@ -24,19 +24,23 @@ const ITEMS: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: 'Can my business integrate?',
-    a: 'Yes. NEAR Intents is available as infrastructure, so you can route cross-chain swaps and settlement through the same layer near.com runs on.',
+    a: 'Yes. By integrating NEAR Intents, major wallets, infrastructure providers, and DeFi protocols like Ledger, SwapKit, Infinex, and others have processed billions in cross-chain swaps. Interested? Reach out.',
   },
   {
     q: 'Need help?',
-    a: (
-      <>
-        Support is one message away, and the docs cover the rest.{' '}
-        <a href="https://near.com/support" style={{ color: 'var(--green-600)', textDecoration: 'underline' }}>
-          Contact support
-        </a>
-        .
-      </>
-    ),
+    /* THE LINK IS GONE WITH THE WORDING. It read "Contact support" and pointed
+       at near.com/support; the supplied line sends the reader to a support chat
+       on this page instead. Leaving the anchor in would give one sentence two
+       exits and name a different one than it says.
+
+       AND THERE IS NO CHAT ON THIS PAGE YET. Nothing in the app mounts one —
+       the only support route the site has is the "Support" link in the footer,
+       which goes to the same near.com/support this answer just stopped
+       pointing at. Until a widget lands, this line asks the reader to use
+       something that is not there. The copy is as supplied; the gap is real
+       and is flagged here rather than papered over with a link the words do
+       not describe. */
+    a: 'Support is one message away, and the docs cover the rest. Use the support chat below.',
   },
 ];
 
