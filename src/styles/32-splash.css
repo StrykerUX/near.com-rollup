@@ -11,6 +11,33 @@
    Everything below either animates on its own or is never shown at all.
    ========================================================================= */
 
+/* ---- 0. THE TWO RUNS ------------------------------------------------------
+   IT PLAYS ON EVERY LOAD NOW, NOT ONCE A SESSION. What the session flag buys
+   is no longer whether the curtain runs but HOW LONG: 2500ms the first time a
+   tab sees the page, 1800ms on every reload after it. The first is long enough
+   to read as an introduction; the second is short enough that somebody
+   refreshing is not made to sit through the same introduction again.
+
+   ONE NUMBER DRIVES BOTH ENDS. `--sp-run` is the whole curtain, entrance to
+   exit, and every delay below is derived from it — the fade starts 380ms
+   before the end because that is its own duration, and the park lands exactly
+   on it. Retiming the curtain is changing these two values and nothing else.
+
+   `--sp-step` IS NOT DERIVED, AND THAT IS DELIBERATE. Scaling the candle
+   stagger by the same ratio would put nine candles on a rubber clock and read
+   as a slow-motion replay of the short version. They are tuned so that in both
+   runs the chart FINISHES and then holds — 300ms of rest at 2500, 160 at 1800
+   — because the pause before a curtain lifts is what makes the lift feel
+   deliberate rather than abrupt.
+
+   THE FIRST-RUN VALUES ARE THE DEFAULT, on bare `html`. Without JavaScript, in
+   a private window, or anywhere `sessionStorage` throws, no attribute is
+   written and the reader gets 2500ms. Failing toward the longer, complete
+   version is the right way round: the short one only makes sense as a second
+   viewing. */
+html { --sp-run: 2500ms; --sp-step: 190ms }
+html[data-splash="again"] { --sp-run: 1800ms; --sp-step: 120ms }
+
 /* ---- 1. THE SHEET ---------------------------------------------------------
    z-index 1000 against a ceiling of 90. `.nav` is the highest thing the page
    declares (06-nav.css:5) and `.mobcta` is 80 (11-grid.css:138), so 1000 is
@@ -60,7 +87,7 @@
          only the exact endpoint is `hidden`. There is no midpoint flip to
          lean on. `display` is special-cased the same way, so it is no escape.
        · that exact endpoint is not reachable. Chrome keeps these times in
-         SECONDS, so the progress at the end computes as
+         SECONDS, so the progress at the end computed as
          (2.0 - 1.999) / 0.001, and in binary floating point that is
          0.9999999999998899, not 1. A 1ms duration is the worst possible
          choice because it divides the subtraction error by the smallest
@@ -70,28 +97,29 @@
      CONTINUOUSLY — at progress 0.9999999999998899 a -100% translate is off by
      nine thousandths of a pixel, which is no difference at all. And
      `step-start` removes the endpoint question entirely: its output is 1
-     across the whole interval, not at the end of it, so from 1940ms onward
+     across the whole interval, not at the end of it, so from `--sp-run` onward
      both declarations below are simply in force. `visibility:hidden` rides
      along as a bonus — it stops the sheet painting — but nothing depends on
      it landing. */
   animation:
-    spfade 380ms var(--ease-soft) 1560ms forwards,
-    sppark  60ms step-start       1940ms forwards;
+    spfade 380ms var(--ease-soft) calc(var(--sp-run) - 380ms) forwards,
+    sppark  60ms step-start       var(--sp-run)               forwards;
 }
 @keyframes spfade { to { opacity: 0 } }
 @keyframes sppark { to { visibility: hidden; transform: translateY(-100%) } }
 
 @media (max-width: 1080px) { .splash { height: 100dvh } }
 
-/* ONCE PER SESSION. The inline script in `layout.tsx` sets the attribute; this
-   hides the curtain when it finds it. The DIRECTION is the load-bearing part:
-   the script marks what has been SEEN and CSS hides it, so a reader with no
-   JavaScript — or a private window, where `sessionStorage` throws — gets the
-   curtain and it leaves on its own. Written the other way round, with CSS
-   hiding by default and a script revealing, the same reader would get a page
-   that works but a feature that never runs; written this way the worst case is
-   that they see it twice. */
-html[data-splash="seen"] .splash { display: none }
+/* THE SESSION FLAG NOW CHOOSES A LENGTH, NOT WHETHER TO RUN. It used to hide
+   the curtain outright on every load after the first; the pair of `--sp-run`
+   values at the top of this file is what it drives instead, and the rule that
+   did the hiding is gone.
+
+   THE DIRECTION IS STILL THE LOAD-BEARING PART. The script marks what has been
+   SEEN and CSS reads the mark, so a reader with no JavaScript — or a private
+   window, where `sessionStorage` throws — gets the unmarked state, which is
+   the full-length first run. Written the other way round the same reader would
+   get the abbreviated version of something they had never seen. */
 
 /* NOT SHOWN AT ALL UNDER REDUCED MOTION. `09-responsive.css:204` already
    forces `animation-duration:.01ms !important` on everything, so the curtain
@@ -128,7 +156,7 @@ html[data-splash="seen"] .splash { display: none }
      fade is invisible — it is the same gradient as the hero underneath it —
      so the sheet's alpha is, in effect, the candles' alpha, and they now
      leave on the single soft curve the sheet is given. */
-  animation: spout 380ms var(--ease-out) 1560ms both;
+  animation: spout 380ms var(--ease-out) calc(var(--sp-run) - 380ms) both;
 }
 @keyframes spout { to { transform: scale(1.04) } }
 
@@ -171,7 +199,7 @@ html[data-splash="seen"] .splash { display: none }
      simultaneous but not synchronised. Here each candle is a beat: the reader
      is meant to watch the series advance left to right, and nine candles at
      45ms would resolve in 405ms and read as a single flicker. */
-  animation: spgrow 300ms var(--ease-out) calc(var(--i) * 130ms) both;
+  animation: spgrow 300ms var(--ease-out) calc(var(--i) * var(--sp-step)) both;
 }
 @keyframes spgrow { to { transform: scaleY(1) } }
 

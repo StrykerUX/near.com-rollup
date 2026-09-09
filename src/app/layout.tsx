@@ -33,9 +33,23 @@ export const viewport: Viewport = {
    The `try` is not defensive noise: Safari in private browsing throws on
    `setItem`, and an uncaught error in a `<head>` script would take the rest of
    the script with it. */
+/**
+ * THE CURTAIN'S GATE. It plays on every load; this decides how long for.
+ *
+ * `data-splash="again"` means "this tab has seen it" — 32-splash.css reads it
+ * to pick 1800ms over the first run's 2500ms. It used to mean "do not draw it
+ * at all", and the value said `seen`, which described the fact rather than
+ * what is done with it.
+ *
+ * THE THROW IS THE POINT OF THE try/catch. `sessionStorage` throws outright in
+ * some privacy modes, and there the attribute is never written — so the reader
+ * gets the unmarked state, which is the full-length first run. Failing toward
+ * the complete version is the right way round: the short one only makes sense
+ * as a second viewing.
+ */
 const GATE =
   'try{if(sessionStorage.getItem("splash"))' +
-  'document.documentElement.dataset.splash="seen";' +
+  'document.documentElement.dataset.splash="again";' +
   'else sessionStorage.setItem("splash","1")}catch(e){}';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
