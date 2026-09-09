@@ -1,10 +1,11 @@
 'use client';
-import type { ReactNode } from 'react';
+import type { ComponentType } from 'react';
 import { fmt } from '@/lib/format';
 import { live, press } from '@/components/stage/phone/ui/tap';
 import { Enter } from '@/components/stage/phone/ui/Enter';
 import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { Dot } from '@/components/demo/app/Dot';
+import { ChevronRightIcon, EarnIcon, EyeIcon, SendIcon, SwapIcon, type IconProps } from '@/components/demo/icons';
 import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -77,13 +78,8 @@ function Assets({ d }: { d: Deck }) {
 
       <span className="ownlab">
         Total balance
-        {/* lucide `eye` (ISC) — the app puts one here, and it is what says the
-            figure can be hidden */}
-        <svg className="owneye" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0" />
-          <circle cx="12" cy="12" r="3" />
-        </svg>
+        {/* what says the figure can be hidden */}
+        <EyeIcon className="owneye" strokeWidth={2} />
       </span>
       <span className="owntotal">{usd(crypto())}</span>
 
@@ -132,29 +128,19 @@ function Row({ h, d, i }: { h: Holding; d: Deck; i: number }) {
 }
 
 /**
- * lucide `chevron-right` (ISC), and A CHEVRON here where the balance rows take
+ * A CHEVRON here, where the balance rows take
  * an arrow. The pill is not a destination, it is more of this row — which is
  * the distinction `Chev` above is named for. It came back when the wallet did:
  * the five-holding version printed $149,187.78 and could not spare the 12px,
  * these three print $6,635.62 and can.
  */
 function PillChev() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
-         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  );
+  return <ChevronRightIcon strokeWidth={2.4} />;
 }
 
-/** lucide `bar-chart` (ISC), ascending — the mark the app's Earn tab carries */
+/** the mark the app carries for yield, here and in the action sheet */
 function Bars() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
-         strokeLinecap="round" aria-hidden="true">
-      <path d="M5 20v-4" /><path d="M12 20V9" /><path d="M19 20V4" />
-    </svg>
-  );
+  return <EarnIcon strokeWidth={2.4} />;
 }
 
 /**
@@ -166,34 +152,18 @@ function Bars() {
  * row pills. Drawing new marks for verbs the device has already named would
  * make the sheet look like a different app's.
  */
-const ACT_ICON: Record<string, ReactNode> = {
-  /* SCALED, because it is drawn on the tab bar's grid and the others are not.
-     This path spans 10 units of the 24 viewBox where Send spans 20 and the
-     other two span 14, so at the same 18px box it rendered at about half their
-     size. 1.4 takes it to 14 and puts it with the arrow and the bars rather
-     than matching Send, which is the largest of the four. The stroke is
-     pre-divided so it still lands at the 1.9 the others use — scaling a path
-     scales its stroke with it. */
-  Swap: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.36"
-         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <g transform="translate(12 12) scale(1.4) translate(-12 -12)">
-        <path d="M7 9.4h9l-2.4-2.4M17 14.6H8l2.4 2.4" />
-      </g>
-    </svg>
-  ),
-  Send: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
-         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" />
-    </svg>
-  ),
-  Earn: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
-         strokeLinecap="round" aria-hidden="true">
-      <path d="M5 20v-4" /><path d="M12 20V9" /><path d="M19 20V4" />
-    </svg>
-  ),
+const ACT_ICON: Record<string, ComponentType<IconProps>> = {
+  /* THE 1.4x SCALE HACK IS GONE WITH THE HAND-DRAWN SET. The Swap glyph used
+     to be the tab bar's own path, which spans 10 units of the 24 grid where
+     Send spans 20 — so at an 18px box it rendered about half the size of its
+     neighbours, and it was scaled 1.4 inside its own viewBox with the stroke
+     pre-divided (1.36 = 1.9 / 1.4) to survive the scale. That whole correction
+     existed because the four marks came from different places. They come from
+     one drawn set now, on one optical grid, and it is the set's job to make
+     them agree. */
+  Swap: SwapIcon,
+  Send: SendIcon,
+  Earn: EarnIcon,
   /* `Move to Main` had one here — an arrow back into the unshielded balance —
      and it went with the balance. There is one now. */
 };
@@ -226,7 +196,7 @@ function ActionSheet({ d }: { d: Deck }) {
                 <span className={'ownaction' + (s.handoff && first ? ' taken' : '') + live(fn)}
                       key={a} {...press(fn)} data-tap={first ? 'swap' : undefined}
                       data-lit={first && s.lit === 'swap' ? '1' : undefined}>
-                  {ACT_ICON[a]}{a}
+                  {(() => { const G = ACT_ICON[a]; return G ? <G strokeWidth={1.9} /> : null; })()}{a}
                 </span>
               );
             })}

@@ -3,6 +3,7 @@ import { fmt } from '@/lib/format';
 import { live, press } from '@/components/stage/phone/ui/tap';
 import { Enter } from '@/components/stage/phone/ui/Enter';
 import { Dot } from '@/components/demo/app/Dot';
+import { ArrowDownIcon, ArrowRightIcon, EyeIcon, ScanIcon, SendIcon } from '@/components/demo/icons';
 import {
   EARN_BAL, HOLDINGS, PERPS_BAL, crypto, total,
 } from '@/components/demo/ownv5/state';
@@ -90,34 +91,20 @@ export function AccountHome({ go, lit }: {
       <div className="ownhead">
         <span className="ownav" aria-hidden="true"><NearMark /></span>
         <b>Account</b>
-        <span className="ownscan" aria-hidden="true">
-          {/* lucide `scan` (ISC) */}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-               strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 7V5a2 2 0 0 1 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" />
-            <path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" />
-          </svg>
-        </span>
+        <span className="ownscan" aria-hidden="true"><ScanIcon strokeWidth={2} /></span>
       </div>
 
       <span className="ownlab">
         Total balance
-        {/* lucide `eye` (ISC) — the app puts one here, and it is what says the
+        {/* the app puts one here, and it is what says the
             figure can be hidden */}
-        <svg className="owneye" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0" />
-          <circle cx="12" cy="12" r="3" />
-        </svg>
+        <EyeIcon className="owneye" strokeWidth={1.7} />
       </span>
       <span className="owntotal">{usd(total())}</span>
 
       <div className="ownpair">
         <span className="ownbtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
-          </svg>
+          <ArrowDownIcon strokeWidth={2} />
           Receive
         </span>
         {/* the one of the pair that leads somewhere. `live`/`press` and the
@@ -125,10 +112,7 @@ export function AccountHome({ go, lit }: {
             press here reads exactly like a press on Earn. */}
         <span className={'ownbtn' + live(go?.send ?? null)} {...press(go?.send ?? null)}
               data-tap="send" data-lit={lit === 'send' ? '1' : undefined}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" />
-          </svg>
+          <SendIcon strokeWidth={2} />
           Send
         </span>
       </div>
@@ -185,7 +169,7 @@ function Row({ row, label, value, children, go, lit }: {
 }
 
 /**
- * lucide `arrow-right` (ISC) — the affordance every balance row carries.
+ * The affordance every balance row carries.
  *
  * An ARROW and not a chevron. The older recording draws `›` here; the current
  * home screen draws `→`, and this file follows the newer of the two frames.
@@ -193,12 +177,7 @@ function Row({ row, label, value, children, go, lit }: {
  * "this goes somewhere", and the row goes somewhere.
  */
 function Chev() {
-  return (
-    <svg className="ownchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
-    </svg>
-  );
+  return <ArrowRightIcon className="ownchev" strokeWidth={2} />;
 }
 
 /**

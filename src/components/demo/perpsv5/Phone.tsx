@@ -8,6 +8,9 @@ import { TokenDot } from '@/components/stage/phone/TokenDot';
 import { findToken } from '@/lib/tokens';
 import { fmt } from '@/lib/format';
 import { Count } from '@/components/demo/shell/Count';
+import {
+  CheckIcon, ChevronDownIcon, ChevronLeftIcon, LineChartIcon, UnitSwapIcon, WalletFullIcon,
+} from '@/components/demo/icons';
 import { Layer } from '@/components/demo/shell/Frame';
 import { PALETTE, PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -48,10 +51,10 @@ const BTC = findToken('BTC');
    figures: the live chip is rewritten every frame and a proportional 1 makes
    the label twitch sideways under a price that has not moved. */
 /**
- * LUCIDE, INLINED (ISC) — `lucide-static@1.38.0`.
+ * WHY THIS SCREEN HAS ICONS AT ALL.
  *
- * EVERY MARK ON THIS DEVICE THAT IS AN ICON IS ONE OF THESE. They were four
- * different kinds of not-an-icon, and each failed the same way:
+ * Every mark on it was once a different kind of not-an-icon, and each failed
+ * the same way:
  *
  *   `⌄`  MODIFIER LETTER DOWN ARROWHEAD — not a chevron, a phonetic letter.
  *        Every family draws it at its own weight, size and baseline, so the
@@ -62,30 +65,20 @@ const BTC = findToken('BTC');
  *   `✓`  drawn in CSS out of two rotated borders — precise, and impossible to
  *        restyle, recolour or resize without redoing the trigonometry.
  *
- * One 24-grid path set each, inlined the way the repo already keeps its icons
- * (`phone/icons.tsx`, `TAB_ICONS` in the shell). A package for five glyphs is
- * a tree to shake for a handful of `d` attributes.
- *
- * The spinner stays CSS. It is a rotating stroke rather than a glyph, and a
- * border with an `animation` is both smaller and smoother than a path being
- * transformed.
+ * They are drawn glyphs from the phone's set now. The note that stood here
+ * argued a package was "a tree to shake for a handful of `d` attributes" —
+ * true of five icons, and it stopped being true at twenty-five across six
+ * files, several of them the same glyph typed out again.
  */
-function Icon({ d, className }: { d: string; className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {d.split('|').map((p) => <path key={p} d={p} />)}
-    </svg>
-  );
-}
-/** lucide `chevron-down` */
-const CHEV = 'm6 9 6 6 6-6';
-/** lucide `chart-line` — the control switches the chart's type */
-const CHART_KIND = 'M3 3v16a2 2 0 0 0 2 2h16|m19 9-5 5-4-4-3 3';
-/** lucide `arrow-right-left` — the unit swap on a protection field */
-const SWAP = 'm16 3 4 4-4 4|M20 7H4|m8 21-4-4 4-4|M4 17h16';
-/** lucide `check` — the "add profit taker/stop loss" box, once it is ticked */
-const CHECK = 'M20 6 9 17l-5-5';
+
+/* The five glyphs this screen needs come from the phone's set — see
+   `demo/icons.tsx`. The `Icon`/`d`-string renderer that stood here, with its
+   `|`-separated multi-path constants, was a private icon format invented for
+   five marks; the set renders itself.
+
+   THE SPINNER STAYS CSS. It is a rotating stroke rather than a glyph, and a
+   border with an `animation` is both smaller and smoother than a path being
+   transformed. */
 
 const AXIS_FACE = '\'Figtree\', "Helvetica Neue", Arial, sans-serif';
 const usd = (v: number, dp = 2) => '$' + fmt(v, dp);
@@ -145,26 +138,11 @@ function Chrome() {
   return (
     <div className="bchrome">
       <span className="bback" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-             strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 5.5L8 12l6.5 6.5" /></svg>
+        <ChevronLeftIcon strokeWidth={2} />
       </span>
       <span className="bspace" />
-      {/* THE WALLET, FROM LUCIDE (ISC) — `lucide-static@1.38.0`, icon `wallet`,
-          inlined rather than depended on. It is one 24-grid path pair and the
-          repo already keeps its icons this way (`phone/icons.tsx`, `TAB_ICONS`
-          in the shell); a package for a single glyph would be 400KB of tree to
-          shake for two `d` attributes.
-
-          The one it replaces was drawn by hand here and did not read as a
-          wallet — a rounded rect with a bar through it is a card, or a
-          database. An icon a viewer has to decode is worse than no icon, and
-          this is a screen whose whole claim is that it looks like the app. */}
-      <span className="bwallet" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-             strokeLinecap="round" strokeLinejoin="round">
-          <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-          <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
-        </svg>
+            <span className="bwallet" aria-hidden="true">
+        <WalletFullIcon strokeWidth={2} />
       </span>
     </div>
   );
@@ -234,7 +212,7 @@ function Market({ d }: { d: Deck }) {
       <div className="bpair">
         <TokenDot token={BTC} size={34} />
         <span className="bpairt"><b>BTC</b><em>Bitcoin</em></span>
-        <Icon d={CHEV} className="bcv bchev" />
+        <ChevronDownIcon className="bcv bchev" />
       </div>
 
       <div className="bpx">
@@ -303,8 +281,8 @@ function Market({ d }: { d: Deck }) {
       <div className="btime" aria-hidden="true"><i>:00</i><i>10:30</i><b>11:00</b></div>
 
       <div className="btools">
-        <span className="btf">1H <Icon d={CHEV} className="bcv" /></span>
-        <Icon d={CHART_KIND} className="bkind" />
+        <span className="btf">1H <ChevronDownIcon className="bcv" /></span>
+        <LineChartIcon className="bkind" />
       </div>
 
       {/* it draws nothing until there is a position in THIS market — the test
@@ -383,7 +361,7 @@ function PositionBar({ d }: { d: Deck }) {
           <b data-pnl={i}>{signed(pnl(p, atFor(p, MARK)))}</b>
           <i data-pnlp={i} className="bpct">{signedPct(pnlPct(p, atFor(p, MARK)))}</i>
         </span>
-        <Icon d={CHEV} className={'bcv bposc' + (s.posOpen ? ' on' : '')} />
+        <ChevronDownIcon className={'bcv bposc' + (s.posOpen ? ' on' : '')} />
       </div>
     </div>
   );
@@ -510,7 +488,7 @@ function Ticket({ d }: { d: Deck }) {
               second story and there is no room for it; a control that opened
               nothing would be worse than one that is plainly just a label, so
               it carries no `can` and gets no pointer. */}
-          <span className="botype">Market <Icon d={CHEV} className="bcv" /></span>
+          <span className="botype">Market <ChevronDownIcon className="bcv" /></span>
         </div>
 
         <div className="bavail">
@@ -530,13 +508,13 @@ function Ticket({ d }: { d: Deck }) {
               {s.focus === 'amount' ? <i className="bcaret" /> : null}
             </span>
             <span className={'blev' + live(d.can('levSheet'))} {...press(d.can('levSheet'))}
-                  data-tap="lev">{s.lev}x <Icon d={CHEV} className="bcv" /></span>
+                  data-tap="lev">{s.lev}x <ChevronDownIcon className="bcv" /></span>
           </div>
         </div>
 
         <span className={'bchk' + (s.prot ? ' on' : '') + live(d.can('prot'))} {...press(d.can('prot'))}
               data-tap="prot">
-          <i className="bbox"><Icon d={CHECK} className="btick" /></i>Add profit taker/stop loss
+          <i className="bbox"><CheckIcon className="btick" /></i>Add profit taker/stop loss
         </span>
 
         {s.prot ? (
@@ -588,7 +566,7 @@ function Protect({ d, which, label, bad, err, delay = 0 }: {
             it is inert because this cut never swaps units — see `prot` in
             state.ts. Inert and undrawn are different lies; this is the smaller
             one, and `press(null)` keeps it out of the tab order either way. */}
-        <span className="bunit" aria-hidden="true"><i>$</i><Icon d={SWAP} className="bswap" /></span>
+        <span className="bunit" aria-hidden="true"><i>$</i><UnitSwapIcon className="bswap" /></span>
       </span>
       {bad ? <em className="berr">{err}</em> : null}
     </div>

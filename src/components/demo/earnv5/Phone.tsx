@@ -7,6 +7,7 @@ import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { Count } from '@/components/demo/shell/Count';
 import { Typed, writeMs } from '@/components/demo/shell/Typed';
 import { Dot } from '@/components/demo/app/Dot';
+import { ChevronDownIcon, ChevronRightIcon, WalletIcon } from '@/components/demo/icons';
 import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -148,14 +149,8 @@ function Vaults({ d }: { d: Deck }) {
   );
 }
 
-/** lucide `chevron-right` (ISC) */
 function Chev() {
-  return (
-    <svg className="ernchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  );
+  return <ChevronRightIcon className="ernchev" strokeWidth={2} />;
 }
 
 /* ---- 2 · the stake ----------------------------------------------------- */
@@ -373,7 +368,7 @@ function PaySheet({ d }: { d: Deck }) {
 /**
  * THE RECIPIENT'S MARK — a wallet, where the other two rows carry a token.
  *
- * lucide `wallet-minimal` (ISC, lucide-static v1.40.0), copied verbatim, which
+ * The set's wallet, the same one the Assets tab carries, which
  * is what the two chevrons in this file already are. It replaces a filled
  * wallet traced by hand off the clip at 13.5s — the frame's own glyph is a
  * solid, and hand-drawing one to match it put a shape in here that no library
@@ -388,24 +383,13 @@ function PaySheet({ d }: { d: Deck }) {
  * above it.
  */
 function Wallet() {
-  return (
-    <svg className="ernswali" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M17 14h.01" />
-      <path d="M7 7h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14" />
-    </svg>
-  );
+  return <WalletIcon className="ernswali" strokeWidth={2} />;
 }
 
-/** lucide `chevron-down` (ISC). The file's other `Chev` points RIGHT and marks
-    a row that goes somewhere; these three mark a field that opens a picker. */
+/** The file's other `Chev` points RIGHT and marks a row that goes somewhere;
+    these three mark a field that opens a picker. */
 function ChevDown() {
-  return (
-    <svg className="ernschev" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
+  return <ChevronDownIcon className="ernschev" strokeWidth={2} />;
 }
 
 /* ---- the vault's sheet ------------------------------------------------- */

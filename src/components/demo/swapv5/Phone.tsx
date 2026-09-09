@@ -9,6 +9,10 @@ import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import { Dot } from '@/components/demo/app/Dot';
+import {
+  ArrowDownIcon, ChevronDownIcon, CloseIcon, FlipIcon, HelpIcon,
+  LockCheckIcon, SearchIcon, SlidersIcon, UndoIcon,
+} from '@/components/demo/icons';
 import { AccountHome } from '@/components/demo/app/AccountHome';
 import { CATALOGUE, type Asset } from './catalogue';
 import { value } from '@/components/demo/ownv5/state';
@@ -123,48 +127,24 @@ const rateStr = (n: number) => {
   return (Math.trunc(n * k) / k).toFixed(dp).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
 };
 
-/** lucide `chevron-down` (ISC) — every token pill carries one */
+/** every token pill carries one */
 function Cv() {
-  return (
-    <svg className="bcv" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
+  return <ChevronDownIcon className="bcv" strokeWidth={2} />;
 }
 
-/** lucide `arrow-down-up` (ISC) — the app's fiat/token flip, drawn and inert */
+/** the app's fiat/token flip, drawn and inert */
 function Flip() {
-  return (
-    <svg className="swflip" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="m3 16 4 4 4-4" /><path d="M7 20V4" />
-      <path d="m21 8-4-4-4 4" /><path d="M17 4v16" />
-    </svg>
-  );
+  return <FlipIcon className="swflip" strokeWidth={2} />;
 }
 
-/** lucide `circle-help` (ISC) — the app hangs one off the rows that need a word */
+/** the app hangs one off the rows that need a word */
 function Help() {
-  return (
-    <svg className="swqh" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3" /><path d="M12 17h.01" />
-    </svg>
-  );
+  return <HelpIcon className="swqh" strokeWidth={2} />;
 }
 
-/** lucide `sliders-horizontal` (ISC) — the tolerance pill is a control, and says so */
+/** the tolerance pill is a control, and says so */
 function Sliders() {
-  return (
-    <svg className="swsl" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M10 5H3" /><path d="M21 5h-7" /><circle cx="12" cy="5" r="2" />
-      <path d="M6 12H3" /><path d="M21 12h-11" /><circle cx="8" cy="12" r="2" />
-      <path d="M14 19H3" /><path d="M21 19h-3" /><circle cx="16" cy="19" r="2" />
-    </svg>
-  );
+  return <SlidersIcon className="swsl" strokeWidth={2} />;
 }
 
 export function Phone({ d }: { d: Deck }) {
@@ -213,14 +193,9 @@ function Chrome() {
   return (
     <div className="swbar">
       <span className="swlock" aria-hidden="true">
-        {/* lucide `lock-keyhole` with a tick — the app draws it green, which on
-            a screen whose whole argument is confidentiality is not decoration */}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
-             strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3.5" y="10.5" width="17" height="11" rx="2.6" />
-          <path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5" />
-          <path d="m9.6 16.1 1.8 1.8 3.4-3.4" />
-        </svg>
+        {/* a lock with a tick in it — the app draws it green, which on a screen
+            whose whole argument is confidentiality is not decoration */}
+        <LockCheckIcon strokeWidth={1.9} />
       </span>
     </div>
   );
@@ -231,12 +206,8 @@ function Heading() {
   return (
     <div className="swhead">
       <b>Swap</b>
-      {/* lucide `circle-help` (ISC) — the app puts one beside the heading */}
-      <svg className="swhelp" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3" /><path d="M12 17h.01" />
-      </svg>
+      {/* the app puts one beside the heading */}
+      <HelpIcon className="swhelp" strokeWidth={2} />
     </div>
   );
 }
@@ -334,10 +305,7 @@ function Swap({ d }: { d: Deck }) {
 
       {/* the swap arrow, which is chrome rather than a control on this cut */}
       <span className="swarrow" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-             strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
-        </svg>
+        <ArrowDownIcon strokeWidth={2} />
       </span>
 
       {/* ---- the destination, empty and waiting ---- */}
@@ -486,12 +454,7 @@ function Settle({ d, from, to }: { d: Deck; from: Asset; to: Asset | null }) {
           already says that, better. */}
       {s.done ? (
         <span className={'bcta swagain' + live(again)} {...press(again)} data-tap="again">
-          {/* lucide `undo-2` (ISC) */}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M9 14 4 9l5-5" />
-            <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
-          </svg>
+          <UndoIcon strokeWidth={2} />
           Swap again
         </span>
       ) : null}
@@ -529,11 +492,7 @@ function Review({ d }: { d: Deck }) {
         <div className="swrevh">
           <b>Review trade</b>
           <span className={'swrevx' + live(close)} {...press(close)} data-tap="closeReview">
-            {/* lucide `x` (ISC) */}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-            </svg>
+            <CloseIcon strokeWidth={2} />
           </span>
         </div>
 
@@ -566,10 +525,7 @@ function Review({ d }: { d: Deck }) {
 function Arrow() {
   return (
     <span className="swrevar" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-           strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
-      </svg>
+      <ArrowDownIcon strokeWidth={2} />
     </span>
   );
 }
@@ -622,11 +578,7 @@ function Picker({ d }: { d: Deck }) {
             cut types into it, and a caret blinking in a box nobody uses reads
             as a control that is broken rather than one that is there. */}
         <div className="swsearch" aria-hidden="true">
-          {/* lucide `search` (ISC) */}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-               strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
-          </svg>
+          <SearchIcon strokeWidth={2} />
           <em>Search tokens</em>
         </div>
 

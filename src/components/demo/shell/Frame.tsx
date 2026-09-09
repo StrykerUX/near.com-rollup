@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type ComponentType, type ReactNode } from 'react';
 import { live, press } from '@/components/stage/phone/ui/tap';
+import { CandlesIcon, HomeIcon, MenuIcon, SwapIcon, WalletIcon, type IconProps } from '@/components/demo/icons';
 import type { Deck } from './deck';
 import type { DemoFlow } from './flow';
 
@@ -173,37 +174,28 @@ export function StatusBar({ time = '12:03' }: { time?: string }) {
 export type TabName = 'Home' | 'Assets' | 'Swap' | 'Perps' | 'Menu';
 
 /**
- * `fl` MARKS THE SHAPES THE ACTIVE TAB FILLS — see `.dtab[aria-current] .fl` in
- * 17-demo.css, which washes them with 22% green. Only a closed shape can carry
- * it; Swap is an open arrow and has never had one.
+ * THE FIVE TAB GLYPHS, from the phone's icon set — see `demo/icons.tsx`.
+ *
+ * `fl` IS GONE, AND WITH IT THE FILL WASH. The five icons used to be
+ * hand-drawn here, and three of them tagged their closed shapes with `.fl` so
+ * that `.dtab[aria-current] .fl` (17-demo.css) could flood them with 22%
+ * green. Two never could: Swap is an open arrow and Assets' wallet body runs
+ * back along its own top edge, so filling either paints a wedge across the
+ * opening. The effect was therefore already true of three tabs out of five.
+ *
+ * A drawn set has no such marks and should not be given them — every glyph in
+ * it is a stroke, and stroke icons fill badly for exactly the reason the two
+ * exceptions above document. So the wash goes, and the active tab is what it
+ * already was for Swap and Assets: the whole icon in `--near-green`, which
+ * `.dtab[aria-current]` does through `color`. Five tabs behaving alike, rather
+ * than three of one kind and two of another.
  */
-const TAB_ICONS: Record<TabName, ReactNode> = {
-  Home: <path className="fl" d="M12 4.6l7.4 5.9V18a1.9 1.9 0 0 1-1.9 1.9H6.5A1.9 1.9 0 0 1 4.6 18v-7.5z" />,
-  /* ASSETS IS LUCIDE'S WALLET (ISC) — `lucide-static`, icon `wallet-minimal`,
-     the same two paths the Earn chapter's recipient row draws, so the app has
-     ONE wallet mark rather than two things that mean the same thing.
-
-     WHAT IT REPLACES was a bare `<rect rx="2.6">` drawn here, and a rounded
-     rectangle is not a wallet — it is a card, or a database, or a note. The
-     `wallet-minimal` cut is the one that keeps the eyelet, which is the detail
-     that still reads at 21px.
-
-     AND IT CARRIES NO `fl`, which is a real trade rather than an oversight: the
-     body is an OPEN path — it ends running back along the top edge — so a fill
-     would close it across the opening and paint a wedge through the middle. The
-     active tab still reads as active, because `.dtab[aria-current]` turns the
-     whole icon green; what it loses is the fill wash behind it. Swap has always
-     looked like that. If the wash matters more than the mark, lucide's
-     `wallet-cards` is the fillable one — a rect with two lines over it. */
-  Assets: (
-    <>
-      <path d="M17 14h.01" />
-      <path d="M7 7h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14" />
-    </>
-  ),
-  Swap: <path d="M7 9.4h9l-2.4-2.4M17 14.6H8l2.4 2.4" />,
-  Perps: <><path d="M8.2 4.8v2.4M12 4.2v3M15.8 5.4v2.4" /><rect className="fl" x="6.9" y="7.2" width="2.6" height="9.6" rx="1.1" /><rect className="fl" x="14.5" y="7.8" width="2.6" height="7.2" rx="1.1" /></>,
-  Menu: <><rect className="fl" x="4.5" y="4.5" width="6.2" height="6.2" rx="1.9" /><rect className="fl" x="13.3" y="4.5" width="6.2" height="6.2" rx="1.9" /><rect className="fl" x="4.5" y="13.3" width="6.2" height="6.2" rx="1.9" /><rect className="fl" x="13.3" y="13.3" width="6.2" height="6.2" rx="1.9" /></>,
+const TAB_ICONS: Record<TabName, ComponentType<IconProps>> = {
+  Home: HomeIcon,
+  Assets: WalletIcon,
+  Swap: SwapIcon,
+  Perps: CandlesIcon,
+  Menu: MenuIcon,
 };
 
 const TABS: TabName[] = ['Home', 'Assets', 'Swap', 'Perps', 'Menu'];
@@ -237,8 +229,10 @@ export function Tabs({ on, go, lit }: {
                 aria-current={t === on ? 'page' : undefined}
                 data-tap={fn ? 'tab:' + t : undefined}
                 data-lit={lit === 'tab:' + t ? '1' : undefined}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
-                 strokeLinecap="round" strokeLinejoin="round">{TAB_ICONS[t]}</svg>
+            {/* 1.7, the weight the hand-drawn set was carrying here. The
+                icons ship at 1.5, which reads thin at 21px against the label
+                under it. */}
+            {(() => { const Glyph = TAB_ICONS[t]; return <Glyph strokeWidth={1.7} />; })()}
             <em>{t}</em>
           </span>
         );
