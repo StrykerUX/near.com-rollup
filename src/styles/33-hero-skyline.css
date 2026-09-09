@@ -409,10 +409,28 @@
    layers that exist to let a dark field through — and 31 made it paper because
    there was no dark field left to let through. There is again, and this one is
    a photograph, which is the case glass was actually invented for: the skyline
-   carries on behind the words instead of stopping at a white rectangle. */
+   carries on behind the words instead of stopping at a white rectangle.
+
+   THE FILL IS A GRADED GREY NOW, not a flat white wash. #A7A7A7 to #414141
+   across 135deg — the supplied pair, on a diagonal running from the top left
+   down to the bottom right. 135 rather than 225 because the ask reads "top to
+   bottom, tilted", and of the two 45-degree rotations of vertical this is the
+   one that keeps the light coming from above; it is also the same direction
+   the pill's own gradient was turned to.
+
+   THE 40% IS CARRIED BY THE STOPS, NOT BY `opacity`. An `opacity` on this
+   element would take the quote, the byline and the pinwheel down with the
+   plate — the whole subtree composites as one. Written into the two colours it
+   is the FILL that is 40%, which is what the plate being glass means, and the
+   type on it stays at full strength.
+
+   THE BLUR STAYS. A 40% fill still lets the city through, and unblurred that
+   is lit windows running under a paragraph. */
 #stage .side.r .rollquote,
 #stage .mchbody .rollquote {
-  background: rgba(255, 255, 255, .07);
+  background: linear-gradient(135deg,
+    rgba(167, 167, 167, .4) 0%,
+    rgba(65, 65, 65, .4) 100%);
   border-color: var(--border);
   box-shadow: 0 18px 44px rgba(0, 0, 0, .38);
   -webkit-backdrop-filter: blur(18px);
