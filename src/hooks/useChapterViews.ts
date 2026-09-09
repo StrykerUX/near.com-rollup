@@ -1,6 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { track } from '@/lib/analytics';
+import { onDomChange } from '@/lib/domWatch';
 import { subscribeActiveFace } from '@/stage/bus';
 
 /**
@@ -65,8 +66,7 @@ export function useChapterViews() {
 
     /* ---- NARROW: five sections in normal flow --------------------------- */
     let io: IntersectionObserver | null = null;
-    let mo: MutationObserver | null = null;
-    let queued = 0;
+    let offDom: (() => void) | null = null;
     const timers = new Map<Element, number>();
 
     if (typeof IntersectionObserver !== 'undefined') {
@@ -100,19 +100,14 @@ export function useChapterViews() {
       };
       scan();
 
-      mo = new MutationObserver(() => {
-        if (queued) return;
-        queued = requestAnimationFrame(() => { queued = 0; scan(); });
-      });
-      mo.observe(document.body, { childList: true, subtree: true });
+      offDom = onDomChange(scan);
     }
 
     return () => {
       offFace();
       if (faceTimer) clearTimeout(faceTimer);
-      mo?.disconnect();
+      offDom?.();
       io?.disconnect();
-      if (queued) cancelAnimationFrame(queued);
       timers.forEach((t) => clearTimeout(t));
     };
   }, []);

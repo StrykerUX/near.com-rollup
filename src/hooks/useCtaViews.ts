@@ -1,6 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { track } from '@/lib/analytics';
+import { onDomChange } from '@/lib/domWatch';
 
 /** every button that declares a tracked position — the same attribute Umami
     turns into the `pos` property on the click event */
@@ -113,18 +114,12 @@ export function useCtaViews() {
     };
     scan();
 
-    /* the composition swap again — see the note in useAcquisition */
-    let queued = 0;
-    const mo = new MutationObserver(() => {
-      if (queued) return;
-      queued = requestAnimationFrame(() => { queued = 0; scan(); });
-    });
-    mo.observe(document.body, { childList: true, subtree: true });
+    /* the composition swap — one observer serves all three hooks, see domWatch */
+    const offDom = onDomChange(scan);
 
     return () => {
-      mo.disconnect();
+      offDom();
       io.disconnect();
-      if (queued) cancelAnimationFrame(queued);
       timers.forEach((t) => clearTimeout(t));
     };
   }, []);

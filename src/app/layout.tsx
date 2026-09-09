@@ -193,17 +193,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `data-domains` IS A FILTER, AND IT FAILS SILENTLY IN BOTH
             DIRECTIONS. The script sends nothing unless `location.hostname`
             matches one of these, which is what keeps localhost and every
-            `*-git-*.vercel.app` preview out of the numbers. The cost: THE DAY
-            THIS SITE MOVES TO ITS REAL DOMAIN, IF THAT HOST IS NOT IN THIS
-            LIST, TRACKING STOPS AND NOTHING REPORTS AN ERROR — the dashboard
-            just goes quiet. `therollup.near.com` is listed ahead of the Vercel
-            host in anticipation; drop the Vercel one once the cutover is
-            done. */}
+            `*-git-*.vercel.app` preview out of the numbers. The cost is the
+            other direction: a host that is NOT listed goes quiet, and quiet
+            looks exactly like nobody visiting.
+
+            WHICH IS WHY THE LIST IS AN ENVIRONMENT VARIABLE. The day this site
+            moves to its real domain, the Vercel host has to come out or the
+            two keep sharing one dashboard — and that is a change made by
+            whoever repoints the domain, on the day they repoint it, in the
+            Vercel project they already have open. As a literal in this file it
+            was a code change, a review and a deploy, scheduled for a moment
+            nobody would be thinking about analytics. The fallback is the pair
+            that was here before, so an unset variable behaves exactly as the
+            previous deploy did.
+
+            Every event carries `hostname` regardless, so traffic that does get
+            mixed can still be separated after the fact — this keeps it from
+            happening, it is not the only remedy. */}
         <Script
           defer
           src="https://umami-production-c53b.up.railway.app/script.js"
           data-website-id="1c630dd6-e7d2-438d-928c-c0183889dc58"
-          data-domains="therollup.near.com,near-com-rollup.vercel.app"
+          data-domains={
+            process.env.NEXT_PUBLIC_ANALYTICS_DOMAINS ??
+            'therollup.near.com,near-com-rollup.vercel.app'
+          }
         />
       </body>
     </html>

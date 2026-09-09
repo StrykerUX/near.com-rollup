@@ -1,6 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { refFor, resolveSource, track } from '@/lib/analytics';
+import { onDomChange } from '@/lib/domWatch';
 
 /** every outbound link to the signup, wherever it is drawn */
 const LOGIN_LINKS = 'a[href*="near.com/login"]';
@@ -67,35 +68,32 @@ export function useAcquisition() {
 
     patch();
 
-    /* ONLY WHEN THIS VISIT NAMED THE DOOR. `fresh` is false for a reader whose
-       source came out of a ninety-day-old cookie: they are a return, not a
-       landing, and counting them again would inflate the top of the funnel
-       against a numerator that cannot inflate with it.
+    /* ONE PER TAB, PER DOOR — and `fresh` alone was not enough to get that.
+       `fresh` means THIS URL NAMED A DOOR, which is a different claim from
+       "this is a first visit": a reader who reloads `/r/nearperps` five times,
+       or opens it from a bookmark every morning, satisfies it every time. The
+       count was inflating exactly where it was supposed to be authoritative.
 
-       IT IS NOT REDUNDANT WITH THE PAGEVIEW. Umami's own pageview records the
-       url, so `/r/nearperps` and its tags are already in the Pages and campaign
-       reports; what neither of those can say is whether this was an ARRIVAL or
-       a reader coming back for the third time. That distinction is the whole
-       top of the funnel. */
-    if (fresh) track('landed');
+       `sessionStorage` IS THE RIGHT SCOPE HERE, not the ninety-day cookie. A
+       genuine second click through the partner's redirect next week IS another
+       arrival and should count; a refresh of the tab already open is not.
 
-    /* `childList` ONLY, which is what makes this safe to run from inside its
-       own callback: `patch` writes attributes, and attribute mutations are not
-       observed here, so it cannot retrigger itself. The rAF coalesces the
-       burst of records a composition swap produces into one pass. */
-    let queued = 0;
-    const mo = new MutationObserver(() => {
-      if (queued) return;
-      queued = requestAnimationFrame(() => {
-        queued = 0;
-        patch();
-      });
-    });
-    mo.observe(document.body, { childList: true, subtree: true });
+       THE THROW COUNTS. Safari in private browsing throws on `setItem`, and
+       there the choice is between losing real arrivals and letting a minority
+       double-count on refresh. An arrival that happened is a fact; failing
+       toward recording it is the honest direction. */
+    if (fresh) {
+      const once = `landed:${source}`;
+      try {
+        if (!sessionStorage.getItem(once)) {
+          sessionStorage.setItem(once, '1');
+          track('landed');
+        }
+      } catch {
+        track('landed');
+      }
+    }
 
-    return () => {
-      mo.disconnect();
-      if (queued) cancelAnimationFrame(queued);
-    };
+    return onDomChange(patch);
   }, []);
 }
