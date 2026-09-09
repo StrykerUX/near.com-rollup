@@ -52,16 +52,35 @@
      GRADIENT. `background-image` does not interpolate, so the hover cannot
      swap one fill for another — it grows the gradient's tile until only the
      white end is inside the pill (see `--cta-fill` in 02-tokens.css).
-     `background-size` is
-     what carries that; `filter` is still here for the press. Without them the
-     sweep and the dip would both be instantaneous while everything beside
-     them eased. */
+     `background-size` is what carries that; `filter` is still here for the
+     press. Without them the sweep and the dip would both be instantaneous
+     while everything beside them eased.
+
+     THE SWEEP KEEPS ITS OWN DURATION AND CURVE, AND THAT IS THE FIX FOR A REAL
+     COMPLAINT: it arrived hard and left softly. Every other property on a
+     button uses the in/out pair above — fast in, slow out — which is right for
+     a colour, where the in is a state landing and the reader is already
+     looking at it. The sweep is not a state landing, it is a 320% TRAVEL
+     across the pill, and 200ms of that reads as a cut while the 420ms exit
+     reads as a move. The asymmetry that flatters a fill exposes a journey.
+
+     SO IT IS SYMMETRIC: the same 460ms and the same curve in both directions,
+     which is the only way in and out can feel alike.
+
+     AND THE CURVE IS AN EASE-IN-OUT, NOT `--ease-soft`. That one is
+     (.22,.61,.36,1) — an ease-OUT, off the mark at speed. On a fill that is
+     what makes a hover feel responsive; on a travel it is what makes the start
+     feel like a jolt, because the fastest part of the move is its first frame.
+     `(.4,0,.2,1)` starts from rest and arrives at rest, so the white gathers
+     itself, crosses, and settles. */
+  --dur-sweep:460ms;
+  --ease-sweep:cubic-bezier(.4,0,.2,1);
   --tr-btn:
     background-color var(--dur-btn-out) var(--ease-soft),
     border-color     var(--dur-btn-out) var(--ease-soft),
     color            var(--dur-btn-out) var(--ease-soft),
     box-shadow       var(--dur-btn-out) var(--ease-soft),
-    background-size  var(--dur-btn-out) var(--ease-soft),
+    background-size  var(--dur-sweep)   var(--ease-sweep),
     filter           var(--dur-btn-out) var(--ease-soft),
     transform        var(--dur-press)   var(--ease-soft);
   /* THE SAME LIST AT THE IN DURATION, WRITTEN OUT. The obvious way to do this
@@ -77,7 +96,7 @@
     border-color     var(--dur-btn-in) var(--ease-soft),
     color            var(--dur-btn-in) var(--ease-soft),
     box-shadow       var(--dur-btn-in) var(--ease-soft),
-    background-size  var(--dur-btn-in) var(--ease-soft),
+    background-size  var(--dur-sweep)  var(--ease-sweep),
     filter           var(--dur-btn-in) var(--ease-soft),
     transform        var(--dur-press)  var(--ease-soft);
 }
