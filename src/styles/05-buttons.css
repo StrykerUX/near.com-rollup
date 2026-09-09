@@ -10,9 +10,33 @@
   transition:var(--tr-btn);white-space:nowrap;
 }
 .btn:hover .arw{transform:translateX(3px)}
-.btn-primary{background:var(--near-green);color:#000}
-.btn-primary:hover{background:var(--green-300);box-shadow:var(--glow-green-sm)}
-.btn-primary:active{background:var(--green-500);transform:translateY(1px)}
+/* THE ASK IS BRUSHED METAL — `--cta-fill`, declared with its numbers and the
+   reason for them in 02-tokens.css. The label stays black: the top half of
+   this pill is white, and anything but black on it is a legibility problem
+   waiting for a wide screen.
+
+   THE HOVER IS A `filter`, AND THAT IS FORCED RATHER THAN CHOSEN. A gradient
+   is `background-image`, and background-image does not interpolate — swap one
+   gradient for another and the change is instantaneous, however long the
+   transition says. `filter` does interpolate, so a brightness lift is the only
+   way this pill can answer smoothly at all. 12-motion.css carries it in both
+   button transition lists for exactly this reason.
+
+   1.08 AND A SOFT HALO, WHICH IS THE WHOLE RESPONSE. It was a jump to a
+   lighter green with `--glow-green-sm` under it — a colour change and a hard
+   ring, on a control that is already the brightest thing on a dark page. The
+   pill now lifts about an eighth of a stop and gathers a wide, weak halo; on
+   the cream zone the halo is invisible and the lift is the whole of it, which
+   is the right amount of event for a button on paper. */
+.btn-primary{
+  background:var(--cta-fill);
+  color:#000;
+}
+.btn-primary:hover{
+  filter:brightness(1.08);
+  box-shadow:var(--cta-halo);
+}
+.btn-primary:active{filter:brightness(.96);transform:translateY(1px)}
 .btn-outline{border-color:var(--border-strong);color:#fff;backdrop-filter:blur(8px)}
 .btn-outline:hover{border-color:#fff;background:rgba(255,255,255,.17)}
 /* thinner, not smaller — the type size is unchanged, only the space above and

@@ -285,48 +285,57 @@
    object on a dark field, which is what it is on again. Left alone. */
 
 /* ---- THE ASK ----------------------------------------------------------- */
-/* 31 made `Create account` a black pill with a green arrow, on the argument
-   that it was the one filled black shape on a light page. Every part of that
-   argument is now false: on this field a black pill is the darkest thing
-   inside the darkest quarter of the frame, and it disappears.
+/* THE ASK IS THE BASE PILL — the brushed gradient in 05-buttons.css, with
+   nothing added here but the right to be it.
 
-   THE COMP DRAWS IT AS AN OUTLINE OVER THE PHOTOGRAPH — a dark translucent
-   fill so the skyline reads through it, a pale hairline that gives it its
-   shape, and the label and arrow both in the page's ink. The fill is the
-   picture's own sky rather than black: over the lit lower third it stays a
-   pane of the same night rather than a slab.
+   THIS BLOCK CANNOT SIMPLY BE DELETED, and that is the only subtle thing about
+   it. `31-hero-green.css:120` sets `#stage .btn-primary { background: #000 }`
+   for the green composition, and 31 is imported BEFORE this file — so removing
+   the override does not fall through to `.btn-primary`, it falls through to
+   31's black. Everything below exists to outrank 31, not to add anything.
 
-   AND THE ARROW STOPS BEING GREEN. It was the only colour on a black pill,
-   which made it a direction; on a pill that is now defined by its edge it
-   would be the only saturated thing on the screen, competing with the phone's
-   own green — which is the one place the page wants green to mean something. */
+   WHAT IT REPLACES was an outline: a dark translucent fill so the skyline read
+   through it, a pale hairline for shape, filling green on hover. That was the
+   right answer while the ask had to sit on a photograph without competing with
+   the phone's own green. It is the wrong one now that the control is a lit
+   object in its own right — a gradient with white at the top does not need an
+   edge drawn round it, it has one.
+
+   THE ARROW GOES BLACK WITH THE LABEL. It was `--fg` on a dark pill; on a pill
+   whose top half is white it would be a hole. */
 #stage .btn-primary,
 .mobcta .btn-primary {
-  background: rgba(10, 13, 17, .55);
-  /* `border-color`, not the shorthand: `.btn` already reserves the ring with
-     `1px solid transparent` (05-buttons.css:7), so colouring it in costs no
-     width and the pill does not grow 2px against every other button. */
-  border-color: var(--border-strong);
-  color: var(--fg);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: var(--cta-fill);
+  /* `border-color`, not the shorthand: `.btn` reserves the ring with
+     `1px solid transparent` (05-buttons.css:7), so clearing it here costs no
+     width and the pill does not shrink 2px against every other button. */
+  border-color: transparent;
+  color: #000;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 #stage .btn-primary .arw,
-.mobcta .btn-primary .arw { color: var(--fg) }
-/* ON HOVER IT FILLS. The rest state is an edge, so the response is the shape
-   becoming solid — the green the arrow gave up, carrying the whole control
-   instead of one glyph of it, with the page's own black back as the label. */
+.mobcta .btn-primary .arw { color: #000 }
+/* the hover and the press are the base's — a brightness lift and a wide, weak
+   halo. Restated only to unseat 31's fill-and-glow pair, which is why the
+   gradient is repeated: dropping `background` here would let 31's black back
+   in on hover alone. */
 #stage .btn-primary:hover,
 .mobcta .btn-primary:hover {
-  background: var(--near-green);
-  border-color: var(--near-green);
-  color: var(--near-black);
-  box-shadow: var(--glow-green-sm);
+  background: var(--cta-fill);
+  border-color: transparent;
+  color: #000;
+  filter: brightness(1.08);
+  box-shadow: var(--cta-halo);
 }
 #stage .btn-primary:hover .arw,
-.mobcta .btn-primary:hover .arw { color: var(--near-black) }
+.mobcta .btn-primary:hover .arw { color: #000 }
 #stage .btn-primary:active,
-.mobcta .btn-primary:active { background: var(--green-500); border-color: var(--green-500) }
+.mobcta .btn-primary:active {
+  background: var(--cta-fill);
+  border-color: transparent;
+  filter: brightness(.96);
+}
 
 /* Sign in — the same pair, one rank down: it is an outline at rest either way,
    so only the two colours move. */

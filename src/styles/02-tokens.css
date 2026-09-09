@@ -84,6 +84,16 @@
   --radius-sm:8px; --radius-md:12px; --radius-lg:20px; --radius-pill:999px;
   --space-5:24px; --space-6:32px; --space-7:48px; --space-8:64px; --space-9:96px;
 
+  /* THE ASK'S FILL, AND THE HALO IT GATHERS ON HOVER. White at the top falling
+     to #878787 at the foot, on 185deg — five degrees off vertical, enough to
+     stop the band reading as machine-made and not enough to look tilted.
+
+     A TOKEN BECAUSE IT IS WRITTEN IN FOUR PLACES OTHERWISE: the base pill in
+     05-buttons.css, and the stage's rest, hover and press, which have to
+     restate it to outrank 31-hero-green.css's black. Four copies of a literal
+     is three chances to retune three of them. */
+  --cta-fill:linear-gradient(185deg,#FFFFFF 0%,#878787 100%);
+  --cta-halo:0 6px 22px rgba(255,255,255,.16);
   --glow-green-sm:0 0 16px rgba(0,236,151,.45);
   --ease-out:cubic-bezier(.16,1,.3,1);
   --dur:240ms; --dur-slow:480ms;
