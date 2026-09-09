@@ -728,7 +728,18 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 /* =========================================================================
    v07.1 - near.com READS AS A URL
    ========================================================================= */
+/* `.mchhead` IS THE NARROW TOUR'S HEADLINE AND IT WAS MISSING FROM HERE. The
+   wide lockup sets its headlines as `.h1` and the narrow one as `.mchhead`
+   (Lockup.tsx / MobileTour.tsx), so every rule below — the light weight, the
+   tracking, the inline-block — applied on a desktop and to nothing on a phone.
+   All `.mchhead .wordmark` ever got was a colour, from 30-mobile-tour.css:135.
+
+   IT WAS INVISIBLE WHILE THE SPAN HELD ONE WORD. `near.com` at 400 next to
+   `near.com` at 300 is a difference you have to be told about. It stopped
+   being invisible when the line became a sentence and a second headline took
+   the same treatment. */
 .h1 .wordmark,
+.mchhead .wordmark,
 .display .wordmark{
   font-family:var(--font-display);font-style:normal;
   /* 300, LITERAL, NOT --w-roman: see the note above.

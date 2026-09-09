@@ -90,7 +90,15 @@ export const CARDS: Card[] = [
             only, where it is the claim being made, and drops it here where it
             was repetition. The break stays: it is where the line wants to turn
             in this column, not part of the sentence. */}
-        Everything you own,<br />one screen
+        Everything you own,<br />
+        {/* THE SECOND LINE STEPS BACK, the same way the opening card's third
+            line does. `.wordmark` is the light weight and the tighter tracking
+            — 13-rollup.css names it for near.com reading as a URL, and what it
+            actually encodes is "this line is quieter than the one above it".
+            "Everything you own" is the claim; "one screen" is the answer, and
+            an answer at the same weight as its own question reads as two
+            claims. */}
+        <span className="wordmark">one screen</span>
       </>
     ),
     aside: (
