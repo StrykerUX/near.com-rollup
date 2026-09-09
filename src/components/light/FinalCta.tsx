@@ -1,6 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import { useCtaContract } from '@/hooks/useCtaContract';
+import { useCtaParallax } from '@/hooks/useCtaParallax';
 
 const LOGIN = 'https://near.com/login?ref=therollup';
 
@@ -15,11 +16,11 @@ const LOGIN = 'https://near.com/login?ref=therollup';
 export function FinalCta() {
   const ref = useRef<HTMLElement>(null);
   useCtaContract(ref);
+  useCtaParallax(ref);
 
   return (
     <section className="finalcta" id="start" ref={ref}>
       <div className="ctagrad" aria-hidden="true" />
-      <div className="ctaveil" aria-hidden="true" />
       <div className="inner">
         <h2 className="h1">Your account is <em>seconds away</em></h2>
         <p>No email. No KYC. Pick a wallet or passkey and you&rsquo;re in.</p>

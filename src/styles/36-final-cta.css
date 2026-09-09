@@ -1,0 +1,135 @@
+/* =========================================================================
+   THE CLOSING PLATE IS THE CITY AGAIN
+   -------------------------------------------------------------------------
+   `.finalcta` has been three things. It was built as the stage's dark field in
+   miniature — a #000 base, four blobs in `.ctagrad`, a radial veil, two corner
+   vignettes and a copper light, six layers deep. 31-hero-green.css replaced
+   all six with the hero's green gradient when the page turned green, and left
+   the layers themselves emptied to `background: none` rather than deleted.
+   This puts a photograph back on them, which is what they were built to carry.
+
+   IT IS A DIFFERENT PLATE FROM THE HERO'S, and deliberately so: 2440x800, a
+   3:1 band cropped for a short wide box, where the stage's is 16:10 for a full
+   viewport. `cover` on the hero plate here would show the middle of a tower
+   and no skyline at all.
+
+   WHY THIS FILE AND NOT 33. That one is the STAGE's field, tokens and all, and
+   this section is not on the stage — it is the light zone's last plate, and it
+   reads none of the `--sky-*` tokens. Filing it there would put two unrelated
+   photographs behind one banner.
+   ========================================================================= */
+
+.finalcta {
+  /* the plate's own darkest value, so the frame before the WebP decodes is the
+     picture's night rather than a black hole in a cream page */
+  background: #05070A;
+  color: var(--fg);
+}
+
+/* ---- THE PHOTOGRAPH, AND ITS DRIFT ------------------------------------- */
+/* `.ctagrad` IS THE LAYER, because it already is the plate: `08-light.css:161`
+   gives it `position:absolute; inset:0`, and `.finalcta` is `overflow:hidden`,
+   so anything oversized in here is cropped by the section's own animated
+   radius for free.
+
+   124% TALL AND PULLED UP 12, WHICH IS THE WHOLE PARALLAX. The layer is taller
+   than its box by twice the travel, so it can move ±12% and never expose an
+   edge. `--cta-par` runs 0 to 1 across the section's pass through the viewport
+   (see `hooks/useCtaParallax.ts`), and `(par - .5)` re-centres it so the rest
+   frame — the one the crop was judged on — is the middle of the pass rather
+   than the start of it.
+
+   THE SIGN IS NEGATIVE ON PURPOSE. The plate travels UP as the page scrolls
+   down, which is slower than the page: the city appears to lag behind the copy
+   sitting on it, which is what reads as distance. Positive would race it and
+   read as a rendering fault.
+
+   DEFAULTED TO .5 SO IT IS CORRECT WITH NO JAVASCRIPT AT ALL — under reduced
+   motion the hook never runs, and the plate simply sits at its rest frame. */
+.finalcta .ctagrad {
+  position: absolute;
+  left: 0; right: 0;
+  top: -12%; height: 124%;
+  opacity: 1;
+  filter: none;
+  background: url('/img/footer-bg.webp') center / cover no-repeat;
+  transform: translateY(calc((var(--cta-par, .5) - .5) * -12%));
+  /* the drift is scrubbed frame by frame, so there is nothing to ease — a
+     transition here would fight the scrub and lag the scroll. */
+  transition: none;
+  will-change: transform;
+}
+
+/* ---- NO OVERLAY ---------------------------------------------------------
+   The photograph is the plate, and nothing is laid over it. `.ctaveil` briefly
+   carried a radial scrim here on the reasoning that the copy sits dead centre
+   where the plate's lit windows run; the plate does not need the help — it is
+   already near-black across the middle third — and a wash over a picture this
+   dark reads as a smudge rather than as a footing.
+
+   THE ELEMENT GOES WITH IT, out of `FinalCta.tsx`. `31-hero-green.css` already
+   emptied it to `background: none`, so leaving it would have been an empty div
+   the markup has to explain.
+
+   WHAT CARRIES THE TYPE INSTEAD is a text-shadow on the two lines themselves —
+   see below. It darkens only the few pixels around each letterform rather than
+   the whole plate, which is the difference between seating type and dimming a
+   photograph. */
+
+/* ---- THE TYPE ---------------------------------------------------------- */
+/* THIS SECTION OPTS BACK OUT OF THE LIGHT ZONE, and without these five lines
+   nothing else in this file works.
+
+   `.light` re-points `--fg`, `--fg-2`, `--fg-3` and both borders at the cream
+   panel's own scale (08-light.css:8) — correct for everything in that panel,
+   and this plate is the exception: a dark island inside it. Left inherited,
+   `color: var(--fg)` on the headline below resolves to `--l-fg`, which is
+   #0B0D0D. That is near-black type on a night photograph, and it is invisible.
+
+   `--d-*` IS THE DARK SCALE UNDER ITS OWN NAME (02-tokens.css). Before this
+   the values existed only as literals assigned straight to `--fg`, so once
+   `.light` re-pointed that variable there was nothing left to ask for.
+
+   And `--hero-ink` comes with them: 33-hero-skyline.css sets it to #1F1F1F
+   inside this section, because at that point this was the one surface still
+   carrying the green. The green is gone and the ink goes with it. */
+.finalcta {
+  --fg: var(--d-fg);
+  --fg-2: var(--d-fg-2);
+  --fg-3: var(--d-fg-3);
+  --border: var(--d-border);
+  --border-strong: var(--d-border-strong);
+  --hero-ink: var(--d-fg);
+}
+.finalcta .h1 { color: var(--fg); text-shadow: 0 2px 40px rgba(0, 0, 0, .5) }
+.finalcta .h1 em { color: var(--fg) }
+/* the supporting line steps back one strength, which it could not do while the
+   plate was green and the ink was a single value */
+.finalcta p { color: var(--fg-2); text-shadow: 0 1px 18px rgba(0, 0, 0, .55) }
+
+/* ---- THE ASK ----------------------------------------------------------- */
+/* THE SAME PILL AS THE HERO'S, down to the token. 31-hero-green.css:282 makes
+   it a black fill with a green arrow — right on a green plate, and on this one
+   a black pill is a hole in a night sky. `--cta-fill` is declared once in
+   02-tokens.css and this is its third caller.
+
+   THE GRADIENT IS REPEATED ON `:hover` AND `:active` for the reason it is on
+   the stage: 31 sets `background:#000` on both, so leaving them out here lets
+   the black back in on the interaction alone. */
+.finalcta .btn-primary {
+  background: var(--cta-fill);
+  border-color: transparent;
+  color: #000;
+}
+.finalcta .btn-primary .arw { color: #000 }
+.finalcta .btn-primary:hover {
+  background: var(--cta-fill);
+  color: #000;
+  filter: brightness(1.08);
+  box-shadow: var(--cta-halo);
+}
+.finalcta .btn-primary:hover .arw { color: #000 }
+.finalcta .btn-primary:active {
+  background: var(--cta-fill);
+  filter: brightness(.96);
+}
