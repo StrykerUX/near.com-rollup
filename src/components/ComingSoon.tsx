@@ -12,12 +12,6 @@
  * is the whole reason this page cannot drift: retune the field for the tour and
  * this follows, because there is no second set of numbers to forget.
  *
- * THE MASK STILL BELONGS TO THE SCREEN AND THE PICTURE TO THE FIELD, which is
- * why the blur is a masked element wrapping a `::before` here exactly as it is
- * on the stage. There is nothing to parallax on a page that does not scroll —
- * but this composition is one thing to learn, not two, and the shape that is
- * correct on the stage costs nothing here.
- *
  * THE CURTAIN DOES NOT RUN IN FRONT OF IT. `<Splash />` lives in the layout, so
  * it would otherwise play its two-second chart over this page and reveal the
  * same two marks it had already been showing — see the rule in
@@ -26,10 +20,7 @@
 export function ComingSoon() {
   return (
     <main className="soon">
-      <div className="soonfield" aria-hidden="true">
-        <div className="soonblur" />
-        <div className="soonscrim" />
-      </div>
+      <div className="soonscrim" aria-hidden="true" />
 
       <div className="soonin">
         {/* The Rollup leads, as it does in the tour's own eyebrow — same

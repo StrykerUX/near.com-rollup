@@ -21,34 +21,24 @@
    ========================================================================= */
 
 /* =========================================================================
-   THE FIELD AS FIVE VALUES
+   THE FIELD AS FOUR VALUES
    -------------------------------------------------------------------------
    THREE SURFACES DRAW THIS FIELD AND NONE OF THEM MAY DISAGREE: the stage, the
-   curtain that has to be pixel-identical to it, and the holding page. The mask
-   was already written out twice before the third arrived, which is the point
-   at which a copied literal stops being clearer than a name and starts being a
-   thing that gets edited in two places out of three.
+   curtain that has to be pixel-identical to it, and the holding page. A plate
+   or a scrim stop copied into three files is a thing that gets edited in two
+   of them.
 
-   THEY LIVE ON `:root` and not on a shared class, because two of the three
-   users are pseudo-elements and one is a `mask-image` — none of which a class
-   can be handed to. 02-tokens.css is untouched: these belong to one
+   THEY LIVE ON `:root` and not on a shared class, because some of the users
+   are pseudo-elements, which a class cannot be handed to. 02-tokens.css is untouched: these belong to one
    composition, and the site's own token file should not learn about it.
    ========================================================================= */
 :root {
   --sky-plate: url('/img/skyline.webp');
   --sky-plate-sm: url('/img/skyline-sm.webp');
-  --sky-blur: url('/img/skyline-blur.webp');
   /* the picture's own sky, sampled from its top edge — the colour under the
      photograph for the frame before the WebP decodes, and anywhere `cover`
      cannot reach */
   --sky-base: #0A0D11;
-  --sky-mask: linear-gradient(180deg,
-    transparent 35%,
-    rgba(0, 0, 0, .10) 45%,
-    rgba(0, 0, 0, .35) 55%,
-    rgba(0, 0, 0, .65) 65%,
-    rgba(0, 0, 0, .90) 71%,
-    #000 75%);
   --sky-scrim: linear-gradient(180deg, rgba(0, 0, 0, .10) 0%, rgba(0, 0, 0, .20) 100%);
 
   /* THE RULE BETWEEN THE TWO MARKS, measured off the supplied file. It is a
@@ -94,66 +84,6 @@
   #stage .gcss {
     background-image: var(--sky-plate-sm);
   }
-}
-
-/* =========================================================================
-   THE BLUR — sharp across the sky, soft under the words
-   -------------------------------------------------------------------------
-   A SECOND PLATE, NOT A FILTER. CSS cannot blur with a radius that varies
-   across an element, and the two ways of faking it both fail here:
-
-     · `backdrop-filter: blur()` under a gradient mask varies the OPACITY of a
-       uniformly blurred layer. Halfway down the mask you are looking at 50% of
-       a sharp photograph over 50% of a blurred one — the lit windows ghost,
-       doubled and offset. On a night skyline it is the most visible possible
-       subject for that artefact.
-     · the technique that DOES work — six or eight stacked `backdrop-filter`
-       layers, each doubling the radius under an overlapping mask, so the blur
-       accumulates — costs six to eight composited backdrop filters per frame,
-       on a page that is already scrubbing a 588vh sticky with a device
-       animating over it.
-
-   Two plates of the same photograph cost one extra texture and nothing per
-   frame. The blurred one is 640px wide: a 48px blur has already thrown away
-   everything a larger plate could carry, so it lands at 3KB — cheaper than the
-   mask it is drawn through would have been to composite.
-
-   THE MASK IS ON THIS ELEMENT AND THE PICTURE IS ON ITS `::before`. That split
-   costs one pseudo-element and buys the parallax: the blur exists so the copy
-   can be read, so its edge belongs to the SCREEN, while the photograph belongs
-   to the field. When the field moves, `::before` and `.gcss` take the same
-   translate and the mask stays where it is. Put the mask on the element that
-   moves and the soft band slides up the frame with the city, which is the
-   whole failure this is built to avoid.
-
-   THE STOPS ARE AN EASE, NOT A RAMP. 35% to 75% is the transition the comp
-   wants — sky and the top of the tower clean, the headline, the quote plate
-   and the ask all sitting on the soft half. A bare two-stop gradient
-   interpolates the MIX linearly and leaves a visible edge where it starts;
-   the intermediate stops bend it into an ease-in-out so the blur arrives
-   without an announcement.
-
-   Z-INDEX 1 PUTS IT OVER `.gcss` AND UNDER `.gshade` (2). It ties with
-   `.isomark`, which is also 1, and wins on document order — correct, and the
-   same thing GradientField.tsx says about the mark belonging to the field
-   rather than sitting on top of it.
-   ========================================================================= */
-#stage .gblur {
-  position: absolute; inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  -webkit-mask-image: var(--sky-mask);
-  mask-image: var(--sky-mask);
-}
-/* `center bottom / cover` TO THE LETTER, because it has to be the same crop as
-   the sharp plate — the two are the same photograph and any disagreement shows
-   up as the city sliding sideways as the mask brings the second one in. The
-   blurred plate is cut to 640x357, which is 2400x1339 to within a fifth of a
-   pixel, so `cover` resolves both to the same rectangle. */
-#stage .gblur::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: var(--sky-blur) center bottom / cover no-repeat;
 }
 
 /* =========================================================================
@@ -218,16 +148,14 @@
    would still animate and nobody would see it. This is the field's colour
    decision, not a type change, so it belongs with the field.
    ========================================================================= */
-/* THE CURTAIN REBUILDS THE STAGE'S THREE LAYERS OUT OF WHAT IT HAS: the
-   photograph on the element, the blur on `::before`, the scrim on `::after`.
+/* THE CURTAIN REBUILDS THE STAGE'S TWO LAYERS OUT OF WHAT IT HAS: the
+   photograph on the element, the scrim on `::after`.
 
-   THE ORDER IS THE POINT, AND IT COST A BUG TO LEARN. This was first written
-   with the scrim stacked into the element's own `background` list, which is
-   shorter and puts it in the WRONG PLACE twice: a background layer paints
-   under every pseudo-element, so the blur landed on top of the black instead
-   of under it, and when the `::after` below was added to fix that, the page
-   was carrying two scrims and was darker than the hero by the whole gradient.
-   On the stage the order is `.gcss` / `.gblur` / `.gshade`, black last, and
+   THE SCRIM IS A PSEUDO-ELEMENT AND NOT A BACKGROUND LAYER, and that cost a
+   bug to learn. Stacked into the element's own `background` list it is
+   shorter, and it was wrong twice: a background layer paints under every
+   pseudo-element.
+   On the stage the order is `.gcss` then `.gshade`, black last, and
    the curtain has to be that or nothing.
 
    NONE OF THIS IS DECORATION. 32-splash.css's whole argument is that the
@@ -241,28 +169,6 @@
   .splash { background-image: var(--sky-plate-sm) }
 }
 
-/* THE CURTAIN'S BLUR IS A PSEUDO-ELEMENT, because a mask cannot be applied to
-   one layer of a background list — it applies to the element. The stops are
-   the hero's, verbatim.
-
-   NO `::before` / `::after` COLLISION: 32-splash.css draws the candles and
-   their wicks on `.spc`, the chart's children, and puts nothing on `.splash`
-   itself. This is the first thing on it.
-
-   `.splashin` IS LIFTED OVER IT, and it needs to be said rather than assumed.
-   The group carries `animation: spout` ending in a `transform`, which makes it
-   a stacking context that would paint after an absolutely-positioned `::before`
-   on document order alone — but only while it keeps that animation. An
-   explicit `z-index` means the chart cannot end up behind the field because
-   somebody simplified the exit. */
-.splash::before {
-  content: '';
-  position: absolute; inset: 0;
-  pointer-events: none;
-  background: var(--sky-blur) center bottom / cover no-repeat;
-  -webkit-mask-image: var(--sky-mask);
-  mask-image: var(--sky-mask);
-}
 /* THE SCRIM, LAST, exactly as `.gshade` is last on the stage. */
 .splash::after {
   content: '';

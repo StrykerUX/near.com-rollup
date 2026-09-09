@@ -4,10 +4,10 @@
    The tour's field with the lockup on it and one line of type. See
    `components/ComingSoon.tsx` for what it is and how it comes back off.
 
-   EVERY VALUE IN THE FIELD IS A TOKEN FROM 33-hero-skyline.css. Not one of the
-   plates, stops or opacities is written again here — the whole argument for
-   naming them was that a third surface was about to be built and a third copy
-   of the mask is a third place to forget.
+   EVERY VALUE IN THE FIELD IS A TOKEN FROM 33-hero-skyline.css. Neither plate
+   nor either scrim stop is written again here — the argument for naming them
+   was that a third surface was about to be built, and a third copy is a third
+   place to forget.
    ========================================================================= */
 
 .soon {
@@ -29,36 +29,14 @@
   .soon { background-image: var(--sky-plate-sm) }
 }
 
-/* ---- THE FIELD'S OTHER TWO LAYERS -------------------------------------- */
-/* A REAL ELEMENT, NOT TWO PSEUDO-ELEMENTS ON `.soon`. The curtain had to use
-   `::before` and `::after` because it is one div the layout owns; this page
-   owns its own markup, so the layers are declared rather than smuggled in, and
-   `.soonin` sits above them on document order without needing a z-index to
-   argue about. */
-.soonfield {
-  position: absolute; inset: 0;
-  pointer-events: none;
-}
-
-/* THE MASK IS HERE AND THE PICTURE IS ON THE `::before`, the same split the
-   stage makes and for the same stated reason — the blur's edge belongs to the
-   screen, the photograph to the field. Nothing on this page moves, so nothing
-   here depends on it; it is written this way because the composition should be
-   one shape to learn rather than two that happen to look alike. */
-.soonblur {
-  position: absolute; inset: 0;
-  -webkit-mask-image: var(--sky-mask);
-  mask-image: var(--sky-mask);
-}
-.soonblur::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: var(--sky-blur) center bottom / cover no-repeat;
-}
-
-/* last, exactly as `.gshade` is last on the stage */
+/* ---- THE SCRIM --------------------------------------------------------- */
+/* A REAL ELEMENT, NOT A PSEUDO-ELEMENT ON `.soon`. The curtain has to use
+   `::after` because it is one div the layout owns; this page owns its own
+   markup, so the layer is declared rather than smuggled in, and `.soonin` sits
+   above it on document order without needing a z-index to argue about. */
 .soonscrim {
   position: absolute; inset: 0;
+  pointer-events: none;
   background: var(--sky-scrim);
 }
 
