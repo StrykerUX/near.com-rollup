@@ -640,16 +640,26 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
    one line. Each is a fixed aspect against its own file, so the width follows
    and neither can be squashed by a clamp tuned for the other.
 
-   AND THE ROLLUP IS ~1.7x THE NEAR MARK, WHICH IS SHORTER THAN IT WAS. The
+   THE ROLLUP IS ~1.45x THE NEAR MARK, DOWN FROM 1.7, AND THE FILE IS WHY. The
    assembled version ran the pinwheel to 80px against a 30px near wordmark —
    2.7x, because it was a separate object that had to carry the co-brand on its
-   own. In the supplied artwork the pinwheel comes with its wordmark attached
-   and the prototype sets them at about 1.7, so the eyebrow reads as two brands
-   at the same rank instead of a logo with a small partner beside it. */
+   own. Supplied artwork brought that to ~1.7: each file arrives with its mark
+   and its wordmark already attached, so the eyebrow reads as two brands at the
+   same rank rather than a logo with a small partner beside it.
+
+   near's file then gained its N. A symbol is taller than the lowercase letters
+   next to it, so the WORD inside the same box got smaller while the box stayed
+   the same — the height was tuned against a bare wordmark and now describes a
+   different object. Raising it ~20% puts the word back where it was and closes
+   the ratio to 1.45, which is the two marks reading level. */
 .rollbrow{gap:clamp(16px,1.6vw,24px);margin-bottom:clamp(22px,2.6vh,34px)}
 .rollbrow .nearw{
   display:block;flex:none;
-  height:clamp(24px,2vw,30px);aspect-ratio:462/120;
+  /* 596/137, THE SUPPLIED FILE'S OWN RATIO once its transparent margin is
+     cropped. It replaces 462/120, which was the wordmark ALONE — the artwork
+     now carries near's N alongside it, so the box is wider at the same height
+     and a ratio cut for the old file would squash the mark into the word. */
+  height:clamp(29px,2.4vw,36px);aspect-ratio:596/137;
   background:var(--nearlock-src) center/contain no-repeat;
 }
 .rollbrow .rolllock{
@@ -710,7 +720,7 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 @media(max-width:640px){
   .side.l{min-height:118px}
   .side.r{min-height:110px}
-  .rollbrow .nearw{height:20px}
+  .rollbrow .nearw{height:24px}
   .rollbrow .rolllock{height:34px}
   .rollbrow .rule{height:26px}
 }

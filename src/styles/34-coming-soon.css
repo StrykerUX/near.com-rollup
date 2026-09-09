@@ -80,9 +80,11 @@
    33-hero-skyline.css on `#stage, .mtour, .splash`, and this page is none of
    those, so it claims them the same way.
 
-   THE RATIOS ARE THE SUPPLIED FILES' OWN: 1525/326 for The Rollup after its
-   transparent margin is cropped, 462/120 for near.com. Change a file and all
-   four places that draw it have to move together. */
+   THE RATIOS ARE THE SUPPLIED FILES' OWN, each measured after its transparent
+   margin is cropped: 1525/326 for The Rollup, 596/137 for near.com. Change a
+   file and all four places that draw it have to move together — which is not
+   hypothetical: near's ratio moved from 462/120 the day the artwork went from
+   the bare wordmark to the wordmark with its N. */
 .soon {
   --nearlock-src: url('/img/near-logo-light.webp');
   --rolllock-src: url('/img/rollup-logo-silver.webp');
@@ -100,15 +102,16 @@
      blue-black sky wants seating, not the copper glow of the old lockup */
   filter: drop-shadow(0 6px 22px rgba(0, 0, 0, .55));
 }
+/* the supplied rule, through the same token the stage and the curtain read —
+   a white bar that fades out at both ends rather than a ruled divider */
 .soonbrow .rule {
   flex: none;
   width: 3px; height: clamp(32px, 4.4vw, 56px);
-  background: rgba(255, 255, 255, .55);
-  border-radius: 2px;
+  background: var(--browrule);
 }
 .soonbrow .nearw {
   display: block; flex: none;
-  height: clamp(26px, 3.5vw, 44px); aspect-ratio: 462/120;
+  height: clamp(31px, 4.2vw, 53px); aspect-ratio: 596/137;
   background: var(--nearlock-src) center/contain no-repeat;
 }
 

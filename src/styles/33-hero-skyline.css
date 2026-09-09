@@ -49,7 +49,26 @@
     rgba(0, 0, 0, .65) 65%,
     rgba(0, 0, 0, .90) 71%,
     #000 75%);
-  --sky-scrim: linear-gradient(180deg, rgba(0, 0, 0, .20) 0%, rgba(0, 0, 0, .50) 100%);
+  --sky-scrim: linear-gradient(180deg, rgba(0, 0, 0, .10) 0%, rgba(0, 0, 0, .20) 100%);
+
+  /* THE RULE BETWEEN THE TWO MARKS, measured off the supplied file. It is a
+     white bar that fades at both ends: sampled down its column the alpha runs
+     16/255 at the top, climbs dead straight to 246 just under halfway, and
+     falls just as straight to 17 at the foot. That is a linear gradient, so it
+     is written as one.
+
+     NOT THE PNG, AND THE FILE IS WHY RATHER THAN AN OPINION. The export is
+     11px wide and the rule is drawn at 3 — the artwork would be resampled at
+     every size, and a soft ramp is the worst thing to resample. Written as a
+     gradient it is exact at any height, costs no request and no bytes, and
+     31-hero-green.css already made this exact call once, for the green
+     hairline that preceded it: "a colour is the whole of it, so it stops being
+     an image." This one is a ramp rather than a colour; the argument is the
+     same. */
+  --browrule: linear-gradient(180deg,
+    rgba(255, 255, 255, .06) 0%,
+    rgba(255, 255, 255, .96) 47%,
+    rgba(255, 255, 255, .07) 100%);
 }
 
 /* THE BASE UNDER THE PHOTOGRAPH is the picture's own sky, sampled from its top
@@ -138,7 +157,7 @@
 }
 
 /* =========================================================================
-   THE OVERLAY — black, .20 at the top and .50 at the foot
+   THE OVERLAY — black, .10 at the top and .20 at the foot
    -------------------------------------------------------------------------
    IT GOES ON `.gshade`, WHICH IS THE LAYER THAT EXISTS FOR THIS. 07-stage.css
    keeps that element for exactly one job — "the scrim the type is read
@@ -153,12 +172,20 @@
    sky is already the darkest part of the picture, so an even wash would crush
    the top and leave the bottom still busy.
 
-   .20 AND .50, DOWN FROM .30 AND .70. Those were set when this was the only
-   thing separating the type from the photograph. The blur above now does the
-   larger half of that job — and it does it better, because it removes the
-   DETAIL the type is competing with rather than lowering its contrast — so
-   holding the scrim at full strength on top of it stopped reading as a night
-   sky and started reading as a black panel with a picture faintly behind it.
+   .10 AND .20, AND IT HAS COME DOWN TWICE. It went in at .30/.70, when it was
+   the only thing separating the type from the photograph. The blur layer took
+   the larger half of that job — and does it better, by removing the DETAIL the
+   type competes with rather than lowering its contrast — which brought it to
+   .20/.50.
+
+   THE PHOTOGRAPH ITSELF TOOK THE REST. The plate is no longer the evenly lit
+   skyline the first two settings were tuned against: it arrives with its own
+   depth of field, a sky that is already near-black across the top half and a
+   city that is already soft. Three darkening passes over that is a black
+   rectangle with a rumour of a building in it. What is left here is a seat,
+   not a scrim — just enough to stop the brightest windows competing with the
+   type, and the direction is unchanged: lighter across the sky, heavier over
+   the city, because that is still where the detail and the words collide.
 
    Z-INDEX 2, AND THAT IS A FIX RATHER THAN A NUMBER. `.gshade` had no z-index
    and `.isomark` declares `z-index: 1` (13-rollup.css:211), so the mark was
@@ -249,9 +276,8 @@
    their own. The HOLLOW down candles do not: 32-splash.css:— writes their
    border as a literal. */
 .splash .spc.dn::after { border-color: var(--fg) }
-/* the rule between the two marks is solid black in 32-splash.css, cut for the
-   green. Two pale wordmarks on a dark sky want a pale divider. */
-.splash .spbrow .rule { background: rgba(255, 255, 255, .55) }
+/* the same rule the stage draws — the curtain has to be the field it lifts off */
+.splash .spbrow .rule { background: var(--browrule); border-radius: 0 }
 
 /* =========================================================================
    THE INK TURNS BACK — one token, and then the six things that are not it
@@ -337,12 +363,17 @@
   filter: drop-shadow(0 6px 22px rgba(0, 0, 0, .55));
 }
 
-/* THE RULE BETWEEN THEM. 31 made it solid #000 to match two black wordmarks;
-   two pale ones want a pale divider, and at the same full-strength weight —
-   31's note about a faded rule reading as a rendering artefact holds either
-   way round. */
+/* THE RULE BETWEEN THEM IS THE SUPPLIED ONE NOW. It has been three things: a
+   green hairline PNG cut for a near-black field, solid #000 when the page went
+   green, then a flat white at .55 when it came back. The supplied artwork is
+   none of those — it is a white bar that fades out at both ends, so it reads
+   as a shaft of light between the marks rather than a divider ruled between
+   them. `--browrule` carries the measurement.
+
+   THE `border-radius` GOES WITH IT. 31 added 2px to soften the ends of a solid
+   bar; ends that fade to 6% have nothing left to round. */
 #stage .rollbrow .rule,
-#stage .mbrow .rule { background: rgba(255, 255, 255, .55) }
+#stage .mbrow .rule { background: var(--browrule); border-radius: 0 }
 
 /* the copper glow under the pinwheel (13-rollup.css:660) was lighting an
    object on a dark field, which is what it is on again. Left alone. */
@@ -466,18 +497,21 @@
 #stage .side.r .rollquote .rqmark,
 #stage .mchbody .rollquote .rqmark { background-image: var(--rollflat-src) }
 
-/* ---- THE MARK IN THE FIELD --------------------------------------------- */
-/* .25 OF A GREEN PINWHEEL IS A LOGO; THIS IS WEATHER. At a quarter strength
-   over the flat green it was a watermark in an empty corner. Over the
-   photograph it is a green object the size of a third of the frame sitting on
-   a night sky, and it is the loudest thing on the page — the comp's upper
-   right is sky.
+/* ---- THE MARK IN THE FIELD IS GONE ------------------------------------- */
+/* It went in at .25 over the flat green, where it was a watermark in an empty
+   corner. Over the photograph it was a logo the size of a third of the frame
+   lying on a night sky, so it came down to .05 — a trace of the brand rather
+   than a mark. Even at a twentieth it is a shape the eye finds in a corner the
+   comp draws as empty, and it now competes with a photograph that has its own
+   subject.
 
-   It is dimmed rather than deleted so the corner keeps a trace of the brand
-   and the element stays where GradientField.tsx documents it. If the comp is
-   read strictly, the next step is `display:none`, and that is a one-line
-   change from here. */
-#stage .isomark { opacity: .05 }
+   `display: none`, NOT `opacity: 0`. A zero-opacity element still has a box,
+   still composites, and still reads to anyone opening the inspector as
+   something that is meant to come back. The element stays in
+   GradientField.tsx, which is where it is documented and where it would be
+   restored from; this is the stylesheet saying it is not drawn, in the same
+   file and next to the reason. */
+#stage .isomark { display: none }
 
 /* the scroll cue's own bar was rebuilt out of the ink by 31 and follows the
    token; nothing to do. */

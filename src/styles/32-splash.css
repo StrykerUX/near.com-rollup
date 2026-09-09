@@ -242,7 +242,7 @@ html[data-splash="seen"] .splash { display: none }
 @keyframes spbrowin { from { opacity: 0 } }
 .spbrow .nearw {
   display: block; flex: none;
-  height: 24px; aspect-ratio: 462 / 120;
+  height: 29px; aspect-ratio: 596 / 137;
   background: var(--nearlock-src) center / contain no-repeat;
 }
 .spbrow .rule {
