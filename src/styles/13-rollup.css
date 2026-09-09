@@ -710,8 +710,20 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 
 /* --- 4. the rail joins the composition ---------------------------------
    It was pinned at x=40 while the content started at x=168, so it read as
-   debris on the frame edge. Now it sits just outside the copy column. */
-.sdrail{left:clamp(20px,calc((100vw - 1220px) / 2 + 14px),96px)}
+   debris on the frame edge. It sits just outside the shell's own column —
+   mirrored, on the DEVICE's side.
+
+   `left:auto` IS THE WHOLE BUG THIS RULE CAUSED. 10-conversion.css was moved
+   to `right` and this line, which is imported AFTER it, kept setting `left` —
+   so both edges were pinned, the element stretched the full width of the frame,
+   and a `flex-direction: column` box aligns its items to the start. The dots
+   stayed exactly where they had always been, on the left, and nothing in
+   10-conversion.css looked wrong. Clearing `left` here is what actually moves
+   them.
+
+   The measure is unchanged and needs no mirroring of its own: the shell is
+   centred, so `(100vw - 1220px) / 2` is the same gutter on either side. */
+.sdrail{left:auto;right:clamp(20px,calc((100vw - 1220px) / 2 + 14px),96px)}
 
 @media(max-width:1080px){
   .lockup{align-content:start;padding-block:70px 36px}
