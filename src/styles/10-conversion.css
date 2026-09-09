@@ -138,7 +138,17 @@
   clip-path:inset(var(--ci-t) var(--ci-r) var(--ci-b) var(--ci-l) round var(--ci-rad));
 }
 .sdrail{
-  position:absolute;left:clamp(18px,2.6vw,42px);top:50%;
+  /* THE RIGHT GUTTER, WHICH IS THE DEVICE'S SIDE. It stood in the left one,
+     beside the copy column — so the rail was reading as furniture belonging to
+     the words, when what it indexes is the sequence the PHONE is playing. The
+     comp puts it against the device, and there the filled ring and the screen
+     it names are one glance apart instead of the width of the lockup.
+
+     `right`, NOT `left`. Setting both pins the element to the full width of
+     the frame, and `translateY(-50%)` would then centre a full-width box —
+     the dots would land back on the left with an invisible hit area laid
+     across the whole card. */
+  position:absolute;right:clamp(18px,2.6vw,42px);top:50%;
   transform:translateY(-50%);
   /* 12 between the rings, so the centres sit 22 apart — a shade over two
      diameters. It was 20/34, and before that 32/46, which is over three
@@ -209,12 +219,23 @@
    the text across it, overhanging evenly. No transform involved, so the
    entrance keeps `transform` to itself. */
 .sdrail .lbl{
-  position:absolute;left:calc(100% + 12px);top:0;bottom:0;
+  /* IT OPENS INWARD, BECAUSE THE RAIL MOVED. Hanging off `left: 100% + 12px`
+     was right while the rail stood in the left gutter — the name grew away
+     from the card, into empty margin. Against the right edge that same rule
+     runs it off the frame, and `PERMISSIONLESS` is ~130px of nowrap type: it
+     would be clipped by the viewport on every width the rail is drawn at.
+
+     So it opens toward the card instead. The names are hover-only and sit over
+     the device's own margin for the moment they are up, which is the trade —
+     a word briefly over the frame beats a word permanently off it. */
+  position:absolute;right:calc(100% + 12px);top:0;bottom:0;
   display:flex;align-items:center;
   font-family:var(--font-mono,var(--font-body));
   font-size:12px;letter-spacing:.13em;text-transform:uppercase;
   color:rgba(255,255,255,.82);
-  opacity:0;transform:translateX(-6px);
+  /* +6, not -6: the label still arrives FROM its ring, and its ring is now on
+     the other side of it. */
+  opacity:0;transform:translateX(6px);
   transition:opacity var(--dur) var(--ease-out),transform var(--dur) var(--ease-out);
   text-shadow:0 1px 14px rgba(0,0,0,.5);
   white-space:nowrap;pointer-events:none;
