@@ -60,7 +60,8 @@ export function Lockup() {
           href={LOGIN}
           target="_blank"
           rel="noopener"
-          data-umami-event="cta-lockup"
+          data-umami-event="cta-click"
+          data-umami-event-pos="lockup"
         >
           Create account <span className="arw">&rarr;</span>
         </a>

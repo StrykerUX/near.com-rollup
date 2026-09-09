@@ -81,7 +81,8 @@ export function MobileTour() {
           href={LOGIN}
           target="_blank"
           rel="noopener"
-          data-umami-event="cta-tour-top"
+          data-umami-event="cta-click"
+          data-umami-event-pos="tour-top"
         >
           Create account <span className="arw">&rarr;</span>
         </a>
@@ -133,7 +134,8 @@ export function MobileTour() {
           href={LOGIN}
           target="_blank"
           rel="noopener"
-          data-umami-event="cta-tour-close"
+          data-umami-event="cta-click"
+          data-umami-event-pos="tour-close"
         >
           Create account <span className="arw">&rarr;</span>
         </a>

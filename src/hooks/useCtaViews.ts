@@ -2,8 +2,18 @@
 import { useEffect } from 'react';
 import { track } from '@/lib/analytics';
 
-/** every element that already declares a click event to Umami */
-const CTAS = '[data-umami-event]';
+/** every button that declares a tracked position — the same attribute Umami
+    turns into the `pos` property on the click event */
+const CTAS = '[data-umami-event-pos]';
+
+/**
+ * POSITIONS THAT GET NO VIEW EVENT. Both nav buttons are pinned to a fixed
+ * header, so they are on screen for essentially every pageview and their view
+ * count would restate the pageview count under a different name. A denominator
+ * that always equals the traffic is not a denominator; it is noise with two
+ * rows in the dashboard. Their CLICKS are still counted — those say something.
+ */
+const NO_VIEW = new Set(['nav-create', 'nav-signin']);
 
 /**
  * A button is "seen" once it has been in the viewport, and actually visible,
@@ -40,6 +50,12 @@ const DWELL_MS = 1000;
  * ONCE PER LOAD, PER BUTTON. Scrolling back up is the same reader looking at
  * the same button, and counting it twice would deflate a rate whose numerator
  * cannot double the same way.
+ *
+ * ONE EVENT NAME, POSITION AS A PROPERTY, AND IT MIRRORS THE CLICK. `cta-view`
+ * and `cta-click` carry the same `pos` values, so a rate is two lists of the
+ * same shape read side by side. The alternative — a distinct event name per
+ * button per side — was twenty-two rows in a dashboard chosen for being simple
+ * to operate, with the two halves of every ratio scattered among them.
  */
 export function useCtaViews() {
   useEffect(() => {
@@ -57,8 +73,8 @@ export function useCtaViews() {
       (entries) => {
         entries.forEach((entry) => {
           const el = entry.target;
-          const name = (el as HTMLElement).dataset.umamiEvent;
-          if (!name || fired.has(name)) {
+          const pos = (el as HTMLElement).dataset.umamiEventPos;
+          if (!pos || fired.has(pos)) {
             io.unobserve(el);
             return;
           }
@@ -76,9 +92,9 @@ export function useCtaViews() {
               timers.delete(el);
               /* re-checked at the END of the dwell, not the start: the whole
                  point is that it was still there a second later */
-              if (!visible(el) || fired.has(name)) return;
-              fired.add(name);
-              track(`${name}-seen`);
+              if (!visible(el) || fired.has(pos)) return;
+              fired.add(pos);
+              track('cta-view', { pos });
               io.unobserve(el);
             }, DWELL_MS),
           );
@@ -91,7 +107,8 @@ export function useCtaViews() {
 
     const scan = () => {
       document.querySelectorAll<HTMLElement>(CTAS).forEach((el) => {
-        if (!fired.has(el.dataset.umamiEvent ?? '')) io.observe(el);
+        const pos = el.dataset.umamiEventPos ?? '';
+        if (!NO_VIEW.has(pos) && !fired.has(pos)) io.observe(el);
       });
     };
     scan();

@@ -30,7 +30,8 @@ export function FinalCta() {
             href={LOGIN}
             target="_blank"
             rel="noopener"
-            data-umami-event="cta-final"
+            data-umami-event="cta-click"
+            data-umami-event-pos="final"
           >
             Get started <span className="arw">&rarr;</span>
           </a>

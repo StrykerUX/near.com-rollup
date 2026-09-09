@@ -18,7 +18,8 @@ export function MobileCta() {
         tabIndex={-1}
         target="_blank"
         rel="noopener"
-        data-umami-event="cta-sticky"
+        data-umami-event="cta-click"
+        data-umami-event-pos="sticky"
       >
         Create account
       </a>

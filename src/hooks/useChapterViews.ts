@@ -14,10 +14,12 @@ const DWELL_MS = 2000;
 /**
  * HOW FAR DOWN THEY GOT
  * ==================================================================
- * Five chapters, five events, fired at most once each per load. It is the
- * shape of the drop-off, and it is what makes a low count on `cta-final`
- * readable: nobody pressed the closing button because nobody reached it is a
- * different problem from nobody pressed it because it does not persuade.
+ * Five chapters, one event with the number as a property, fired at most once
+ * per chapter per load. It is the shape of the drop-off, and it is what makes
+ * a low count on the closing CTA readable: nobody pressed it because nobody
+ * reached it is a different problem from nobody pressed it because it does not
+ * persuade. Opening `chapter` in the dashboard lists 1 to 5 by count, which is
+ * the funnel, in order, without five rows competing with everything else.
  *
  * TWO COMPOSITIONS, TWO MECHANISMS, ONE EVENT NAME. The page draws its
  * chapters in ways that have nothing in common:
@@ -32,7 +34,7 @@ const DWELL_MS = 2000;
  *   NARROW — five ordinary sections in normal flow. An observer is exactly
  *     right, and the engine is not even running.
  *
- * Both write `chapter-1`..`chapter-5`, so the funnel reads as one series
+ * Both write `chapter` with the same `n`, so the funnel reads as one series
  * whatever the reader is holding. Umami records screen size on every event
  * already, so the split is still available without a property saying so.
  *
@@ -48,7 +50,7 @@ export function useChapterViews() {
     const send = (i: number) => {
       if (i < 0 || fired.has(i)) return;
       fired.add(i);
-      track(`chapter-${i + 1}`);
+      track('chapter', { n: i + 1 });
     };
 
     /* ---- WIDE: the engine's own answer ---------------------------------- */
