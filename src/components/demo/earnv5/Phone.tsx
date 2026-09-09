@@ -8,6 +8,7 @@ import { Count } from '@/components/demo/shell/Count';
 import { Typed, writeMs } from '@/components/demo/shell/Typed';
 import { Dot } from '@/components/demo/app/Dot';
 import { ChevronDownIcon, ChevronRightIcon, WalletIcon } from '@/components/demo/icons';
+import { NearAvatar } from '@/components/demo/app/NearAvatar';
 import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -81,6 +82,7 @@ function Earn({ d }: { d: Deck }) {
   return (
     <Enter k={`e${d.pass}`} className="ernpage">
       <div className="ernhead">
+        <NearAvatar />
         <b>{TITLE}</b><i className="ernbeta">{BETA}</i>
       </div>
       <span className="ernsub">{SUB}</span>

@@ -9,6 +9,7 @@ import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
 import { Dot } from '@/components/demo/app/Dot';
+import { NearAvatar } from '@/components/demo/app/NearAvatar';
 import {
   ArrowDownIcon, ChevronDownIcon, CloseIcon, FlipIcon, HelpIcon,
   LockCheckIcon, SearchIcon, SlidersIcon, UndoIcon,
@@ -159,7 +160,6 @@ export function Phone({ d }: { d: Deck }) {
         <div className="pdview"><AccountHome lit={d.s.lit} /></div>
       ) : (
         <>
-          <Chrome />
           <div className="pdview">
             <Heading />
             <Swap d={d} />
@@ -182,32 +182,36 @@ export function Phone({ d }: { d: Deck }) {
  * It was drawn as a pushed page — arrow, centred title, an action on the right
  * — and it is not one. Swap is a TAB: it is reached from the bar at the bottom,
  * it is where you already are, and there is nothing behind it to go back to.
- * So the title drops out of the bar and becomes a heading on the page, the way
- * every other rooted screen in this app writes its name.
+ * So the title is a heading on the page, the way every other rooted screen in
+ * this app writes its name.
  *
- * What is in the corner is the confidential lock, and it is the only control
- * up there. The reference also carries a blue notification badge beside it;
- * that is a count of something this demo does not have and would be inventing.
+ * AND IT IS ONE ROW NOW, NOT TWO. The lock had a bar of its own above the
+ * heading — `.swbar`, sitting outside `.pdview` and paying its own padding to
+ * line up with the cards below it. That made this the only chapter whose
+ * header was two bands tall: a strip with a control floating in it, then the
+ * name underneath. The account screen has always been one row — mark, name,
+ * control hard right — and these are meant to be the same phone.
+ *
+ * So the lock moved into the heading and `.swbar` is gone. It sits at the end
+ * of the row on `margin-left: auto`, in the same dark chip `.ownscan` uses,
+ * and it inherits `.pdview`'s padding instead of restating it — which is the
+ * whole reason that note about paying its own margin existed.
+ *
+ * The reference also carries a blue notification badge beside the lock; that
+ * is a count of something this demo does not have and would be inventing.
  */
-function Chrome() {
+function Heading() {
   return (
-    <div className="swbar">
+    <div className="swhead">
+      <NearAvatar />
+      <b>Swap</b>
+      {/* the app puts one beside the heading */}
+      <HelpIcon className="swhelp" strokeWidth={2} />
       <span className="swlock" aria-hidden="true">
         {/* a lock with a tick in it — the app draws it green, which on a screen
             whose whole argument is confidentiality is not decoration */}
         <LockCheckIcon strokeWidth={1.9} />
       </span>
-    </div>
-  );
-}
-
-/** the page's own name, where a rooted screen puts it */
-function Heading() {
-  return (
-    <div className="swhead">
-      <b>Swap</b>
-      {/* the app puts one beside the heading */}
-      <HelpIcon className="swhelp" strokeWidth={2} />
     </div>
   );
 }

@@ -9,8 +9,9 @@ import { findToken } from '@/lib/tokens';
 import { fmt } from '@/lib/format';
 import { Count } from '@/components/demo/shell/Count';
 import {
-  CheckIcon, ChevronDownIcon, ChevronLeftIcon, LineChartIcon, UnitSwapIcon, WalletFullIcon,
+  CheckIcon, ChevronDownIcon, LineChartIcon, UnitSwapIcon, WalletFullIcon,
 } from '@/components/demo/icons';
+import { NearAvatar } from '@/components/demo/app/NearAvatar';
 import { Layer } from '@/components/demo/shell/Frame';
 import { PALETTE, PALETTE_VARS } from '@/components/demo/app/palette';
 import type { Deck as GenericDeck } from '@/components/demo/shell/deck';
@@ -137,11 +138,19 @@ export function Phone({ d }: { d: Deck }) {
 function Chrome() {
   return (
     <div className="bchrome">
-      <span className="bback" aria-hidden="true">
-        <ChevronLeftIcon strokeWidth={2} />
-      </span>
+      {/* THE WAY BACK IS GONE, AND THIS IS THE SCREEN THE TOUR OPENS ON. A back
+          control on the first thing a reader sees points at nothing — there is
+          no screen behind it, and the phone is not driven by the reader anyway.
+          It was drawn because the reference frame is a rooted screen inside a
+          running app; this one is the front door.
+
+          WHICH LEAVES THE MARK WHERE THE CONTROL WAS. Perps is the one header
+          with no name in it — the thing being named, the BTC pair, is drawn
+          below with its own token artwork — so the mark stands alone at the
+          head of the row rather than beside a title. */}
+      <NearAvatar />
       <span className="bspace" />
-            <span className="bwallet" aria-hidden="true">
+      <span className="bwallet" aria-hidden="true">
         <WalletFullIcon strokeWidth={2} />
       </span>
     </div>

@@ -5,6 +5,7 @@ import { live, press } from '@/components/stage/phone/ui/tap';
 import { Enter } from '@/components/stage/phone/ui/Enter';
 import { Layer, Tabs } from '@/components/demo/shell/Frame';
 import { Dot } from '@/components/demo/app/Dot';
+import { NearAvatar } from '@/components/demo/app/NearAvatar';
 import { ChevronRightIcon, EarnIcon, EyeIcon, SendIcon, SwapIcon, type IconProps } from '@/components/demo/icons';
 import { AccountHome } from '@/components/demo/app/AccountHome';
 import { PALETTE_VARS } from '@/components/demo/app/palette';
@@ -74,7 +75,14 @@ export function Phone({ d }: { d: Deck }) {
 function Assets({ d }: { d: Deck }) {
   return (
     <Enter k={`a${d.pass}`} className="ownassets">
-      <b className="ownh">Assets</b>
+      {/* THE NAME GETS A ROW SO IT CAN CARRY THE MARK. It was a bare `<b>` —
+          the one chapter heading on the device that was a line of type rather
+          than a header — which is why it was the last screen without near's
+          logo on it. Same shape as the account, swap and earn headers now. */}
+      <div className="ownhd">
+        <NearAvatar />
+        <b className="ownh">Assets</b>
+      </div>
 
       <span className="ownlab">
         Total balance

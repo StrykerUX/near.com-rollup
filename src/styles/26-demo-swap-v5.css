@@ -17,23 +17,35 @@
 /* THE TOP BAR HOLDS ONE CONTROL, and it is not a back arrow. Swap is a tab —
    you are already there and there is nothing behind it — so the name drops out
    of the bar and becomes a heading on the page. */
-/* IT IS OUTSIDE `.pdview`, SO IT PAYS ITS OWN PADDING. The lock was hard
-   against the right edge of the device while every card under it stopped 16px
-   short — the one element on this screen not standing on the page's own
-   margin, which reads as a bleed rather than as a corner control. */
-.pdev.swp .swbar {
-  flex: none; display: flex; justify-content: flex-end; height: 50px;
-  padding: 14px 16px 0;
+/* ONE ROW, AND IT IS THE ACCOUNT SCREEN'S ROW. `.swbar` used to sit above
+   this — a 50px strip outside `.pdview` holding nothing but the lock, which
+   made swap the only chapter with a two-band header. Its own note explained
+   that it had to restate the page's 16px padding to stop the lock bleeding
+   against the device edge; inside `.pdview` there is nothing to restate.
+
+   THE NUMBERS ARE `.ownhead`'s, not near them: 62px tall, 16 of padding above,
+   a 10px gap and the name at 17/600. It was 25px on a shorter row, which is
+   why the two screens read as different apps at the top even though everything
+   below the fold matches. Matched by the numbers, not by eye — the same thing
+   29-account-home.css says about this row's height. */
+.pdev.swp .swhead {
+  flex: none; display: flex; align-items: center; gap: 10px;
+  height: 62px; padding-top: 16px;
 }
+.pdev.swp .swhead b { font-size: 17px; font-weight: 600 }
+.pdev.swp .swhelp { width: 16px; height: 16px; color: rgba(255, 255, 255, .38) }
+
+/* the lock closes the row where `.ownscan` closes the account's — same chip,
+   same size, same corner. The colour is the one difference and it is the
+   point: green, because on a screen whose whole argument is confidentiality
+   the lock is not decoration. */
 .pdev.swp .swlock {
-  width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center;
+  margin-left: auto;
+  width: 34px; height: 34px; border-radius: 11px; flex: none;
+  display: grid; place-items: center;
   background: var(--btc-card); color: var(--btc-up);
 }
 .pdev.swp .swlock svg { width: 19px; height: 19px }
-
-.pdev.swp .swhead { flex: none; display: flex; align-items: center; gap: 8px; padding: 8px 0 18px }
-.pdev.swp .swhead b { font-size: 25px; font-weight: 600; letter-spacing: -.02em }
-.pdev.swp .swhelp { width: 16px; height: 16px; color: rgba(255, 255, 255, .38) }
 
 /* ---- the form ----------------------------------------------------------- */
 

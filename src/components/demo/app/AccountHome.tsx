@@ -3,6 +3,7 @@ import { fmt } from '@/lib/format';
 import { live, press } from '@/components/stage/phone/ui/tap';
 import { Enter } from '@/components/stage/phone/ui/Enter';
 import { Dot } from '@/components/demo/app/Dot';
+import { NearAvatar } from '@/components/demo/app/NearAvatar';
 import { ArrowDownIcon, ArrowRightIcon, EyeIcon, ScanIcon, SendIcon } from '@/components/demo/icons';
 import {
   EARN_BAL, HOLDINGS, PERPS_BAL, crypto, total,
@@ -89,7 +90,7 @@ export function AccountHome({ go, lit }: {
           right. Not two — the reference has a single scan button where the
           older recording had a scan and a lock. */}
       <div className="ownhead">
-        <span className="ownav" aria-hidden="true"><NearMark /></span>
+        <NearAvatar />
         <b>Account</b>
         <span className="ownscan" aria-hidden="true"><ScanIcon strokeWidth={2} /></span>
       </div>
@@ -180,16 +181,3 @@ function Chev() {
   return <ArrowRightIcon className="ownchev" strokeWidth={2} />;
 }
 
-/**
- * THE NEAR MARK, as the account avatar — the path from the supplied
- * `Vector.svg`, on its own 326-unit grid. `marks/index.tsx` carries the same
- * logo on a 351 grid for the nav; this is the file that was handed over for
- * this spot, so this is the one that is drawn here.
- */
-function NearMark() {
-  return (
-    <svg viewBox="0 0 326 325" fill="currentColor" aria-hidden="true">
-      <path d="M291.272 3.04803e-08C285.334 -0.000248205 279.495 1.51575 274.312 4.40348C269.129 7.2912 264.774 11.4544 261.662 16.4962L193.515 117.358C192.45 118.953 192.063 120.904 192.439 122.783C192.626 123.713 192.994 124.597 193.524 125.386C194.054 126.174 194.734 126.85 195.526 127.377C196.842 128.248 198.408 128.667 199.986 128.571C201.563 128.474 203.066 127.867 204.265 126.841L271.337 68.8377C272.447 67.8354 274.165 67.9406 275.171 69.0471C275.627 69.5602 275.871 70.2121 275.871 70.888V252.482C275.871 252.838 275.801 253.19 275.664 253.519C275.527 253.847 275.327 254.146 275.074 254.397C274.821 254.648 274.52 254.847 274.19 254.982C273.86 255.117 273.506 255.186 273.149 255.184C272.752 255.185 272.36 255.099 272.001 254.932C271.641 254.765 271.323 254.521 271.069 254.217L68.3104 12.2558C65.0505 8.41718 60.9912 5.33241 56.4147 3.21593C51.8382 1.09945 46.8542 0.00203948 41.8092 3.04803e-08H34.7281C15.5529 3.04803e-08 0 15.5058 0 34.6228V290.377C0 309.494 15.5529 325 34.7281 325C40.6659 325.001 46.505 323.486 51.6885 320.598C56.872 317.711 61.2269 313.547 64.3378 308.505L132.485 207.642C133.013 206.853 133.38 205.968 133.564 205.037C133.749 204.106 133.748 203.148 133.562 202.218C133.375 201.288 133.006 200.403 132.477 199.615C131.947 198.826 131.267 198.15 130.475 197.623C129.159 196.752 127.592 196.332 126.015 196.429C124.437 196.526 122.934 197.133 121.735 198.159L54.6627 256.163C53.5528 257.165 51.8348 257.059 50.8305 255.953C50.3768 255.447 50.1306 254.79 50.1406 254.112V72.4728C50.1403 72.1168 50.2106 71.7643 50.3475 71.4355C50.4843 71.1067 50.685 70.8081 50.938 70.5568C51.191 70.3056 51.4913 70.1067 51.8217 69.9716C52.152 69.8365 52.5059 69.7678 52.863 69.7696C53.6584 69.7696 54.4287 70.1188 54.9434 70.7361L257.666 312.745C260.927 316.583 264.986 319.667 269.563 321.783C274.139 323.899 279.123 324.997 284.168 325H291.249C310.424 325 325.988 309.518 326 290.401V34.6228C326 15.5058 310.447 3.04803e-08 291.272 3.04803e-08Z" />
-    </svg>
-  );
-}

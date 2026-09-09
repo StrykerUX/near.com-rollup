@@ -16,7 +16,15 @@
    THE HOME ITSELF MOVED to 29-account-home.css: the earn chapter opens on it
    too, and a screen two chapters draw is not this file's to own. What is left
    here is the one rule the assets screen uses out of that block. */
-.pdev.own .ownh { flex: none; display: block; font-size: 22px; font-weight: 600; padding: 30px 0 6px }
+/* THE PADDING MOVED TO THE ROW, and it had to: `.ownh` is the name, and the
+   name now shares a line with the mark. Left on the `<b>`, the 30px would push
+   the type down inside a row the avatar had already set the height of, and the
+   two would not sit on the same centreline. */
+.pdev.own .ownhd {
+  flex: none; display: flex; align-items: center; gap: 10px;
+  padding: 30px 0 6px;
+}
+.pdev.own .ownh { flex: none; display: block; font-size: 22px; font-weight: 600 }
 
 /* ---- the assets screen ------------------------------------------------- */
 

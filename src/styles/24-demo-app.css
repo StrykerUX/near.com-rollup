@@ -128,11 +128,6 @@
   flex: none; height: 62px; display: flex; align-items: center; gap: 8px;
   padding: 16px 14px 0;
 }
-.pdev.app .bback {
-  width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center;
-  background: var(--btc-card); color: rgba(255, 255, 255, .82);
-}
-.pdev.app .bback svg { width: 19px; height: 19px }
 .pdev.app .bspace { flex: 1 }
 
 .pdev.app .bwallet {

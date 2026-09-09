@@ -31,14 +31,40 @@
   height: 62px; padding-top: 16px;
 }
 .pdev.app .ownhead b { font-size: 17px; font-weight: 600 }
-/* a green ROUNDED SQUARE carrying the NEAR mark, not a circle and not a
-   gradient — the reference is a flat brand green with the logo knocked out */
-.pdev.app .ownav {
+/* A GREEN ROUNDED SQUARE CARRYING THE NEAR MARK, not a circle and not a
+   gradient — the reference is a flat brand green with the logo knocked out.
+
+   IT WAS `.ownav` AND IS NOW `.appav`, because it is no longer this screen's.
+   Every chapter's header carries the mark now (see `app/NearAvatar.tsx`), so a
+   name that said "the account screen's avatar" described one of four users.
+
+   THE SCOPE IS `.pdev` AND NOT `.pdev.app`. The three other headers live on
+   `.pdev.swp` and `.pdev.earn`, which is what `.pdev.app` was excluding — the
+   rule matched nothing on the very screens it was being extended to. This is
+   the one detail in the move that a rename alone would have got wrong, and it
+   fails silently: an unstyled `<span>` with a 17px logo loose in it. */
+.pdev .appav {
   width: 34px; height: 34px; border-radius: 11px; flex: none;
   display: grid; place-items: center;
   background: var(--btc-up); color: #04140E;
 }
-.pdev.app .ownav svg { width: 17px; height: 17px; display: block }
+.pdev .appav svg { width: 17px; height: 17px; display: block }
+
+/* SMALLER WHERE THE TITLE IS SMALLER. 34px is measured against a 17px name,
+   which is what the account screen and — since its header was rebuilt as one
+   row — the swap screen both set. Earn and assets both run their name at 22,
+   and perps has no name at all, so those three take a chip cut for their own
+   row. */
+.pdev.earn .ernhead .appav,
+.pdev.own .ownhd .appav { width: 28px; height: 28px; border-radius: 9px }
+.pdev.earn .ernhead .appav svg,
+.pdev.own .ownhd .appav svg { width: 14px; height: 14px }
+/* perps' row is chrome rather than a heading, and since its back control came
+   off the mark now opens the row on its own. It keeps the smaller chip so it
+   still reads as part of a bar with `.bwallet` at the other end, rather than
+   as a heading the row does not have. */
+.pdev.app .bchrome .appav { width: 28px; height: 28px; border-radius: 9px }
+.pdev.app .bchrome .appav svg { width: 14px; height: 14px }
 .pdev.app .ownscan {
   margin-left: auto; width: 34px; height: 34px; border-radius: 11px;
   display: grid; place-items: center;
