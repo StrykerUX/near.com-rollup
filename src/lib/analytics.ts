@@ -100,11 +100,13 @@ function writeCookie(name: string, value: string) {
 /**
  * The door a pathname names, or '' if it names a route of this site.
  *
- * Shared by `resolveSource` and `cleanedUrl` deliberately: one decides what to
- * record and the other decides what to erase, and they must not be able to
- * disagree about which paths are doors. A door that the cleaner did not
- * recognise would stay in the address bar; a route the cleaner thought was a
- * door would have `/preview` rewritten to `/` under a reader who is on it.
+ * A DOOR IS NOT ERASED ONCE IT IS READ. The url the reader arrives on is left
+ * exactly as it came: Umami parses `utm_*` out of the pageview url it reports,
+ * and `/r/nearperps` is the row that shows the door in its Pages report. An
+ * earlier version tidied the address bar here and paid for it three times over
+ * — it raced Umami's own pageview, it stripped the tags Umami reads, and
+ * Umami wraps `history.replaceState` to send a SECOND pageview whenever the
+ * url changes. Cosmetics are not worth a measurement.
  */
 function sourceFromPath(pathname: string): string {
   const ns = pathname.match(/^\/r\/([\w-]+)\/?$/);
@@ -112,42 +114,6 @@ function sourceFromPath(pathname: string): string {
   const bare = pathname.match(/^\/([\w-]+)\/?$/);
   if (bare && SOURCE_PATHS.has(bare[1].toLowerCase())) return clean(bare[1]);
   return '';
-}
-
-/**
- * WHAT THE ADDRESS BAR SHOULD SAY ONCE THE SOURCE HAS BEEN BANKED, or null if
- * there is nothing to tidy.
- *
- * THE ORDER IS THE WHOLE TRICK. Blockers strip query strings on ARRIVAL, which
- * is why the door is in the path; this runs afterwards, when the answer is
- * already in a cookie and the url is decoration. Cleaning first would be the
- * one arrangement that loses everything.
- *
- * IT COLLAPSES A DOOR AND ONLY A DOOR. `/r/nearperps` was rewritten to `/`, so
- * `/` is what it becomes and a refresh lands on the same page it was already
- * showing. A url that merely carries tags — `/preview?utm_source=x` — keeps its
- * path and loses the tags: rewriting THAT to `/` would move a reader off the
- * page they asked for, which is not tidying, it is a redirect nobody ordered.
- */
-export function cleanedUrl(): string | null {
-  try {
-    const url = new URL(location.href);
-    let changed = false;
-
-    for (const key of [...url.searchParams.keys()]) {
-      if (/^utm_/i.test(key)) {
-        url.searchParams.delete(key);
-        changed = true;
-      }
-    }
-    if (sourceFromPath(url.pathname)) {
-      url.pathname = '/';
-      changed = true;
-    }
-    return changed ? url.pathname + url.search + url.hash : null;
-  } catch {
-    return null;
-  }
 }
 
 /** what `resolveSource` found, and whether THIS visit is what carried it */
