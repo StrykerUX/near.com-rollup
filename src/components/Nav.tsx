@@ -17,8 +17,8 @@ export function Nav() {
         <NearMark />
       </a>
       <span className="navspacer" />
-      <a className="btn btn-ghost" href={LOGIN}>Sign in</a>
-      <a className="btn btn-primary" href={LOGIN}>Create account</a>
+      <a className="btn btn-ghost" href={LOGIN} target="_blank" rel="noopener" data-umami-event="signin-nav">Sign in</a>
+      <a className="btn btn-primary" href={LOGIN} target="_blank" rel="noopener" data-umami-event="cta-nav">Create account</a>
     </nav>
   );
 }

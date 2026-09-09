@@ -12,7 +12,16 @@ const LOGIN = 'https://near.com/login?ref=therollup';
 export function MobileCta() {
   return (
     <div className="mobcta" id="mobcta" aria-hidden="true">
-      <a className="btn btn-primary" href={LOGIN} tabIndex={-1}>Create account</a>
+      <a
+        className="btn btn-primary"
+        href={LOGIN}
+        tabIndex={-1}
+        target="_blank"
+        rel="noopener"
+        data-umami-event="cta-sticky"
+      >
+        Create account
+      </a>
       <span>No email. No KYC.</span>
     </div>
   );

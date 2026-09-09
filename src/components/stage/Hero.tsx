@@ -19,7 +19,13 @@ export function Hero() {
           </h1>
 
           <div className="herocta">
-            <a className="btn btn-primary btn-lg ripple-cta" href={LOGIN}>
+            <a
+              className="btn btn-primary btn-lg ripple-cta"
+              href={LOGIN}
+              target="_blank"
+              rel="noopener"
+              data-umami-event="cta-hero"
+            >
               Create account <span className="arw">&rarr;</span>
             </a>
             <p className="friction">No email. No KYC. Ready in seconds.</p>

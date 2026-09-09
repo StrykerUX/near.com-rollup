@@ -76,14 +76,20 @@ export function MobileTour() {
           <span className="nearw" role="img" aria-label="near.com" />
         </div>
         {OFFER}
-        <a className="btn btn-primary btn-lg" href={LOGIN}>
+        <a
+          className="btn btn-primary btn-lg"
+          href={LOGIN}
+          target="_blank"
+          rel="noopener"
+          data-umami-event="cta-tour-top"
+        >
           Create account <span className="arw">&rarr;</span>
         </a>
         <p className="friction">No email. No KYC. Ready in seconds.</p>
       </header>
 
       {CARDS.map((c, i) => (
-        <section className="mch" key={c.id} aria-label={CH_TITLES[i]}>
+        <section className="mch" key={c.id} aria-label={CH_TITLES[i]} data-ch={i}>
           {/* THE COPY IS ONE GROUP AND THE DEVICE IS THE OTHER, which is a
               markup decision made for the TABLET: from 760 up the section is
               two columns, and a headline and a paragraph that are siblings of
@@ -122,7 +128,13 @@ export function MobileTour() {
           {PERM_WORDS[0]} <em>{PERM_WORDS[1]}</em>
         </h2>
         <p className="mclosebody">{PERM_BODY}</p>
-        <a className="btn btn-primary btn-lg" href={LOGIN}>
+        <a
+          className="btn btn-primary btn-lg"
+          href={LOGIN}
+          target="_blank"
+          rel="noopener"
+          data-umami-event="cta-tour-close"
+        >
           Create account <span className="arw">&rarr;</span>
         </a>
         <p className="friction">No email. No KYC. Ready in seconds.</p>

@@ -25,7 +25,13 @@ export function FinalCta() {
         <h2 className="h1">Your account is <em>seconds away</em></h2>
         <p>No email. No KYC. Pick a wallet or passkey and you&rsquo;re in.</p>
         <div style={{ marginTop: 'var(--space-6)' }}>
-          <a className="btn btn-primary btn-lg ripple-cta" href={LOGIN}>
+          <a
+            className="btn btn-primary btn-lg ripple-cta"
+            href={LOGIN}
+            target="_blank"
+            rel="noopener"
+            data-umami-event="cta-final"
+          >
             Get started <span className="arw">&rarr;</span>
           </a>
         </div>

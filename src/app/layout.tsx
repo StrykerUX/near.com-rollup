@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import './globals.css';
+import { Analytics } from '@/components/Analytics';
 import { InlineScript } from '@/components/InlineScript';
 import { Splash } from '@/components/Splash';
 
@@ -168,6 +169,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             being first costs nothing in reading order. */}
         <Splash />
         {children}
+
+        {/* The source capture, the CTA view events and the chapter depth
+            events. It draws nothing; see the component for why it is here and
+            not inside `<Site />`. */}
+        <Analytics />
 
         {/* THE COUNTER. A self-hosted Umami instance, which is the whole reason
             it can be here at all: it sets no cookie, so the page still owes
