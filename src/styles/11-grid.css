@@ -129,12 +129,25 @@
 .socials a{display:grid;place-items:center}
 
 /* --- mobile sticky CTA -------------------------------------------------- */
-/* Only ever exists below 768. On desktop the hero button and the closing CTA
-   are both reachable without one, and a fixed bar would fight the stage. */
+/* NOT DRAWN, AT ANY WIDTH. The bar existed below 799 to keep the ask reachable
+   once the hero had scrolled away — a reasonable thing for a long page, and
+   the wrong thing for this one: the narrow tour IS the ask, repeated at the
+   foot of every chapter, so the bar was a second `Create account` floating over
+   a first one for most of the scroll.
+
+   `display:none` ON THE BASE RULE, WHICH IS WHERE IT ALREADY WAS. The `none`
+   below 799 is not a new declaration — it is the original one, no longer
+   overridden. Everything the bar needs is still here, unentered, so putting it
+   back is deleting the `display:none` from the media query.
+
+   THE MARKUP STAYS in `light/MobileCta.tsx`. The stage engine toggles
+   `.hero-gone` on <html> and manages this element's tabIndex; removing the node
+   would leave that code reaching for something that is not there. Hidden, it
+   costs nothing and the engine's contract still holds. */
 .mobcta{display:none}
 @media(max-width:799px){
   .mobcta{
-    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    display:none;align-items:center;justify-content:space-between;gap:14px;
     position:fixed;left:10px;right:10px;bottom:10px;z-index:80;
     padding:10px 12px 10px 18px;border-radius:100px;
     background:rgba(12,16,14,.72);
@@ -152,8 +165,8 @@
     color:rgba(255,255,255,.66);
   }
   .mobcta .btn{padding:9px 18px;font-size:.9rem}
-  /* keep the footer clear of the bar */
-  footer{padding-bottom:86px}
+  /* the 86px that kept the footer clear of the bar goes with the bar — it was
+     reserving space for something that is no longer drawn. */
 }
 @media(prefers-reduced-motion:reduce){
   .mobcta{transition:none}
