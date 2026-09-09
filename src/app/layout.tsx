@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import { InlineScript } from '@/components/InlineScript';
 import { Splash } from '@/components/Splash';
@@ -167,6 +168,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             being first costs nothing in reading order. */}
         <Splash />
         {children}
+
+        {/* THE COUNTER. A self-hosted Umami instance, which is the whole reason
+            it can be here at all: it sets no cookie, so the page still owes
+            nobody a consent banner, and there is none to write.
+
+            `afterInteractive` IS THE DEFAULT AND IT IS THE RIGHT ONE. Analytics
+            has no claim on the first paint, and this page spends its opening
+            second drawing a curtain over a 164KB photograph. `beforeInteractive`
+            would put a third-party request in front of that; `lazyOnload` would
+            lose the readers who leave before onload, who are exactly the
+            bounces worth counting.
+
+            IT COUNTS ROUTE CHANGES ON ITS OWN. Umami patches the History API,
+            so `/`, `/preview` and the `/demo/*` routes each register without a
+            listener here.
+
+            `data-domains` IS A FILTER, AND IT FAILS SILENTLY IN BOTH
+            DIRECTIONS. The script sends nothing unless `location.hostname`
+            matches one of these, which is what keeps localhost and every
+            `*-git-*.vercel.app` preview out of the numbers. The cost: THE DAY
+            THIS SITE MOVES TO ITS REAL DOMAIN, IF THAT HOST IS NOT IN THIS
+            LIST, TRACKING STOPS AND NOTHING REPORTS AN ERROR — the dashboard
+            just goes quiet. `therollup.near.com` is listed ahead of the Vercel
+            host in anticipation; drop the Vercel one once the cutover is
+            done. */}
+        <Script
+          defer
+          src="https://umami-production-c53b.up.railway.app/script.js"
+          data-website-id="1c630dd6-e7d2-438d-928c-c0183889dc58"
+          data-domains="therollup.near.com,near-com-rollup.vercel.app"
+        />
       </body>
     </html>
   );
