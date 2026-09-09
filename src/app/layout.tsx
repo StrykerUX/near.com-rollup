@@ -3,10 +3,62 @@ import './globals.css';
 import { InlineScript } from '@/components/InlineScript';
 import { Splash } from '@/components/Splash';
 
+/**
+ * WHAT A SHARED LINK SAYS.
+ *
+ * EVERY WORD BELOW IS ON THE PAGE. The title is the hero's own first line and
+ * the co-brand it is published under; the description is the hero's claim
+ * followed by the offer, verbatim from `lib/cards.tsx`. Nothing here is a
+ * summary written for the card — a share preview that promises something the
+ * page does not say is the one kind of copy nobody proofreads.
+ *
+ * IT REPLACES A DESCRIPTION THAT HAD GONE STALE. The old one led on
+ * confidentiality — "everything you do onchain is public, it doesn't have to
+ * be" — which was the hero's argument two copy passes ago and is not on this
+ * page any more. Metadata drifts silently, because the only place it shows is
+ * somewhere the author is not looking.
+ *
+ * THE ROLLUP IS NAMED, AND ONLY AS WHAT IT IS: the page is co-branded (the
+ * lockup, the quote, the referral on every LOGIN url) and Rollup traders are
+ * who the fee share is for. No claim is made about the partnership beyond what
+ * the page itself states.
+ */
+const TITLE = 'near.com × The Rollup — Trade where the liquidity is';
+const DESCRIPTION =
+  'Trade where the liquidity is. Hedge where your assets are. ' +
+  'Rollup traders keep 20% of every fee back in NEAR tokens.';
+
 export const metadata: Metadata = {
-  title: "near.com — The only onchain account you'll need",
-  description:
-    "Everything you do onchain is public. It doesn't have to be. Fully confidential swaps, transfers, deposits and withdrawals across 30+ chains, from one account.",
+  /* WITHOUT THIS, `opengraph-image.jpg` RESOLVES TO A RELATIVE URL and the
+     scrapers that do not follow one show a card with no image. It is read from
+     the environment rather than written down: Vercel sets
+     VERCEL_PROJECT_PRODUCTION_URL to the project's own production host, so the
+     value is correct per deployment and there is no domain hardcoded here to
+     go stale. Locally there is no such variable and a relative base is fine —
+     nothing is scraping a dev server. */
+  metadataBase: process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? new URL(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`)
+    : undefined,
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    siteName: 'near.com × The Rollup',
+    type: 'website',
+    /* the image itself is `app/opengraph-image.jpg` — Next writes the url, the
+       type and the dimensions from the file, and `opengraph-image.alt.txt`
+       beside it writes the alt */
+  },
+  twitter: {
+    /* `summary_large_image` OR THE CARD IS A THUMBNAIL. There is no
+       `twitter-image.jpg`, deliberately: X falls back to `og:image` when none
+       is set, so one 1200x630 plate serves both and there is not a second copy
+       to keep in step. What X will NOT infer is the card size. */
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
   other: { 'build-version': 'v08_rollup' },
 };
 
