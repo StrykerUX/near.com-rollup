@@ -10,33 +10,24 @@
   transition:var(--tr-btn);white-space:nowrap;
 }
 .btn:hover .arw{transform:translateX(3px)}
-/* THE ASK IS BRUSHED METAL — `--cta-fill`, declared with its numbers and the
-   reason for them in 02-tokens.css. The label stays black: the top half of
-   this pill is white, and anything but black on it is a legibility problem
-   waiting for a wide screen.
+/* THE DEFAULT PRIMARY IS STILL THE GREEN PILL, and that is a correction.
+   The brushed gradient went in here first, on the reading that "the CTA
+   button" meant every `.btn-primary` on the site. It does not: it means the
+   big ask — `Create account` on the stage, the fixed bar's copy of it, and
+   `Get started` on the closing plate. Those three declare `--cta-fill` for
+   themselves in 33-hero-skyline.css and 36-final-cta.css.
 
-   THE HOVER IS A `filter`, AND THAT IS FORCED RATHER THAN CHOSEN. A gradient
-   is `background-image`, and background-image does not interpolate — swap one
-   gradient for another and the change is instantaneous, however long the
-   transition says. `filter` does interpolate, so a brightness lift is the only
-   way this pill can answer smoothly at all. 12-motion.css carries it in both
-   button transition lists for exactly this reason.
+   THE ONE IT WAS WRONG FOR IS THE NAV. `Create account` sits in the header
+   over the cream panel, at 34px beside a ghost `Sign in`, and a white-to-grey
+   pill there is a silver lozenge on paper — no brand colour, and the white
+   half with nothing to be lighter than. It is the site's green button, which
+   is what it has always been.
 
-   1.08 AND A SOFT HALO, WHICH IS THE WHOLE RESPONSE. It was a jump to a
-   lighter green with `--glow-green-sm` under it — a colour change and a hard
-   ring, on a control that is already the brightest thing on a dark page. The
-   pill now lifts about an eighth of a stop and gathers a wide, weak halo; on
-   the cream zone the halo is invisible and the lift is the whole of it, which
-   is the right amount of event for a button on paper. */
-.btn-primary{
-  background:var(--cta-fill);
-  color:#000;
-}
-.btn-primary:hover{
-  filter:brightness(1.08);
-  box-shadow:var(--cta-halo);
-}
-.btn-primary:active{filter:brightness(.96);transform:translateY(1px)}
+   THE SWEEP GOES WITH THE GRADIENT. `background-size` has nothing to grow
+   here: this is a flat fill, so the hover is the fill it always was. */
+.btn-primary{background:var(--near-green);color:#000}
+.btn-primary:hover{background:var(--green-300);box-shadow:var(--glow-green-sm)}
+.btn-primary:active{background:var(--green-500);transform:translateY(1px)}
 .btn-outline{border-color:var(--border-strong);color:#fff;backdrop-filter:blur(8px)}
 .btn-outline:hover{border-color:#fff;background:rgba(255,255,255,.17)}
 /* thinner, not smaller — the type size is unchanged, only the space above and

@@ -305,7 +305,18 @@
    whose top half is white it would be a hole. */
 #stage .btn-primary,
 .mobcta .btn-primary {
-  background: var(--cta-fill);
+  /* RESTATED, BECAUSE 31 OUTRANKS THE BASE AND USES THE SHORTHAND.
+     `31-hero-green.css` writes `background: #000` at a higher specificity than
+     `.btn-primary`, and the shorthand resets `background-origin` to
+     `padding-box` — which is the exact condition that tiles a white line under
+     the pill (see `--cta-fill` in 02-tokens.css). Setting the image without
+     the origin here
+     would leave the bug fixed everywhere except the two places it was
+     reported. */
+  background-image: var(--cta-fill);
+  background-origin: border-box;
+  background-size: 100% 100%;
+  background-position: 0 0;
   /* `border-color`, not the shorthand: `.btn` reserves the ring with
      `1px solid transparent` (05-buttons.css:7), so clearing it here costs no
      width and the pill does not shrink 2px against every other button. */
@@ -322,17 +333,28 @@
    in on hover alone. */
 #stage .btn-primary:hover,
 .mobcta .btn-primary:hover {
-  background: var(--cta-fill);
+  background-image: var(--cta-fill);
+  background-origin: border-box;
   border-color: transparent;
   color: #000;
-  filter: brightness(1.08);
+  /* the base's sweep, restated for the same reason the fill is: 31 sets
+     `background:#000` on this hover at a higher specificity, and the shorthand
+     resets `background-size` to `auto` along with everything else. */
+  background-size: 100% 420%;
   box-shadow: var(--cta-halo);
 }
 #stage .btn-primary:hover .arw,
 .mobcta .btn-primary:hover .arw { color: #000 }
 #stage .btn-primary:active,
 .mobcta .btn-primary:active {
-  background: var(--cta-fill);
+  background-image: var(--cta-fill);
+  background-origin: border-box;
+  /* THE SWEEP HOLDS THROUGH THE PRESS. `:active` and `:hover` have the
+     same specificity and this rule is later, so stating the rest size here
+     would rewind the white the moment the pointer went down — the pill
+     would flinch back to grey under the finger. A press is a dip in
+     brightness on top of the hover, not a return to rest. */
+  background-size: 100% 420%;
   border-color: transparent;
   filter: brightness(.96);
 }

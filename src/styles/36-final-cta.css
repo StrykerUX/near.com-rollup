@@ -117,19 +117,40 @@
    the stage: 31 sets `background:#000` on both, so leaving them out here lets
    the black back in on the interaction alone. */
 .finalcta .btn-primary {
-  background: var(--cta-fill);
+  /* RESTATED, BECAUSE 31 OUTRANKS THE BASE AND USES THE SHORTHAND.
+     `31-hero-green.css` writes `background: #000` at a higher specificity than
+     `.btn-primary`, and the shorthand resets `background-origin` to
+     `padding-box` — which is the exact condition that tiles a white line under
+     the pill (see 05-buttons.css). Setting the image without the origin here
+     would leave the bug fixed everywhere except the two places it was
+     reported. `--cta-fill` in 02-tokens.css carries the full account. */
+  background-image: var(--cta-fill);
+  background-origin: border-box;
+  /* the rest frame, stated so the hover sweep has a from-value to read */
+  background-size: 100% 100%;
+  background-position: 0 0;
   border-color: transparent;
   color: #000;
 }
 .finalcta .btn-primary .arw { color: #000 }
 .finalcta .btn-primary:hover {
-  background: var(--cta-fill);
+  background-image: var(--cta-fill);
+  background-origin: border-box;
   color: #000;
-  filter: brightness(1.08);
+  /* the base's sweep, restated because 31 writes this hover with the shorthand
+     at a higher specificity and resets `background-size` with it */
+  background-size: 100% 420%;
   box-shadow: var(--cta-halo);
 }
 .finalcta .btn-primary:hover .arw { color: #000 }
 .finalcta .btn-primary:active {
-  background: var(--cta-fill);
+  background-image: var(--cta-fill);
+  background-origin: border-box;
+  /* THE SWEEP HOLDS THROUGH THE PRESS. `:active` and `:hover` have the
+     same specificity and this rule is later, so stating the rest size here
+     would rewind the white the moment the pointer went down — the pill
+     would flinch back to grey under the finger. A press is a dip in
+     brightness on top of the hover, not a return to rest. */
+  background-size: 100% 420%;
   filter: brightness(.96);
 }

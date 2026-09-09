@@ -98,14 +98,43 @@
   --space-5:24px; --space-6:32px; --space-7:48px; --space-8:64px; --space-9:96px;
 
   /* THE ASK'S FILL, AND THE HALO IT GATHERS ON HOVER. White at the top falling
-     to #878787 at the foot, on 185deg — five degrees off vertical, enough to
-     stop the band reading as machine-made and not enough to look tilted.
+     to #878787 at the foot, on 175deg — five degrees off vertical, enough to
+     stop the band reading as machine-made and not enough to look tilted. It
+     went in at 185, which tilts the same amount the other way; 175 rotates the
+     axis anticlockwise, so the light falls from the top RIGHT rather than the
+     top left.
 
-     A TOKEN BECAUSE IT IS WRITTEN IN FOUR PLACES OTHERWISE: the base pill in
-     05-buttons.css, and the stage's rest, hover and press, which have to
-     restate it to outrank 31-hero-green.css's black. Four copies of a literal
-     is three chances to retune three of them. */
-  --cta-fill:linear-gradient(185deg,#FFFFFF 0%,#878787 100%);
+     A TOKEN BECAUSE IT IS WRITTEN IN SIX PLACES OTHERWISE: rest, hover and
+     press for the stage's ask (33-hero-skyline.css) and again for the closing
+     plate's (36-final-cta.css), each having to restate it to outrank
+     31-hero-green.css's black. Six copies of a literal is five chances to
+     retune five of them.
+
+     NOT ON `.btn-primary`. This is the big ask, not the site's default pill —
+     the nav's `Create account` is the green button and stays one.
+
+     TWO RULES COME WITH THIS TOKEN WHEREVER IT IS USED, and both are load
+     bearing:
+
+     `background-origin: border-box`, OR A WHITE LINE APPEARS UNDER THE PILL.
+     `.btn` reserves its ring with `border:1px solid transparent` so outlined
+     and filled pills measure the same. A gradient defaults to
+     `background-origin: padding-box` with `background-clip: border-box` — so
+     it is SIZED to the padding box and PAINTED out to the border box, and the
+     1px strip left over is filled by the default `background-repeat: repeat`.
+     It tiles. The strip under the pill repeats the gradient's FIRST stop,
+     #FFFFFF: a one-pixel white line along the bottom edge. `no-repeat` also
+     stops it and is the wrong fix — it leaves that strip transparent, which
+     on the stage shows the photograph through a hairline gap.
+
+     AND `background-image`, NEVER THE `background` SHORTHAND. The shorthand
+     resets `background-origin`, `background-size` and `background-position`,
+     so an override written with it silently puts the line back and kills the
+     hover sweep — on hover only, which is the worst version of both to find.
+     31-hero-green.css writes `background:#000` at a higher specificity than
+     either caller, which is why all three of those properties are restated in
+     every state rather than inherited. */
+  --cta-fill:linear-gradient(175deg,#FFFFFF 0%,#878787 100%);
   /* THE HALO IS CENTRED, AND THAT IS A BUG FIX. It went in as
      `0 6px 22px` — offset six pixels DOWN — which is how a shadow is normally
      written, because a shadow falls. This is not a shadow: it is white, on a

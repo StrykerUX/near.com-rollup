@@ -48,15 +48,20 @@
   --ease-soft:cubic-bezier(.22,.61,.36,1);
   --dur-btn-in:200ms;
   --dur-btn-out:420ms;
-  /* `filter` IS IN BOTH LISTS BECAUSE THE ASK IS A GRADIENT. `background-image`
-     does not interpolate, so `.btn-primary`'s hover cannot be a fill swap and
-     is a brightness lift instead — see 05-buttons.css. Without `filter` here
-     that lift would be instantaneous while everything beside it eased. */
+  /* `background-size` AND `filter` ARE IN BOTH LISTS BECAUSE THE ASK IS A
+     GRADIENT. `background-image` does not interpolate, so the hover cannot
+     swap one fill for another — it grows the gradient's tile until only the
+     white end is inside the pill (see `--cta-fill` in 02-tokens.css).
+     `background-size` is
+     what carries that; `filter` is still here for the press. Without them the
+     sweep and the dip would both be instantaneous while everything beside
+     them eased. */
   --tr-btn:
     background-color var(--dur-btn-out) var(--ease-soft),
     border-color     var(--dur-btn-out) var(--ease-soft),
     color            var(--dur-btn-out) var(--ease-soft),
     box-shadow       var(--dur-btn-out) var(--ease-soft),
+    background-size  var(--dur-btn-out) var(--ease-soft),
     filter           var(--dur-btn-out) var(--ease-soft),
     transform        var(--dur-press)   var(--ease-soft);
   /* THE SAME LIST AT THE IN DURATION, WRITTEN OUT. The obvious way to do this
@@ -72,6 +77,7 @@
     border-color     var(--dur-btn-in) var(--ease-soft),
     color            var(--dur-btn-in) var(--ease-soft),
     box-shadow       var(--dur-btn-in) var(--ease-soft),
+    background-size  var(--dur-btn-in) var(--ease-soft),
     filter           var(--dur-btn-in) var(--ease-soft),
     transform        var(--dur-press)  var(--ease-soft);
 }
