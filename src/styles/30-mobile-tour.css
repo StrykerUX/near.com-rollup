@@ -371,6 +371,24 @@
    plate would centre half of it. */
 @media (max-width: 759px) {
   .mch { text-align: center }
+
+  /* CENTRING TEXT IS NOT CENTRING ITS BOX, and three of these have a box.
+     `.mchhead` is capped at 24ch (13-rollup.css:67), `.mchbody p` at 42ch, and
+     `.rollquote` at 44ch — all blocks, so once the frame is wider than the cap
+     they stop filling it and sit against the left edge with their text neatly
+     centred inside. Below about 400px the caps never bite and nothing shows;
+     by 690 all three are short of the gutter and the column reads as though it
+     had been nudged.
+
+     `margin-inline` RATHER THAN `align-items` ON THE PARENT. Only `.mchhead`
+     is a direct flex item of `.mch` — `.mchbody p` and the quote plate sit one
+     level down, where `align-items` cannot reach them. An auto inline margin
+     centres a capped block wherever it lives, so one rule covers all three
+     instead of one rule and an exception. */
+  .mchhead,
+  .mchbody p,
+  .mchbody .rollquote { margin-inline: auto }
+
   .mchbody .rollquote { text-align: left }
 }
 
