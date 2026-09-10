@@ -324,23 +324,25 @@
 /* =========================================================================
    AND THE SAME HEAD, ON A TABLET
    -------------------------------------------------------------------------
-   Same composition, shallower frame. 60dvh rather than the phone's 80: a
-   tablet in portrait is a tall screen and 80% of it for four lines of type and
-   a button is a hero that has run out of things to say — and in landscape 80
-   would push the first chapter clean off the fold. 60 opens the page and still
-   shows the tour beginning underneath it.
+   Same composition, same depth as the phone's. It went in at 60 on the
+   argument that a tablet is a tall screen and 80% of it for four lines and a
+   button is a hero with nothing left to say. Seen on one, that was wrong in
+   the other direction: at 60 the frame is wide, the type is centred in the
+   middle of it, and the band of empty photograph beneath reads as the hero
+   having stopped early rather than as air. The opening is the same opening at
+   both sizes and it wants the same share of the screen.
 
    `dvh` FOR THE SAME REASON IT IS USED BELOW. A tablet has retracting browser
    chrome too; `vh` measures the frame as if it were never there.
 
    IT IS DELIBERATELY NOT FOLDED INTO THE 800–1080 BLOCK further down, which
    handles the fixed CTA bar and the footer's clearance. This belongs beside
-   the phone's version of the same decision, where the two numbers can be read
-   against each other.
+   the phone's version of the same decision, where the two can be read against
+   each other.
    ========================================================================= */
 @media (min-width: 800px) and (max-width: 1080px) {
   .mtop {
-    min-height: 60dvh;
+    min-height: 80dvh;
     display: flex;
     flex-direction: column;
     justify-content: center;
