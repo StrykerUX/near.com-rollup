@@ -70,7 +70,12 @@
 .nav .brand .brandrule {
   flex: none;
   width: 1px;
-  height: 22px;
+  /* FULL HEIGHT OF THE MARKS EITHER SIDE, not the wordmark's. It was 22px —
+     set to the type rather than to the boxes — which left it stopping short of
+     both icons and reading as a slightly-too-short tick between them. A
+     divider in a lockup is a spine: it either matches what it separates or it
+     draws attention to itself. Keep it equal to the mark height above. */
+  height: 26px;
   /* `currentColor`, not a token: the nav already owns the ink for each state,
      and a rule that is 22% of whatever the type is cannot disagree with it */
   background: currentColor;
