@@ -184,7 +184,12 @@ export const PERPS_NOTE = (
    entitled to rely on. What replaces it describes the step in front of them
    rather than making a claim about what the platform will never ask. */
 export const PERM_WORDS = ['Get started with', 'a wallet or passkey.'] as const;
+/* IT USED TO OPEN 'Sign in with a passkey or any wallet you already use'.
+   That was written under a headline about being permissionless, where it was
+   the first mention of how you get in. The headline now says 'Get started with
+   a wallet or passkey' — same verb, same two nouns, same order — so the two
+   lines sat one above the other saying one thing twice. The body leads with
+   the ecosystems instead; the headline keeps the action. */
 export const PERM_BODY =
-  'Sign in with a passkey or any wallet you already use: NEAR, Solana, EVM, ' +
-  'and more. No email, no KYC, no application. Just connect and start moving ' +
-  'across 30+ chains.';
+  'Works with NEAR, Solana, EVM and more. No email, no KYC, no application. ' +
+  'Just connect and start moving across 30+ chains.';
