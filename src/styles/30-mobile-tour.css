@@ -253,6 +253,45 @@
   .modesw { bottom: calc(82px + env(safe-area-inset-bottom, 0px)) }
 }
 
+/* =========================================================================
+   ON A PHONE THE HEAD OF THE PAGE IS A HERO
+   -------------------------------------------------------------------------
+   Above 800 it stays what it was: a left-aligned block that the tour begins
+   underneath. Under 800 it becomes a screen of its own — the lockup, the
+   offer, the button and the two notes centred in a frame that holds most of
+   the viewport, so a reader arriving on a phone gets an opening rather than
+   the top of a list.
+
+   `dvh`, AND IT IS THE ONLY UNIT THAT IS RIGHT HERE. `vh` on a phone measures
+   the viewport with the browser's own chrome hidden, so `80vh` is 80% of a
+   screen the reader may never see — the frame would run taller than intended
+   and push the button toward the fold, on exactly the devices this rule
+   exists for. `.soon` in 34-coming-soon.css makes the same call for the same
+   reason.
+
+   `min-height`, NOT `height`. The offer runs to three lines at 24px and can
+   take a fourth on a narrow phone; a fixed frame would clip it or force it to
+   overflow. 80dvh is a floor for the composition, not a cage.
+
+   THE PADDING STAYS AND IS WHAT KEEPS IT OFF THE NAV. `justify-content`
+   centres within the content box, which is already inset 106px at the top to
+   clear the fixed bar, so the group settles a little below true centre — which
+   is where it should sit when there is a header above it.
+   ========================================================================= */
+@media (max-width: 799px) {
+  .mtop {
+    min-height: 80dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  /* the offer's measure was written for a left column; centred, a 22ch line
+     wants to be a little narrower or the last line strands short of the rest */
+  .mtop .offer { max-width: 20ch }
+}
+
 /* Under 800 the fixed bar already carried the CTA, and the footer already
    cleared it. It runs up to 1080 now, because that is where `.rollcta` stops
    being drawn — without this there is a band of tablet widths with no call to
