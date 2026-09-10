@@ -789,16 +789,20 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
 .mchhead .wordmark,
 .display .wordmark{
   font-family:var(--font-display);font-style:normal;
-  /* 300, LITERAL, NOT --w-roman: see the note above.
+  /* 200, LITERAL, NOT --w-roman: see the note above.
      AND IT DOES NOT PAINT YET. PP Neue Montreal is loaded as exactly two faces,
      Book at 400 and Medium at 500 (public/fonts). Browsers synthesize BOLD and
      ITALIC and nothing else — there is no such thing as a faked light weight —
-     so 300 resolves to the nearest face it has, which is Book, and the line
+     so 200 resolves to the nearest face it has, which is Book, and the line
      renders identically to 400 until a Light or Thin .woff2 is added and
      declared in 01-fonts.css. The declaration is right and goes live the day
      that file lands; it is written here rather than left at 400 so the intent
-     is not lost in the gap. */
-  font-weight:300;
+     is not lost in the gap.
+
+     IT WAS 300 AND MOVING IT TO 200 CHANGES NOTHING ON SCREEN TODAY — both
+     round to the same missing face. What it changes is which cut this asks for
+     when one is finally installed. */
+  font-weight:200;
   font-size:inherit;line-height:inherit;letter-spacing:-.02em;
   display:inline-block;transform:none;color:#fff;
 }

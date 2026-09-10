@@ -36,7 +36,18 @@
    because the stage engine animates `.hw` and `.pw` runs with a transform, and
    a transform does nothing on an inline box. */
 em{
-  font-family:var(--font-display);font-style:normal;font-weight:300;
+  /* 200, THE LIGHT HALF OF A MIXED HEADLINE. The roman sets at 500 and this
+     drops away from it; the gap between the two is the whole effect.
+
+     IT DOES NOT PAINT YET, AND IT DID NOT AT 300 EITHER. PP Neue Montreal is
+     loaded as exactly two faces — Book at 400 and Medium at 500
+     (public/fonts). Browsers synthesize BOLD and ITALIC and nothing else;
+     there is no such thing as a faked light weight. So this resolves to the
+     nearest face there is, Book, and renders identically to 400 until a Light
+     or Thin .woff2 is added and declared in 01-fonts.css. Written at the
+     intended value rather than left at 400 so the intent is not lost in the
+     gap. */
+  font-family:var(--font-display);font-style:normal;font-weight:200;
   letter-spacing:-.02em;display:inline-block;transform-origin:50% 60%;
 }
 .nb{white-space:nowrap}
