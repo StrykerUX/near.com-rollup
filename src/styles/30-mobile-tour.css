@@ -321,6 +321,31 @@
   }
 }
 
+/* =========================================================================
+   THE CHAPTERS CENTRE ON A PHONE TOO
+   -------------------------------------------------------------------------
+   759 AND NOT 799, AND THE NUMBER IS NOT ARBITRARY. 760 is where a chapter
+   stops being a column and becomes a row — copy left, device right. Centring
+   text in the left column of a two-column layout is a different decision from
+   centring a single column, and not one that was asked for, so this stops
+   exactly where the single column does.
+
+   `text-align` ALONE, NOT `align-items`. `.mch` is a flex column at default
+   `stretch`, so its children are already full width and only their text needs
+   moving. Setting `align-items: center` would shrink each block to fit its own
+   content, leaving the headline and the paragraph at two different widths with
+   two different centres. The device is untouched either way — it centres on
+   `margin: … auto` and has since it was written.
+
+   THE PULL QUOTE STAYS LEFT. It is a plate with an attribution rather than
+   running copy, and its byline is a flex row — `text-align` moves the quoted
+   line but cannot move the avatar and the name beside it, so centring the
+   plate would centre half of it. */
+@media (max-width: 759px) {
+  .mch { text-align: center }
+  .mchbody .rollquote { text-align: left }
+}
+
 /* Under 800 the fixed bar already carried the CTA, and the footer already
    cleared it. It runs up to 1080 now, because that is where `.rollcta` stops
    being drawn — without this there is a band of tablet widths with no call to
