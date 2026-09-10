@@ -39,6 +39,49 @@
   text-wrap: pretty;
 }
 
+/* =========================================================================
+   AND ON A PHONE THE NARROW TOUR TAKES THE OPPOSITE PAIR
+   -------------------------------------------------------------------------
+   `balance` for the paragraphs, `pretty` for the headlines — the reverse of
+   everything above, and the reason is that this composition is now CENTRED
+   (30-mobile-tour.css, under 760).
+
+   THE ARGUMENT AT THE TOP OF THIS FILE ASSUMED A RAGGED RIGHT EDGE. Left
+   aligned, a paragraph has one loose edge and the only visible fault is an
+   orphan on the last line, which is what `pretty` exists to prevent. Centred,
+   BOTH edges are loose and the fault changes: three lines of wildly different
+   length read as an accident, and a stranded last word is merely one more
+   uneven line among them. `balance` equalises the lengths, which is what makes
+   centred text look composed rather than poured.
+
+   `balance` IS CAPPED AND THAT IS NOT A BUG HERE. Engines skip it past a
+   handful of lines — six in Chrome — so a long paragraph silently falls back
+   to normal wrapping. The chapter asides run three or four lines at this size,
+   inside the cap; the ones that overrun get today's behaviour rather than a
+   worse one, which is the right way for this to fail.
+
+   THE HEADLINES TAKE `pretty` FOR THE FIRST TIME. Their breaks are explicit
+   `<br />` in `lib/cards.tsx`, so there was nothing for an algorithm to decide
+   and they were deliberately left out. Centred and narrow, a line that was
+   authored for one width does wrap on its own, and `pretty` is what keeps that
+   forced break from stranding a word.
+
+   UNDER 760 ONLY, matching the centring exactly. From there up the section is
+   a row with the copy in a left column, where the reasoning at the top of this
+   file still holds.
+   ========================================================================= */
+@media (max-width: 759px) {
+  #stage .mchbody p,
+  #stage .mclosebody {
+    text-wrap: balance;
+  }
+  #stage .mchhead,
+  #stage .mclose h2,
+  #stage .mtop .offer {
+    text-wrap: pretty;
+  }
+}
+
 /* ---- THE QUOTE --------------------------------------------------------- */
 /* It is prose in a column narrower than any of them, which makes it the most
    likely of the lot to strand a word — and it sits on a plate, where a short
