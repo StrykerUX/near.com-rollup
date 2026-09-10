@@ -279,8 +279,9 @@ html[data-splash="again"] { --sp-run: 1800ms; --sp-step: 120ms }
      changed thickness across that cut would be the one thing on screen that
      moved. The fill stays black here and is still replaced by the gradient on
      the skyline theme (33-hero-skyline.css). */
-  flex: none; width: 2px; height: 28px;
+  flex: none; width: 1px; height: 28px;
   background: #000; border-radius: 2px;
+  opacity: .5;
 }
 .spbrow .rolllock {
   display: block; flex: none;

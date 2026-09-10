@@ -73,8 +73,9 @@
   .mbrow .rule {
     /* drawn rather than fetched, and narrower for it — see the note on
        `.rollbrow .rule` in 13-rollup.css */
-    flex: none; width: 2px; height: 28px;
+    flex: none; width: 1px; height: 28px;
     background: var(--browrule);
+    opacity: .5;
   }
   .mbrow .rolllock {
     display: block; flex: none;

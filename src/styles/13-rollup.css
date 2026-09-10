@@ -659,14 +659,19 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
      cropped. It replaces 462/120, which was the wordmark ALONE — the artwork
      now carries near's N alongside it, so the box is wider at the same height
      and a ratio cut for the old file would squash the mark into the word. */
-  height:clamp(29px,2.4vw,36px);aspect-ratio:596/137;
-  /* DROPPED 10px OFF THE FLEX CENTRE LINE. `.rollbrow` centres its three items,
+  height:clamp(27px,2.25vw,34px);aspect-ratio:596/137;
+  /* DROPPED 8px OFF THE FLEX CENTRE LINE. `.rollbrow` centres its three items,
      which is right for three boxes and wrong for these two marks: The Rollup
      stacks "The" above "ROLLUP", so its ink sits low in its box, while near's
-     is spread evenly through its own. Centred by box, near reads as floating.
-     A transform rather than a margin because this is an optical correction, not
-     a layout one — nothing else in the row should move to accommodate it. */
-  transform:translateY(10px);
+     is spread evenly through its own. Centred by box, near read as floating.
+
+     A transform rather than a margin because this is an optical correction and
+     not a layout one — nothing else in the row should move to accommodate it.
+     Written as `translate()` and not `translateY()` on purpose: a second
+     `transform` declaration REPLACES the first rather than adding to it, so a
+     later nudge on X has to travel inside this same function or the drop is
+     silently lost. */
+  transform:translate(0,8px);
   background:var(--nearlock-src) center/contain no-repeat;
 }
 .rollbrow .rolllock{
@@ -698,12 +703,24 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
    taking the file out of the base declaration is what frees the WIDTH, here and
    on every other surface that draws this lockup.
 
-   2px, and it is one number to move. A hairline at 1 is right beside the nav's
-   marks and wrong beside these: the rule stands 42px tall here and fades to 6%
-   at both ends, so a single pixel of it would be mostly fade. */
+   1px — a true hairline, which is what the prototype's divider always was.
+   The concern about a single pixel being mostly fade turned out not to hold in
+   front of the eye: the rule got taller and dropped to half opacity in the same
+   pass, and at that weight a 2px bar reads as a bar rather than as a seam. Same
+   thickness on all four surfaces that draw this lockup — the curtain lifts to
+   reveal the same rule half a second later, and thickness is the one dimension
+   that would visibly jump across that cut. */
 .rollbrow .rule{
-  flex:none;width:2px;height:clamp(30px,3vw,42px);
+  flex:none;width:1px;height:clamp(34px,3.3vw,46px);
   background:var(--browrule);
+  /* HALF STRENGTH. `opacity` on the element rather than halved alpha stops
+     inside `--browrule`: the two composite identically, and this way the
+     token keeps describing the gradient that was authored — a .96 peak
+     that fades to 6% — instead of carrying a second decision folded into
+     its numbers. Applied to all four surfaces that draw this lockup, for
+     the reason the widths are: the curtain lifts to reveal the same rule
+     half a second later. */
+  opacity:.5;
 }
 
 /* --- 2. air ------------------------------------------------------------
