@@ -217,8 +217,26 @@
      The closing plate's copy has no plate to land on here — there is no
      shrink on a page whose scroll is its own — and the jurisdiction note is
      not a design decision. Both live in an ordinary last section. */
+  /* CENTRED AT EVERY WIDTH THIS COMPOSITION RENDERS AT, which is why it sits
+     here and not in one of the breakpoint blocks below. `.mclose` is drawn by
+     `MobileTour` and nowhere else, so this rule's scope and the component's
+     are already the same thing — a media query would only be restating the
+     one wrapped around it.
+
+     IT IS THE HEAD'S BOOKEND. Those two are the only sections on the narrow
+     tour that are an argument rather than a chapter, and a reader who met a
+     centred opening should not be handed a left-aligned ending.
+
+     NO `min-height`. The head is a hero because it is the first screen; this
+     arrives after five chapters of scrolling and already has the closing
+     plate's own room. A floor here would open a gap above the footer on a tall
+     screen. */
   .mclose {
     padding: clamp(20px, 4vh, 40px) var(--gut) calc(120px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
   /* `.h1` alone is `font-size: var(--fs-h1)`, a desktop display size: it set
      this headline at 40.8px on a 426px screen. */
@@ -301,24 +319,6 @@
   /* the offer's measure was written for a left column; centred, a 22ch line
      wants to be a little narrower or the last line strands short of the rest */
   .mtop .offer { max-width: 20ch }
-
-  /* THE CLOSE IS CENTRED TOO, AND FOR THE SAME REASON THE HEAD IS. These two
-     are the page's bookends — the only sections on the narrow tour that are
-     an argument rather than a chapter — and a reader who met a centred opening
-     should not be handed a left-aligned ending. The five chapters between them
-     stay left: those are read in sequence and a ragged left edge is what makes
-     a sequence scannable.
-
-     NO `min-height` HERE. The head is a hero because it is the first screen;
-     this one arrives after five chapters of scrolling and has the closing
-     plate's own room already. Giving it a floor would open a gap above the
-     footer on a tall phone. */
-  .mclose {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
 }
 
 /* =========================================================================
