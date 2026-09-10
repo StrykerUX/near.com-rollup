@@ -6,23 +6,41 @@
   display:flex;align-items:center;gap:var(--space-6);
   /* fixed at its final size — no resize on scroll, nothing to shift */
   height:62px;padding-inline:var(--gut);border-bottom:1px solid transparent;
-  /* 8px, AND IN BOTH STATES. It used to be 20 and only over the cream page,
-     where the bar has a fill of its own to blur behind. Over the stage the bar
-     is transparent, and a backdrop-filter needs no fill to work — it softens
-     whatever passes beneath, which is what keeps a headline or an interface
-     from running hard into "Sign in". One number for the header, so the two
-     states are the same bar in two colours rather than two bars. */
-  /* ONE DECLARATION, UNPREFIXED. Writing the pair — `backdrop-filter` then
-     `-webkit-backdrop-filter` — is the usual belt and braces and it does not
-     survive this build: Lightning CSS folds the two into one and keeps the
-     last, so what shipped was the `-webkit-` form alone. Unprefixed only, and
-     the minifier adds back whatever the targets need. Same trap as `translate`
-     beside `transform` in the step rail. */
-  backdrop-filter:blur(8px);
+  /* THE BAR IS NOTHING AT ALL OVER THE STAGE. No fill, no blur, no rule — the
+     photograph runs under it unaltered and the only things drawn up here are
+     the lockup and the two controls.
+
+     IT USED TO BLUR IN BOTH STATES, and the argument was legibility: a
+     backdrop-filter needs no fill to work, so it softened whatever passed
+     beneath and kept a headline from running hard into "Sign in". That is a
+     real job, and on this composition it is one nothing was doing — the wide
+     stage keeps its copy in a left column and its device in the middle, so
+     nothing ever arrives under the controls at the right. What the blur did
+     instead was put a permanent band of soft across the top of a photograph
+     that was chosen for being sharp.
+
+     THE NARROW FRAME IS DIFFERENT AND IS HANDLED SEPARATELY. There, copy runs
+     full width and does pass beneath the bar — `30-mobile-tour.css:249` draws
+     a gradient footing for exactly that, under 1080 only, and it still does.
+     That one is not decoration to be cleared away with this. */
   transition:background var(--dur-slow) var(--ease-out),
-             border-color var(--dur-slow) var(--ease-out),color var(--dur-slow) var(--ease-out);
+             border-color var(--dur-slow) var(--ease-out),color var(--dur-slow) var(--ease-out),
+             backdrop-filter var(--dur-slow) var(--ease-out);
 }
-.nav.on-light{background:rgba(243,242,239,.5);border-bottom-color:var(--l-border);color:var(--l-fg)}
+/* THE GLASS ARRIVES WITH THE CREAM, and it has to: the fill is `.5`, so
+   without something to blur behind it the bar would be a flat half-tint over
+   whatever it covers rather than a pane of it.
+
+   ONE DECLARATION, UNPREFIXED. Writing the pair — `backdrop-filter` then
+   `-webkit-backdrop-filter` — is the usual belt and braces and it does not
+   survive this build: Lightning CSS folds the two into one and keeps the last,
+   so what shipped was the `-webkit-` form alone. Unprefixed only, and the
+   minifier adds back whatever the targets need. Same trap as `translate`
+   beside `transform` in the step rail. */
+.nav.on-light{
+  background:rgba(243,242,239,.5);border-bottom-color:var(--l-border);color:var(--l-fg);
+  backdrop-filter:blur(8px);
+}
 .brand{display:flex;align-items:center;flex:none}
 .brand svg{height:22px;width:auto}
 .navspacer{flex:1}
