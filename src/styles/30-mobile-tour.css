@@ -322,6 +322,34 @@
 }
 
 /* =========================================================================
+   AND THE SAME HEAD, ON A TABLET
+   -------------------------------------------------------------------------
+   Same composition, shallower frame. 60dvh rather than the phone's 80: a
+   tablet in portrait is a tall screen and 80% of it for four lines of type and
+   a button is a hero that has run out of things to say — and in landscape 80
+   would push the first chapter clean off the fold. 60 opens the page and still
+   shows the tour beginning underneath it.
+
+   `dvh` FOR THE SAME REASON IT IS USED BELOW. A tablet has retracting browser
+   chrome too; `vh` measures the frame as if it were never there.
+
+   IT IS DELIBERATELY NOT FOLDED INTO THE 800–1080 BLOCK further down, which
+   handles the fixed CTA bar and the footer's clearance. This belongs beside
+   the phone's version of the same decision, where the two numbers can be read
+   against each other.
+   ========================================================================= */
+@media (min-width: 800px) and (max-width: 1080px) {
+  .mtop {
+    min-height: 60dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* =========================================================================
    THE CHAPTERS CENTRE ON A PHONE TOO
    -------------------------------------------------------------------------
    759 AND NOT 799, AND THE NUMBER IS NOT ARBITRARY. 760 is where a chapter
