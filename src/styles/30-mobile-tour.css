@@ -99,23 +99,34 @@
   }
 
   /* ---- A CHAPTER -----------------------------------------------------
-     Eyebrow, headline, device, copy, in that order and in normal flow. The
-     section is taller than the viewport on purpose: this composition's whole
-     premise is that the device and the copy are not asked to share a screen,
-     and a section squeezed to fit one would be asking again. */
+     Headline, copy, device, in that order and in normal flow. The section is
+     taller than the viewport on purpose: this composition's whole premise is
+     that the device and the copy are not asked to share a screen, and a
+     section squeezed to fit one would be asking again. */
   .mch {
-    /* flex, so `order` can put the device between the headline and the body
-       while the DOM keeps the copy together — see `.mchtext` in MobileTour. */
+    /* flex, so `order` can arrange the three while the DOM keeps the copy
+       together in one element — see `.mchtext` in MobileTour. */
     display: flex;
     flex-direction: column;
     padding: 0 var(--gut) clamp(56px, 9vh, 104px);
   }
-  /* the group is transparent to layout on a phone: its three children are flex
+  /* the group is transparent to layout on a phone: its two children are flex
      items of the section itself */
   .mchtext { display: contents }
+
+  /* THE DEVICE COMES AFTER EVERYTHING THAT EXPLAINS IT. It used to sit between
+     the headline and the body, which split each chapter's argument in half:
+     the reader met a claim, scrolled a screen of interface, and only then
+     found the paragraph that said what they had just looked at. On Perps that
+     paragraph is the pull quote, so the quote was landing under a device it
+     was not about yet.
+
+     Copy first, then the screen it describes. Below 760 only — from there up
+     the section is a row (copy left, device right) and `.mchtext` becomes a
+     real box, so these two never compete for the same column. */
   .mchhead { order: 2 }
-  .mch > .mdev { order: 3 }
-  .mchbody { order: 4 }
+  .mchbody { order: 3 }
+  .mch > .mdev { order: 4 }
 
   /* the size is the clamp `13-rollup.css` shares with the wide composition's
      left column, whose 24px floor was written for this frame */
