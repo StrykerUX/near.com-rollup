@@ -1,5 +1,3 @@
-import { NearMark } from './marks';
-
 const LOGIN = 'https://near.com/login?ref=therollup';
 
 /**
@@ -19,10 +17,12 @@ export function Nav() {
         {/* Both marks are decorative here: the link's name says where it goes,
             and reading out two brand names in its place would describe the
             artwork rather than the destination. The Rollup is named in the
-            hero's own lockup, which is labelled. */}
+            hero's own lockup, which is labelled. near is the lockup with its
+            N here, not the bare wordmark the nav used to draw — the same file
+            the hero uses, recut to black. */}
         <span className="brandroll" aria-hidden="true" />
         <span className="brandrule" aria-hidden="true" />
-        <NearMark />
+        <span className="brandnear" aria-hidden="true" />
       </a>
       <span className="navspacer" />
       <a className="btn btn-ghost" href={LOGIN} target="_blank" rel="noopener" data-umami-event="cta-click" data-umami-event-pos="nav-signin">Sign in</a>

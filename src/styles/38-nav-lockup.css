@@ -1,45 +1,73 @@
 /* =========================================================================
    THE CO-BRAND IN THE HEADER, ONCE THE STAGE LETS GO
    -------------------------------------------------------------------------
-   The nav carried near's wordmark alone. Below the stage — where the page
-   turns cream and nothing else on screen says who published it — it now
-   carries the same lockup the hero and the curtain do: The Rollup, a rule,
-   near.
+   The nav carried near's bare wordmark as an inline SVG. Below the stage —
+   where the page turns cream and nothing else on screen says who published it
+   — it now carries the same lockup the hero and the curtain do: The Rollup, a
+   rule, near with its N. In black, because that surface is the only one it is
+   ever seen on.
 
-   IT IS ONLY EVER SEEN ON THE LIGHT PAGE, so it is only ever drawn in black.
-   `13-rollup.css:801` keeps `.brand` at `opacity:0` while the stage owns the
-   frame and reveals it with `.on-light`; the lockup inherits that entrance
-   rather than declaring one, which is why there is no transition here.
+   BOTH MARKS ARE THE SITE'S OWN ARTWORK, RECUT. `near-logo-black.webp` is
+   `near-logo-light.webp` with its RGB set to black and its alpha untouched, so
+   the header and the hero are drawing the same file in two inks rather than
+   two files that have to be kept in step. The wordmark SVG it replaces was a
+   different drawing — no N, different proportions — and having both on one
+   page was the thing worth fixing.
 
-   near IS STILL THE INLINE SVG. It is `currentColor` and the nav already sets
-   the ink per state, so it costs no request and needs no second cut. Only The
-   Rollup arrives as a file, because it is artwork rather than a glyph.
+   IT INHERITS THE ENTRANCE IT ALREADY HAD. `13-rollup.css:801` keeps `.brand`
+   at `opacity:0` while the stage owns the frame and reveals it with
+   `.on-light` off the shrink clock, so the lockup arrives with it and declares
+   no transition of its own.
+
+   EVERY SELECTOR IS SCOPED TO `.nav`. The footer uses `.brand` too, with the
+   inline wordmark inside it, and it is a white mark on near-black — none of
+   this applies there and it must not leak.
    ========================================================================= */
 
-.brand {
+.nav .brand {
   /* the pieces of a lockup sit closer than nav items do — `.nav`'s own
      `--space-6` between them would read as three separate marks */
   gap: 11px;
 }
 
-.brand .brandroll {
+/* ---- THE TWO MARKS ----------------------------------------------------- */
+/* SET TO THE SAME HEIGHT SO THE TWO ICONS MATCH, which is the pairing the eye
+   actually checks across a rule: The Rollup's pinwheel and near's N both fill
+   their box top to bottom, so equal boxes put them on equal footing.
+
+   THE WORDMARKS THEN LAND WHERE THEY SHOULD. Measured from the artwork rather
+   than guessed: in `near-logo-black.webp` the wordmark occupies y 14–121 of
+   137, so 78.8% of the box — at 26px that is a 20.5px wordmark, against the
+   22px the bare SVG used to be. Slightly smaller is correct now that it has an
+   icon beside it carrying part of the weight. The Rollup stacks "The" above
+   "ROLLUP" and its capitals take roughly the lower half, landing close to the
+   same place. Change one of these heights and check both wordmarks, not both
+   boxes. */
+.nav .brand .brandroll,
+.nav .brand .brandnear {
   display: block;
   flex: none;
-  /* TALLER THAN near, AND THAT IS WHAT MAKES THEM MATCH. The artwork stacks
-     "The" above "ROLLUP", so its capitals occupy roughly the lower half of the
-     box — set to near's 22px the wordmark would read a size smaller than the
-     wordmark beside it. 26px puts the two sets of capitals on the same
-     footing, which is the alignment the eye actually checks. */
   height: 26px;
-  /* the file's own ratio, measured after checking it carries no transparent
-     margin to crop — 4422x797 of artwork, edge to edge. It is NOT the silver
-     cut's 1525/326: that is a differently trimmed file and the two must not be
-     given each other's numbers. */
-  aspect-ratio: 4422/797;
-  background: url('/img/rollup-logo-black.webp') center / contain no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
-.brand .brandrule {
+/* Each file's OWN ratio, measured after checking for a transparent margin to
+   crop — neither has one. The Rollup is NOT the silver cut's 1525/326: that is
+   a differently trimmed file, and giving one of them the other's numbers
+   stretches it. */
+.nav .brand .brandroll {
+  aspect-ratio: 4422/797;
+  background-image: url('/img/rollup-logo-black.webp');
+}
+.nav .brand .brandnear {
+  aspect-ratio: 596/137;
+  background-image: url('/img/near-logo-black.webp');
+}
+
+/* ---- THE RULE ---------------------------------------------------------- */
+.nav .brand .brandrule {
   flex: none;
   width: 1px;
   height: 22px;
@@ -51,12 +79,10 @@
 
 /* ---- NARROW ------------------------------------------------------------ */
 /* THE LOCKUP DROPS BACK TO near ALONE below 640, which is where `.nav` gives
-   up its gap and the two buttons start setting their own type down. The brand
-   is a `flex:none` item competing with a CTA for the same bar; a co-brand that
-   pushes "Create account" off the edge has cost more than it carried. This is
-   the layout that shipped before, unchanged, on the widths where it was the
-   only one that fitted. */
+   up its gap and both buttons start setting their type down. The brand is a
+   `flex:none` item competing with a CTA for the same bar; a co-brand that
+   pushes "Create account" off the edge has cost more than it carried. */
 @media (max-width: 640px) {
-  .brand .brandroll,
-  .brand .brandrule { display: none }
+  .nav .brand .brandroll,
+  .nav .brand .brandrule { display: none }
 }
