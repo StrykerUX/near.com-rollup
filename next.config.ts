@@ -29,6 +29,21 @@ const nextConfig: NextConfig = {
       { source: '/r/:source', destination: '/' },
     ];
   },
+
+  /**
+   * `/preview` WAS THE TOUR WHILE THE HOLDING PAGE HELD `/`, and links to it
+   * went out. The route is gone, so without this they 404 — a worse answer
+   * than the page they were promised, which now lives one path up.
+   *
+   * PERMANENT, and that is the honest status: `/preview` existed for one
+   * reason and that reason has ended. A 308 also tells a crawler which url is
+   * canonical, which matters because that route carried `robots: noindex` for
+   * exactly as long as it existed and nothing should now be weighing the two
+   * against each other.
+   */
+  async redirects() {
+    return [{ source: '/preview', destination: '/', permanent: true }];
+  },
 };
 
 export default nextConfig;
