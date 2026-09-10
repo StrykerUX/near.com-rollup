@@ -660,6 +660,13 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
      now carries near's N alongside it, so the box is wider at the same height
      and a ratio cut for the old file would squash the mark into the word. */
   height:clamp(29px,2.4vw,36px);aspect-ratio:596/137;
+  /* DROPPED 10px OFF THE FLEX CENTRE LINE. `.rollbrow` centres its three items,
+     which is right for three boxes and wrong for these two marks: The Rollup
+     stacks "The" above "ROLLUP", so its ink sits low in its box, while near's
+     is spread evenly through its own. Centred by box, near reads as floating.
+     A transform rather than a margin because this is an optical correction, not
+     a layout one — nothing else in the row should move to accommodate it. */
+  transform:translateY(10px);
   background:var(--nearlock-src) center/contain no-repeat;
 }
 .rollbrow .rolllock{
@@ -682,10 +689,21 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
    3px AND NOT 8px. The file's 8px is its EXPORT width, not its drawn width —
    at 8 logical pixels it reads as a green bar between the two brands rather
    than a rule holding them together, and the prototype's divider is a hairline.
-   3 is the same artwork at roughly the 3x it was exported at. */
+
+   IT IS DRAWN, NOT FETCHED, AND THAT IS WHAT LET IT GET THINNER. This was
+   `--browrule-src`, a PNG hairline, at 3px — which was never a design decision:
+   3 is what that artwork measured at roughly the 3x it was exported at, so the
+   width was pinned to a file rather than to the lockup. `33-hero-skyline.css`
+   had already swapped the FILL for the `--browrule` gradient on the stage;
+   taking the file out of the base declaration is what frees the WIDTH, here and
+   on every other surface that draws this lockup.
+
+   2px, and it is one number to move. A hairline at 1 is right beside the nav's
+   marks and wrong beside these: the rule stands 42px tall here and fades to 6%
+   at both ends, so a single pixel of it would be mostly fade. */
 .rollbrow .rule{
-  flex:none;width:3px;height:clamp(30px,3vw,42px);
-  background:var(--browrule-src) center/100% 100% no-repeat;
+  flex:none;width:2px;height:clamp(30px,3vw,42px);
+  background:var(--browrule);
 }
 
 /* --- 2. air ------------------------------------------------------------

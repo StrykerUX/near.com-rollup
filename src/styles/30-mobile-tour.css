@@ -71,8 +71,10 @@
     background: var(--nearlock-src) center/contain no-repeat;
   }
   .mbrow .rule {
-    flex: none; width: 3px; height: 28px;
-    background: var(--browrule-src) center/100% 100% no-repeat;
+    /* drawn rather than fetched, and narrower for it — see the note on
+       `.rollbrow .rule` in 13-rollup.css */
+    flex: none; width: 2px; height: 28px;
+    background: var(--browrule);
   }
   .mbrow .rolllock {
     display: block; flex: none;

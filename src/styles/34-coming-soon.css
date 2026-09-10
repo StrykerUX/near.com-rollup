@@ -84,7 +84,7 @@
    a white bar that fades out at both ends rather than a ruled divider */
 .soonbrow .rule {
   flex: none;
-  width: 3px; height: clamp(32px, 4.4vw, 56px);
+  width: 2px; height: clamp(32px, 4.4vw, 56px);
   background: var(--browrule);
 }
 .soonbrow .nearw {
