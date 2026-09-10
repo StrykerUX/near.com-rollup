@@ -1,0 +1,38 @@
+/* =========================================================================
+   THE DISCLOSURE UNDER THE PRIMARY CTA
+   -------------------------------------------------------------------------
+   The footer carries the full paid-placement notice and the rebate terms.
+   This is the one-line version, repeated at the point of decision — a reader
+   who presses the first button on the page may never reach the foot of it,
+   and the fee share is something they should know before they press, not
+   after.
+
+   IT IS DIMMER THAN `.friction` AND THAT IS THE HIERARCHY. `.friction` sells
+   ("No email. No KYC.") and this discloses; setting them at the same strength
+   would either make the disclosure read as another selling point or make the
+   sales line read as small print. Third strength, one step down, still
+   comfortably legible — it is not there to be missed.
+
+   ONLY UNDER THE FIRST CTA OF EACH COMPOSITION — `.herocta` on the wide stage,
+   `.mtop` on the narrow tour. The same slot in both, never both at once. The
+   other six buttons are further down the page than the footer's own notice is
+   from them, so repeating it at each one would be noise rather than notice.
+   ========================================================================= */
+
+.herocta .ctadisc,
+.mtop .ctadisc {
+  margin: 10px 0 0;
+  font-size: var(--fs-caption, 12px);
+  line-height: 1.5;
+  /* the field behind both of these is the skyline photograph, so the colour is
+     stated against it rather than inherited from a token that means something
+     different on the cream panel */
+  color: rgba(255, 255, 255, .58);
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+
+/* centred composition, centred note — `.mtop` is a column with
+   `align-items:center`, and a left-aligned measure inside it reads as a
+   mistake rather than as a paragraph */
+.mtop .ctadisc { text-align: center; margin-inline: auto }

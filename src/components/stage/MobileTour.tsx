@@ -87,6 +87,9 @@ export function MobileTour() {
           Create account <span className="arw">&rarr;</span>
         </a>
         <p className="friction">No email. No KYC. Ready in seconds.</p>
+        <p className="ctadisc">
+          The Rollup earns a share of fees from users who sign up through this page.
+        </p>
       </header>
 
       {CARDS.map((c, i) => (
@@ -124,7 +127,7 @@ export function MobileTour() {
       {/* THE CLOSE. Two things land here that the narrow frame otherwise drops
           on the floor: the closing plate's copy — there is no shrink to carry
           it — and the jurisdiction note, which is not a design decision. */}
-      <section className="mclose" aria-label="Permissionless to the core">
+      <section className="mclose" aria-label="Get started with a wallet or passkey">
         <h2>
           {PERM_WORDS[0]} <em>{PERM_WORDS[1]}</em>
         </h2>

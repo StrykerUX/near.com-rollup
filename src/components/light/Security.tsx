@@ -30,9 +30,9 @@ export function Security() {
         <div className="copy rv">
           <h2 className="h1">Secure by design</h2>
           <p className="lead" style={{ color: 'var(--l-fg-2)' }}>
-            Your assets stay under your control. Every transaction is signed on
-            your device and settled onchain through NEAR Intents, the universal
-            liquidity layer used by leading DeFi protocols.
+            Every transaction is signed on your device and settled onchain
+            through NEAR Intents, the universal liquidity layer used by leading
+            DeFi protocols.
           </p>
         </div>
         <div className="secgrid rv">

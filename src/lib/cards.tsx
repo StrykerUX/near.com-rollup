@@ -153,7 +153,7 @@ export const CARDS: Card[] = [
  */
 export const OFFER = (
   <p className="offer">
-    Rollup traders keep <b>20% of every fee</b> back in NEAR tokens.
+    Rollup traders keep <b>20% of near.com platform fees</b> back in NEAR tokens.
   </p>
 );
 
@@ -179,7 +179,11 @@ export const PERPS_NOTE = (
  * Hence pieces rather than a node. Each composition brings its own wrapper and
  * the words cannot drift, which is the same bargain OFFER above already makes.
  */
-export const PERM_WORDS = ['Permissionless', 'to the core'] as const;
+/* WAS 'Permissionless to the core'. The page runs AML and security controls,
+   and a headline that says otherwise is the one line on it a reader would be
+   entitled to rely on. What replaces it describes the step in front of them
+   rather than making a claim about what the platform will never ask. */
+export const PERM_WORDS = ['Get started with', 'a wallet or passkey.'] as const;
 export const PERM_BODY =
   'Sign in with a passkey or any wallet you already use: NEAR, Solana, EVM, ' +
   'and more. No email, no KYC, no application. Just connect and start moving ' +

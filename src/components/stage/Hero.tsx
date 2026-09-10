@@ -30,6 +30,9 @@ export function Hero() {
               Create account <span className="arw">&rarr;</span>
             </a>
             <p className="friction">No email. No KYC. Ready in seconds.</p>
+            <p className="ctadisc">
+              The Rollup earns a share of fees from users who sign up through this page.
+            </p>
             <dl className="hstats">
               <div><dt>30+</dt><dd>chains</dd></div>
               <div><dt>113</dt><dd>assets</dd></div>

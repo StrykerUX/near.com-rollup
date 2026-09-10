@@ -28,7 +28,7 @@ import { Splash } from '@/components/Splash';
 const TITLE = 'near.com × The Rollup — Trade where the liquidity is';
 const DESCRIPTION =
   'Trade where the liquidity is. Hedge where your assets are. ' +
-  'Rollup traders keep 20% of every fee back in NEAR tokens.';
+  'Rollup traders keep 20% of near.com platform fees back in NEAR.';
 
 export const metadata: Metadata = {
   /* WITHOUT THIS, `opengraph-image.jpg` RESOLVES TO A RELATIVE URL and the

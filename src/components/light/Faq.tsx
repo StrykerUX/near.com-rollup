@@ -16,7 +16,7 @@ const ITEMS: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: 'What are private deals?',
-    a: 'A peer-to-peer trade. You set the terms, send a link, and a smart contract holds both sides until the swap executes. No intermediary, no counterparty risk, no order book.',
+    a: 'A peer-to-peer trade. You set the terms, send a link, and a smart contract holds both sides until the swap executes. No intermediary, no counterparty settlement risk, no order book.',
   },
   {
     q: "What's coming next?",

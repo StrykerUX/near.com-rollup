@@ -521,7 +521,7 @@ footer .rdisc{max-width:70ch;margin:0 0 22px;font-size:12px;line-height:1.55;
   /* PURE WHITE, THE WHOLE SENTENCE. It was .95 with the figure picked out in
      copper, which is the field's own accent and reads as a highlighter over
      the one line on the page that is an offer rather than a claim. The weight
-     still holds "20% of every fee" apart from the rest of it; nothing else
+     still holds "20% of near.com platform fees" apart from the rest; nothing
      needs to. Same treatment in `.mtop .offer` — one sentence, one colour. */
   color:#fff;text-transform:none;
   margin:0 0 clamp(16px,1.8vh,22px);max-width:26ch;
