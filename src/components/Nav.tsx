@@ -8,12 +8,20 @@ const LOGIN = 'https://near.com/login?ref=therollup';
  * would still be dark when the shrink finishes after the last scroll event.
  *
  * The brand is hidden while the stage owns the frame (the lockup carries it)
- * and revealed again in the light zone, where nothing else carries a brand.
+ * and revealed again in the light zone, where nothing else carries a brand —
+ * which is why it is the CO-BRAND that reappears there and not near alone. See
+ * 38-nav-lockup.css; the two marks are the hero's own, in black.
  */
 export function Nav() {
   return (
     <nav className="nav" id="nav">
       <a className="brand" href="#top" aria-label="near.com home">
+        {/* Both marks are decorative here: the link's name says where it goes,
+            and reading out two brand names in its place would describe the
+            artwork rather than the destination. The Rollup is named in the
+            hero's own lockup, which is labelled. */}
+        <span className="brandroll" aria-hidden="true" />
+        <span className="brandrule" aria-hidden="true" />
         <NearMark />
       </a>
       <span className="navspacer" />

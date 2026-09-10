@@ -1,0 +1,62 @@
+/* =========================================================================
+   THE CO-BRAND IN THE HEADER, ONCE THE STAGE LETS GO
+   -------------------------------------------------------------------------
+   The nav carried near's wordmark alone. Below the stage — where the page
+   turns cream and nothing else on screen says who published it — it now
+   carries the same lockup the hero and the curtain do: The Rollup, a rule,
+   near.
+
+   IT IS ONLY EVER SEEN ON THE LIGHT PAGE, so it is only ever drawn in black.
+   `13-rollup.css:801` keeps `.brand` at `opacity:0` while the stage owns the
+   frame and reveals it with `.on-light`; the lockup inherits that entrance
+   rather than declaring one, which is why there is no transition here.
+
+   near IS STILL THE INLINE SVG. It is `currentColor` and the nav already sets
+   the ink per state, so it costs no request and needs no second cut. Only The
+   Rollup arrives as a file, because it is artwork rather than a glyph.
+   ========================================================================= */
+
+.brand {
+  /* the pieces of a lockup sit closer than nav items do — `.nav`'s own
+     `--space-6` between them would read as three separate marks */
+  gap: 11px;
+}
+
+.brand .brandroll {
+  display: block;
+  flex: none;
+  /* TALLER THAN near, AND THAT IS WHAT MAKES THEM MATCH. The artwork stacks
+     "The" above "ROLLUP", so its capitals occupy roughly the lower half of the
+     box — set to near's 22px the wordmark would read a size smaller than the
+     wordmark beside it. 26px puts the two sets of capitals on the same
+     footing, which is the alignment the eye actually checks. */
+  height: 26px;
+  /* the file's own ratio, measured after checking it carries no transparent
+     margin to crop — 4422x797 of artwork, edge to edge. It is NOT the silver
+     cut's 1525/326: that is a differently trimmed file and the two must not be
+     given each other's numbers. */
+  aspect-ratio: 4422/797;
+  background: url('/img/rollup-logo-black.webp') center / contain no-repeat;
+}
+
+.brand .brandrule {
+  flex: none;
+  width: 1px;
+  height: 22px;
+  /* `currentColor`, not a token: the nav already owns the ink for each state,
+     and a rule that is 22% of whatever the type is cannot disagree with it */
+  background: currentColor;
+  opacity: .22;
+}
+
+/* ---- NARROW ------------------------------------------------------------ */
+/* THE LOCKUP DROPS BACK TO near ALONE below 640, which is where `.nav` gives
+   up its gap and the two buttons start setting their own type down. The brand
+   is a `flex:none` item competing with a CTA for the same bar; a co-brand that
+   pushes "Create account" off the edge has cost more than it carried. This is
+   the layout that shipped before, unchanged, on the widths where it was the
+   only one that fitted. */
+@media (max-width: 640px) {
+  .brand .brandroll,
+  .brand .brandrule { display: none }
+}
