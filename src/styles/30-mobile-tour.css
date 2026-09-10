@@ -113,20 +113,9 @@
   /* the group is transparent to layout on a phone: its three children are flex
      items of the section itself */
   .mchtext { display: contents }
-  .mchno { order: 1 }
   .mchhead { order: 2 }
   .mch > .mdev { order: 3 }
   .mchbody { order: 4 }
-
-  /* the step rail is a left-gutter orientation aid and this frame has no left
-     gutter. A number and a name, at the head of the section it names. */
-  .mchno {
-    display: flex; align-items: baseline; gap: 11px; margin: 0 0 14px;
-    font-family: var(--font-mono, var(--font-body));
-    font-size: 12px; letter-spacing: .13em; text-transform: uppercase;
-  }
-  .mchno b { font-weight: 400; color: var(--near-green, #00EC97) }
-  .mchno span { color: rgba(255, 255, 255, .56) }
 
   /* the size is the clamp `13-rollup.css` shares with the wide composition's
      left column, whose 24px floor was written for this frame */

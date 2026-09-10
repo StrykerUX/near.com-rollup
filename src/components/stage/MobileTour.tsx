@@ -106,13 +106,17 @@ export function MobileTour() {
               device between the headline and the body. The reading order in
               the DOM stays copy-then-device either way. */}
           <div className="mchtext">
-            {/* the step rail is a left-gutter orientation aid and this frame
-                has no left gutter. A number and a name, at the head of the
-                section they name. */}
-            <p className="mchno">
-              <b>{String(i + 1).padStart(2, '0')}</b>
-              <span>{CH_TITLES[i]}</span>
-            </p>
+            {/* THE NUMBERED EYEBROW IS GONE. It read "01 PERPS" above each
+                headline — the narrow frame's answer to the wide composition's
+                step rail, which is a left-gutter orientation aid this frame has
+                no gutter for. On a phone it was a second, smaller line of type
+                competing with the headline directly beneath it, on the one
+                composition with the least room to spend.
+
+                NOTHING IS LOST TO A SCREEN READER. The `<section>` above
+                carries `aria-label={CH_TITLES[i]}`, so the chapter still
+                announces itself by name; the eyebrow was restating out loud
+                what the landmark already said. */}
             <h2 className={'mchhead' + (c.headClass ?? '')}>{c.head}</h2>
             {/* Perps' aside is the pull quote. It is drawn here rather than in
                 `.qband`: that band exists because the stacked lockup could not

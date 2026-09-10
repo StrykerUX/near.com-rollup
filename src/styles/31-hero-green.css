@@ -109,11 +109,6 @@
 #stage .mdisc { color: var(--hero-ink) }
 #stage .perpsdisc b { color: var(--hero-ink) }
 
-/* the chapter eyebrow on a narrow frame. Its number was `--near-green`, which
-   is a green mark on a green field. */
-#stage .mchno b { color: var(--hero-ink) }
-#stage .mchno span { color: var(--hero-ink) }
-
 /* ---- THE BUTTON IS BLACK ----------------------------------------------- */
 /* `.btn-primary` is the green pill everywhere else on the site, including the
    light zone's closing CTA, so this is scoped rather than retuned at source. */
