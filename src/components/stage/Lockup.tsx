@@ -1,7 +1,6 @@
 import { CARDS, OFFER, PERPS_NOTE } from '@/lib/cards';
 import { PhoneShell } from './phone/PhoneShell';
-
-const LOGIN = 'https://near.com/login?ref=therollup';
+import { LOGIN_URL } from '@/lib/login';
 
 /**
  * THE CARD LOCKUP — copy left, phone centre, offer and CTA right.
@@ -57,7 +56,7 @@ export function Lockup() {
         {OFFER}
         <a
           className="btn btn-primary btn-lg ripple-cta"
-          href={LOGIN}
+          href={LOGIN_URL}
           target="_blank"
           rel="noopener"
           data-umami-event="cta-click"

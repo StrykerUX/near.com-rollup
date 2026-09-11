@@ -1,4 +1,4 @@
-const LOGIN = 'https://near.com/login?ref=therollup';
+import { LOGIN_URL } from '@/lib/login';
 
 /**
  * The mobile sticky CTA. Revealed only once the hero has left the viewport, so
@@ -14,7 +14,7 @@ export function MobileCta() {
     <div className="mobcta" id="mobcta" aria-hidden="true">
       <a
         className="btn btn-primary"
-        href={LOGIN}
+        href={LOGIN_URL}
         tabIndex={-1}
         target="_blank"
         rel="noopener"

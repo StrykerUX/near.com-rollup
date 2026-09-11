@@ -1,15 +1,18 @@
 /**
- * WHO SENT THEM, AND HOW THAT REACHES THE OTHER SIDE
+ * WHO SENT THEM
  * ==================================================================
- * Two jobs, and they are not the same job.
+ * One job: TELL OUR OWN COUNTER. Umami is on `window` once `script.js` has
+ * run, and every event this file sends carries the source with it, so a
+ * breakdown by door is one property away.
  *
- *   1. TELL OUR OWN COUNTER. Umami is on `window` once `script.js` has run,
- *      and every event this file sends carries the source with it, so a
- *      breakdown by door is one property away.
- *   2. TELL near.com. That is a DIFFERENT ORIGIN. Nothing we write here — no
- *      cookie, no storage, no header — is readable there. The only vehicle
- *      that crosses is the query string on the outgoing link, which is why
- *      `refFor()` exists and why `useAcquisition` rewrites eight `href`s.
+ * IT USED TO HAVE A SECOND JOB and no longer does. near.com is a different
+ * origin — nothing written here is readable there, and the query string on the
+ * outgoing link was the only vehicle that crossed — so this file also built a
+ * `ref` out of the source and a hook wrote it onto eight `href`s. That assumed
+ * `ref` was a free text field. It is an opaque code near.com issues, and a code
+ * with a door appended to it is not a code they know. The link is a constant
+ * now; see `lib/login.ts`. What the door reaches is this counter and nothing
+ * else.
  *
  * WHERE A SOURCE COMES FROM, in the order it is believed:
  *
@@ -48,17 +51,11 @@ export const SOURCE_COOKIE = 'acq_src';
 const MAX_AGE = 60 * 60 * 24 * 90;
 
 /**
- * WHAT `ref` SAYS WHEN WE KNOW NOTHING, and it is deliberately the value the
- * eight links were hardcoded to before any of this existed. The worst case of
- * the whole mechanism is therefore what shipped yesterday, not a broken link.
- */
-export const DEFAULT_REF = 'therollup';
-
-/**
- * A SOURCE IS `[a-z0-9-]`, AT MOST 32, AND NOTHING ELSE. This value is
- * concatenated into a url that leaves our origin, so it is whitelisted rather
- * than escaped — a stranger controls the path and the query it is read from,
- * and a whitelist cannot be wrong about a character it never passes.
+ * A SOURCE IS `[a-z0-9-]`, AT MOST 32, AND NOTHING ELSE. It is read from a path
+ * and a query a stranger controls, and it ends up in an analytics payload and a
+ * cookie — so it is whitelisted rather than escaped, because a whitelist cannot
+ * be wrong about a character it never passes. It no longer reaches any outgoing
+ * url; that is not a reason to loosen it.
  */
 const clean = (raw: string | null | undefined): string =>
   (raw ?? '').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 32);
@@ -162,10 +159,6 @@ export function resolveSource(): Acquisition {
   }
   return { source: clean(readCookie(SOURCE_COOKIE)), fresh: false };
 }
-
-/** What the `ref` on a near.com link should say for a given source. */
-export const refFor = (source: string): string =>
-  source ? `${DEFAULT_REF}-${source}` : DEFAULT_REF;
 
 /* ---- THE COUNTER ------------------------------------------------------- */
 

@@ -1,4 +1,4 @@
-const LOGIN = 'https://near.com/login?ref=therollup';
+import { LOGIN_URL } from '@/lib/login';
 
 /**
  * Two-state nav. It ships dark and transparent over the stage; the engine adds
@@ -25,8 +25,8 @@ export function Nav() {
         <span className="brandnear" aria-hidden="true" />
       </a>
       <span className="navspacer" />
-      <a className="btn btn-ghost" href={LOGIN} target="_blank" rel="noopener" data-umami-event="cta-click" data-umami-event-pos="nav-signin">Sign in</a>
-      <a className="btn btn-primary" href={LOGIN} target="_blank" rel="noopener" data-umami-event="cta-click" data-umami-event-pos="nav-create">Create account</a>
+      <a className="btn btn-ghost" href={LOGIN_URL} target="_blank" rel="noopener" data-umami-event="cta-click" data-umami-event-pos="nav-signin">Sign in</a>
+      <a className="btn btn-primary" href={LOGIN_URL} target="_blank" rel="noopener" data-umami-event="cta-click" data-umami-event-pos="nav-create">Create account</a>
     </nav>
   );
 }

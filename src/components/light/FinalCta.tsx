@@ -2,8 +2,7 @@
 import { useRef } from 'react';
 import { useCtaContract } from '@/hooks/useCtaContract';
 import { useCtaParallax } from '@/hooks/useCtaParallax';
-
-const LOGIN = 'https://near.com/login?ref=therollup';
+import { LOGIN_URL } from '@/lib/login';
 
 /**
  * The closing plate. It enters full-bleed and contracts to a resting inset —
@@ -27,7 +26,7 @@ export function FinalCta() {
         <div style={{ marginTop: 'var(--space-6)' }}>
           <a
             className="btn btn-primary btn-lg ripple-cta"
-            href={LOGIN}
+            href={LOGIN_URL}
             target="_blank"
             rel="noopener"
             data-umami-event="cta-click"

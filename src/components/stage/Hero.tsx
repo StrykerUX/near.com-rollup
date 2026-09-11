@@ -1,4 +1,4 @@
-const LOGIN = 'https://near.com/login?ref=therollup';
+import { LOGIN_URL } from '@/lib/login';
 
 /**
  * The hero type and the ask above the fold.
@@ -21,7 +21,7 @@ export function Hero() {
           <div className="herocta">
             <a
               className="btn btn-primary btn-lg ripple-cta"
-              href={LOGIN}
+              href={LOGIN_URL}
               target="_blank"
               rel="noopener"
               data-umami-event="cta-click"

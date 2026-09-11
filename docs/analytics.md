@@ -43,50 +43,61 @@ script loaded `afterInteractive`. Cosmetics are not worth a measurement.
 
 ## Reaching near.com
 
-`useAcquisition` rewrites the `ref` on all eight outgoing links to
-`therollup-<source>`. It has to be the query string: `near.com` is a different
-origin and nothing else we write crosses. With no source known it stays
-`therollup`, which is what the links were hardcoded to before any of this — so
-the worst case is the previous behaviour, not a broken link.
+The signup link is a constant. One string, one export, `src/lib/login.ts`, and
+nothing modifies it at runtime:
 
-Done in an effect rather than on the server: reading `cookies()` would turn a
-static route into one rendered per request.
+```
+https://near.com/login?ref=uykzkl1o&utm_source=perpscampaign&utm_medium=landing&utm_campaign=near_q3_perps
+```
 
-## Open: the ref carries the door, not the button
+`uykzkl1o` is a code **near.com issued**. It is opaque — eight characters that
+mean nothing on their own and everything in their database, which is where the
+account, the fee share and the 20% rebate are all keyed from. Do not concatenate
+to it, derive from it, or swap it for a name that reads better. The UTM tags
+belong to near.com's own analytics and arrived with the code; our campaign
+measurement is separate and never touches this url.
 
-`ref=therollup-nearperps` says which door they came through. It does not say
-which of the eight buttons they pressed, so near.com can report accounts per
-campaign but not per position.
+### The bug this replaced, because it is worth not repeating
 
-That gap matters because **a click is not an account**. Someone who presses the
-hero three seconds in is a different intent from someone who read five chapters
-first, and the second arrives far warmer. It is entirely possible for the hero
-to produce three times the clicks and half the accounts — in which case the
-click counts would point at the worse button.
+It was `?ref=therollup` in six hand-copied constants, and `useAcquisition`
+rewrote it to `?ref=therollup-<door>` at hydration so the ref would say which
+campaign the reader came through.
 
-Two shapes would close it:
+That was built on the assumption that `ref` is a free text field near.com stores
+verbatim. It is not. So near.com saw two different values depending on whether
+the page had hydrated yet — `therollup` and `therollup-nearperps` — and **both
+were invalid**. Weeks of signups went unattributed, and nothing anywhere
+reported an error: the link worked, the page loaded, the account was created.
 
-- `ref=therollup-nearperps-final` — one field, but eight values per campaign
-  where their report currently has one clean row.
-- `ref=therollup-nearperps&ref_pos=final` — leaves the working field alone,
-  needs their side to store a second parameter.
+Two failures made it, and the fix addresses both. The value was never verified
+with the party that reads it. And the string lived in six files with no import
+between them, so the served markup and the hydrated href could drift apart
+without anything failing.
 
-**Why it is not done.** The field is theirs, on their domain, in their system.
-If their pipeline validates `ref` against known values, an unregistered
-`therollup-nearperps-hero` drops silently — and that does not merely fail to
-add the position, it breaks the attribution that works today, with nothing
-reporting an error.
+## Open: near.com cannot tell which door an account came from
 
-Ask them first:
+The door (`/perps`, `/r/nearperps`) reaches our counter and stops there. It used
+to ride in the `ref`, which is what broke it.
 
-1. Is `ref` stored verbatim, or matched against a list?
-2. Can they report it broken down, or only as a campaign total?
-3. Would a second parameter be accepted instead of changing `ref`?
+That gap is real. A click is not an account, and without it there is no way to
+know whether one campaign's traffic converts better than another's once it
+leaves this page — only how many clicked.
 
-If the answer to (1) is "matched against a list", the only version with a
-chance is a coarse one — `-cold` for the buttons pressed before reading,
-`-warm` for those after. Two values instead of eight, and it still captures
-where most of the signal is.
+Two ways to close it, **both theirs to decide**:
+
+- **A code per door.** near.com issues `uykzkl1o` for this campaign; they could
+  issue another for the next. Cleanest, because it uses the field that already
+  carries attribution through their signup flow.
+- **`utm_content`.** The standard UTM field for distinguishing links inside one
+  campaign. Costs them nothing structurally, but only helps if their analytics
+  reads it and their signup pipeline keeps it.
+
+The same question applies one level down — which of the eight buttons was
+pressed. `pos` answers it on our side already; carrying it to theirs has the
+same two options and the same owner.
+
+**Do not guess at either again.** The last attempt to enrich this field broke
+the attribution it was trying to improve, silently, for weeks.
 
 ## Operational notes
 

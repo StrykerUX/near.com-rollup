@@ -1,33 +1,41 @@
 'use client';
 import { useEffect } from 'react';
-import { refFor, resolveSource, track } from '@/lib/analytics';
+import { resolveSource, track } from '@/lib/analytics';
 import { onDomChange } from '@/lib/domWatch';
 
-/** every outbound link to the signup, wherever it is drawn */
-const LOGIN_LINKS = 'a[href*="near.com/login"]';
+/**
+ * Every element that already declares a click event to Umami. It used to be
+ * `a[href*="near.com/login"]`, named for a url rewrite that no longer happens —
+ * what is stamped here is an analytics attribute, and the set that wants one is
+ * the set that reports clicks.
+ */
+const TRACKED_CTAS = '[data-umami-event]';
 
 /**
- * THE SOURCE, PUT WHERE THE OTHER SIDE CAN SEE IT
+ * THE SOURCE, RECORDED — AND NOT WRITTEN INTO THE SIGNUP LINK
  * ==================================================================
- * `lib/analytics.ts` works out WHICH door the reader came through. This puts
- * that answer on the eight links that leave for near.com, because a cookie on
- * `therollup.near.com` is unreadable from `near.com` and the query string is
- * the only thing that crosses.
+ * `lib/analytics.ts` works out WHICH door the reader came through. This banks
+ * that answer in a cookie and stamps it on the CTAs so Umami's click events
+ * carry it. It does NOT go anywhere near the outgoing url.
  *
- * WHY THE HREFS ARE PATCHED IN AN EFFECT AND NOT RENDERED. Reading a cookie on
- * the server means reading `cookies()`, and that turns a statically generated
- * route into one rendered per request — this page is a landing page whose whole
- * argument is that it arrives fast, and paying the CDN for an attribution tag
- * is the wrong trade. The cost of doing it here instead is a window between
- * first paint and hydration in which the links still say what the markup said.
- * THAT FALLBACK IS EXACTLY `ref=therollup`, the value every one of them was
- * hardcoded to before this existed — so the worst case of the entire mechanism
- * is the behaviour that already shipped, not a broken link.
+ * IT USED TO. This hook rewrote `?ref=therollup` to `?ref=therollup-nearperps`
+ * on every signup link, so the ref would say not just which partner but which
+ * of their campaigns. That was built on the assumption that `ref` is a free
+ * text field near.com stores verbatim — and it is not. near.com issues opaque
+ * codes (`lib/login.ts`), so appending a door to one invalidates it exactly as
+ * changing a character would. Between the served markup and the rewrite, their
+ * side saw two different values, both wrong, and attributed nothing.
+ *
+ * SO THE LINK IS A CONSTANT NOW and the door reaches only our own counter. That
+ * is a real loss on their side — they can no longer tell which door produced an
+ * account — and closing it needs either a code issued per door or a `utm_content`
+ * they agree to read. Both are theirs to decide; neither is worth guessing at
+ * again. See `docs/analytics.md`.
  *
  * THE OBSERVER IS NOT DEFENSIVE PADDING. `useNarrow` swaps the whole stage
  * between two compositions on a `matchMedia` change, so crossing 1080px
- * unmounts four of these anchors and mounts different ones. Patching once on
- * mount would leave a resized window handing out untagged links.
+ * unmounts four of these CTAs and mounts different ones. Stamping once on mount
+ * would leave a resized window sending click events with no door on them.
  *
  * THE URL IS LEFT ALONE, AND THAT IS THE CORRECTION. A previous version tidied
  * `/r/nearperps?utm_campaign=...` down to `/` once the source was banked. It
@@ -46,23 +54,14 @@ const LOGIN_LINKS = 'a[href*="near.com/login"]';
 export function useAcquisition() {
   useEffect(() => {
     const { source, fresh } = resolveSource();
-    const ref = refFor(source);
 
+    /* Umami turns `data-umami-event-source` into a `source` property on the
+       click event it fires itself, which is the only reason to walk the DOM
+       here at all. No href is read and none is written. */
     const patch = () => {
-      document.querySelectorAll<HTMLAnchorElement>(LOGIN_LINKS).forEach((a) => {
-        try {
-          const url = new URL(a.href);
-          if (url.searchParams.get('ref') !== ref) {
-            url.searchParams.set('ref', ref);
-            a.href = url.toString();
-          }
-        } catch {
-          /* an href that is not a url is not ours to fix */
-        }
-        /* Umami turns `data-umami-event-source` into a `source` property on
-           the click event, so the counter and near.com agree on the door
-           without the two being wired to each other. */
-        if (source) a.dataset.umamiEventSource = source;
+      if (!source) return;
+      document.querySelectorAll<HTMLElement>(TRACKED_CTAS).forEach((el) => {
+        el.dataset.umamiEventSource = source;
       });
     };
 

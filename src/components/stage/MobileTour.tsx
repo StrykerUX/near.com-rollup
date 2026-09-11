@@ -3,8 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CARDS, OFFER, PERM_BODY, PERM_WORDS, PERPS_NOTE } from '@/lib/cards';
 import { CH_TITLES } from '@/lib/schedule';
 import { ChapterScreen } from './phone/AppDevice';
-
-const LOGIN = 'https://near.com/login?ref=therollup';
+import { LOGIN_URL } from '@/lib/login';
 
 /* NO OBSERVER, NO GATE. The gate below is an optimisation — four demo flows
    are three too many to run at once — and a browser that cannot express it
@@ -78,7 +77,7 @@ export function MobileTour() {
         {OFFER}
         <a
           className="btn btn-primary btn-lg"
-          href={LOGIN}
+          href={LOGIN_URL}
           target="_blank"
           rel="noopener"
           data-umami-event="cta-click"
@@ -138,7 +137,7 @@ export function MobileTour() {
         <p className="mclosebody">{PERM_BODY}</p>
         <a
           className="btn btn-primary btn-lg"
-          href={LOGIN}
+          href={LOGIN_URL}
           target="_blank"
           rel="noopener"
           data-umami-event="cta-click"
