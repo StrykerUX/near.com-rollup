@@ -24,8 +24,8 @@ export function Footer() {
           </div>
           <div className="fcol">
             <h4>Product</h4>
-            <a href="https://near.com/home">Dashboard</a>
-            <a href="https://near.com/support">Support</a>
+            <a href="https://near.com/login?ref=therollup">Dashboard</a>
+            <a href="https://near.com/login?ref=therollup">Support</a>
           </div>
         </div>
 
@@ -58,8 +58,8 @@ export function Footer() {
         <div className="fbot">
           <span>© 2026 near.com. Built on NEAR.</span>
           <span style={{ display: 'flex', gap: 20 }}>
-            <a href="https://near.com/terms">Terms</a>
-            <a href="https://near.com/privacy">Privacy</a>
+            <a href="https://near.com/terms" target="_blank" rel="noopener">Terms</a>
+            <a href="https://near.com/privacy" target="_blank" rel="noopener">Privacy</a>
           </span>
         </div>
       </div>
