@@ -8,8 +8,8 @@
  *      breakdown by door is one property away.
  *   2. TELL near.com. That is a DIFFERENT ORIGIN. Nothing we write here — no
  *      cookie, no storage, no header — is readable there. The only vehicle
- *      that crosses is the query string on the outgoing link, which is why
- *      `refFor()` exists and why `useAcquisition` rewrites eight `href`s.
+ *      that crosses is the query string on the outgoing link, and the `ref`
+ *      on those links stays a fixed `therollup` — see `useAcquisition`.
  *
  * WHERE A SOURCE COMES FROM, in the order it is believed:
  *
@@ -46,13 +46,6 @@ const SOURCE_PATHS = new Set(['perps']);
 export const SOURCE_COOKIE = 'acq_src';
 /** ninety days: long enough to survive a newsletter read weeks late */
 const MAX_AGE = 60 * 60 * 24 * 90;
-
-/**
- * WHAT `ref` SAYS WHEN WE KNOW NOTHING, and it is deliberately the value the
- * eight links were hardcoded to before any of this existed. The worst case of
- * the whole mechanism is therefore what shipped yesterday, not a broken link.
- */
-export const DEFAULT_REF = 'therollup';
 
 /**
  * A SOURCE IS `[a-z0-9-]`, AT MOST 32, AND NOTHING ELSE. This value is
@@ -162,10 +155,6 @@ export function resolveSource(): Acquisition {
   }
   return { source: clean(readCookie(SOURCE_COOKIE)), fresh: false };
 }
-
-/** What the `ref` on a near.com link should say for a given source. */
-export const refFor = (source: string): string =>
-  source ? `${DEFAULT_REF}-${source}` : DEFAULT_REF;
 
 /* ---- THE COUNTER ------------------------------------------------------- */
 

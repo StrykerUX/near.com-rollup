@@ -43,50 +43,9 @@ script loaded `afterInteractive`. Cosmetics are not worth a measurement.
 
 ## Reaching near.com
 
-`useAcquisition` rewrites the `ref` on all eight outgoing links to
-`therollup-<source>`. It has to be the query string: `near.com` is a different
-origin and nothing else we write crosses. With no source known it stays
-`therollup`, which is what the links were hardcoded to before any of this — so
-the worst case is the previous behaviour, not a broken link.
-
-Done in an effect rather than on the server: reading `cookies()` would turn a
-static route into one rendered per request.
-
-## Open: the ref carries the door, not the button
-
-`ref=therollup-nearperps` says which door they came through. It does not say
-which of the eight buttons they pressed, so near.com can report accounts per
-campaign but not per position.
-
-That gap matters because **a click is not an account**. Someone who presses the
-hero three seconds in is a different intent from someone who read five chapters
-first, and the second arrives far warmer. It is entirely possible for the hero
-to produce three times the clicks and half the accounts — in which case the
-click counts would point at the worse button.
-
-Two shapes would close it:
-
-- `ref=therollup-nearperps-final` — one field, but eight values per campaign
-  where their report currently has one clean row.
-- `ref=therollup-nearperps&ref_pos=final` — leaves the working field alone,
-  needs their side to store a second parameter.
-
-**Why it is not done.** The field is theirs, on their domain, in their system.
-If their pipeline validates `ref` against known values, an unregistered
-`therollup-nearperps-hero` drops silently — and that does not merely fail to
-add the position, it breaks the attribution that works today, with nothing
-reporting an error.
-
-Ask them first:
-
-1. Is `ref` stored verbatim, or matched against a list?
-2. Can they report it broken down, or only as a campaign total?
-3. Would a second parameter be accepted instead of changing `ref`?
-
-If the answer to (1) is "matched against a list", the only version with a
-chance is a coarse one — `-cold` for the buttons pressed before reading,
-`-warm` for those after. Two values instead of eight, and it still captures
-where most of the signal is.
+Every outgoing link is `https://near.com/login?ref=therollup`, and nothing
+modifies it at runtime. The door the reader came through stays on our side, as
+the `source` property on Umami events.
 
 ## Operational notes
 
