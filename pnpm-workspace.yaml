@@ -1,3 +1,14 @@
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+# Security patches for transitive dependencies that their parents have not
+# released yet. Every range is scoped to the vulnerable versions only, so the
+# override stays within the same major that the parent asks for, and each can
+# be removed once `pnpm audit` is clean without it.
+overrides:
+  'brace-expansion@<1.1.21': ^1.1.21           # GHSA-qhr7-859c-m2p7, -6j4f-fj2g-mc7p, -q2hr-2g5m-vwhr (via eslint>minimatch@3)
+  'brace-expansion@>=4.0.0 <5.0.12': ^5.0.12   # same advisories (via typescript-eslint>minimatch@10)
+  'minimatch@>=7.0.0 <11.0.1': ^11.0.1         # GHSA-g3hv-75wg-m249 (via typescript-eslint)
+  'zod@>=4.0.0 <4.6.6': ^4.6.6                 # GHSA-mrhx-c7xc-m3w5 (via eslint-plugin-react-hooks)
+  'source-map-js@<1.2.2': ^1.2.2               # GHSA-68fv-2mgg-jv7q (via @tailwindcss/node)
